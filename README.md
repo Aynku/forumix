@@ -154,23 +154,45 @@ Folgenden Block einfügen:
 # Aynku Forum – nginx-Routing + Schutz
 # ════════════════════════════════════════════════════════════════
 
-# Sensible Dateien blockieren
+# Sensible Einzeldateien blockieren
 location = /config.php           { deny all; return 403; }
 location = /bootstrap.php        { deny all; return 403; }
 location = /install.sql          { deny all; return 403; }
 location = /README.md            { deny all; return 403; }
 location = /CHANGELOG.md         { deny all; return 403; }
+location = /.htaccess            { deny all; return 403; }
 
-location ~ ^/(lib|views|pages|lang|cache)/ { deny all; return 403; }
-location ~ ^/install/migrations/           { deny all; return 403; }
-location = /install/install.sql            { deny all; return 403; }
+# Verzeichnisse, die nie über HTTP erreichbar sein dürfen.
+#
+# Warum `^~` und kein regulärer Ausdruck: ein `^~`-Präfix schlägt bei nginx
+# JEDEN regulären Ausdruck — unabhängig von der Reihenfolge im File. Mit
+# `location ~ ^/(lib|cache)/` hinge die Wirkung davon ab, ob dieser Block
+# vor oder nach der `location ~ \.php$` des Panels landet. Und `cache/`
+# enthält übersetzte Templates als lauffähiges PHP, `backup/` die DB-Dumps.
+location ^~ /lib/       { deny all; }
+location ^~ /views/     { deny all; }
+location ^~ /views_new/ { deny all; }   # Vorlagen im Klartext
+location ^~ /pages/     { deny all; }
+location ^~ /lang/      { deny all; }
+location ^~ /cache/     { deny all; }   # übersetzte Templates = PHP
+location ^~ /backup/    { deny all; }   # DB-Dumps
+location ^~ /install/migrations/ { deny all; }
+location = /install/install.sql  { deny all; }
+
+autoindex off;
 
 location ~ /\. { return 404; }
 location ~ ~$  { return 404; }
-location ~ \.(bak|sql|log|sqlite|sqlite3|db)$ { return 404; }
+location ~ \.(bak|sql|log|sqlite|sqlite3|db|tpl\.html|orig|dist|ini)$ { return 404; }
 
-# PHP in uploads/ blockieren (XSS-Schutz)
-location ~* ^/uploads/.*\.(php|phtml|phar|cgi|pl|py|rb|sh)$ {
+# Hochgeladenes wird ausgeliefert, aber niemals ausgeführt.
+#
+# Das MUSS ein regulärer Ausdruck bleiben (Bilder aus uploads/ sollen ja
+# weiter raus), und damit zählt hier die Reihenfolge: nginx nimmt bei
+# regulären Ausdrücken den ERSTEN Treffer. Diese Regel muss also vor der
+# allgemeinen `location ~ \.php$` stehen, sonst landet die Datei doch bei
+# PHP-FPM. Bei Panels, die den Custom-Block oben einsetzen, passt das.
+location ~* ^/uploads/.*\.(php|phtml|phar|phps|php[0-9]|cgi|pl|py|rb|sh)$ {
     deny all;
     return 403;
 }
@@ -216,6 +238,42 @@ nginx -t && systemctl reload nginx
 
 Bei einem eigenen nginx ohne Panel: gleicher Block in den `server { }`-Block der Domain. Datei meist unter `/etc/nginx/sites-available/deinedomain.tld`.
 
+#### Variante 3: Orbitalpanel
+
+Nicht in die vhost-Datei schreiben — die wird bei jeder Änderung an der Domain neu erzeugt und überschreibt Handarbeit. Der Block gehört ins Feld **Domain → nginx-Direktiven**. Von dort setzt ihn die Vorlage an genau die Stelle oberhalb der PHP-`location`, an der die Reihenfolge stimmt.
+
+Das Panel bringt einen **.htaccess-Konverter** mit: die vorhandene `.htaccess` einlesen lassen, das Ergebnis übernehmen und um den Block oben ergänzen. Was der Konverter nicht sicher übersetzen kann, markiert er als `# [BITTE PRÜFEN]` statt still etwas Falsches zu erzeugen.
+
+Gespeichert wird erst, wenn `nginx -t` die Konfiguration annimmt — eine kaputte Direktive kann die Domain nicht abschießen.
+
+---
+
+### Prüfen, ob es greift
+
+Nach dem Einbau von außen messen, nicht auf der Platte nachsehen. Erwartet wird durchgehend `403`:
+
+```bash
+for u in /views_new/thread.tpl.html /modules/faq/install.sql \
+         /cache/templates/error.php /backup/index.html \
+         /lib/db.php /lang/de.php /uploads/avatars/test.php; do
+  printf '%-38s ' "$u"
+  curl -s -o /dev/null -w '%{http_code}\n' "https://deine-domain.tld$u"
+done
+```
+
+Und die Gegenprobe — das hier muss weiter `200` liefern, sonst ist zu viel zu:
+
+```bash
+for u in / /login.php /members.php /assets/style.css /api/quicksearch.php?q=te; do
+  printf '%-38s ' "$u"
+  curl -s -o /dev/null -w '%{http_code}\n' "https://deine-domain.tld$u"
+done
+```
+
+> **Vorsicht bei der Auswertung:** Eine nicht existierende Datei liefert wegen `try_files` ebenfalls `200` — nämlich die Startseite, nicht die Datei. Wer `/backup/irgendwas.sql` testet und `200` sieht, hat nicht zwingend ein Leck gefunden. Immer mit `%{size_download}` und `%{content_type}` gegenprüfen: 17 KB `text/html` ist die Startseite.
+>
+> Umgekehrt ist bei `/uploads/…/test.php` der Wechsel von `404` auf `403` der eigentliche Beweis: der nackte `404` kommt von PHP-FPM („Skript nicht da") — die Anfrage war also bei PHP. Erst `403` heißt, sie endet vorher.
+
 ---
 
 ### Apache-Konfiguration (für Setup A als Fallback, oder C als Hauptkonfig)
@@ -227,10 +285,14 @@ a2enmod rewrite
 systemctl reload apache2
 ```
 
-Inhalt der `.htaccess`:
+Inhalt der `.htaccess` im Root:
 - Routing `/xyz.php` → `/index.php?_page=xyz`
 - Schutz für `lib/`, `views/`, `pages/`, `lang/`, `cache/`
 - PHP-Sperre in `uploads/`
+
+Zusätzlich liegen eigene `.htaccess` in `lib/`, `views/`, `uploads/` und `backup/`. Die bleiben bewusst im Paket, damit eine Apache-Installation ohne Zutun geschützt ist.
+
+> **Unter reinem nginx (Setup B) tun diese Dateien nichts.** nginx liest keine `.htaccess` — weder im Root noch in den Unterverzeichnissen, und es gibt auch keine Warnung. Ein `Deny from all` in `backup/` sieht nach Schutz aus und ist unter nginx wirkungslos. Wer von Apache umzieht, muss jede dieser Dateien im nginx-Block nachbilden; genau dafür ist der Block oben gedacht.
 
 **Bei Setup A:** Die `.htaccess` ist deine zweite Sicherheitsschicht — sie greift falls die nginx-Custom-Config mal fehlerhaft oder weg ist. Einfach drin lassen, sie schadet nicht.
 
@@ -331,6 +393,7 @@ Falls eine Migration nötig wäre (bei MINOR-Updates), liegt sie in `install/mig
 - ✅ Owner-Account: starkes Passwort + 2FA aktivieren
 - ✅ DB-User nur auf das eine Schema berechtigt
 - ✅ `config.php` darf nicht öffentlich lesbar sein (siehe nginx-Block)
+- ✅ `backup/` von außen prüfen, **bevor** das erste Backup erzeugt wird — der Dateiname enthält nur einen Zeitstempel und ist damit erratbar; ein erreichbarer Dump ist die komplette Datenbank inklusive Passwort-Hashes und privater Nachrichten
 
 ### Regelmäßig
 - 🔄 PHP-Version aktuell halten
