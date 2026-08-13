@@ -1,0 +1,21 @@
+<?php if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); } ?>
+<?php /** @var bool $ok */ ?>
+<div style="max-width:460px;margin:0 auto;text-align:center">
+  <div class="form-card">
+    <?php if ($ok): ?>
+      <div style="font-size:48px;margin-bottom:10px">✅</div>
+      <h2 style="font-size:18px;margin-bottom:8px">E-Mail bestätigt!</h2>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">
+        Dein Konto ist jetzt aktiv. Du kannst dich anmelden.
+      </p>
+      <a href="<?= e(FORUM_URL) ?>/login.php" class="btn btn-primary">→ Zum Login</a>
+    <?php else: ?>
+      <div style="font-size:48px;margin-bottom:10px">❌</div>
+      <h2 style="font-size:18px;margin-bottom:8px">Link ungültig oder abgelaufen</h2>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">
+        Der Bestätigungslink konnte nicht verifiziert werden. Er war vielleicht schon einmal verwendet oder ist abgelaufen.
+      </p>
+      <a href="<?= e(FORUM_URL) ?>/index.php" class="btn btn-ghost">Zur Startseite</a>
+    <?php endif; ?>
+  </div>
+</div>

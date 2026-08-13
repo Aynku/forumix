@@ -1,0 +1,157 @@
+{% set isFiltered = boardId or author or dateFrom or dateTo or hasReactions or hasAttachments or sortBy != 'date_desc' %}
+<div class="section-heading">🔍 {{ t('search') }}</div>
+
+{% if currentUser and savedSearches %}
+  <div class="saved-searches-bar">
+    <div class="saved-searches-label">⭐ Deine gespeicherten Suchen:</div>
+    <div class="saved-searches-items">
+      {% for s in savedSearches %}
+        <span class="saved-search-chip">
+          <a href="?saved=load&id={{ s.search_id }}">{{ s.name }}</a>
+          <a href="?saved=delete&id={{ s.search_id }}&csrf={{ csrfToken }}"
+             class="saved-search-x"
+             title="Löschen"
+             onclick="return confirm('Diese gespeicherte Suche löschen?')">✕</a>
+        </span>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+<form method="get" action="{{ url('/search.php') }}" class="form-card search-form">
+  <div class="search-main-row">
+    <input type="text" name="q" value="{{ query }}" placeholder="🔍 Suchbegriff (min. 3 Zeichen)…" autofocus>
+    <button type="submit" class="btn btn-primary">Suchen</button>
+    <button type="button" class="btn btn-ghost" id="toggle-filters">
+      <span id="filter-toggle-label">⚙️ Filter {{ isFiltered ? '(aktiv)' : '' }}</span>
+    </button>
+  </div>
+
+  <div class="search-filters {{ isFiltered ? 'open' : '' }}" id="search-filters">
+    <div class="search-filter-grid">
+      <div class="form-row">
+        <label>📋 Forum</label>
+        <select name="board">
+          <option value="0">– alle Foren –</option>
+          {% for b in boards %}
+            <option value="{{ b.board_id }}" {{ boardId == b.board_id ? 'selected' : '' }}>
+              {{ b.cat }} › {{ b.title }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label>👤 Autor (Benutzername)</label>
+        <input type="text" name="author_name" value="{{ author }}" placeholder="z.B. Aynku">
+      </div>
+
+      <div class="form-row">
+        <label>📅 Datum von</label>
+        <input type="date" name="date_from" value="{{ dateFrom }}">
+      </div>
+
+      <div class="form-row">
+        <label>📅 Datum bis</label>
+        <input type="date" name="date_to" value="{{ dateTo }}">
+      </div>
+
+      <div class="form-row">
+        <label>🔀 Sortierung</label>
+        <select name="sort">
+          <option value="date_desc" {{ sortBy == 'date_desc' ? 'selected' : '' }}>Neueste zuerst</option>
+          <option value="date_asc"  {{ sortBy == 'date_asc'  ? 'selected' : '' }}>Älteste zuerst</option>
+          <option value="reactions" {{ sortBy == 'reactions' ? 'selected' : '' }}>Meiste Reaktionen</option>
+          <option value="replies"   {{ sortBy == 'replies'   ? 'selected' : '' }}>Meiste Antworten</option>
+          <option value="views"     {{ sortBy == 'views'     ? 'selected' : '' }}>Meiste Aufrufe</option>
+        </select>
+      </div>
+
+      <div class="form-row search-filter-checkboxes">
+        <label>🎯 Erweitert</label>
+        <label class="search-chk">
+          <input type="checkbox" name="has_reactions" value="1" {{ hasReactions ? 'checked' : '' }}>
+          ⭐ Mit Reaktionen
+        </label>
+        <label class="search-chk">
+          <input type="checkbox" name="has_attachments" value="1" {{ hasAttachments ? 'checked' : '' }}>
+          📎 Mit Anhängen
+        </label>
+      </div>
+    </div>
+
+    {% if currentUser and hasQuery %}
+      <div class="search-save-row">
+        <input type="text" id="save_name" placeholder="Name für diese Suche, z.B. „Aynkus News"" maxlength="100" style="max-width:280px">
+        <button type="button" class="btn btn-ghost btn-sm" id="save-search-btn">⭐ Diese Suche speichern</button>
+      </div>
+    {% endif %}
+  </div>
+</form>
+
+{% if hasQuery %}
+  {% if not results %}
+    <div class="card" style="padding:30px;text-align:center;color:var(--text-faint)">
+      Keine Treffer. Versuche andere Suchbegriffe oder weniger Filter.
+    </div>
+  {% else %}
+    <div style="margin-bottom:8px;color:var(--text-muted);font-size:13px">
+      {{ total }} Treffer
+    </div>
+    <div class="card" style="padding:6px">
+      {% for r in results %}
+        <a href="{{ url('/thread.php?id=') }}{{ r.thread_id }}#post{{ r.post_id }}"
+           class="search-result">
+          <div class="search-result-meta">
+            {{ r.cat_title }} › {{ r.board_title }}
+            · von <strong>{{ r.author }}</strong>
+            · {{ format_date(r.post_date) }}
+          </div>
+          <div class="search-result-title">{{ r.thread_title }}</div>
+          <div class="search-result-snippet">{{ r.snippet|raw }}…</div>
+          <div class="search-result-stats">
+            💬 {{ r.reply_count }}
+            {% if r.reaction_count > 0 %} · ⭐ {{ r.reaction_count }}{% endif %}
+            {% if r.attachment_count > 0 %} · 📎 {{ r.attachment_count }}{% endif %}
+            · 👁 {{ r.view_count }}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+    {{ paginationHtml|raw }}
+  {% endif %}
+{% endif %}
+
+<form method="post" action="?saved=save" id="save-search-form" style="display:none">
+  <input type="hidden" name="csrf" value="{{ csrfToken }}">
+  <input type="hidden" name="save_name" id="save_name_hidden">
+  <input type="hidden" name="q" value="{{ query }}">
+  <input type="hidden" name="board" value="{{ boardId }}">
+  <input type="hidden" name="author_name" value="{{ author }}">
+  <input type="hidden" name="date_from" value="{{ dateFrom }}">
+  <input type="hidden" name="date_to" value="{{ dateTo }}">
+  <input type="hidden" name="sort" value="{{ sortBy }}">
+  {% if hasReactions %}<input type="hidden" name="has_reactions" value="1">{% endif %}
+  {% if hasAttachments %}<input type="hidden" name="has_attachments" value="1">{% endif %}
+</form>
+
+<script>
+(function() {
+  const toggle = document.getElementById('toggle-filters');
+  const filters = document.getElementById('search-filters');
+  toggle?.addEventListener('click', () => filters.classList.toggle('open'));
+
+  const saveBtn = document.getElementById('save-search-btn');
+  const saveInput = document.getElementById('save_name');
+  saveBtn?.addEventListener('click', function() {
+    const name = (saveInput?.value || '').trim();
+    if (!name) {
+      saveInput?.focus();
+      alert('Bitte einen Namen für die Suche eingeben.');
+      return;
+    }
+    document.getElementById('save_name_hidden').value = name;
+    document.getElementById('save-search-form').submit();
+  });
+})();
+</script>

@@ -1,0 +1,40 @@
+<div class="section-heading">
+  🏆 Achievements von <a href="{{ url('/profile.php?id=') }}{{ profile.user_id }}">{{ profile.username }}</a>
+</div>
+
+<div class="stat-grid" style="margin-bottom:18px">
+  <div class="stat-box">
+    <div class="stat-icon">🏅</div>
+    <div class="stat-num">{{ count(earned) }} / {{ total }}</div>
+    <div class="stat-label">Trophäen</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-icon">⭐</div>
+    <div class="stat-num">{{ number_format(points, 0, ',', '.') }}</div>
+    <div class="stat-label">Punkte</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-icon">📊</div>
+    <div class="stat-num">{{ total > 0 ? round(count(earned) / total * 100) : 0 }}%</div>
+    <div class="stat-label">Fortschritt</div>
+  </div>
+</div>
+
+<div class="achievements-grid">
+  {% for a in overview %}
+    {% set isEarned = a.earned %}
+    <div class="achievement-card {{ isEarned ? 'earned' : 'locked' }}">
+      <div class="achievement-icon">{{ a.icon|raw }}</div>
+      <div class="achievement-title">{{ a.title }}</div>
+      <div class="achievement-desc">{{ a.description }}</div>
+      <div class="achievement-meta">
+        <span class="achievement-points">+{{ a.points }} Pkt</span>
+        {% if isEarned %}
+          <span class="achievement-earned">✓ {{ format_date(a.earned_at) }}</span>
+        {% else %}
+          <span class="achievement-locked">🔒 Noch nicht</span>
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div>

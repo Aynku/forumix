@@ -1,0 +1,265 @@
+{% if profile.profile_banner %}
+<div class="profile-banner" style="background-image:url('{{ url('/uploads/avatars/') }}{{ profile.profile_banner | escape  }}')"></div>
+{% endif %}
+
+<div class="profile-hero {% if profile.profile_banner %}with-banner{% endif %}">
+  <img class="profile-hero-avatar zoomable-avatar"
+       src="{{ avatar_url(profile) }}"
+       alt="{{ profile.username }}"
+       data-username="{{ profile.username }}">
+
+  <div class="profile-hero-info">
+
+    <div class="profile-username-row">
+      <h2 class="profile-username">
+        {{ online_dot(profile) | raw }}
+        {{ profile.username }}
+      </h2>
+      <div class="profile-badge-row">
+        {% if profile.is_owner %}
+          <span class="post-admin-badge" style="background:#7c3aed !important">👑 Owner</span>
+        {% elseif profile.is_banned %}
+          <span class="post-banned-badge">Gesperrt</span>
+        {% elseif profile.is_admin %}
+          <span class="post-admin-badge">Admin</span>
+        {% elseif profile.is_mod %}
+          <span class="post-mod-badge">Mod</span>
+        {% else %}
+          {{ rank_badge(profile.rank, profile.post_count) | raw }}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="profile-stats-grid">
+      <div class="profile-stat-card">
+        <span class="profile-stat-icon">📝</span>
+        <div class="profile-stat-content">
+          <strong>{{ profile.post_count }}</strong>
+          <span>Beiträge</span>
+        </div>
+      </div>
+      <div class="profile-stat-card">
+        <span class="profile-stat-icon">👍</span>
+        <div class="profile-stat-content">
+          <strong>{{ user_received_reactions(profile.user_id) }}</strong>
+          <span>Reaktionen</span>
+        </div>
+      </div>
+      <a href="{{ url('/achievements.php?user=') }}{{ profile.user_id }}" class="profile-stat-card profile-stat-clickable">
+        <span class="profile-stat-icon">🏆</span>
+        <div class="profile-stat-content">
+          <strong>{{ user_achievement_count(profile.user_id) }}</strong>
+          <span>Achievements</span>
+        </div>
+      </a>
+      <div class="profile-stat-card">
+        <span class="profile-stat-icon">⭐</span>
+        <div class="profile-stat-content">
+          <strong>{{ user_total_points(profile.user_id) }}</strong>
+          <span>Punkte</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-meta">
+      📅 Dabei seit <strong>{{ profile.registered_at | date('d.m.Y') }}</strong>
+      · 🆔 Mitglied <strong>#{{ profile.user_id }}</strong>
+      {# v0.18.52: last_activity_at (Pageviews+Posts) statt last_login (nur echte Logins).
+         Fallback auf last_login wenn last_activity_at noch nicht befüllt ist. #}
+      {% if profile.last_activity_at %}
+        · 🕐 Zuletzt aktiv <strong>{{ format_date(profile.last_activity_at) }}</strong>
+      {% elseif profile.last_login %}
+        · 🕐 Zuletzt aktiv <strong>{{ format_date(profile.last_login) }}</strong>
+      {% endif %}
+      · {{ extendedStats.activity_level.icon }}
+      <strong style="color:{{ extendedStats.activity_level.color }}">{{ extendedStats.activity_level.label }}</strong>
+    </div>
+
+    <div class="profile-actions">
+      {% if currentUser and currentUser.user_id != profile.user_id %}
+        <a href="{{ url('/pm.php?new=1&to=') }}{{ profile.user_id }}" class="btn btn-primary btn-sm">📬 PN senden</a>
+      {% endif %}
+      {% if currentUser and currentUser.user_id == profile.user_id %}
+        <a href="{{ url('/settings.php') }}" class="btn btn-primary btn-sm">⚙️ Profil bearbeiten</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{# ─── v0.18.50: Erweiterte Aktivitäts-Übersicht ─── #}
+<div class="section-heading">📊 Aktivität</div>
+<div class="card" style="margin-bottom:16px;padding:16px">
+  <div class="profile-activity-grid">
+    <div class="profile-activity-row">
+      <span class="profile-activity-icon">💬</span>
+      <span class="profile-activity-label">Threads erstellt</span>
+      <strong class="profile-activity-value">{{ extendedStats.threads_count }}</strong>
+    </div>
+    <div class="profile-activity-row">
+      <span class="profile-activity-icon">📝</span>
+      <span class="profile-activity-label">Beiträge gesamt</span>
+      <strong class="profile-activity-value">{{ profile.post_count }}</strong>
+    </div>
+    <div class="profile-activity-row">
+      <span class="profile-activity-icon">↑</span>
+      <span class="profile-activity-label">Reaktionen erhalten</span>
+      <strong class="profile-activity-value">{{ user_received_reactions(profile.user_id) }}</strong>
+    </div>
+    <div class="profile-activity-row">
+      <span class="profile-activity-icon">↓</span>
+      <span class="profile-activity-label">Reaktionen vergeben</span>
+      <strong class="profile-activity-value">{{ extendedStats.reactions_given }}</strong>
+    </div>
+    <div class="profile-activity-row">
+      <span class="profile-activity-icon">📅</span>
+      <span class="profile-activity-label">Posts in den letzten 30 Tagen</span>
+      <strong class="profile-activity-value">{{ extendedStats.posts_last_30d }}</strong>
+    </div>
+  </div>
+</div>
+
+{# ─── v0.18.50: Top-Beiträge ─── #}
+{% if topThreads %}
+<div class="section-heading">🏆 Top-Threads</div>
+<div class="card" style="margin-bottom:16px">
+  <table class="forum-table">
+    <thead>
+      <tr>
+        <th>Thread</th>
+        <th style="width:140px;text-align:right">Reaktionen</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tt in topThreads %}
+      <tr>
+        <td>
+          <a href="{{ url('/thread.php?id=') }}{{ tt.thread_id }}">
+            {{ tt.title }}
+          </a>
+        </td>
+        <td style="text-align:right;font-size:13px">
+          {% if tt.reactions_total > 0 %}
+            <strong>👍 {{ tt.reactions_total }}</strong>
+          {% else %}
+            <span style="color:var(--text-faint)">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% set visibleFields = profile_visible_fields(profile, currentUser) %}
+{% if visibleFields %}
+<div class="section-heading">👤 Über {{ profile.username }}</div>
+<div class="card" style="margin-bottom:16px;padding:14px 16px">
+  <div class="profile-fields-grid">
+    {% for field in visibleFields %}
+      <div class="profile-field-card" {% if field.type == 'textarea' or field.type == 'text-wide' %}style="grid-column:1 / -1"{% endif %}>
+        <span class="profile-field-card-icon">{{ field.icon | raw }}</span>
+        <div class="profile-field-card-content">
+          <div class="profile-field-card-label">{{ field.label }}</div>
+          <div class="profile-field-card-value {% if field.type == 'textarea' %}long-text{% endif %}">
+            {% if field.type == 'textarea' %}
+              {{ bbcode(field.value) | raw }}
+            {% else %}
+              {{ field.value }}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if profile.signature %}
+<div class="card" style="margin-bottom:16px">
+  <div class="card-header"><div class="card-title">✍️ Signatur</div></div>
+  <div class="card-body" style="padding:14px 16px;font-size:13px">
+    {{ bbcode(profile.signature) | raw }}
+  </div>
+</div>
+{% endif %}
+
+<div class="section-heading">📰 Letzte Beiträge</div>
+<div class="card" style="margin-bottom:16px">
+  <table class="forum-table">
+    <thead><tr><th>Thread</th><th style="width:180px">Datum</th></tr></thead>
+    <tbody>
+      {% if not latestPosts %}
+        <tr><td colspan="2" style="text-align:center;color:var(--text-faint);padding:20px">
+          {% if isOwner %}
+            Du hast noch keine Beiträge geschrieben. Worauf wartest du? 😊
+          {% else %}
+            Noch keine Beiträge.
+          {% endif %}
+        </td></tr>
+      {% endif %}
+      {% for lp in latestPosts %}
+      <tr>
+        <td>
+          <a href="{{ url('/thread.php?id=') }}{{ lp.thread_id }}#post{{ lp.post_id }}">
+            {{ lp.thread_title }}
+          </a>
+        </td>
+        <td style="font-size:12px;color:var(--text-muted)">{{ format_date(lp.created_at) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if isMod and ipHistory %}
+<details class="mod-ip-history" {% if count(ipHistory) <= 10 %}open{% endif %}>
+  <summary class="mod-ip-summary">
+    <span>🔍 IP-Verlauf <span style="color:var(--text-faint);font-weight:normal">(nur für Moderatoren · {{ ipHistory|length }} Einträge)</span></span>
+    <span class="mod-ip-summary-chevron">▼</span>
+  </summary>
+
+  <div class="card" style="margin-top:8px">
+    <div style="padding:10px 14px;font-size:12px;color:var(--text-muted);background:var(--bg-surface2);border-bottom:1px solid var(--border)">
+      Registrierungs-IP: <code>{{ profile.registration_ip | default('–') }}</code>
+      &nbsp;·&nbsp;
+      Letzte IP: <code>{{ profile.last_ip | default('–') }}</code>
+    </div>
+    <table class="forum-table">
+      <thead><tr><th>IP</th><th>Aktion</th><th>Zuletzt gesehen</th><th>Anzahl</th><th>Aktionen</th></tr></thead>
+      <tbody>
+        {% for h in ipHistory %}
+        <tr class="ip-row {% if loop.index0 >= 10 %}ip-row-hidden{% endif %}" {% if loop.index0 >= 10 %}style="display:none"{% endif %}>
+          <td><code>{{ h.ip }}</code></td>
+          <td>
+            {% if h.action == 'register' %}📝 Registriert
+            {% elseif h.action == 'login' %}🔑 Login
+            {% elseif h.action == 'post' %}📨 Post
+            {% else %}{{ h.action }}
+            {% endif %}
+          </td>
+          <td style="font-size:12px;color:var(--text-muted)">{{ format_date(h.last_seen) }}</td>
+          <td>{{ h.hits }}</td>
+          <td>
+            {% if isAdmin %}
+              <a href="{{ url('/admin/?action=ban_ip&ip=') }}{{ h.ip|escape }}&csrf={{ csrfToken }}"
+                 class="btn btn-danger btn-xs"
+                 onclick="return confirm('IP {{ h.ip }} sperren?')">🚫 Sperren</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if count(ipHistory) > 10 %}
+      <div style="padding:10px 14px;border-top:1px solid var(--border);text-align:center;background:var(--bg-surface2)">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="
+          this.closest('.card').querySelectorAll('.ip-row-hidden').forEach(r => r.style.display = '');
+          this.style.display = 'none';
+        ">▼ Weitere Einträge anzeigen</button>
+      </div>
+    {% endif %}
+  </div>
+</details>
+{% endif %}

@@ -1,0 +1,18 @@
+# Instanz-Daten — gehoeren zur Installation, nicht zur Software.
+
+# Zugangsdaten der jeweiligen Installation
+/config.php
+
+# Vom Template-Compiler erzeugt; baut sich bei Bedarf selbst neu
+/cache/templates/*.php
+
+# Hochgeladenes der Mitglieder
+/uploads/avatars/*
+/uploads/attachments/*
+!/uploads/avatars/.gitkeep
+!/uploads/attachments/.gitkeep
+
+# Sicherungen (DB-Dumps und Datei-Archive)
+/backup/*.sql
+/backup/*.zip
+/backup/*.note

@@ -1,0 +1,37 @@
+<div class="section-heading">🔖 Meine Lesezeichen ({{ count(bookmarks) }})</div>
+
+<div class="card">
+  {% if not bookmarks %}
+    <div style="padding:40px;text-align:center;color:var(--text-faint)">
+      <div style="font-size:48px;margin-bottom:8px">🔖</div>
+      <p>Noch keine Lesezeichen.</p>
+      <p style="font-size:12px;margin-top:8px">Klicke in einem Thread auf 🔖, um ihn hier zu speichern.</p>
+    </div>
+  {% else %}
+    <table class="forum-table">
+      <thead>
+        <tr><th>Thread</th><th>Autor</th><th>Antworten</th><th>Gespeichert</th></tr>
+      </thead>
+      <tbody>
+        {% for b in bookmarks %}
+          <tr>
+            <td>
+              <a href="{{ url('/thread.php?id=') }}{{ b.thread_id }}"
+                 class="thread-title-link">
+                {{ b.title }}
+              </a>
+              <div class="thread-meta">
+                in <a href="{{ url('/board.php?id=') }}{{ b.board_id }}">{{ b.board_title }}</a>
+              </div>
+            </td>
+            <td>
+              <a href="{{ url('/profile.php?id=') }}{{ b.author_id }}">{{ b.author }}</a>
+            </td>
+            <td class="stat-cell">{{ b.reply_count }}</td>
+            <td class="last-post-cell">{{ format_date(b.created_at) }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</div>

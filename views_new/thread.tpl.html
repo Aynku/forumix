@@ -1,0 +1,260 @@
+{% set canModThis = isAdmin or (currentUser and is_mod_for_board(currentUser.user_id, thread.board_id)) %}
+
+<div class="section-heading">
+  <span>
+    {% if thread.is_sticky %}<span class="badge badge-sticky">Angepinnt</span>{% endif %}
+    {% if thread.is_closed %}<span class="badge badge-closed">Geschlossen</span>{% endif %}
+    {{ thread.title }}
+  </span>
+  <span style="display:inline-flex;gap:6px;align-items:center">
+    {% if canModThis %}
+      <div class="action-dropdown">
+        <button type="button" class="action-dropdown-toggle btn btn-ghost btn-sm">🛡️ Mod-Tools ▾</button>
+        <div class="action-dropdown-menu" style="left:auto;right:0">
+          {% if not thread.is_sticky %}
+            <a href="{{ url('/mod_action.php?action=sticky&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">📌 Anpinnen</a>
+          {% else %}
+            <a href="{{ url('/mod_action.php?action=unsticky&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">📌 Loslösen</a>
+          {% endif %}
+          {% if not thread.is_closed %}
+            <a href="{{ url('/mod_action.php?action=close&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">🔒 Schließen</a>
+          {% else %}
+            <a href="{{ url('/mod_action.php?action=open&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">🔓 Öffnen</a>
+          {% endif %}
+          <div class="action-dropdown-divider"></div>
+          <a href="{{ url('/mod_action.php?action=delete_thread&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}"
+             class="action-danger"
+             onclick="return confirm('Thread wirklich löschen?')">🗑️ Thread löschen</a>
+        </div>
+      </div>
+    {% endif %}
+    {% if currentUser %}
+      <button class="btn btn-ghost btn-sm" id="bookmark-toggle"
+              data-thread="{{ thread.thread_id }}"
+              data-bookmarked="{{ isBookmarked ? '1' : '0' }}"
+              type="button">
+        <span id="bookmark-icon">{{ isBookmarked ? '🔖' : '📑' }}</span>
+        <span id="bookmark-label">{{ isBookmarked ? 'Gespeichert' : 'Lesezeichen' }}</span>
+      </button>
+      {% if isSubscribed %}
+        <a href="{{ url('/subscribe.php?thread=') }}{{ thread.thread_id }}&action=unsubscribe&csrf={{ csrfToken }}"
+           class="btn btn-ghost btn-sm">🔔 {{ t('subscribed') }}</a>
+      {% else %}
+        <a href="{{ url('/subscribe.php?thread=') }}{{ thread.thread_id }}&action=subscribe&csrf={{ csrfToken }}"
+           class="btn btn-ghost btn-sm">🔕 {{ t('subscribe') }}</a>
+      {% endif %}
+    {% endif %}
+  </span>
+</div>
+
+{% if threadTags %}
+<div style="margin-bottom:14px;display:flex;flex-wrap:wrap;gap:6px">
+  {% for tg in threadTags %}
+    {{ render_tag_chip(tg)|raw }}
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if poll %}
+<div class="card" style="margin-bottom:16px;padding:18px 22px">
+  <h3 style="font-size:16px;margin-bottom:14px">📊 {{ poll.question }}</h3>
+  {% if currentUser and not hasVoted and (not poll.expires_at or strtotime(poll.expires_at) > time()) %}
+    <form method="post">
+      <input type="hidden" name="csrf" value="{{ csrfToken }}">
+      <input type="hidden" name="poll_vote" value="1">
+      <input type="hidden" name="poll_id" value="{{ poll.poll_id }}">
+      {% for opt in poll.options %}
+        <label style="display:block;padding:8px 12px;background:var(--bg-surface2);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;cursor:pointer">
+          <input type="{{ poll.multi_choice ? 'checkbox' : 'radio' }}"
+                 name="option{{ poll.multi_choice ? '[]' : '' }}"
+                 value="{{ opt.option_id }}"
+                 style="margin-right:8px">
+          {{ opt.text }}
+        </label>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary btn-sm" style="margin-top:8px">🗳️ {{ t('vote') }}</button>
+    </form>
+  {% else %}
+    {% for opt in poll.options %}
+    {% set pct = poll.total_votes > 0 ? round(opt.vote_count / poll.total_votes * 100) : 0 %}
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px">
+        <span>{{ opt.text }}</span>
+        <span style="color:var(--text-muted);font-size:12px">
+          {{ opt.vote_count }} {{ t('votes') }} ({{ pct }}%)
+        </span>
+      </div>
+      <div style="background:var(--bg-surface2);border-radius:4px;height:8px;overflow:hidden">
+        <div style="background:var(--text-base);height:100%;width:{{ pct }}%"></div>
+      </div>
+    </div>
+    {% endfor %}
+    <p style="margin-top:10px;font-size:11px;color:var(--text-faint)">
+      {{ poll.total_votes }} {{ t('votes') }} insgesamt
+    </p>
+  {% endif %}
+</div>
+{% endif %}
+
+{{ pagination|raw }}
+
+{% for post in posts %}
+<div class="post-card{{ post.is_approved ? '' : ' post-pending' }}" id="post{{ post.post_id }}">
+  {% if not post.is_approved %}
+    <div class="post-pending-bar">⏳ Dieser Beitrag wartet auf Freigabe</div>
+  {% endif %}
+  <div class="post-header">
+    <span>
+      <strong>#{{ pag.offset + loop.index0 + 1 }}</strong>
+    </span>
+    <span style="color:var(--text-faint)">{{ format_date(post.created_at) }}</span>
+  </div>
+  <div class="post-body">
+    <div class="post-user-col">
+      <img class="post-avatar zoomable-avatar" src="{{ avatar_url(post) }}" alt="{{ post.username }}"
+           data-username="{{ post.username }}"
+           data-profile-url="{{ url('/profile.php?id=') }}{{ post.user_id }}">
+      <div class="post-username">
+        {{ online_dot(post)|raw }}
+        <a href="{{ url('/profile.php?id=') }}{{ post.user_id }}">{{ post.username }}</a>
+      </div>
+      {% if post.is_owner %}
+        <div class="post-admin-badge" style="background:#7c3aed !important">👑 Owner</div>
+      {% elseif post.is_banned %}
+        <div class="post-banned-badge">Gesperrt</div>
+      {% elseif post.is_admin %}
+        <div class="post-admin-badge">Admin</div>
+      {% elseif post.is_mod %}
+        <div class="post-mod-badge">Mod</div>
+      {% else %}
+        {{ rank_badge(post.rank, post.post_count)|raw }}
+      {% endif %}
+      <div class="post-count-label">Beiträge: {{ post.post_count }}</div>
+    </div>
+    <div class="post-content-col">
+      <div class="post-text">{{ bbcode(post.content)|raw }}</div>
+      <script type="text/plain" class="post-raw" data-post-id="{{ post.post_id }}">{{ post.content }}</script>
+
+      {% if post.attachments %}
+      <div style="margin-top:14px;padding-top:10px;border-top:1px dashed var(--border)">
+        <strong style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">
+          📎 {{ t('attachments') }} ({{ count(post.attachments) }})
+        </strong>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+          {% for att in post.attachments %}
+            {% if att.is_image %}
+              <a href="{{ attachment_url(att.filename) }}" target="_blank" style="display:block">
+                <img src="{{ attachment_url(att.filename) }}"
+                     style="max-width:200px;max-height:200px;border-radius:6px;border:1px solid var(--border)"
+                     alt="{{ att.original_name }}">
+              </a>
+            {% else %}
+              <a href="{{ attachment_url(att.filename) }}" target="_blank"
+                 style="display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:var(--bg-surface2);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text-base);text-decoration:none">
+                📎 {{ att.original_name }}
+                <span style="color:var(--text-faint)">({{ format_filesize(att.size_bytes) }})</span>
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if post.signature %}
+        <div class="post-signature">– {{ bbcode(post.signature)|raw }}</div>
+      {% endif %}
+      {% if post.edited_at %}
+        <div style="font-size:11px;color:var(--text-faint);margin-top:8px">
+          Bearbeitet: {{ format_date(post.edited_at) }}
+        </div>
+      {% endif %}
+
+      {% if post.mod_edited_by and post.mod_editor_name %}
+        <div class="mod-edit-notice">
+          <strong>✏️ Bearbeitet von Moderator {{ post.mod_editor_name }}</strong>
+          {% if post.mod_edited_at %}
+            <span class="mod-edit-date">am {{ format_date(post.mod_edited_at) }}</span>
+          {% endif %}
+          {% if post.mod_edit_reason %}
+            <div class="mod-edit-reason">Grund: {{ post.mod_edit_reason }}</div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div class="reactions-bar" data-post-id="{{ post.post_id }}">
+        {% for r in post.reactions %}
+          <button type="button" class="reaction-pill {{ r.by_me ? 'by-me' : '' }}"
+                  data-type="{{ r.type }}" title="{{ r.label }}">
+            <span class="reaction-emoji">{{ r.emoji|raw }}</span>
+            <span class="reaction-count">{{ r.count }}</span>
+          </button>
+        {% endfor %}
+        {% if currentUser %}
+          <button type="button" class="reaction-add" data-post-id="{{ post.post_id }}" title="Reagieren">
+            <span style="font-size:14px">＋</span>
+          </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="post-footer">
+    {% if canModThis and post.author_ip and get_setting('show_ips_to_mods', '1') == '1' %}
+      <a class="post-action post-ip"
+         href="{{ url('/admin/?action=iplookup&ip=') }}{{ urlencode(post.author_ip) }}"
+         title="IP-Lookup">
+        🌐 <code>{{ post.author_ip }}</code>
+      </a>
+    {% endif %}
+    <span style="flex:1"></span>
+    {% if currentUser %}
+      <a class="post-action quote-btn" href="#reply"
+         data-post-id="{{ post.post_id }}"
+         data-author="{{ post.username }}">
+        💬 {{ t('quote') }}
+      </a>
+    {% endif %}
+    {% if currentUser and currentUser.user_id != post.user_id %}
+      <a class="post-action" href="{{ url('/report.php?post=') }}{{ post.post_id }}"
+         title="Beitrag melden">🚨 Melden</a>
+    {% endif %}
+    {% set editCount = post_edit_count(post.post_id) %}
+    {% set canSeeHistory = canModThis or (currentUser and currentUser.user_id == post.user_id) %}
+    {% if editCount > 0 and canSeeHistory %}
+      <a class="post-action" href="{{ url('/post_history.php?post=') }}{{ post.post_id }}"
+         title="{{ editCount }} Bearbeitung(en)">📜 Verlauf ({{ editCount }})</a>
+    {% endif %}
+    {% if currentUser and (currentUser.user_id == post.user_id or canModThis) %}
+      <a class="post-action" href="{{ url('/edit_post.php?id=') }}{{ post.post_id }}">✏️ {{ t('edit') }}</a>
+    {% endif %}
+    {% if canModThis %}
+      <a class="post-action" href="{{ url('/mod_action.php?action=delete_post&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}"
+         onclick="return confirm('Beitrag löschen?')">🗑️ {{ t('delete') }}</a>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+
+{{ pagination|raw }}
+
+{% if currentUser and not thread.is_closed %}
+<div id="reply" class="form-card" style="margin-top:20px">
+  <h2>💬 {{ t('reply') }}</h2>
+  <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf" value="{{ csrfToken }}">
+    <div class="form-row">
+      {{ render_editor('content', 'content', '', 'Dein Beitrag… (@user erwähnen möglich)', true, false)|raw }}
+    </div>
+    <div class="form-row">
+      <label>📎 {{ t('attach_file') }} (max. 5 MB pro Datei, mehrere möglich)</label>
+      <input type="file" name="attachments[]" multiple accept="image/*,application/pdf,text/plain,.zip,.rar">
+    </div>
+    <button type="submit" class="btn btn-primary">{{ t('reply') }}</button>
+  </form>
+</div>
+{% elseif thread.is_closed %}
+  <p style="margin-top:16px;color:var(--text-muted);font-style:italic">🔒 Dieser Thread ist geschlossen.</p>
+{% elseif not currentUser %}
+  <p style="margin-top:16px">
+    <a href="{{ url('/login.php') }}" class="btn btn-primary">Anmelden, um zu antworten</a>
+  </p>
+{% endif %}

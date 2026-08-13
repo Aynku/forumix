@@ -1,0 +1,166 @@
+<div class="section-heading">
+  👥 Mitglieder
+  <span style="font-size:12px;color:var(--text-muted);font-weight:400;text-transform:none">
+    {{ number_format(totalUsers, 0, ',', '.') }} registriert
+  </span>
+</div>
+
+{% if team.owners or team.admins or team.mods or team.board_mods %}
+<div class="card" style="margin-bottom:18px">
+  <div class="card-header">
+    <span class="card-title">🛡️ Das Team</span>
+  </div>
+
+  {% if team.owners %}
+    <div class="team-section">
+      <div class="team-section-label" style="color:#7c3aed">
+        👑 {{ count(team.owners) > 1 ? 'Inhaber:innen' : 'Inhaber' }}
+      </div>
+      <div class="team-grid">
+        {% for u in team.owners %}
+          <a href="{{ url('/profile.php?id=') }}{{ u.user_id }}" class="team-card">
+            <img src="{{ avatar_url(u) }}" alt="" class="team-avatar zoomable-avatar" width="48" height="48"
+                 data-username="{{ u.username }}"
+                 data-profile-url="{{ url('/profile.php?id=') }}{{ u.user_id }}">
+            <div class="team-info">
+              <div class="team-name">
+                {{ online_dot(u)|raw }}
+                <strong style="color:#7c3aed">{{ u.username }}</strong>
+              </div>
+              <div class="team-meta">
+                📝 {{ u.post_count }} &middot;
+                📅 seit {{ date('m/Y', strtotime(u.registered_at)) }}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if team.admins %}
+    <div class="team-section">
+      <div class="team-section-label" style="color:#dc2626">🔴 Administratoren</div>
+      <div class="team-grid">
+        {% for u in team.admins %}
+          <a href="{{ url('/profile.php?id=') }}{{ u.user_id }}" class="team-card">
+            <img src="{{ avatar_url(u) }}" alt="" class="team-avatar zoomable-avatar" width="48" height="48" data-username="{{ u.username }}" data-profile-url="{{ url('/profile.php?id=') }}{{ u.user_id }}">
+            <div class="team-info">
+              <div class="team-name">
+                {{ online_dot(u)|raw }}
+                <strong style="color:#dc2626">{{ u.username }}</strong>
+              </div>
+              <div class="team-meta">
+                📝 {{ u.post_count }} &middot;
+                📅 seit {{ date('m/Y', strtotime(u.registered_at)) }}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if team.mods %}
+    <div class="team-section">
+      <div class="team-section-label" style="color:#f59e0b">🟠 Globale Moderatoren</div>
+      <div class="team-grid">
+        {% for u in team.mods %}
+          <a href="{{ url('/profile.php?id=') }}{{ u.user_id }}" class="team-card">
+            <img src="{{ avatar_url(u) }}" alt="" class="team-avatar zoomable-avatar" width="48" height="48" data-username="{{ u.username }}" data-profile-url="{{ url('/profile.php?id=') }}{{ u.user_id }}">
+            <div class="team-info">
+              <div class="team-name">
+                {{ online_dot(u)|raw }}
+                <strong style="color:#f59e0b">{{ u.username }}</strong>
+              </div>
+              <div class="team-meta">
+                📝 {{ u.post_count }} &middot;
+                📅 seit {{ date('m/Y', strtotime(u.registered_at)) }}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if team.board_mods %}
+    <div class="team-section">
+      <div class="team-section-label" style="color:#f59e0b">🟡 Forum-Moderatoren</div>
+      <div class="team-grid">
+        {% for u in team.board_mods %}
+          <a href="{{ url('/profile.php?id=') }}{{ u.user_id }}" class="team-card">
+            <img src="{{ avatar_url(u) }}" alt="" class="team-avatar zoomable-avatar" width="48" height="48" data-username="{{ u.username }}" data-profile-url="{{ url('/profile.php?id=') }}{{ u.user_id }}">
+            <div class="team-info">
+              <div class="team-name">
+                {{ online_dot(u)|raw }}
+                <strong style="color:#f59e0b">{{ u.username }}</strong>
+              </div>
+              <div class="team-meta">
+                🛡️ {% for b in u.boards %}{% if not loop.first %}, {% endif %}{{ b.title }}{% endfor %}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="section-heading">
+  Alle Mitglieder
+  <span>
+    <a href="?sort=posts" class="btn btn-ghost btn-xs {{ sort == 'posts' ? 'btn-primary' : '' }}">📝 Aktivste</a>
+    <a href="?sort=newest" class="btn btn-ghost btn-xs {{ sort == 'newest' ? 'btn-primary' : '' }}">🆕 Neueste</a>
+    <a href="?sort=oldest" class="btn btn-ghost btn-xs {{ sort == 'oldest' ? 'btn-primary' : '' }}">📅 Älteste</a>
+    <a href="?sort=name" class="btn btn-ghost btn-xs {{ sort == 'name' ? 'btn-primary' : '' }}">🔤 Name</a>
+    <a href="?sort=active" class="btn btn-ghost btn-xs {{ sort == 'active' ? 'btn-primary' : '' }}">⏰ Zuletzt aktiv</a>
+  </span>
+</div>
+
+<div class="card">
+  <table class="forum-table">
+    <thead>
+      <tr>
+        <th>Mitglied</th>
+        <th>Rang</th>
+        <th style="text-align:center;width:90px">Beiträge</th>
+        <th style="width:120px">Dabei seit</th>
+        <th style="width:140px">Zuletzt aktiv</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in members %}
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <img src="{{ avatar_url(u) }}" alt="" class="member-list-avatar zoomable-avatar" width="32" height="32" data-username="{{ u.username }}" data-profile-url="{{ url('/profile.php?id=') }}{{ u.user_id }}">
+              <div>
+                <a href="{{ url('/profile.php?id=') }}{{ u.user_id }}" style="font-weight:600">
+                  {{ online_dot(u)|raw }}
+                  {{ u.username }}
+                </a>
+                {% if u.is_owner %}
+                  <span class="member-role-tag" style="background:#7c3aed">Owner</span>
+                {% elseif u.is_admin %}
+                  <span class="member-role-tag" style="background:#dc2626">Admin</span>
+                {% elseif u.is_mod %}
+                  <span class="member-role-tag" style="background:#f59e0b">Mod</span>
+                {% endif %}
+              </div>
+            </div>
+          </td>
+          <td style="font-size:12px;color:var(--text-muted)">{{ u.rank ?? '–' }}</td>
+          <td class="stat-cell">{{ number_format(u.post_count, 0, ',', '.') }}</td>
+          <td style="font-size:12px;color:var(--text-muted)">{{ date('d.m.Y', strtotime(u.registered_at)) }}</td>
+          <td style="font-size:12px;color:var(--text-muted)">
+            {% if u.last_login %}{{ format_date(u.last_login) }}{% else %}<em>nie</em>{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{{ pagination|raw }}

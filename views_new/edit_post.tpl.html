@@ -1,0 +1,43 @@
+<div class="section-heading">✏️ Beitrag bearbeiten</div>
+<div class="form-card">
+    {% if error %}<div class="flash flash-error">❌ {{ error }}</div>{% endif %}
+
+    {% if isModEdit %}
+      <div class="flash" style="background:rgba(220,38,38,.12);border:1px solid var(--color-danger);color:var(--color-danger);margin-bottom:16px">
+        ⚠️ Du bearbeitest den Beitrag eines anderen Benutzers.
+        Der Grund ist Pflicht und wird sichtbar unter dem Beitrag angezeigt.
+      </div>
+    {% endif %}
+
+    <form method="post">
+      <input type="hidden" name="csrf" value="{{ csrfToken }}">
+      <div class="form-row">
+        {{ render_editor('content', 'content', post.content, 'Beitrag bearbeiten…', true, false)|raw }}
+      </div>
+      <div class="form-row">
+        <label>
+          Bearbeitungsgrund
+          {% if isModEdit %}
+            <span style="color:var(--color-danger)">(Pflicht)</span>
+          {% else %}
+            (optional)
+          {% endif %}
+        </label>
+        <input type="text" name="edit_reason" maxlength="500"
+               placeholder="{{ isModEdit ? 'z.B. Beleidigender Inhalt entfernt, Bildgröße reduziert' : 'z.B. Tippfehler korrigiert' }}"
+               {{ (isModEdit ? 'required minlength="3"' : '')|raw }}>
+        <div class="form-hint">
+          {% if isModEdit %}
+            🔴 Der Grund erscheint rot unter dem Beitrag und ist für alle sichtbar.
+          {% else %}
+            Sichtbar für Moderatoren im Edit-Verlauf.
+          {% endif %}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button type="submit" class="btn btn-primary">Speichern</button>
+        <a href="{{ url('/thread.php?id=') }}{{ post.thread_id }}#post{{ post.post_id }}"
+           class="btn btn-ghost">Abbrechen</a>
+      </div>
+    </form>
+</div>

@@ -1,0 +1,213 @@
+<div class="dashboard-hero">
+  <div class="dashboard-hero-avatar">
+    {% set avatar = dashUser.avatar ? (url('/uploads/avatars/') . dashUser.avatar) : url('/assets/default_avatar.svg') %}
+    <img src="{{ avatar }}" alt="{{ dashUser.username ?? '' }}">
+  </div>
+  <div class="dashboard-hero-info">
+    <h1>
+      {{ dashUser.username ?? '–' }}
+      {% if dashUser.is_owner %}
+        <span class="post-owner-badge">👑 OWNER</span>
+      {% elseif dashUser.is_admin %}
+        <span class="post-admin-badge">A</span>
+      {% elseif dashUser.is_mod %}
+        <span class="post-mod-badge">M</span>
+      {% endif %}
+    </h1>
+
+    {% if not hideRank and rangText != '' %}
+      <div class="dashboard-hero-rank">🏅 {{ rangText }}</div>
+    {% endif %}
+
+    <div class="dashboard-hero-meta">
+      <span>💬 <strong>{{ dashUser.post_count ?? 0 }}</strong> Beiträge</span>
+      <span class="dashboard-hero-sep">·</span>
+      <span>📅 Dabei seit {{ format_date(dashUser.registered_at ?? '') }}</span>
+    </div>
+  </div>
+  <div class="dashboard-hero-streak">
+    <div class="streak-flame {{ dashStreak.current > 0 ? 'streak-active' : '' }}">
+      🔥
+    </div>
+    <div class="streak-info">
+      <div class="streak-num">{{ dashStreak.current }}</div>
+      <div class="streak-label">Tag{{ dashStreak.current == 1 ? '' : 'e' }} Streak</div>
+      {% if dashStreak.longest > dashStreak.current %}
+        <div class="streak-best">Best: {{ dashStreak.longest }} 🏆</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="dashboard-stats">
+  <div class="dash-stat">
+    <div class="dash-stat-num">{{ dashOverview.posts_total ?? 0 }}</div>
+    <div class="dash-stat-label">💬 Beiträge gesamt</div>
+  </div>
+  <div class="dash-stat dash-stat-accent">
+    <div class="dash-stat-num">{{ dashOverview.posts_week ?? 0 }}</div>
+    <div class="dash-stat-label">📈 Diese Woche</div>
+  </div>
+  <div class="dash-stat">
+    <div class="dash-stat-num">{{ dashOverview.posts_month ?? 0 }}</div>
+    <div class="dash-stat-label">📅 Letzte 30 Tage</div>
+  </div>
+  <div class="dash-stat">
+    <div class="dash-stat-num">{{ dashOverview.threads_started ?? 0 }}</div>
+    <div class="dash-stat-label">🧵 Themen gestartet</div>
+  </div>
+  <div class="dash-stat">
+    <div class="dash-stat-num">{{ dashOverview.reactions_received ?? 0 }}</div>
+    <div class="dash-stat-label">⭐ Reaktionen erhalten</div>
+  </div>
+  <div class="dash-stat">
+    <div class="dash-stat-num">{{ dashOverview.reactions_given ?? 0 }}</div>
+    <div class="dash-stat-label">👍 Reaktionen gegeben</div>
+  </div>
+  <div class="dash-stat">
+    <div class="dash-stat-num">{{ dashOverview.bookmarks ?? 0 }}</div>
+    <div class="dash-stat-label">🔖 Lesezeichen</div>
+  </div>
+  <div class="dash-stat">
+    <div class="dash-stat-num">{{ dashAch.unlocked }}/{{ dashAch.total }}</div>
+    <div class="dash-stat-label">🏆 Achievements</div>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:18px;padding:20px">
+  <h2 style="font-size:15px;margin-bottom:14px">📊 Deine Aktivität – letzte 12 Wochen</h2>
+  <div class="heatmap-wrap">
+    <div class="heatmap-grid">
+      {% for week in dashWeeks %}
+        <div class="heatmap-week">
+          {% for cell in week %}
+            <div class="heatmap-cell heatmap-l{{ cell.level }}"
+                 title="{{ cell.date }}: {{ cell.cnt }} Beitrag{{ cell.cnt == 1 ? '' : 'e' }}"></div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="heatmap-legend">
+      <span>Weniger</span>
+      <div class="heatmap-cell heatmap-l0"></div>
+      <div class="heatmap-cell heatmap-l1"></div>
+      <div class="heatmap-cell heatmap-l2"></div>
+      <div class="heatmap-cell heatmap-l3"></div>
+      <div class="heatmap-cell heatmap-l4"></div>
+      <span>Mehr</span>
+    </div>
+  </div>
+</div>
+
+<div class="dashboard-cols">
+  <div class="card" style="padding:18px">
+    <h2 style="font-size:15px;margin-bottom:12px">⭐ Deine Top-Beiträge</h2>
+    {% if not topPosts %}
+      <div style="color:var(--text-faint);font-size:13px;font-style:italic">Noch keine Reaktionen erhalten.</div>
+    {% else %}
+      <div class="dash-list">
+        {% for p in topPosts %}
+          <a href="{{ url('/thread.php?id=') }}{{ p.thread_id }}#post{{ p.post_id }}" class="dash-list-item">
+            <div class="dash-list-main">
+              <div class="dash-list-title">{{ mb_substr(p.thread_title, 0, 60) }}</div>
+              <div class="dash-list-snippet">{{ mb_substr(strip_tags(p.content), 0, 80) }}…</div>
+            </div>
+            <div class="dash-list-count">⭐ {{ p.reactions }}</div>
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="card" style="padding:18px">
+    <h2 style="font-size:15px;margin-bottom:12px">🧵 Deine erfolgreichsten Themen</h2>
+    {% if not topThreads %}
+      <div style="color:var(--text-faint);font-size:13px;font-style:italic">Noch keine Themen gestartet.</div>
+    {% else %}
+      <div class="dash-list">
+        {% for t in topThreads %}
+          <a href="{{ url('/thread.php?id=') }}{{ t.thread_id }}" class="dash-list-item">
+            <div class="dash-list-main">
+              <div class="dash-list-title">{{ mb_substr(t.title, 0, 60) }}</div>
+              <div class="dash-list-snippet">vor {{ format_date(t.created_at) }}</div>
+            </div>
+            <div class="dash-list-count">💬 {{ t.reply_count }}</div>
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="card" style="padding:18px">
+    <h2 style="font-size:15px;margin-bottom:12px">👥 Mit wem interagierst du am meisten?</h2>
+    {% if not topInteractions %}
+      <div style="color:var(--text-faint);font-size:13px;font-style:italic">
+        Noch keine Interaktionen.
+      </div>
+    {% else %}
+      <div class="dash-list">
+        {% for u2 in topInteractions %}
+          {% set u2avatar = u2.avatar ? (url('/uploads/avatars/') . u2.avatar) : url('/assets/default_avatar.svg') %}
+          <a href="{{ url('/profile.php?id=') }}{{ u2.user_id }}" class="dash-list-item">
+            <img src="{{ u2avatar }}" alt="" class="dash-list-avatar">
+            <div class="dash-list-main">
+              <div class="dash-list-title">{{ u2.username }}</div>
+              <div class="dash-list-snippet">{{ u2.interactions }} Beiträge in deinen Themen</div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="card" style="padding:18px">
+    <h2 style="font-size:15px;margin-bottom:12px">
+      🏆 Achievements
+      <a href="{{ url('/achievements.php') }}" style="font-size:12px;font-weight:400;margin-left:6px;color:var(--text-muted)">alle anzeigen →</a>
+    </h2>
+    <div class="dash-ach-progress">
+      <div class="dash-ach-progress-bar" style="width:{{ dashAch.total > 0 ? floor(dashAch.unlocked / dashAch.total * 100) : 0 }}%"></div>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">
+      {{ dashAch.unlocked }} von {{ dashAch.total }} freigeschaltet
+    </div>
+    {% if dashAch.recent %}
+      <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Zuletzt freigeschaltet</div>
+      <div class="dash-list">
+        {% for a in dashAch.recent %}
+          <div class="dash-list-item" style="cursor:default">
+            <div style="font-size:24px;flex-shrink:0">{{ a.icon ?? '🏆' }}</div>
+            <div class="dash-list-main">
+              <div class="dash-list-title">{{ a.title }}</div>
+              <div class="dash-list-snippet">{{ a.description }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card" style="padding:18px;margin-top:18px">
+  <h2 style="font-size:15px;margin-bottom:12px">📝 Deine letzte Aktivität</h2>
+  {% if not recentActivity %}
+    <div style="color:var(--text-faint);font-size:13px;font-style:italic">Noch keine Aktivität.</div>
+  {% else %}
+    <div class="dash-list">
+      {% for r in recentActivity %}
+        <a href="{{ url('/thread.php?id=') }}{{ r.thread_id }}#post{{ r.post_id }}" class="dash-list-item">
+          <div style="font-size:18px;flex-shrink:0">💬</div>
+          <div class="dash-list-main">
+            <div class="dash-list-title">
+              {{ r.thread_title }}
+              {% if not r.is_approved %}
+                <span style="color:var(--color-warning);font-size:11px;margin-left:6px">⏳ wartet auf Freigabe</span>
+              {% endif %}
+            </div>
+            <div class="dash-list-snippet">vor {{ format_date(r.created_at) }}</div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>

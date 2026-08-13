@@ -1,0 +1,20 @@
+<div class="form-card" style="max-width:560px;margin:40px auto;text-align:center;padding:40px 32px">
+  <div style="font-size:48px;margin-bottom:16px;opacity:0.5">👤</div>
+  <h2 style="margin-bottom:12px;color:var(--text-muted)">
+    <em>{{ profile.username }}</em>
+  </h2>
+  <p style="color:var(--text-muted);font-size:14px;line-height:1.6">
+    Dieser Account wurde gelöscht.
+  </p>
+  {% if profile.deleted_at %}
+    <p style="color:var(--text-faint);font-size:12px;margin-top:8px">
+      Gelöscht am {{ profile.deleted_at|date('d.m.Y H:i') }}
+    </p>
+  {% endif %}
+  <p style="color:var(--text-faint);font-size:12px;margin-top:14px;line-height:1.6">
+    Beiträge dieses Benutzers bleiben erhalten, persönliche Daten wurden vollständig entfernt.
+  </p>
+  <p style="margin-top:24px">
+    <a href="{{ url('/index.php') }}" class="btn btn-ghost btn-sm">← Zur Startseite</a>
+  </p>
+</div>

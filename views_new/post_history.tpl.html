@@ -1,0 +1,45 @@
+<div class="section-heading">📜 Edit-Verlauf von Beitrag #{{ post.post_id }}</div>
+
+<p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
+  Beitrag von <strong>{{ post.author_name }}</strong> in
+  „<a href="{{ url('/thread.php?id=') }}{{ post.thread_id }}#post{{ post.post_id }}">{{ post.thread_title }}</a>".
+</p>
+
+<div class="card" style="margin-bottom:14px">
+  <div class="card-header"><span class="card-title">✏️ Aktuelle Version</span></div>
+  <div style="padding:16px;font-size:13px">
+    {{ bbcode(post.content)|raw }}
+  </div>
+  {% if post.edited_at %}
+    <div style="padding:6px 16px;background:var(--bg-surface2);border-top:1px solid var(--border);font-size:11px;color:var(--text-muted)">
+      Zuletzt bearbeitet: {{ format_date(post.edited_at) }}
+    </div>
+  {% endif %}
+</div>
+
+{% if not history %}
+  <div class="card" style="padding:30px;text-align:center;color:var(--text-faint)">
+    <div style="font-size:36px;margin-bottom:8px">📜</div>
+    Noch keine Bearbeitungen.
+  </div>
+{% else %}
+  <div class="section-heading">Vorherige Versionen ({{ count(history) }})</div>
+  {% for h in history %}
+    <div class="card" style="margin-bottom:10px">
+      <div class="card-header">
+        <span class="card-title">
+          Version vom {{ format_date(h.created_at) }}
+        </span>
+        <span style="font-size:11px;color:var(--text-muted)">
+          bearbeitet von <a href="{{ url('/profile.php?id=') }}{{ h.editor_id }}">{{ h.editor_name }}</a>
+        </span>
+      </div>
+      {% if h.reason %}
+        <div style="padding:8px 16px;background:var(--bg-surface2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text-muted);font-style:italic">
+          💬 {{ h.reason }}
+        </div>
+      {% endif %}
+      <div style="padding:14px 16px;font-size:13px;background:var(--bg-surface2);border-left:3px solid var(--border-strong);font-family:var(--font-mono);white-space:pre-wrap;color:var(--text-muted)">{{ h.old_content }}</div>
+    </div>
+  {% endfor %}
+{% endif %}

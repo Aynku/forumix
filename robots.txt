@@ -1,0 +1,39 @@
+# robots.txt für Aynku Forum
+# v0.18.51
+
+User-agent: *
+
+# Admin- und Setup-Bereiche
+Disallow: /admin/
+Disallow: /install/
+
+# Persönliche User-Bereiche (sollten nicht im Index landen)
+Disallow: /settings.php
+Disallow: /pm.php
+Disallow: /notifications.php
+Disallow: /bookmarks.php
+
+# Auth-Endpunkte
+Disallow: /login.php
+Disallow: /logout.php
+Disallow: /register.php
+Disallow: /reset_password.php
+Disallow: /verify_email.php
+Disallow: /verify_email_change.php
+
+# Aktions-Endpunkte (kein Content, nur Forms/Redirects)
+Disallow: /new_thread.php
+Disallow: /edit_post.php
+
+# Suche und Online-Listen (dynamische Inhalte, sollten nicht gecrawlt werden)
+Disallow: /search.php
+Disallow: /online.php
+
+# Unsubscribe-Links (Token-URLs, niemals crawlen)
+Disallow: /unsubscribe.php
+
+# Statische Assets sind erlaubt — Crawler dürfen Bilder/CSS sehen
+Allow: /assets/
+
+# Höflich: nicht zu schnell crawlen
+Crawl-delay: 2

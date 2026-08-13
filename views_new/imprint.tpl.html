@@ -1,0 +1,20 @@
+{% set imp = imprint_data() %}
+{% set page = get_page('imprint') %}
+<div class="section-heading">📄 {{ page.title|default('Impressum') }}</div>
+
+<div class="card" style="padding:28px 32px">
+
+  {% if imp.is_default and is_admin(current_user()) %}
+    <div class="flash flash-warning" style="margin-bottom:20px">
+      ⚠️ <strong>Hinweis für Administratoren:</strong> Die Impressums-Daten sind noch nicht ausgefüllt.
+      Bitte unter <a href="{{ url('/admin/?action=legal') }}">Admin → Rechtliches</a> die Daten eintragen.
+    </div>
+  {% endif %}
+
+  {% if page %}
+    {{ render_page_content('imprint')|raw }}
+  {% else %}
+    <p>Der Impressums-Inhalt wurde noch nicht eingerichtet.</p>
+  {% endif %}
+
+</div>

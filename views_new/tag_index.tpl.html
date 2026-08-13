@@ -1,0 +1,17 @@
+<div class="section-heading">🏷️ Alle Tags</div>
+
+<div class="card" style="padding:18px">
+  {% if count(tags) == 0 %}
+    <p style="color:var(--text-faint);text-align:center">Noch keine Tags vorhanden.</p>
+  {% else %}
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      {% for t in tags %}
+        <a href="{{ url('/tag.php') }}?slug={{ t.slug }}"
+           class="tag-chip" style="border-color:{{ t.color }};color:{{ t.color }}">
+          {% if t.description %}{{ t.description }} {% endif %}{{ t.name }}
+          <span style="opacity:.6">({{ t.usage_count }})</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>

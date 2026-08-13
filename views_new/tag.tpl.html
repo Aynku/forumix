@@ -1,0 +1,43 @@
+<div class="section-heading">
+  🏷️ Tag: <span style="color:{{ tag.color }}">{{ tag.name }}</span>
+  <span style="font-size:12px;color:var(--text-muted);font-weight:400;text-transform:none">
+    {{ count(threads) }} Threads
+  </span>
+</div>
+
+{% if tag.description %}
+  <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">{{ tag.description }}</p>
+{% endif %}
+
+<div class="card">
+  {% if not threads %}
+    <div style="padding:30px;text-align:center;color:var(--text-faint)">
+      Noch keine Threads mit diesem Tag.
+    </div>
+  {% else %}
+    <table class="forum-table">
+      <thead>
+        <tr><th>Thread</th><th>Autor</th><th>Antworten</th><th>Aufrufe</th></tr>
+      </thead>
+      <tbody>
+        {% for t in threads %}
+          <tr>
+            <td>
+              <a href="{{ url('/thread.php?id=') }}{{ t.thread_id }}" class="thread-title-link">{{ t.title }}</a>
+              <div class="thread-meta">
+                in <a href="{{ url('/board.php?id=') }}{{ t.board_id }}">{{ t.board_title }}</a>
+              </div>
+            </td>
+            <td>{{ t.author }}</td>
+            <td class="stat-cell">{{ t.reply_count }}</td>
+            <td class="stat-cell">{{ t.view_count }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</div>
+
+<p style="margin-top:14px;text-align:center">
+  <a href="{{ url('/tag.php') }}" class="btn btn-ghost btn-sm">← Alle Tags</a>
+</p>

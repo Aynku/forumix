@@ -1,0 +1,4 @@
+# Backup-Dateien dürfen niemals direkt heruntergeladen werden.
+# Download nur über PHP mit Auth-Check (admin/?action=download_backup).
+Order Deny,Allow
+Deny from all

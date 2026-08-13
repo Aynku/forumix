@@ -1,0 +1,12 @@
+{% set page = get_page('terms') %}
+<div class="section-heading">📜 {{ page.title|default('Nutzungsbedingungen') }}</div>
+
+<div class="card" style="padding:28px 32px;line-height:1.7">
+
+  {% if page %}
+    {{ render_page_content('terms')|raw }}
+  {% else %}
+    <p>Die Nutzungsbedingungen wurden noch nicht eingerichtet.</p>
+  {% endif %}
+
+</div>

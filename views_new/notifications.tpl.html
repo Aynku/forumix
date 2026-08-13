@@ -1,0 +1,52 @@
+<div class="section-heading">
+  🔔 {{ t('notifications') }}
+  {% if notifications %}
+    <span style="display:inline-flex;gap:6px">
+      <a href="?mark_all=1&csrf={{ csrfToken }}" class="btn btn-ghost btn-sm">
+        ✓ {{ t('mark_all_read') }}
+      </a>
+      <a href="?delete_read=1&csrf={{ csrfToken }}"
+         class="btn btn-ghost btn-sm"
+         onclick="return confirm('Alle bereits gelesenen Benachrichtigungen wirklich löschen?')">
+        🧹 Gelesene löschen
+      </a>
+      <a href="?delete_all=1&csrf={{ csrfToken }}"
+         class="btn btn-ghost btn-sm action-danger"
+         style="color:var(--color-danger);border-color:rgba(220,38,38,.3)"
+         onclick="return confirm('WIRKLICH alle Benachrichtigungen löschen? Auch ungelesene!')">
+        🗑️ Alle löschen
+      </a>
+    </span>
+  {% endif %}
+</div>
+
+<div class="card">
+  {% if not notifications %}
+    <div style="padding:30px;text-align:center;color:var(--text-faint)">
+      {{ t('no_notifications') }}
+    </div>
+  {% endif %}
+  {% for n in notifications %}
+    <div class="notif-row pm-list-item {{ not n.is_read ? 'unread' : '' }}">
+      <a href="?read={{ n.notif_id }}"
+         class="notif-main"
+         style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+        <div style="font-size:18px">
+          {{ notification_icon(n)|raw }}
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="pm-subject" style="color:var(--text-base)">
+            {{ notification_text(n)|raw }}
+          </div>
+          <div class="pm-meta" style="font-size:11px;color:var(--text-faint);margin-top:2px">{{ format_date(n.created_at) }}</div>
+        </div>
+      </a>
+      <a href="?delete={{ n.notif_id }}&csrf={{ csrfToken }}"
+         class="notif-delete"
+         title="Löschen"
+         onclick="return confirm('Diese Benachrichtigung löschen?')">
+        ✕
+      </a>
+    </div>
+  {% endfor %}
+</div>

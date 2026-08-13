@@ -1,0 +1,10 @@
+<div style="max-width:520px;margin:60px auto;text-align:center">
+  <div class="form-card">
+    <div style="font-size:48px;margin-bottom:14px">🔍</div>
+    <h2 style="margin-bottom:10px">{{ title|default('Fehler') }}</h2>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">
+      {{ message|default('Ein unbekannter Fehler ist aufgetreten.') }}
+    </p>
+    <a href="{{ url('/') }}" class="btn btn-primary">← Zur Startseite</a>
+  </div>
+</div>
