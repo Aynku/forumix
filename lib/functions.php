@@ -2,14 +2,8 @@
 if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
 // lib/functions.php
 
-/**
- * Erlaubte Bild-Uploads: Inhaltstyp → Dateiendung.
- *
- * Die Endung kommt aus DIESER Tabelle, niemals aus dem hochgeladenen
- * Dateinamen. Geprüft wird der Inhalt (mime_content_type), vergeben wird
- * die dazu passende Endung — sonst genügt ein echtes Bild namens "x.php",
- * um eine ausführbare Datei im Upload-Verzeichnis abzulegen.
- */
+// Erlaubte Bild-Uploads: Inhaltstyp → Dateiendung. Die Endung kommt aus
+// dieser Tabelle, nie aus dem hochgeladenen Dateinamen.
 const UPLOAD_IMAGE_EXTENSIONS = [
     'image/jpeg' => 'jpg',
     'image/png'  => 'png',

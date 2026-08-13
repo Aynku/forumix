@@ -196,10 +196,7 @@ PHP;
     if (file_put_contents(CONFIG_FILE, $out) === false) {
         return false;
     }
-    // Die Datei enthält die Datenbank-Zugangsdaten im Klartext. Ohne diesen
-    // Schritt bekommt sie die Standard-Rechte (meist 0644) und ist damit für
-    // jeden anderen Systembenutzer lesbar — auf geteiltem Hosting also für
-    // fremde Kunden auf derselben Maschine.
+    // enthält die DB-Zugangsdaten im Klartext, nicht für andere lesbar
     @chmod(CONFIG_FILE, 0640);
     return true;
 }
@@ -281,9 +278,7 @@ if ($step === 4) {
             if (mb_strlen($user) < 3 || mb_strlen($user) > 30) {
                 $errors[] = 'Benutzername: 3 bis 30 Zeichen.';
             } elseif (!preg_match('/^[\p{L}\p{N} ._-]+$/u', $user)) {
-                // Gleiche Regel wie bei der Registrierung (pages/register.php):
-                // Namen landen auch in HTML, das erst im Browser gebaut wird,
-                // und dort genügt ein Anführungszeichen zum Ausbrechen.
+                // gleiche Regel wie in pages/register.php
                 $errors[] = 'Benutzername darf nur Buchstaben, Ziffern, Leerzeichen, '
                           . 'Punkt, Unterstrich und Bindestrich enthalten.';
             }
@@ -317,10 +312,6 @@ if ($step === 4) {
                             $errors[] = 'config.php konnte nicht geschrieben werden. '
                                       . 'Schreibrechte im Forum-Root prüfen.';
                         } elseif (file_put_contents(LOCK_FILE, "installed " . date('c') . "\n") === false) {
-                            // Nicht verschlucken: ohne Lockfile bliebe der
-                            // Installer offen. Die config.php mit
-                            // FORUM_INSTALLED=true fängt es zwar ab, aber der
-                            // Betreiber soll es erfahren statt es zu glauben.
                             $errors[] = 'Installation abgeschlossen, aber die Sperrdatei '
                                       . 'install/.installed konnte nicht geschrieben werden. '
                                       . 'Bitte den Ordner install/ jetzt von Hand löschen.';

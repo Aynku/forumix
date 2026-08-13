@@ -51,9 +51,7 @@ if (!isset($csrfToken))   $csrfToken   = $_SESSION['csrf_token'] ?? '';
   ] : null) ?>;
 
   function esc(s) {
-    // textContent/innerHTML escaped nur < > & — die Anführungszeichen
-    // bleiben stehen. Das genügt zwischen zwei Tags, nicht aber in einem
-    // Attribut (alt="…", src="…"), und genau dort landet der Name hier.
+    // auch Anführungszeichen – der Name landet in Attributen (alt, src)
     return String(s ?? '')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')

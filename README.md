@@ -93,13 +93,8 @@ Live unter:       https://www.aynku.de
 
 5. **Installer starten**: `https://deine-domain.tld/install/`
 
-   > Zwischen Hochladen und Einrichten steht ein unfertiges Forum offen im
-   > Netz. Der Datenbank-Host ist ein freies Feld — wer in diesem Fenster
-   > zuerst `/install/` aufruft, kann das Forum auf seiner eigenen Datenbank
-   > einrichten und sich als Inhaber anlegen. Das Fenster also kurz halten:
-   > hochladen und direkt durchinstallieren. Passiert es doch, ist die
-   > Reparatur ein Löschen und erneutes Hochladen — zu diesem Zeitpunkt gibt
-   > es noch keine Daten zu verlieren.
+   > ⏱️ Zügig durchziehen: bis der Installer durch ist, könnte ein Fremder das
+   > Forum auf seiner eigenen Datenbank einrichten.
 
    Der Wizard führt durch 4 Schritte:
    - System-Check (PHP-Version, Extensions)
@@ -171,12 +166,8 @@ location = /CHANGELOG.md         { deny all; return 403; }
 location = /.htaccess            { deny all; return 403; }
 
 # Verzeichnisse, die nie über HTTP erreichbar sein dürfen.
-#
-# Warum `^~` und kein regulärer Ausdruck: ein `^~`-Präfix schlägt bei nginx
-# JEDEN regulären Ausdruck — unabhängig von der Reihenfolge im File. Mit
-# `location ~ ^/(lib|cache)/` hinge die Wirkung davon ab, ob dieser Block
-# vor oder nach der `location ~ \.php$` des Panels landet. Und `cache/`
-# enthält übersetzte Templates als lauffähiges PHP, `backup/` die DB-Dumps.
+# `^~` statt regulärem Ausdruck: schlägt jeden Regex, egal in welcher
+# Reihenfolge der Block eingesetzt wird.
 location ^~ /lib/       { deny all; }
 location ^~ /views/     { deny all; }
 location ^~ /views_new/ { deny all; }   # Vorlagen im Klartext
@@ -193,14 +184,8 @@ location ~ /\. { return 404; }
 location ~ ~$  { return 404; }
 location ~ \.(bak|sql|log|sqlite|sqlite3|db|tpl\.html|orig|dist|ini)$ { return 404; }
 
-# Hochgeladenes wird ausgeliefert, aber niemals ausgeführt.
-#
-# Verschachtelt statt als einzelner regulärer Ausdruck: das äussere `^~`
-# fängt alles unter /uploads/ ein und schaltet damit die regulären
-# Ausdrücke der Server-Ebene ab — die innere Regel gilt nur noch hier.
-# Bilder gehen weiter raus, PHP nie, und die Reihenfolge im File ist egal.
-# (Die flache Variante `location ~* ^/uploads/.*\.php$` funktioniert auch,
-# aber nur solange sie VOR der allgemeinen `location ~ \.php$` steht.)
+# Hochgeladenes wird ausgeliefert, aber nie ausgeführt.
+# Verschachtelt, damit die Reihenfolge im File egal ist.
 location ^~ /uploads/ {
     location ~* \.(php|phtml|phar|phps|php[0-9]|cgi|pl|py|rb|sh)$ {
         deny all;
@@ -250,39 +235,36 @@ Bei einem eigenen nginx ohne Panel: gleicher Block in den `server { }`-Block der
 
 #### Variante 3: Orbitalpanel
 
-Nicht in die vhost-Datei schreiben — die wird bei jeder Änderung an der Domain neu erzeugt und überschreibt Handarbeit. Der Block gehört ins Feld **Domain → nginx-Direktiven**. Von dort setzt ihn die Vorlage an genau die Stelle oberhalb der PHP-`location`, an der die Reihenfolge stimmt.
+Block ins Feld **Domain → nginx-Direktiven**, nicht in die vhost-Datei — die wird bei jeder Domain-Änderung neu erzeugt.
 
-Das Panel bringt einen **.htaccess-Konverter** mit: die vorhandene `.htaccess` einlesen lassen, das Ergebnis übernehmen und um den Block oben ergänzen. Was der Konverter nicht sicher übersetzen kann, markiert er als `# [BITTE PRÜFEN]` statt still etwas Falsches zu erzeugen.
-
-Gespeichert wird erst, wenn `nginx -t` die Konfiguration annimmt — eine kaputte Direktive kann die Domain nicht abschießen.
+- Der eingebaute **.htaccess-Konverter** übernimmt die vorhandene `.htaccess`; was er nicht sicher übersetzen kann, markiert er als `# [BITTE PRÜFEN]`
+- Gespeichert wird erst, wenn `nginx -t` zustimmt
 
 ---
 
 ### Prüfen, ob es greift
 
-Nach dem Einbau von außen messen, nicht auf der Platte nachsehen. Erwartet wird durchgehend `403`:
+Von außen messen, nicht auf der Platte nachsehen:
 
 ```bash
-for u in /views_new/thread.tpl.html /modules/faq/install.sql \
-         /cache/templates/error.php /backup/index.html \
-         /lib/db.php /lang/de.php /uploads/avatars/test.php; do
-  printf '%-38s ' "$u"
-  curl -s -o /dev/null -w '%{http_code}\n' "https://deine-domain.tld$u"
+DOM=https://deine-domain.tld
+# muss 403 sein
+for u in /views_new/thread.tpl.html /modules/faq/install.sql /cache/templates/error.php \
+         /backup/index.html /lib/db.php /lang/de.php /uploads/avatars/test.php; do
+  printf '%-38s ' "$u"; curl -s -o /dev/null -w '%{http_code}\n' "$DOM$u"
+done
+# muss 200 bleiben
+for u in / /login.php /members.php /assets/style.css "/api/quicksearch.php?q=te"; do
+  printf '%-38s ' "$u"; curl -s -o /dev/null -w '%{http_code}\n' "$DOM$u"
 done
 ```
 
-Und die Gegenprobe — das hier muss weiter `200` liefern, sonst ist zu viel zu:
+Zwei Stolperfallen beim Auswerten:
 
-```bash
-for u in / /login.php /members.php /assets/style.css /api/quicksearch.php?q=te; do
-  printf '%-38s ' "$u"
-  curl -s -o /dev/null -w '%{http_code}\n' "https://deine-domain.tld$u"
-done
-```
-
-> **Vorsicht bei der Auswertung:** Eine nicht existierende Datei liefert wegen `try_files` ebenfalls `200` — nämlich die Startseite, nicht die Datei. Wer `/backup/irgendwas.sql` testet und `200` sieht, hat nicht zwingend ein Leck gefunden. Immer mit `%{size_download}` und `%{content_type}` gegenprüfen: 17 KB `text/html` ist die Startseite.
->
-> Umgekehrt ist bei `/uploads/…/test.php` der Wechsel von `404` auf `403` der eigentliche Beweis: der nackte `404` kommt von PHP-FPM („Skript nicht da") — die Anfrage war also bei PHP. Erst `403` heißt, sie endet vorher.
+| Beobachtung | Bedeutung |
+|---|---|
+| `200` bei einer *nicht existierenden* Datei | `try_files` liefert die Startseite, nicht die Datei — mit `%{size_download}` gegenprüfen |
+| `404` statt `403` bei `/uploads/…/test.php` | kommt von PHP-FPM, die Anfrage war also **bei PHP**. Erst `403` heißt: vorher gestoppt |
 
 ---
 
@@ -300,9 +282,9 @@ Inhalt der `.htaccess` im Root:
 - Schutz für `lib/`, `views/`, `pages/`, `lang/`, `cache/`
 - PHP-Sperre in `uploads/`
 
-Zusätzlich liegen eigene `.htaccess` in `lib/`, `views/`, `uploads/` und `backup/`. Die bleiben bewusst im Paket, damit eine Apache-Installation ohne Zutun geschützt ist.
+Zusätzlich liegen eigene `.htaccess` in `lib/`, `views/`, `uploads/` und `backup/` — damit eine Apache-Installation ohne Zutun geschützt ist.
 
-> **Unter reinem nginx (Setup B) tun diese Dateien nichts.** nginx liest keine `.htaccess` — weder im Root noch in den Unterverzeichnissen, und es gibt auch keine Warnung. Ein `Deny from all` in `backup/` sieht nach Schutz aus und ist unter nginx wirkungslos. Wer von Apache umzieht, muss jede dieser Dateien im nginx-Block nachbilden; genau dafür ist der Block oben gedacht.
+> ⚠️ **Unter reinem nginx tun diese Dateien nichts** — auch die in den Unterverzeichnissen, und ohne Warnung. Ein `Deny from all` in `backup/` sieht dann nach Schutz aus und ist keiner. Dafür ist der nginx-Block oben da.
 
 **Bei Setup A:** Die `.htaccess` ist deine zweite Sicherheitsschicht — sie greift falls die nginx-Custom-Config mal fehlerhaft oder weg ist. Einfach drin lassen, sie schadet nicht.
 
@@ -403,7 +385,7 @@ Falls eine Migration nötig wäre (bei MINOR-Updates), liegt sie in `install/mig
 - ✅ Owner-Account: starkes Passwort + 2FA aktivieren
 - ✅ DB-User nur auf das eine Schema berechtigt
 - ✅ `config.php` darf nicht öffentlich lesbar sein (siehe nginx-Block)
-- ✅ `backup/` von außen prüfen, **bevor** das erste Backup erzeugt wird — der Dateiname enthält nur einen Zeitstempel und ist damit erratbar; ein erreichbarer Dump ist die komplette Datenbank inklusive Passwort-Hashes und privater Nachrichten
+- ✅ `backup/` von außen prüfen, **bevor** das erste Backup läuft — der Dateiname ist nur ein Zeitstempel, also erratbar
 
 ### Regelmäßig
 - 🔄 PHP-Version aktuell halten

@@ -203,9 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'save_profil
         } elseif (!isset(UPLOAD_IMAGE_EXTENSIONS[$mime])) {
             $error = 'Ungültiges Bildformat (JPEG/PNG/GIF/WebP).';
         } else {
-            // Endung IMMER aus dem geprüften Inhaltstyp, nie aus dem
-            // hochgeladenen Dateinamen: sonst genügt ein echtes Bild namens
-            // "x.php", um eine ausführbare Datei in uploads/ abzulegen.
+            // Endung aus dem geprüften Inhaltstyp, nie aus dem Dateinamen
             $ext  = UPLOAD_IMAGE_EXTENSIONS[$mime];
             $name = 'avatar_' . $userId . '_' . time() . '.' . $ext;
             if (move_uploaded_file($file['tmp_name'], AVATAR_DIR . $name)) {
@@ -235,7 +233,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'save_profil
         } elseif (!isset(UPLOAD_IMAGE_EXTENSIONS[$mime])) {
             $error = 'Ungültiges Bildformat (JPEG/PNG/GIF/WebP).';
         } else {
-            // Endung aus dem Inhaltstyp — siehe Avatar-Upload oben.
             $ext  = UPLOAD_IMAGE_EXTENSIONS[$mime];
             $name = 'banner_' . $userId . '_' . time() . '.' . $ext;
             if (move_uploaded_file($file['tmp_name'], AVATAR_DIR . $name)) {

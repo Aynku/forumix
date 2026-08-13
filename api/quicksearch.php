@@ -20,10 +20,7 @@ $query = mb_substr($query, 0, 100);
 $like  = '%' . $query . '%';
 
 try {
-    // Threads suchen (Top 5).
-    // Passwort-geschützte Foren müssen hier genauso raus wie in der
-    // grossen Suche — sonst verrät die Schnellsuche deren Titel, und das
-    // sogar an nicht angemeldete Gäste.
+    // Threads suchen (Top 5), passwort-geschützte Foren raus
     $threads = db_fetchAll('
         SELECT t.thread_id, t.title, t.reply_count, t.view_count,
                b.title AS board_title, b.board_id,

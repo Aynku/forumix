@@ -34,10 +34,8 @@ function ensure_board_permission(?int $threadId = null, ?int $postId = null): vo
 }
 
 /**
- * Aktionen, die sich gegen einen Benutzer richten (sperren, Rechte
- * vergeben oder entziehen). can_modify_user() schützt den Inhaber davor,
- * von einem Admin gesperrt oder degradiert zu werden — die Regel gab es
- * schon in lib/auth.php, sie wurde hier nur nie angewendet.
+ * Prüft Berechtigung für Aktionen auf einen Benutzer (sperren, Rechte
+ * ändern). can_modify_user() schützt den Owner.
  */
 function ensure_user_permission(int $targetId): void {
     global $cu;
