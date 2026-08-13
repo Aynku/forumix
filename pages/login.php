@@ -22,16 +22,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $code      = post_str('code');
         $isBackup  = isset($_POST['use_backup']);
 
+        // Der Code-Schritt braucht eine eigene Bremse. Der Passwort-Schritt
+        // ist begrenzt, aber wer das Passwort schon hat, landet direkt hier —
+        // ohne Zähler wären sechs Ziffern in Ruhe durchprobierbar. Gezählt
+        // wird pro Konto, nicht pro IP: an dieser Stelle steht der Angreifer
+        // bereits vor genau einem Konto.
         $row = db_fetch('SELECT secret FROM user_2fa WHERE user_id = ? AND enabled = 1', [$pendingId]);
-        if (!$row) {
+        if (!rate_limit_check('login_2fa', 5, 900, 'user:' . $pendingId)) {
+            // Zurück auf Anfang: das Passwort muss neu eingegeben werden.
+            unset($_SESSION['pending_2fa_user']);
+            $step  = 'credentials';
+            $error = 'Zu viele Code-Versuche. Bitte melde dich erneut an.';
+        } elseif (!$row) {
             unset($_SESSION['pending_2fa_user']);
             $error = 'Sitzung abgelaufen.';
         } else {
             $ok = $isBackup ? verify_backup_code($pendingId, $code) : verify_totp($row['secret'], $code);
             if ($ok) {
-                // Login abschließen
+                // Login abschließen. Session-ID erneuern wie im normalen
+                // Weg (login_user macht es dort) — sonst behält der
+                // Angemeldete die ID aus der Zeit vor der Anmeldung.
+                if (session_status() === PHP_SESSION_ACTIVE) {
+                    @session_regenerate_id(true);
+                }
                 $_SESSION['user_id'] = $pendingId;
                 unset($_SESSION['pending_2fa_user']);
+                rate_limit_reset('login_2fa', 'user:' . $pendingId);
                 $ip = client_ip();
                 try {
                     db_execute('UPDATE users SET last_login = NOW(), last_ip = ? WHERE user_id = ?',

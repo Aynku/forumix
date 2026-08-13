@@ -42,7 +42,8 @@ if ($action === 'list') {
         $rows = array_reverse($rows);
         echo json_encode(['ok' => true, 'messages' => $rows]);
     } catch (Exception $e) {
-        echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+        error_log('[shoutbox] ' . $e->getMessage());
+        echo json_encode(['ok' => false, 'error' => 'Serverfehler']);
     }
     exit;
 }
@@ -88,7 +89,8 @@ if ($action === 'post') {
             [$cu['user_id'], $msg]);
         echo json_encode(['ok' => true]);
     } catch (Exception $e) {
-        echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+        error_log('[shoutbox] ' . $e->getMessage());
+        echo json_encode(['ok' => false, 'error' => 'Serverfehler']);
     }
     exit;
 }
@@ -116,7 +118,8 @@ if ($action === 'delete') {
         db_execute('DELETE FROM shoutbox_messages WHERE shout_id = ?', [$id]);
         echo json_encode(['ok' => true]);
     } catch (Exception $e) {
-        echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+        error_log('[shoutbox] ' . $e->getMessage());
+        echo json_encode(['ok' => false, 'error' => 'Serverfehler']);
     }
     exit;
 }

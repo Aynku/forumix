@@ -187,14 +187,16 @@ location ~ \.(bak|sql|log|sqlite|sqlite3|db|tpl\.html|orig|dist|ini)$ { return 4
 
 # Hochgeladenes wird ausgeliefert, aber niemals ausgeführt.
 #
-# Das MUSS ein regulärer Ausdruck bleiben (Bilder aus uploads/ sollen ja
-# weiter raus), und damit zählt hier die Reihenfolge: nginx nimmt bei
-# regulären Ausdrücken den ERSTEN Treffer. Diese Regel muss also vor der
-# allgemeinen `location ~ \.php$` stehen, sonst landet die Datei doch bei
-# PHP-FPM. Bei Panels, die den Custom-Block oben einsetzen, passt das.
-location ~* ^/uploads/.*\.(php|phtml|phar|phps|php[0-9]|cgi|pl|py|rb|sh)$ {
-    deny all;
-    return 403;
+# Verschachtelt statt als einzelner regulärer Ausdruck: das äussere `^~`
+# fängt alles unter /uploads/ ein und schaltet damit die regulären
+# Ausdrücke der Server-Ebene ab — die innere Regel gilt nur noch hier.
+# Bilder gehen weiter raus, PHP nie, und die Reihenfolge im File ist egal.
+# (Die flache Variante `location ~* ^/uploads/.*\.php$` funktioniert auch,
+# aber nur solange sie VOR der allgemeinen `location ~ \.php$` steht.)
+location ^~ /uploads/ {
+    location ~* \.(php|phtml|phar|phps|php[0-9]|cgi|pl|py|rb|sh)$ {
+        deny all;
+    }
 }
 
 # Routing: /xyz.php → /index.php?_page=xyz

@@ -33,6 +33,25 @@ function ensure_board_permission(?int $threadId = null, ?int $postId = null): vo
     }
 }
 
+/**
+ * Aktionen, die sich gegen einen Benutzer richten (sperren, Rechte
+ * vergeben oder entziehen). can_modify_user() schützt den Inhaber davor,
+ * von einem Admin gesperrt oder degradiert zu werden — die Regel gab es
+ * schon in lib/auth.php, sie wurde hier nur nie angewendet.
+ */
+function ensure_user_permission(int $targetId): void {
+    global $cu;
+    $target = $targetId > 0 ? db_fetch('SELECT * FROM users WHERE user_id = ?', [$targetId]) : null;
+    if (!$target) {
+        http_response_code(404);
+        die('Benutzer nicht gefunden.');
+    }
+    if (!can_modify_user($cu, $target)) {
+        http_response_code(403);
+        die('Dieser Benutzer darf nicht geändert werden.');
+    }
+}
+
 function mod_log_entry(string $act, string $type, int $id, string $reason = ''): void {
     global $cu;
     db_execute('INSERT INTO mod_log (mod_id, action, target_type, target_id, reason) VALUES (?, ?, ?, ?, ?)',
@@ -99,6 +118,7 @@ switch ($action) {
 
     case 'ban':
         require_admin();
+        ensure_user_permission($userId2);
         db_execute('UPDATE users SET is_banned = 1 WHERE user_id = ?', [$userId2]);
         mod_log_entry('ban', 'user', $userId2);
         flash('Benutzer gesperrt.', 'success');
@@ -106,6 +126,7 @@ switch ($action) {
 
     case 'unban':
         require_admin();
+        ensure_user_permission($userId2);
         db_execute('UPDATE users SET is_banned = 0 WHERE user_id = ?', [$userId2]);
         mod_log_entry('unban', 'user', $userId2);
         flash('Benutzer entsperrt.', 'success');
@@ -113,12 +134,14 @@ switch ($action) {
 
     case 'make_mod':
         require_admin();
+        ensure_user_permission($userId2);
         db_execute('UPDATE users SET is_mod = 1 WHERE user_id = ?', [$userId2]);
         flash('Moderator ernannt.', 'success');
         redirect(FORUM_URL . '/admin/');
 
     case 'remove_mod':
         require_admin();
+        ensure_user_permission($userId2);
         db_execute('UPDATE users SET is_mod = 0 WHERE user_id = ?', [$userId2]);
         flash('Moderationsrechte entzogen.', 'success');
         redirect(FORUM_URL . '/admin/');

@@ -20,7 +20,10 @@ $query = mb_substr($query, 0, 100);
 $like  = '%' . $query . '%';
 
 try {
-    // Threads suchen (Top 5)
+    // Threads suchen (Top 5).
+    // Passwort-geschützte Foren müssen hier genauso raus wie in der
+    // grossen Suche — sonst verrät die Schnellsuche deren Titel, und das
+    // sogar an nicht angemeldete Gäste.
     $threads = db_fetchAll('
         SELECT t.thread_id, t.title, t.reply_count, t.view_count,
                b.title AS board_title, b.board_id,
@@ -28,7 +31,7 @@ try {
         FROM threads t
         JOIN boards b ON b.board_id = t.board_id
         JOIN users u  ON u.user_id  = t.user_id
-        WHERE t.title LIKE ?
+        WHERE t.title LIKE ?' . board_filter_sql('t', 'board_id') . '
         ORDER BY t.is_sticky DESC, t.thread_id DESC
         LIMIT 5
     ', [$like]);

@@ -54,6 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (mb_strlen($un) < $minUn) {
             $error = 'Benutzername mindestens ' . $minUn . ' Zeichen.';
+        } elseif (mb_strlen($un) > 30) {
+            $error = 'Benutzername höchstens 30 Zeichen.';
+        } elseif (!preg_match('/^[\p{L}\p{N} ._-]+$/u', $un)) {
+            // Zeichensatz begrenzen. Serverseitig escaped e() zwar alles,
+            // aber Namen landen auch in HTML, das erst im Browser gebaut
+            // wird (Shoutbox) — dort reicht ein Anführungszeichen, um aus
+            // einem Attribut auszubrechen. Buchstaben inkl. Umlauten,
+            // Ziffern, Leerzeichen, Punkt, Unterstrich und Bindestrich.
+            $error = 'Benutzername darf nur Buchstaben, Ziffern, Leerzeichen, Punkt, Unterstrich und Bindestrich enthalten.';
         } elseif (preg_match('/^gel(ö|oe)schter\s*benutzer/i', $un)) {
             $error = 'Dieser Benutzername ist reserviert.';
         } elseif (!filter_var($em, FILTER_VALIDATE_EMAIL)) {

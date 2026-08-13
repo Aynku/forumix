@@ -6,9 +6,14 @@ if (basename($_SERVER['SCRIPT_NAME'] ?? '') === 'bootstrap.php') {
     die('Forbidden');
 }
 
+// Fehler werden protokolliert, aber nicht ausgeliefert. Eine angezeigte
+// PHP-Meldung verrät absolute Pfade und bei Datenbank-Ausnahmen Teile der
+// Abfrage. Der Debug-Schalter wird weiter unten ausgewertet — erst wenn
+// die config.php geladen ist. Bis dahin gilt: nichts anzeigen.
 error_reporting(E_ALL);
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
+ini_set('display_errors',         '0');
+ini_set('display_startup_errors', '0');
+ini_set('log_errors',             '1');
 
 $configFile = __DIR__ . '/config.php';
 if (!file_exists($configFile)) {
@@ -22,6 +27,14 @@ require_once $configFile;
 if (!defined('FORUM_INSTALLED') || FORUM_INSTALLED !== true) {
     header('Location: install/');
     exit;
+}
+
+// Jetzt ist die config.php gelesen: zum Entwickeln dort
+// `define('FORUM_DEBUG', true);` setzen, dann gehen Meldungen wieder an
+// den Bildschirm. Ohne den Eintrag bleibt es beim Protokoll.
+if (defined('FORUM_DEBUG') && FORUM_DEBUG === true) {
+    ini_set('display_errors',         '1');
+    ini_set('display_startup_errors', '1');
 }
 
 // ── Zeitzone festlegen ──────────────────────────────────────────

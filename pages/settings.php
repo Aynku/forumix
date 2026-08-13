@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'change_pass
                 $tokens = remember_list_for_user($userId);
                 foreach ($tokens as $t) {
                     if ((string) $t['token_id'] !== (string) $currentTok) {
-                        remember_revoke((string) $t['token_id']);
+                        remember_destroy_one((int) $t['token_id']);
                     }
                 }
             } catch (Exception $e) {}
@@ -197,12 +197,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'save_profil
     // Avatar-Upload
     if (!empty($_FILES['avatar']['name'])) {
         $file = $_FILES['avatar'];
+        $mime = mime_content_type($file['tmp_name']) ?: '';
         if ($file['size'] > MAX_AVATAR_SIZE) {
             $error = 'Avatar zu groß (max. 512 KB).';
-        } elseif (!in_array(mime_content_type($file['tmp_name']), ALLOWED_AVATAR_TYPES, true)) {
+        } elseif (!isset(UPLOAD_IMAGE_EXTENSIONS[$mime])) {
             $error = 'Ungültiges Bildformat (JPEG/PNG/GIF/WebP).';
         } else {
-            $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            // Endung IMMER aus dem geprüften Inhaltstyp, nie aus dem
+            // hochgeladenen Dateinamen: sonst genügt ein echtes Bild namens
+            // "x.php", um eine ausführbare Datei in uploads/ abzulegen.
+            $ext  = UPLOAD_IMAGE_EXTENSIONS[$mime];
             $name = 'avatar_' . $userId . '_' . time() . '.' . $ext;
             if (move_uploaded_file($file['tmp_name'], AVATAR_DIR . $name)) {
                 if ($profile['avatar'] && file_exists(AVATAR_DIR . $profile['avatar'])) {
@@ -225,12 +229,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'save_profil
     // Banner-Upload
     if (!empty($_FILES['banner']['name']) && empty($error)) {
         $file = $_FILES['banner'];
+        $mime = mime_content_type($file['tmp_name']) ?: '';
         if ($file['size'] > 2 * 1024 * 1024) {
             $error = 'Banner zu groß (max. 2 MB).';
-        } elseif (!in_array(mime_content_type($file['tmp_name']), ALLOWED_AVATAR_TYPES, true)) {
+        } elseif (!isset(UPLOAD_IMAGE_EXTENSIONS[$mime])) {
             $error = 'Ungültiges Bildformat (JPEG/PNG/GIF/WebP).';
         } else {
-            $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            // Endung aus dem Inhaltstyp — siehe Avatar-Upload oben.
+            $ext  = UPLOAD_IMAGE_EXTENSIONS[$mime];
             $name = 'banner_' . $userId . '_' . time() . '.' . $ext;
             if (move_uploaded_file($file['tmp_name'], AVATAR_DIR . $name)) {
                 if ($newBanner && file_exists(AVATAR_DIR . $newBanner)) {

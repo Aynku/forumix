@@ -103,10 +103,34 @@ function forum_logo_render(string $alt): string {
 /**
  * Aktuelle Client-IP zuverlässig ermitteln
  */
+/**
+ * Liefert die IP des Aufrufers.
+ *
+ * Grundsatz: geglaubt wird nur REMOTE_ADDR. Die Kopfzeilen X-Forwarded-For,
+ * X-Real-IP und CF-Connecting-IP schickt der Client selbst — steht kein
+ * Proxy davor, der sie überschreibt, sind sie frei erfunden. Wer sie
+ * ungeprüft nimmt, hebelt damit Rate-Limits, IP-Sperren und die
+ * Captcha-Schwelle aus und kann den IP-Verlauf beliebig beschreiben.
+ *
+ * Steht tatsächlich ein Proxy davor (nginx als Reverse-Proxy, Cloudflare,
+ * Load-Balancer), dann in der config.php eintragen:
+ *
+ *     define('TRUSTED_PROXIES', ['127.0.0.1', '::1']);
+ *
+ * Nur wenn REMOTE_ADDR in dieser Liste steht, wird der weitergereichten
+ * Kopfzeile geglaubt. Ohne Eintrag bleibt es bei REMOTE_ADDR — der sichere
+ * Zustand ist der, der nichts voraussetzt.
+ */
 function client_ip(): string {
-    foreach (['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR'] as $k) {
-        if (!empty($_SERVER[$k])) {
-            $ip = $_SERVER[$k];
+    $remote = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+
+    $trusted = defined('TRUSTED_PROXIES') ? (array) TRUSTED_PROXIES : [];
+    if ($remote !== '' && in_array($remote, $trusted, true)) {
+        foreach (['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP'] as $k) {
+            if (empty($_SERVER[$k])) continue;
+            $ip = (string) $_SERVER[$k];
+            // X-Forwarded-For ist eine Kette "client, proxy1, proxy2" —
+            // der erste Eintrag ist der ursprüngliche Aufrufer.
             if (str_contains($ip, ',')) {
                 $ip = trim(explode(',', $ip)[0]);
             }
@@ -114,6 +138,10 @@ function client_ip(): string {
                 return $ip;
             }
         }
+    }
+
+    if (filter_var($remote, FILTER_VALIDATE_IP)) {
+        return $remote;
     }
     return '0.0.0.0';
 }
