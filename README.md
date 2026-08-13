@@ -91,7 +91,18 @@ Live unter:       https://www.aynku.de
 
 4. **Web-Server konfigurieren** (siehe nächster Abschnitt)
 
-5. **Installer starten**: `https://deine-domain.tld/install/`
+5. **Installer freigeben** – eine leere Datei anlegen:
+   ```bash
+   touch install/.unlock          # oder install/UNLOCK.txt, falls der
+                                  # FTP-Client Punkt-Dateien versteckt
+   ```
+   Ohne diese Datei antwortet der Installer mit 403. Grund: zwischen dem
+   Hochladen und dem Einrichten steht ein unfertiges Forum offen im Netz —
+   wer dann als Erster `/install/` aufruft, kann es auf seine eigene Datenbank
+   einrichten und sich selbst als Inhaber anlegen. Die Datei ist kein
+   Geheimnis, sie beweist nur Dateizugriff.
+
+6. **Installer starten**: `https://deine-domain.tld/install/`
 
    Der Wizard führt durch 4 Schritte:
    - System-Check (PHP-Version, Extensions)
@@ -99,7 +110,7 @@ Live unter:       https://www.aynku.de
    - Admin-Account anlegen → wird automatisch zum **Owner**
    - Fertig
 
-6. **`install/`-Ordner löschen** (Wichtig!)
+7. **`install/`-Ordner löschen** (Wichtig!)
    ```bash
    rm -rf install/
    ```

@@ -46,6 +46,41 @@ if ($alreadyInstalled) {
     exit;
 }
 
+/* ── Freigabe: nur wer Dateizugriff hat, darf installieren ─────────────
+ *
+ * Zwischen dem Hochladen der Dateien und dem Aufruf des Installers steht
+ * ein unfertiges Forum offen im Netz. Wer in diesem Fenster als Erster
+ * /install/ aufruft, richtet es ein: Datenbank-Host ist ein freies Feld,
+ * er kann also seinen eigenen Server eintragen, legt das Owner-Konto mit
+ * seinem Passwort an und schreibt die config.php. Danach gehört die
+ * Installation ihm, und der rechtmässige Betreiber steht vor einem
+ * gesperrten Installer.
+ *
+ * Die Freigabe verlangt deshalb einen Nachweis, den nur jemand mit
+ * Dateizugriff erbringen kann: eine leere Datei neben dieser hier. Kein
+ * Geheimnis, das ausgelesen werden könnte — es zählt allein, dass sie
+ * angelegt wurde. Nach der Installation kann sie mit install/ verschwinden.
+ */
+$unlockCandidates = [INSTALL_DIR . '/.unlock', INSTALL_DIR . '/UNLOCK.txt'];
+$unlocked = false;
+foreach ($unlockCandidates as $u) { if (file_exists($u)) { $unlocked = true; break; } }
+if (!$unlocked) {
+    http_response_code(403);
+    render_page('Installer gesperrt', '
+        <div class="card">
+            <h2>Installer ist gesperrt</h2>
+            <p>Damit niemand Fremdes das frisch hochgeladene Forum einrichtet,
+               muss die Freigabe über das Dateisystem erfolgen.</p>
+            <p>Lege per FTP oder SSH eine <strong>leere Datei</strong> an:</p>
+            <p><code>install/.unlock</code></p>
+            <p class="hint">Versteckt der FTP-Client Dateien mit führendem Punkt,
+               geht auch <code>install/UNLOCK.txt</code>. Der Inhalt ist egal.
+               Danach diese Seite neu laden.</p>
+            <p class="hint">Per SSH: <code>touch install/.unlock</code></p>
+        </div>');
+    exit;
+}
+
 /* ── CSRF ──────────────────────────────────────────────────────────────── */
 if (empty($_SESSION['install_csrf'])) {
     $_SESSION['install_csrf'] = bin2hex(random_bytes(16));
@@ -193,7 +228,15 @@ PHP;
         '{FNAME}'   => $v($c['forum_name']),
         '{FURL}'    => $v($c['forum_url']),
     ]);
-    return file_put_contents(CONFIG_FILE, $out) !== false;
+    if (file_put_contents(CONFIG_FILE, $out) === false) {
+        return false;
+    }
+    // Die Datei enthält die Datenbank-Zugangsdaten im Klartext. Ohne diesen
+    // Schritt bekommt sie die Standard-Rechte (meist 0644) und ist damit für
+    // jeden anderen Systembenutzer lesbar — auf geteiltem Hosting also für
+    // fremde Kunden auf derselben Maschine.
+    @chmod(CONFIG_FILE, 0640);
+    return true;
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -270,8 +313,14 @@ if ($step === 4) {
             $pass  = (string) ($_POST['owner_pass'] ?? '');
             $pass2 = (string) ($_POST['owner_pass2'] ?? '');
 
-            if (mb_strlen($user) < 3 || mb_strlen($user) > 50) {
-                $errors[] = 'Benutzername: 3 bis 50 Zeichen.';
+            if (mb_strlen($user) < 3 || mb_strlen($user) > 30) {
+                $errors[] = 'Benutzername: 3 bis 30 Zeichen.';
+            } elseif (!preg_match('/^[\p{L}\p{N} ._-]+$/u', $user)) {
+                // Gleiche Regel wie bei der Registrierung (pages/register.php):
+                // Namen landen auch in HTML, das erst im Browser gebaut wird,
+                // und dort genügt ein Anführungszeichen zum Ausbrechen.
+                $errors[] = 'Benutzername darf nur Buchstaben, Ziffern, Leerzeichen, '
+                          . 'Punkt, Unterstrich und Bindestrich enthalten.';
             }
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $errors[] = 'Bitte eine gültige E-Mail-Adresse angeben.';
@@ -302,8 +351,15 @@ if ($step === 4) {
                         if (!write_config($c)) {
                             $errors[] = 'config.php konnte nicht geschrieben werden. '
                                       . 'Schreibrechte im Forum-Root prüfen.';
+                        } elseif (file_put_contents(LOCK_FILE, "installed " . date('c') . "\n") === false) {
+                            // Nicht verschlucken: ohne Lockfile bliebe der
+                            // Installer offen. Die config.php mit
+                            // FORUM_INSTALLED=true fängt es zwar ab, aber der
+                            // Betreiber soll es erfahren statt es zu glauben.
+                            $errors[] = 'Installation abgeschlossen, aber die Sperrdatei '
+                                      . 'install/.installed konnte nicht geschrieben werden. '
+                                      . 'Bitte den Ordner install/ jetzt von Hand löschen.';
                         } else {
-                            @file_put_contents(LOCK_FILE, "installed " . date('c') . "\n");
                             // Session-Reste aufräumen
                             unset($_SESSION['install_db'], $_SESSION['install_db_form'],
                                   $_SESSION['install_schema_done']);
