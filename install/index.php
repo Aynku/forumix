@@ -46,41 +46,6 @@ if ($alreadyInstalled) {
     exit;
 }
 
-/* ── Freigabe: nur wer Dateizugriff hat, darf installieren ─────────────
- *
- * Zwischen dem Hochladen der Dateien und dem Aufruf des Installers steht
- * ein unfertiges Forum offen im Netz. Wer in diesem Fenster als Erster
- * /install/ aufruft, richtet es ein: Datenbank-Host ist ein freies Feld,
- * er kann also seinen eigenen Server eintragen, legt das Owner-Konto mit
- * seinem Passwort an und schreibt die config.php. Danach gehört die
- * Installation ihm, und der rechtmässige Betreiber steht vor einem
- * gesperrten Installer.
- *
- * Die Freigabe verlangt deshalb einen Nachweis, den nur jemand mit
- * Dateizugriff erbringen kann: eine leere Datei neben dieser hier. Kein
- * Geheimnis, das ausgelesen werden könnte — es zählt allein, dass sie
- * angelegt wurde. Nach der Installation kann sie mit install/ verschwinden.
- */
-$unlockCandidates = [INSTALL_DIR . '/.unlock', INSTALL_DIR . '/UNLOCK.txt'];
-$unlocked = false;
-foreach ($unlockCandidates as $u) { if (file_exists($u)) { $unlocked = true; break; } }
-if (!$unlocked) {
-    http_response_code(403);
-    render_page('Installer gesperrt', '
-        <div class="card">
-            <h2>Installer ist gesperrt</h2>
-            <p>Damit niemand Fremdes das frisch hochgeladene Forum einrichtet,
-               muss die Freigabe über das Dateisystem erfolgen.</p>
-            <p>Lege per FTP oder SSH eine <strong>leere Datei</strong> an:</p>
-            <p><code>install/.unlock</code></p>
-            <p class="hint">Versteckt der FTP-Client Dateien mit führendem Punkt,
-               geht auch <code>install/UNLOCK.txt</code>. Der Inhalt ist egal.
-               Danach diese Seite neu laden.</p>
-            <p class="hint">Per SSH: <code>touch install/.unlock</code></p>
-        </div>');
-    exit;
-}
-
 /* ── CSRF ──────────────────────────────────────────────────────────────── */
 if (empty($_SESSION['install_csrf'])) {
     $_SESSION['install_csrf'] = bin2hex(random_bytes(16));
