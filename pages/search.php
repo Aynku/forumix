@@ -11,7 +11,7 @@ $cu = current_user();
 $savedAction = $_GET['saved'] ?? '';
 
 if ($savedAction === 'save' && $cu) {
-    if (!verify_csrf($_POST['csrf'] ?? $_GET['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? $_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $name = trim($_POST['save_name'] ?? '');
     if ($name === '') {
         flash('Bitte einen Namen für die Suche angeben.', 'error');
@@ -40,7 +40,7 @@ if ($savedAction === 'save' && $cu) {
 }
 
 if ($savedAction === 'delete' && $cu) {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     db_execute('DELETE FROM saved_searches WHERE search_id = ? AND user_id = ?',
         [get_int('id'), $cu['user_id']]);
     flash('Gespeicherte Suche gelöscht.', 'success');

@@ -4,7 +4,7 @@ if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
 require_once __DIR__ . '/../bootstrap.php';
 require_login();
 
-if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF-Fehler');
+if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
 $action   = $_GET['action'] ?? '';
 $threadId = get_int('thread');
@@ -29,7 +29,7 @@ function ensure_board_permission(?int $threadId = null, ?int $postId = null): vo
     }
     if (!$boardId || !is_mod_for_board((int) $cu['user_id'], $boardId)) {
         http_response_code(403);
-        die('Du darfst in diesem Forum nicht moderieren.');
+        error_page(403, 'Keine Berechtigung', 'Du bist in diesem Forum kein Moderator.');
     }
 }
 
@@ -42,11 +42,11 @@ function ensure_user_permission(int $targetId): void {
     $target = $targetId > 0 ? db_fetch('SELECT * FROM users WHERE user_id = ?', [$targetId]) : null;
     if (!$target) {
         http_response_code(404);
-        die('Benutzer nicht gefunden.');
+        error_page(404, 'Benutzer nicht gefunden', 'Dieses Konto gibt es nicht.');
     }
     if (!can_modify_user($cu, $target)) {
         http_response_code(403);
-        die('Dieser Benutzer darf nicht geändert werden.');
+        error_page(403, 'Nicht erlaubt', 'Dieser Benutzer darf nicht geändert werden.');
     }
 }
 
@@ -145,5 +145,5 @@ switch ($action) {
         redirect(FORUM_URL . '/admin/');
 
     default:
-        die('Unbekannte Aktion.');
+        error_page(400, 'Unbekannte Aktion', 'Diese Moderations-Aktion gibt es nicht.');
 }

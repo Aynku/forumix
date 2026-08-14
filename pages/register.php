@@ -14,7 +14,7 @@ $error    = '';
 $formData = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     // CAPTCHA-Schicht 2: Verhaltens-Token
     if (!behavior_verify(post_str('_bt'))) {

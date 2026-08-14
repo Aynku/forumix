@@ -8,7 +8,7 @@ $userId  = get_int('id');
 $profile = db_fetch('SELECT * FROM users WHERE user_id = ?', [$userId]);
 if (!$profile) {
     http_response_code(404);
-    die('Benutzer nicht gefunden.');
+    error_page(404, 'Benutzer nicht gefunden', 'Dieses Konto gibt es nicht.');
 }
 
 // Gelöschte User: minimale Profilseite

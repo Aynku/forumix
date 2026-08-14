@@ -13,7 +13,7 @@ $thread = db_fetch('
     WHERE t.thread_id = ?
 ', [$threadId]);
 
-if (!$thread) { http_response_code(404); die('Thread nicht gefunden.'); }
+if (!$thread) error_page(404, 'Thread nicht gefunden', 'Dieses Thema gibt es nicht oder es wurde entfernt.');
 
 // Passwort-Schutz: wenn das Board geschützt ist und User keinen Zugang hat → zur Unlock-Seite
 $threadBoard = db_fetch('SELECT board_id, password_hash FROM boards WHERE board_id = ?', [$thread['board_id']]);
@@ -31,7 +31,7 @@ if (current_user()) {
 // ─── Vote-Handler ────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['poll_vote'])) {
     require_login();
-    if (!verify_csrf(post_str('csrf'))) die('CSRF');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $pollId = (int) post_int('poll_id');
     $opts   = $_POST['option'] ?? [];
     if (!is_array($opts)) $opts = [$opts];
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['poll_vote'])) {
 // ─── Antwort speichern ───────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
     require_login();
-    if (!verify_csrf(post_str('csrf'))) die('CSRF');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     if ($thread['is_closed'] && !is_mod()) {
         flash('Dieser Thread ist geschlossen.', 'error');

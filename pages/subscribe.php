@@ -3,7 +3,7 @@ if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
 // subscribe.php
 require_once __DIR__ . '/../bootstrap.php';
 require_login();
-if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF');
+if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
 $threadId = (int) ($_GET['thread'] ?? 0);
 $action   = $_GET['action'] ?? 'subscribe';
@@ -16,8 +16,7 @@ $cu = current_user();
 if ($action === 'subscribe') {
     $t = $threadId > 0 ? db_fetch('SELECT board_id FROM threads WHERE thread_id = ?', [$threadId]) : null;
     if (!$t || !board_id_can_access((int) $t['board_id'])) {
-        http_response_code(403);
-        die('Kein Zugriff auf dieses Forum.');
+        error_page(403, 'Kein Zugriff', 'Dieses Thema liegt in einem passwortgeschützten Forum.');
     }
 }
 

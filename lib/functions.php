@@ -15,6 +15,37 @@ function e(?string $s): string {
     return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+/**
+ * Fehlerseite im Forum-Layout statt nacktem die().
+ *
+ * Faellt auf eine schlichte HTML-Seite zurueck, wenn das Layout selbst nicht
+ * mehr laeuft (z.B. Datenbank weg) — eine Fehlerseite, die einen Fehler
+ * braucht um zu erscheinen, waere keine.
+ * API-Endpunkte bekommen JSON, sonst bricht die Antwort dem Browser-Skript
+ * im Hals ab.
+ */
+function error_page(int $code, string $title, string $message = ''): void {
+    if (!headers_sent()) http_response_code($code);
+
+    $isApi = str_contains($_SERVER['SCRIPT_NAME'] ?? '', '/api/')
+          || str_contains($_SERVER['SCRIPT_NAME'] ?? '', '/modules/');
+    if ($isApi) {
+        if (!headers_sent()) header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => false, 'error' => $message !== '' ? $message : $title]);
+        exit;
+    }
+
+    try {
+        render('error', ['title' => $title, 'message' => $message]);
+    } catch (Throwable $e) {
+        echo '<!doctype html><html lang="de"><head><meta charset="UTF-8"><title>' . e($title)
+           . '</title></head><body style="font-family:system-ui;background:#0a0a0b;color:#e7e7ea;'
+           . 'text-align:center;padding:60px"><h1>' . e($title) . '</h1><p>' . e($message)
+           . '</p><p><a href="' . e(FORUM_URL) . '/" style="color:#4f46e5">Zur Startseite</a></p></body></html>';
+    }
+    exit;
+}
+
 function bbcode(string $text): string {
     $text = e($text);
 

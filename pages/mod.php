@@ -30,7 +30,7 @@ $boardIds = $isGlobalMod ? null : $boardModFor;
 // ── AKTIONEN ───────────────────────────────────────────────────────
 
 if (in_array($action, ['approve_thread', 'approve_post', 'reject_thread', 'reject_post'], true)) {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $id = get_int('id');
     $reason = $_GET['reason'] ?? '';
 
@@ -59,7 +59,7 @@ if (in_array($action, ['approve_thread', 'approve_post', 'reject_thread', 'rejec
 
 // Report-Status ändern
 if ($action === 'report_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $reportId = post_int('report_id');
     $newStatus = post_str('status');
 

@@ -12,11 +12,11 @@ $post = db_fetch('
     JOIN users u ON u.user_id = p.user_id
     WHERE p.post_id = ?
 ', [$postId]);
-if (!$post) { http_response_code(404); die('Beitrag nicht gefunden.'); }
+if (!$post) error_page(404, 'Beitrag nicht gefunden', 'Dieser Beitrag gibt es nicht oder er wurde entfernt.');
 
 $cu = current_user();
 $canView = is_mod() || $cu['user_id'] == $post['user_id'];
-if (!$canView) { http_response_code(403); die('Keine Berechtigung.'); }
+if (!$canView) error_page(403, 'Keine Berechtigung', 'Den Bearbeitungsverlauf sehen nur Moderatoren und der Autor selbst.');
 
 $history = post_edit_history($postId);
 

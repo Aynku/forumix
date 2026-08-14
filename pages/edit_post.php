@@ -12,21 +12,19 @@ $post   = db_fetch('
 ', [$postId]);
 
 if (!$post) {
-    http_response_code(404);
-    die('Beitrag nicht gefunden.');
+    error_page(404, 'Beitrag nicht gefunden', 'Diesen Beitrag gibt es nicht oder er wurde entfernt.');
 }
 
 $cu = current_user();
 if ($cu['user_id'] !== $post['user_id'] && !is_mod()) {
-    http_response_code(403);
-    die('Keine Berechtigung.');
+    error_page(403, 'Keine Berechtigung', 'Bearbeiten darf nur der Autor selbst oder ein Moderator.');
 }
 
 $error = '';
 $isModEdit = $cu['user_id'] != $post['user_id'];  // bearbeitet jemand fremden Post?
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $content    = post_str('content');
     $editReason = trim(post_str('edit_reason'));
 

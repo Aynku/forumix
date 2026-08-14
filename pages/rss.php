@@ -18,7 +18,7 @@ if ($type === 'board' && $id > 0) {
     if ($board && !board_user_can_access($board)) {
         // Geschütztes Board → kein RSS für Nicht-Berechtigte
         http_response_code(403);
-        die('🔒 Dieses Forum ist passwort-geschützt. RSS nicht verfügbar.');
+        error_page(403, 'Kein Zugriff', 'Dieses Forum ist passwortgeschützt — es gibt dafür keinen Feed.');
     }
     if ($board) {
         $feedTitle = FORUM_NAME . ' – ' . $board['title'];
@@ -42,7 +42,7 @@ if ($type === 'board' && $id > 0) {
         $tBoard = db_fetch('SELECT board_id, password_hash FROM boards WHERE board_id = ?', [$thread['board_id']]);
         if ($tBoard && !board_user_can_access($tBoard)) {
             http_response_code(403);
-            die('🔒 Dieses Forum ist passwort-geschützt. RSS nicht verfügbar.');
+            error_page(403, 'Kein Zugriff', 'Dieses Forum ist passwortgeschützt — es gibt dafür keinen Feed.');
         }
         $feedTitle = FORUM_NAME . ' – ' . $thread['title'];
         $feedDesc  = 'Beiträge im Thread';

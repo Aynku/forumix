@@ -16,10 +16,18 @@ define('FORUM_RUNNING', true);
 // Welche Seite wurde angefragt?
 $page = $_GET['_page'] ?? '';
 
-// Wenn nichts angefordert wurde: Startseite
+// Wenn nichts angefordert wurde: Startseite — aber nur, wenn wirklich die
+// Wurzel gemeint war. nginx schickt jede unbekannte Adresse hierher; ohne
+// diese Unterscheidung antwortet /gibtsnicht mit der Startseite und dem
+// Status 200, statt ehrlich 404 zu sagen.
 if ($page === '') {
-    require __DIR__ . '/pages/home.php';
-    return;
+    $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    if ($path === '/' || $path === '/index.php') {
+        require __DIR__ . '/pages/home.php';
+        return;
+    }
+    require __DIR__ . '/bootstrap.php';
+    error_page(404, 'Seite nicht gefunden', 'Die angeforderte Adresse gibt es hier nicht.');
 }
 
 // Sicherheit: nur a-z, 0-9, _ und - erlauben (Path-Traversal vermeiden)
@@ -32,9 +40,5 @@ if ($page && is_file($path)) {
 }
 
 // Seite nicht gefunden
-http_response_code(404);
 require __DIR__ . '/bootstrap.php';
-render('error', [
-    'title'   => 'Seite nicht gefunden',
-    'message' => 'Die angeforderte Seite konnte nicht gefunden werden.',
-]);
+error_page(404, 'Seite nicht gefunden', 'Die angeforderte Seite konnte nicht gefunden werden.');

@@ -14,7 +14,7 @@ $userId  = (int) $cu['user_id'];
 $profile = db_fetch('SELECT * FROM users WHERE user_id = ?', [$userId]);
 if (!$profile) {
     http_response_code(404);
-    die('Benutzer nicht gefunden.');
+    error_page(404, 'Benutzer nicht gefunden', 'Dieses Konto gibt es nicht.');
 }
 
 $error = '';
@@ -27,7 +27,7 @@ if (!in_array($activeTab, $validTabs, true)) $activeTab = 'profile';
 // ─── Session-Verwaltung ─────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST'
     && in_array(post_str('session_action'), ['revoke_one', 'revoke_others'], true)) {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     if (post_str('session_action') === 'revoke_one') {
         $tokId = (int) post_str('token_id');
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
 
 // ─── 2FA aktivieren ─────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'enable_2fa') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $secret = post_str('secret');
     $code   = post_str('code');
 
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'enable_2fa'
 
 // ─── 2FA deaktivieren ───────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'disable_2fa') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $pw = post_str('password_confirm');
     if (password_verify($pw, $profile['password'])) {
         db_execute('DELETE FROM user_2fa WHERE user_id = ?', [$userId]);
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'disable_2fa
 // ─── Profil/Account-Bearbeitung ─────────────────────────
 // ─── Passwort ändern (v0.18.48) ─────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'change_password') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $activeTab = 'security';
 
     $currentPw = post_str('current_password');
@@ -137,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'change_pass
 
 // ─── E-Mail-Änderung anfordern (v0.18.48) ─────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'request_email_change') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     require_once __DIR__ . '/../lib/email_change.php';
     $activeTab = 'security';
 
@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'request_ema
 
 // ─── E-Mail-Änderung abbrechen (v0.18.48) ─────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'cancel_email_change') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     require_once __DIR__ . '/../lib/email_change.php';
 
     email_change_cancel($userId);
@@ -170,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'cancel_emai
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'save_profile') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     // Tab-spezifische Forms (v0.18.45 fix): Wenn ein Feld NICHT im POST steht,
     // bestehenden DB-Wert behalten statt mit '' überschreiben.

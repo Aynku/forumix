@@ -12,7 +12,7 @@ $board = db_fetch('
 
 if (!$board) {
     http_response_code(404);
-    die('Forum nicht gefunden.');
+    error_page(404, 'Forum nicht gefunden', 'Dieses Forum gibt es nicht.');
 }
 
 // Passwort-Schutz: wenn kein Zugang → zur Entsperr-Seite umleiten

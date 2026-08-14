@@ -9,7 +9,7 @@ $action = $_GET['action'] ?? 'dashboard';
 // ─── AKTIONEN ─────────────────────────────────────────────────────
 
 if ($action === 'add_cat' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     db_execute('INSERT INTO categories (title, position) VALUES (?, ?)',
         [post_str('title'), post_int('position')]);
     flash('Kategorie angelegt.', 'success');
@@ -17,7 +17,7 @@ if ($action === 'add_cat' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'update_cat' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $catId = post_int('cat_id');
     if ($catId > 0) {
         db_execute('UPDATE categories SET title = ?, position = ? WHERE cat_id = ?',
@@ -28,14 +28,14 @@ if ($action === 'update_cat' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete_cat') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF-Fehler');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     db_execute('DELETE FROM categories WHERE cat_id = ?', [get_int('id')]);
     flash('Kategorie gelöscht.', 'success');
     redirect(FORUM_URL . '/admin/?action=categories');
 }
 
 if ($action === 'add_board' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     // Optional: Passwort beim Anlegen direkt setzen
     $newPw = (string) ($_POST['new_password'] ?? '');
@@ -49,14 +49,14 @@ if ($action === 'add_board' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete_board') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF-Fehler');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     db_execute('DELETE FROM boards WHERE board_id = ?', [get_int('id')]);
     flash('Forum gelöscht.', 'success');
     redirect(FORUM_URL . '/admin/?action=boards');
 }
 
 if ($action === 'update_board' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $bid = post_int('board_id');
     try {
         db_execute(
@@ -87,7 +87,7 @@ if ($action === 'update_board' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'update_board_approval' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $bid = post_int('board_id');
     $reqThreads = isset($_POST['require_approval_threads']) ? 1 : 0;
     $reqReplies = isset($_POST['require_approval_replies']) ? 1 : 0;
@@ -102,7 +102,7 @@ if ($action === 'update_board_approval' && $_SERVER['REQUEST_METHOD'] === 'POST'
 }
 
 if ($action === 'recalc_ranks') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF-Fehler');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $n = recalculate_all_ranks();
     flash($n . ' Ränge neu berechnet.', 'success');
     redirect(FORUM_URL . '/admin/?action=ranks');
@@ -110,7 +110,7 @@ if ($action === 'recalc_ranks') {
 
 // ─── EINSTELLUNGEN SPEICHERN ──────────────────────────────────────
 if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     // v0.18.49: Sub-Sektion-Marker — welche Settings-Sektion wurde abgesendet?
     // Ohne Marker = altes Verhalten (alle Felder). Mit Marker = nur die Felder dieser Sektion.
@@ -217,7 +217,7 @@ if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 // ─── IP-BANN ──────────────────────────────────────────────────────
 if ($action === 'ban_ip') {
     $csrf = $_GET['csrf'] ?? post_str('csrf');
-    if (!verify_csrf($csrf)) die('CSRF-Fehler');
+    if (!verify_csrf($csrf)) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     $ip      = trim($_GET['ip'] ?? post_str('ip'));
     $reason  = post_str('reason');
@@ -247,7 +247,7 @@ if ($action === 'ban_ip') {
 }
 
 if ($action === 'unban_ip') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF-Fehler');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     db_execute('DELETE FROM ip_bans WHERE ban_id = ?', [get_int('id')]);
     flash('IP-Bann aufgehoben.', 'success');
     redirect(FORUM_URL . '/admin/?action=ipbans');
@@ -255,7 +255,7 @@ if ($action === 'unban_ip') {
 
 // ─── WARTUNGS-TOOLS ───────────────────────────────────────────────
 if ($action === 'maintenance_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $task = post_str('task');
 
     if ($task === 'recount_stats') {
@@ -324,7 +324,7 @@ if ($action === 'maintenance_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── DESIGN: SPEICHERN ────────────────────────────────────────────
 if ($action === 'save_design' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     $themeKeys = [
         'theme_color_bg_body', 'theme_color_bg_surface', 'theme_color_bg_surface2',
@@ -394,7 +394,7 @@ if ($action === 'preview_design' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── DESIGN: PREVIEW LÖSCHEN ──────────────────────────────────────
 if ($action === 'clear_preview') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF-Fehler');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     unset($_SESSION['theme_preview']);
     redirect(FORUM_URL . '/admin/?action=design');
 }
@@ -433,7 +433,7 @@ if ($action === 'send_test_mail' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── DESIGN: AUF DEFAULTS ZURÜCKSETZEN ───────────────────────────
 if ($action === 'reset_design' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $defaults = [
         'theme_color_bg_body'       => '0a0a0b', 'theme_color_bg_surface'    => '131316',
         'theme_color_bg_surface2'   => '1a1a1f', 'theme_color_text_base'     => 'e7e7ea',
@@ -457,7 +457,7 @@ if ($action === 'reset_design' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── ROLLEN-AVATARE: UPLOAD / DELETE ──────────────────────────────
 if ($action === 'upload_role_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $role = post_str('role');
     if (!in_array($role, ['owner', 'admin', 'mod'], true)) {
         flash('Ungültige Rolle.', 'error');
@@ -494,7 +494,7 @@ if ($action === 'upload_role_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete_role_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $role = post_str('role');
     if (!in_array($role, ['owner', 'admin', 'mod'], true)) {
         redirect(FORUM_URL . '/admin/?action=settings');
@@ -512,7 +512,7 @@ if ($action === 'delete_role_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── MODUL-VERWALTUNG ─────────────────────────────────────────────
 if ($action === 'module_toggle') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $code = $_GET['code'] ?? '';
     $turnOn = ($_GET['enable'] ?? '0') === '1';
     if ($turnOn) {
@@ -527,7 +527,7 @@ if ($action === 'module_toggle') {
 
 // ─── SMILEY-VERWALTUNG ───────────────────────────────────────
 if ($action === 'add_smiley' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $code  = trim($_POST['code']  ?? '');
     $emoji = trim($_POST['emoji'] ?? '');
     $desc  = trim($_POST['description'] ?? '');
@@ -556,7 +556,7 @@ if ($action === 'add_smiley' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'update_smiley' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $id    = (int) ($_POST['smiley_id'] ?? 0);
     $code  = trim($_POST['code']  ?? '');
     $emoji = trim($_POST['emoji'] ?? '');
@@ -588,7 +588,7 @@ if ($action === 'update_smiley' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete_smiley') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $id = (int) ($_GET['id'] ?? 0);
     if ($id) {
         try {
@@ -603,7 +603,7 @@ if ($action === 'delete_smiley') {
 }
 
 if ($action === 'reorder_smileys' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $ids = $_POST['order'] ?? [];
     if (is_array($ids)) {
         $pos = 0;
@@ -626,7 +626,7 @@ if ($action === 'reorder_smileys' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── RECHTLICHES (Impressum / Datenschutz) ──────────────────────
 if ($action === 'save_legal' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     set_setting('imprint_name',   trim($_POST['imprint_name']   ?? ''));
     set_setting('imprint_street', trim($_POST['imprint_street'] ?? ''));
     set_setting('imprint_city',   trim($_POST['imprint_city']   ?? ''));
@@ -636,7 +636,7 @@ if ($action === 'save_legal' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'save_page' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $slug    = $_POST['slug'] ?? '';
     $content = $_POST['content'] ?? '';
     if (!in_array($slug, ['imprint', 'privacy', 'terms'], true)) {
@@ -652,7 +652,7 @@ if ($action === 'save_page' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'save_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $name    = trim($_POST['name'] ?? '');
     $content = $_POST['content'] ?? '';
     $cu      = current_user();
@@ -682,7 +682,7 @@ if ($action === 'save_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'reset_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $name = trim($_POST['name'] ?? '');
     if ($name && delete_template_override($name)) {
         flash('Template auf Original zurückgesetzt.', 'success');
@@ -693,7 +693,7 @@ if ($action === 'reset_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'ack_template_update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $name = trim($_POST['name'] ?? '');
     if ($name && acknowledge_template_override_update($name)) {
         flash('Update-Hinweis ausgeblendet. Dein Override bleibt aktiv.', 'success');
@@ -704,7 +704,7 @@ if ($action === 'ack_template_update' && $_SERVER['REQUEST_METHOD'] === 'POST') 
 }
 
 if ($action === 'approve_user_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $uid = (int) ($_POST['user_id'] ?? 0);
     $cu  = current_user();
     if ($uid > 0 && $cu && approve_user($uid, (int) $cu['user_id'])) {
@@ -716,7 +716,7 @@ if ($action === 'approve_user_action' && $_SERVER['REQUEST_METHOD'] === 'POST') 
 }
 
 if ($action === 'reject_user_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $uid    = (int) ($_POST['user_id'] ?? 0);
     $reason = trim((string) ($_POST['reason'] ?? ''));
     $cu     = current_user();
@@ -734,7 +734,7 @@ if ($action === 'reject_user_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── EINLADUNGEN ──────────────────────────────────────────────────
 if ($action === 'invitation_create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $cu = current_user();
     if (!$cu) redirect(FORUM_URL . '/admin/');
 
@@ -766,7 +766,7 @@ if ($action === 'invitation_create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'invitation_resend' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $iid = (int) ($_POST['invitation_id'] ?? 0);
     $override = trim((string) ($_POST['email_override'] ?? ''));
     $inv = db_fetch('SELECT * FROM invitations WHERE invitation_id = ?', [$iid]);
@@ -787,7 +787,7 @@ if ($action === 'invitation_resend' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'invitation_revoke' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $iid = (int) ($_POST['invitation_id'] ?? 0);
     $cu  = current_user();
     if ($iid > 0 && $cu && invitation_revoke($iid, (int) $cu['user_id'])) {
@@ -799,7 +799,7 @@ if ($action === 'invitation_revoke' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'create_backup' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $type = $_POST['type'] ?? 'db';
     $note = trim($_POST['note'] ?? '');
 
@@ -819,7 +819,7 @@ if ($action === 'create_backup' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete_backup' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $filename = $_POST['filename'] ?? '';
     if (delete_backup($filename)) {
         flash("Backup gelöscht: {$filename}", 'success');
@@ -832,13 +832,13 @@ if ($action === 'delete_backup' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($action === 'download_backup') {
     if (!is_admin(current_user())) {
         http_response_code(403);
-        die('Nur Admins');
+        error_page(403, 'Zugriff verweigert', 'Dieser Bereich ist Administratoren vorbehalten.');
     }
     $filename = $_GET['file'] ?? '';
     $path = backup_path($filename);
     if (!$path) {
         http_response_code(404);
-        die('Backup nicht gefunden oder ungültiger Name.');
+        error_page(404, 'Backup nicht gefunden', 'Diese Sicherung gibt es nicht, oder der Name ist ungültig.');
     }
     // Force-Download
     $mime = str_ends_with($filename, '.sql') ? 'application/sql' : 'application/zip';
@@ -851,7 +851,7 @@ if ($action === 'download_backup') {
 }
 
 if ($action === 'clear_cache' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $type = $_POST['type'] ?? 'all';
 
     $cleared = [];
@@ -874,7 +874,7 @@ if ($action === 'clear_cache' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── FREIGABE-WARTESCHLANGE ───────────────────────────────────────
 if (in_array($action, ['approve_thread', 'approve_post', 'reject_thread', 'reject_post'], true)) {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     $id = get_int('id');
     $reason = $_GET['reason'] ?? '';
@@ -898,7 +898,7 @@ if (in_array($action, ['approve_thread', 'approve_post', 'reject_thread', 'rejec
 
 // ─── DATENBANK-MIGRATIONEN ────────────────────────────────────────
 if ($action === 'run_migration' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     // Admin oder Owner (require_admin oben deckt es bereits ab)
     $cu = current_user();
@@ -920,7 +920,7 @@ if ($action === 'run_migration' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── UPDATE-PAKET HOCHLADEN (v0.18.54) ────────────────────────────
 if ($action === 'upload_update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     // STRENG: Nur der Owner darf Pakete einspielen (RCE-Vektor)
     $cu = current_user();
@@ -972,7 +972,7 @@ if ($action === 'upload_update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── BENUTZER-AKTIONEN ────────────────────────────────────────────
 if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', 'ban_user', 'unban_user', 'delete_user', 'make_owner', 'remove_owner'], true)) {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     $targetId = get_int('id');
     $target   = db_fetch('SELECT * FROM users WHERE user_id = ?', [$targetId]);
@@ -1108,7 +1108,7 @@ if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', '
 
 // ─── MELDUNGEN ────────────────────────────────────────────────────
 if ($action === 'resolve_report') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $rid    = get_int('id');
     $newSt  = $_GET['status'] ?? 'reviewed';
     $cu     = current_user();
@@ -1119,7 +1119,7 @@ if ($action === 'resolve_report') {
 
 // ─── WARNUNGEN ────────────────────────────────────────────────────
 if ($action === 'issue_warning' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $cu = current_user();
     $uid = post_int('user_id');
     $pts = post_int('points', 1);
@@ -1143,7 +1143,7 @@ if ($action === 'issue_warning' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'revoke_warning') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $cu = current_user();
     revoke_warning(get_int('id'), (int) $cu['user_id']);
     flash('Warnung aufgehoben.', 'success');
@@ -1152,7 +1152,7 @@ if ($action === 'revoke_warning') {
 
 // ─── FORUM-MODERATOREN ────────────────────────────────────────────
 if ($action === 'add_board_mod' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $cu  = current_user();
     $bid = post_int('board_id');
     $uid = post_int('user_id');
@@ -1164,7 +1164,7 @@ if ($action === 'add_board_mod' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'remove_board_mod') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $bid = get_int('board');
     $uid = get_int('user');
     if ($bid > 0 && $uid > 0) {
@@ -1176,7 +1176,7 @@ if ($action === 'remove_board_mod') {
 
 // ─── TAGS ─────────────────────────────────────────────────────────
 if ($action === 'add_tag' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $slug = preg_replace('/[^a-z0-9]/', '', strtolower(post_str('slug')));
     $name = post_str('name');
     $desc = post_str('description');
@@ -1198,7 +1198,7 @@ if ($action === 'add_tag' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete_tag') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     db_execute('DELETE FROM tags WHERE tag_id = ?', [get_int('id')]);
     flash('Tag gelöscht.', 'success');
     redirect(FORUM_URL . '/admin/?action=tags');

@@ -7,7 +7,7 @@ require_login();
 $cu       = current_user();
 $showUser = get_int('user', (int) $cu['user_id']);
 $profile  = db_fetch('SELECT * FROM users WHERE user_id = ?', [$showUser]);
-if (!$profile) { http_response_code(404); die('User nicht gefunden.'); }
+if (!$profile) error_page(404, 'Benutzer nicht gefunden', 'Dieses Konto gibt es nicht.');
 
 check_achievements((int) $profile['user_id']);
 

@@ -18,7 +18,7 @@ if ($action === 'new' || isset($_GET['new'])) {
     $formContent  = '';
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+        if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
         $recv    = db_fetch('SELECT * FROM users WHERE username = ?', [post_str('receiver')]);
         $subject = post_str('subject');
@@ -86,7 +86,7 @@ if ($action === 'read') {
 
     if (!$pm) {
         http_response_code(403);
-        die('Nachricht nicht gefunden.');
+        error_page(404, 'Nachricht nicht gefunden', 'Diese Nachricht gibt es nicht, oder sie gehört nicht dir.');
     }
 
     // is_read nur setzen wenn der aktuelle User der Empfänger ist
@@ -106,7 +106,7 @@ if ($action === 'read') {
 
 // ── LÖSCHEN ───────────────────────────────────────────────────────
 if ($action === 'delete') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF-Fehler');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     $pmId = get_int('id');
     $pm = db_fetch('SELECT sender_id, receiver_id FROM private_messages WHERE pm_id = ?', [$pmId]);

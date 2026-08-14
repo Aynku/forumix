@@ -12,7 +12,7 @@ $board = db_fetch('
 
 if (!$board) {
     http_response_code(404);
-    die('Forum nicht gefunden.');
+    error_page(404, 'Forum nicht gefunden', 'Dieses Forum gibt es nicht.');
 }
 
 // Wenn das Board nicht (mehr) geschützt ist oder der User bereits Zugang hat → direkt rein
@@ -28,7 +28,7 @@ if (!is_logged_in()) {
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF-Fehler');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     $pw = (string) ($_POST['password'] ?? '');
 

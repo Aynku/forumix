@@ -6,7 +6,7 @@ require_login();
 
 $boardId = get_int('board');
 $board   = db_fetch('SELECT * FROM boards WHERE board_id = ?', [$boardId]);
-if (!$board) { http_response_code(404); die('Forum nicht gefunden.'); }
+if (!$board) error_page(404, 'Forum nicht gefunden', 'Dieses Forum gibt es nicht.');
 
 // Passwort-Schutz: kein neuer Thread ohne Zugang
 if (!board_user_can_access($board)) {
@@ -15,7 +15,7 @@ if (!board_user_can_access($board)) {
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) die('CSRF');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
     $title   = post_str('title');
     $content = post_str('content');

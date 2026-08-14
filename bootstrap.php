@@ -114,6 +114,31 @@ require_once __DIR__ . '/lib/view.php';
 require_once __DIR__ . '/lib/user_deletion.php';
 require_once __DIR__ . '/lib/template.php';
 
+// ── Unbehandelte Fehler landen im Forum, nicht im Nichts ────────
+//
+// Seit display_errors aus ist, endete ein Fatal in einer weissen Seite.
+// Hier bekommt er eine Fehlerseite im Layout — und immer einen Eintrag im
+// Protokoll. Bei FORUM_DEBUG bleibt alles wie es ist, sonst verdeckt die
+// huebsche Seite genau das, was man beim Entwickeln sehen will.
+if (!defined('FORUM_DEBUG') || FORUM_DEBUG !== true) {
+    set_exception_handler(static function (Throwable $e): void {
+        error_log('[uncaught] ' . get_class($e) . ': ' . $e->getMessage()
+                . ' in ' . $e->getFile() . ':' . $e->getLine());
+        if (headers_sent()) { echo '<p style="padding:20px">Es ist ein Fehler aufgetreten.</p>'; return; }
+        error_page(500, 'Es ist ein Fehler aufgetreten',
+            'Der Fehler wurde protokolliert. Bitte versuche es später erneut.');
+    });
+
+    register_shutdown_function(static function (): void {
+        $e = error_get_last();
+        if (!$e || !in_array($e['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) return;
+        error_log('[fatal] ' . $e['message'] . ' in ' . $e['file'] . ':' . $e['line']);
+        if (headers_sent()) return;  // Seite ist schon halb raus, nichts mehr zu retten
+        error_page(500, 'Es ist ein Fehler aufgetreten',
+            'Der Fehler wurde protokolliert. Bitte versuche es später erneut.');
+    });
+}
+
 // ────────────────────────────────────────────────────────────────
 // Forum-Version
 // ────────────────────────────────────────────────────────────────

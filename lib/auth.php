@@ -182,10 +182,10 @@ function require_login(): void {
     }
 }
 function require_admin(): void {
-    if (!is_admin()) { http_response_code(403); die('Zugriff verweigert.'); }
+    if (!is_admin()) error_page(403, 'Zugriff verweigert', 'Dieser Bereich ist Administratoren vorbehalten.');
 }
 function require_mod(): void {
-    if (!is_mod()) { http_response_code(403); die('Zugriff verweigert.'); }
+    if (!is_mod()) error_page(403, 'Zugriff verweigert', 'Dieser Bereich ist dem Moderationsteam vorbehalten.');
 }
 
 function csrf_token(): string {

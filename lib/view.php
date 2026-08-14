@@ -54,7 +54,13 @@ function render(string $view, array $data = []): void {
                 $viewFile = __DIR__ . '/../modules/' . $parts[0] . '/views/' . $parts[1] . '.php';
             }
         }
-        if (!file_exists($viewFile)) die('View nicht gefunden: ' . e($view));
+        if (!file_exists($viewFile)) {
+            // Nicht ueber error_page(): das rendert selbst eine View und liefe im
+            // Kreis, wenn ausgerechnet die Fehleransicht fehlt.
+            error_log('[view] fehlt: ' . $view);
+            if (!headers_sent()) http_response_code(500);
+            die('Ansicht nicht verfuegbar.');
+        }
     }
 
     ob_start();
