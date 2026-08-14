@@ -319,12 +319,12 @@
           (Google Authenticator, Authy, 1Password, …) oder gib den Secret-Code manuell ein.
         </p>
 
-        {# Kein QR-Bild von einem fremden Dienst: die URL enthaelt den
-           2FA-Schluessel im Klartext und landete damit in dessen Logs.
-           Eintragen geht ueber den Secret-Code darunter. #}
-        <div style="text-align:center;margin:18px 0;padding:14px;border:1px dashed var(--border);border-radius:8px;color:var(--text-muted);font-size:13px">
-          Trage den Code unten in deiner Authenticator-App unter
-          <strong>„Schlüssel manuell eingeben"</strong> ein.
+        {# QR wird auf dem eigenen Server erzeugt (lib/qrcode.php) — der
+           Schluessel verlaesst die Maschine nicht. #}
+        <div style="text-align:center;margin:18px 0">
+          <span style="display:inline-block;background:#fff;padding:10px;border-radius:8px;border:1px solid var(--border);line-height:0">
+            {{ otpSvg|raw }}
+          </span>
         </div>
 
         <div style="background:var(--bg-surface2);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:16px;text-align:center">

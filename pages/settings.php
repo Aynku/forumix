@@ -393,6 +393,7 @@ try {
 $has2fa = user_has_2fa($userId);
 $newSecret = $has2fa ? '' : generate_2fa_secret();
 $otpUrl    = $newSecret ? twofa_otpauth_url($profile['username'], $newSecret) : '';
+$otpSvg    = $otpUrl ? qr_svg($otpUrl, 5) : '';
 
 // Frisch generierte Backup-Codes (einmalig nach Aktivierung sichtbar)
 $newBackupCodes = $_SESSION['_2fa_new_backup_codes'] ?? [];
@@ -408,6 +409,7 @@ render('settings', [
     'has2fa'           => $has2fa,
     'newSecret'        => $newSecret,
     'otpUrl'           => $otpUrl,
+    'otpSvg'           => $otpSvg,
     'newBackupCodes'   => $newBackupCodes,
     'breadcrumb'       => [
         ['title' => '⚙️ Einstellungen', 'url' => FORUM_URL . '/settings.php'],
