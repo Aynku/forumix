@@ -26,7 +26,6 @@
     <h1>Häufige Fragen</h1>
     <p class="lead">
       Fragen zum Betrieb, und weiter unten der Aufbau eigener Module.
-      Was hier steht, ist am Code nachgesehen — nicht aus der Erinnerung.
     </p>
     <div class="cta">
       <a class="btn" href="/">Zur Startseite</a>
@@ -118,26 +117,81 @@
   <div class="wrap">
     <h2>Module</h2>
     <p class="sub">
-      Ein Modul ist ein Ordner unter <code>modules/</code>. Es wird im Adminbereich
-      ein- und ausgeschaltet, bringt sein eigenes Tabellenschema mit und kann eigene
-      Seiten, Ansichten und Einhängepunkte liefern. Deaktivieren löscht keine Daten.
+      Forumix hat eine Modul-Schnittstelle. Ein Modul ist ein Ordner unter
+      <code>modules/</code> — mehr braucht es nicht, damit der Adminbereich es findet.
+      Es kann eigene Seiten und Ansichten mitbringen, eigene Tabellen anlegen, sich an
+      definierten Stellen ins Layout hängen und eigene Einstellungen speichern. Ein Modul
+      ist kein Fremdkörper: es benutzt dieselben Funktionen wie der Kern.
     </p>
 
-    <h3 style="font-size:16px;margin:26px 0 10px">Aufbau</h3>
+    <div class="grid">
+      <div class="card">
+        <h3>📄 Eigene Seiten</h3>
+        <ul><li>Eine PHP-Datei im Modulordner, direkt aufrufbar. Sie startet das Forum
+                selbst und hat danach Anmeldung, Rechte und Layout zur Verfügung.</li></ul>
+      </div>
+      <div class="card">
+        <h3>🧱 Eigene Ansichten</h3>
+        <ul><li><code>render('@code/name')</code> holt
+                <code>views/name.php</code> aus dem Modul und setzt es in das Layout des
+                Forums — mit Kopf, Fuß und Theme.</li></ul>
+      </div>
+      <div class="card">
+        <h3>🪝 Einhängepunkte</h3>
+        <ul><li>Eine Datei unter <code>hooks/</code> wird an der passenden Stelle
+                eingebunden, solange das Modul aktiv ist. Ohne Eingriff im Kern.</li></ul>
+      </div>
+      <div class="card">
+        <h3>🗄️ Eigene Tabellen</h3>
+        <ul><li><code>install.sql</code> läuft beim ersten Aktivieren. Die Daten bleiben,
+                wenn das Modul später wieder ausgeschaltet wird.</li></ul>
+      </div>
+      <div class="card">
+        <h3>⚙️ Eigene Einstellungen</h3>
+        <ul><li>Ein JSON-Feld je Modul, über zwei Funktionen erreichbar. Keine eigene
+                Tabelle nötig, nur um sich drei Werte zu merken.</li></ul>
+      </div>
+      <div class="card">
+        <h3>🔔 Ein- und Ausschalten</h3>
+        <ul><li>Zwei optionale Funktionen im Manifest laufen beim Aktivieren und beim
+                Deaktivieren — für Aufräumarbeiten oder eine erste Befüllung.</li></ul>
+      </div>
+    </div>
+
+    <h3 style="font-size:16px;margin:30px 0 12px">Vom Ordner zum laufenden Modul</h3>
+    <ol class="steps">
+      <li>
+        <strong>Ordner ablegen</strong>
+        <p><code>modules/meinmodul/</code> mit einer <code>module.php</code> darin. Der
+           Adminbereich listet ab sofort alles auf, was eine <code>module.php</code> hat.</p>
+      </li>
+      <li>
+        <strong>Aktivieren</strong>
+        <p>Beim ersten Einschalten läuft <code>install.sql</code> — genau einmal. Danach
+           wird das Modul in der Tabelle <code>modules</code> vermerkt.</p>
+      </li>
+      <li>
+        <strong>Deaktivieren</strong>
+        <p>Nur der Schalter geht auf 0. Tabellen und Inhalte bleiben unangetastet, ein
+           erneutes Einschalten holt alles zurück.</p>
+      </li>
+    </ol>
+
+    <h3 style="font-size:16px;margin:30px 0 10px">Aufbau</h3>
 <pre><code>modules/meinmodul/
-  module.php        <span class="comment">Pflicht — gibt ein Array zurück (das Manifest)</span>
-  install.sql       <span class="comment">optional — läuft EINMAL beim ersten Aktivieren</span>
-  meinmodul.php     <span class="comment">optional — eigene Seite, direkt aufrufbar</span>
-  views/liste.php   <span class="comment">optional — render('@meinmodul/liste')</span>
-  hooks/home_top.php<span class="comment">optional — wird an dieser Stelle eingebunden</span></code></pre>
+  module.php          <span class="comment">Pflicht — gibt ein Array zurück (das Manifest)</span>
+  install.sql         <span class="comment">optional — läuft EINMAL beim ersten Aktivieren</span>
+  meinmodul.php       <span class="comment">optional — eigene Seite, direkt aufrufbar</span>
+  views/liste.php     <span class="comment">optional — render('@meinmodul/liste')</span>
+  hooks/home_top.php  <span class="comment">optional — Einhängepunkt im Layout</span></code></pre>
 
     <div class="note" style="margin-top:14px">
       Der Ordnername ist der <strong>Code</strong> des Moduls und muss zum Feld
-      <code>code</code> im Manifest passen. Erlaubt sind nur
-      <code>a–z 0–9 _ -</code> — der Name landet in einem Dateipfad, deshalb die enge Regel.
+      <code>code</code> im Manifest passen. Erlaubt sind nur <code>a–z 0–9 _ -</code> —
+      der Name landet in einem Dateipfad, deshalb die enge Regel.
     </div>
 
-    <h3 style="font-size:16px;margin:26px 0 10px">Das Manifest</h3>
+    <h3 style="font-size:16px;margin:30px 0 10px">Das Manifest</h3>
 <pre><code>&lt;?php
 <span class="comment">// modules/meinmodul/module.php</span>
 if (!defined('FORUM_RUNNING')) return [];
@@ -153,34 +207,147 @@ return [
     'on_disable'  =&gt; function () { <span class="comment">/* vor dem Ausschalten */</span> },
 ];</code></pre>
 
-    <h3 style="font-size:16px;margin:26px 0 10px">Eigene Seite</h3>
-    <p class="sub" style="margin-bottom:12px">
-      Eine Modulseite wird direkt aufgerufen, etwa
-      <code>/modules/meinmodul/meinmodul.php</code>. Sie startet das Forum selbst und
-      muss zwei Dinge prüfen.
+    <h3 style="font-size:16px;margin:30px 0 10px">Ein vollständiges Beispiel</h3>
+    <p class="sub" style="margin-bottom:16px">
+      „Zitat des Tages": zeigt auf der Startseite ein zufälliges Zitat und hat eine eigene
+      Seite, auf der Admins Zitate pflegen. Fünf Dateien, alles dabei — Tabelle, Seite,
+      Ansicht, Einhängepunkt.
     </p>
+
+    <p class="sub" style="margin:0 0 6px"><strong>1.</strong> <code>modules/zitate/module.php</code></p>
+<pre><code>&lt;?php
+if (!defined('FORUM_RUNNING')) return [];
+
+return [
+    'code'        =&gt; 'zitate',
+    'name'        =&gt; 'Zitat des Tages',
+    'description' =&gt; 'Zeigt oben auf der Startseite ein zufälliges Zitat.',
+    'icon'        =&gt; '💭',
+    'version'     =&gt; '1.0',
+    'author'      =&gt; 'Dein Name',
+];</code></pre>
+
+    <p class="sub" style="margin:18px 0 6px"><strong>2.</strong> <code>modules/zitate/install.sql</code></p>
+<pre><code>CREATE TABLE IF NOT EXISTS `zitate` (
+  `zitat_id`   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `text`       VARCHAR(500) NOT NULL,
+  `quelle`     VARCHAR(120) NOT NULL DEFAULT '',
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+<span class="comment">-- IGNORE, damit ein zweiter Durchlauf nicht an einem doppelten Schlüssel stirbt</span>
+INSERT IGNORE INTO `zitate` (`zitat_id`, `text`, `quelle`) VALUES
+(1, 'Erst wenn es kaputt ist, weiß man, wie es funktioniert.', 'Werkstattweisheit');</code></pre>
+
+    <p class="sub" style="margin:18px 0 6px"><strong>3.</strong> <code>modules/zitate/hooks/home_top.php</code></p>
+<pre><code>&lt;?php
+<span class="comment">// Wird auf der Startseite eingebunden, solange das Modul aktiv ist.
+// $currentUser und $csrfToken stehen hier bereit.</span>
+$z = db_fetch('SELECT text, quelle FROM zitate ORDER BY RAND() LIMIT 1');
+if ($z):
+?&gt;
+&lt;div class="card" style="margin-bottom:16px"&gt;
+  💭 &lt;em&gt;&lt;?= e($z['text']) ?&gt;&lt;/em&gt;
+  &lt;?php if ($z['quelle'] !== ''): ?&gt;
+    &lt;span style="color:var(--text-muted)"&gt;— &lt;?= e($z['quelle']) ?&gt;&lt;/span&gt;
+  &lt;?php endif; ?&gt;
+&lt;/div&gt;
+&lt;?php endif; ?&gt;</code></pre>
+
+    <p class="sub" style="margin:18px 0 6px"><strong>4.</strong> <code>modules/zitate/zitate.php</code> — die eigene Seite</p>
 <pre><code>&lt;?php
 if (!defined('FORUM_RUNNING')) define('FORUM_RUNNING', true);
 require_once __DIR__ . '/../../bootstrap.php';
 
-<span class="comment">// 1. Ist das Modul überhaupt an? Sonst sieht man es auch im Aus-Zustand.</span>
-if (!module_enabled('meinmodul')) {
-    http_response_code(404);
-    render('error', ['title' =&gt; 'Nicht gefunden', 'message' =&gt; 'Nicht aktiv.']);
-    return;
+<span class="comment">// Aus heißt aus — sonst bliebe die Seite auch im abgeschalteten Zustand erreichbar.</span>
+if (!module_enabled('zitate')) {
+    error_page(404, 'Nicht gefunden', 'Dieses Modul ist nicht aktiv.');
 }
 
-<span class="comment">// 2. Bei jedem POST das Token prüfen — ohne das kann eine fremde Seite
-//    Aktionen im Namen eines angemeldeten Besuchers auslösen.</span>
+$cu       = current_user();
+$canAdmin = $cu && ($cu['is_admin'] || !empty($cu['is_owner']));
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    <span class="comment">// Beides prüfen: Token gegen fremde Formulare, Rechte gegen neugierige Besucher.</span>
     if (!verify_csrf($_POST['csrf'] ?? '')) {
-        error_page(400, 'Sicherheits-Token ungültig');
+        error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu.');
     }
+    if (!$canAdmin) {
+        error_page(403, 'Kein Zugriff', 'Zitate darf nur die Verwaltung pflegen.');
+    }
+
+    if (($_POST['tun'] ?? '') === 'anlegen') {
+        $text   = trim($_POST['text'] ?? '');
+        $quelle = trim($_POST['quelle'] ?? '');
+        if ($text !== '') {
+            <span class="comment">// Werte gehören in die Platzhalter, nie in den SQL-Text.</span>
+            db_execute('INSERT INTO zitate (text, quelle) VALUES (?, ?)',
+                       [mb_substr($text, 0, 500), mb_substr($quelle, 0, 120)]);
+            flash('Zitat gespeichert.', 'success');
+        } else {
+            flash('Ohne Text geht es nicht.', 'error');
+        }
+    }
+
+    if (($_POST['tun'] ?? '') === 'loeschen') {
+        db_execute('DELETE FROM zitate WHERE zitat_id = ?', [(int) ($_POST['id'] ?? 0)]);
+        flash('Zitat gelöscht.', 'success');
+    }
+
+    <span class="comment">// Nach dem Schreiben umleiten, sonst legt ein Neuladen alles noch einmal an.</span>
+    redirect(FORUM_URL . '/modules/zitate/zitate.php');
 }
 
-render('@meinmodul/liste', ['eintraege' =&gt; db_fetchAll('SELECT * FROM meine_tabelle')]);</code></pre>
+render('@zitate/liste', [
+    'zitate'   =&gt; db_fetchAll('SELECT * FROM zitate ORDER BY zitat_id DESC'),
+    'canAdmin' =&gt; $canAdmin,
+]);</code></pre>
 
-    <h3 style="font-size:16px;margin:26px 0 10px">Einhängepunkte</h3>
+    <p class="sub" style="margin:18px 0 6px"><strong>5.</strong> <code>modules/zitate/views/liste.php</code></p>
+<pre><code>&lt;?php if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); } ?&gt;
+&lt;h1&gt;Zitate&lt;/h1&gt;
+
+&lt;?php if ($canAdmin): ?&gt;
+  &lt;form method="post" class="form-card"&gt;
+    <span class="comment">&lt;!-- csrfToken kommt von render() und ist in jeder Ansicht da --&gt;</span>
+    &lt;input type="hidden" name="csrf" value="&lt;?= e($csrfToken) ?&gt;"&gt;
+    &lt;input type="hidden" name="tun" value="anlegen"&gt;
+    &lt;div class="form-row"&gt;
+      &lt;label&gt;Zitat&lt;/label&gt;
+      &lt;input type="text" name="text" maxlength="500" required&gt;
+    &lt;/div&gt;
+    &lt;div class="form-row"&gt;
+      &lt;label&gt;Quelle&lt;/label&gt;
+      &lt;input type="text" name="quelle" maxlength="120"&gt;
+    &lt;/div&gt;
+    &lt;button class="btn btn-primary"&gt;Speichern&lt;/button&gt;
+  &lt;/form&gt;
+&lt;?php endif; ?&gt;
+
+&lt;?php foreach ($zitate as $z): ?&gt;
+  &lt;div class="card" style="margin-top:10px"&gt;
+    <span class="comment">&lt;!-- Alles, was aus der Datenbank kommt, durch e() --&gt;</span>
+    &lt;em&gt;&lt;?= e($z['text']) ?&gt;&lt;/em&gt;
+    &lt;?php if ($z['quelle'] !== ''): ?&gt; — &lt;?= e($z['quelle']) ?&gt;&lt;?php endif; ?&gt;
+
+    &lt;?php if ($canAdmin): ?&gt;
+      &lt;form method="post" style="display:inline"&gt;
+        &lt;input type="hidden" name="csrf" value="&lt;?= e($csrfToken) ?&gt;"&gt;
+        &lt;input type="hidden" name="tun" value="loeschen"&gt;
+        &lt;input type="hidden" name="id" value="&lt;?= (int) $z['zitat_id'] ?&gt;"&gt;
+        &lt;button class="btn btn-ghost"&gt;Löschen&lt;/button&gt;
+      &lt;/form&gt;
+    &lt;?php endif; ?&gt;
+  &lt;/div&gt;
+&lt;?php endforeach; ?&gt;</code></pre>
+
+    <div class="note" style="margin-top:16px">
+      Ordner nach <code>modules/</code> hochladen, im Adminbereich unter
+      <em>Module</em> einschalten — fertig. Das Zitat steht auf der Startseite, die
+      Pflegeseite liegt unter <code>/modules/zitate/zitate.php</code>.
+    </div>
+
+    <h3 style="font-size:16px;margin:30px 0 10px">Einhängepunkte</h3>
     <p class="sub" style="margin-bottom:12px">
       Eine Datei <code>hooks/&lt;name&gt;.php</code> wird an der passenden Stelle eingebunden,
       sofern das Modul aktiv ist. Im Geltungsbereich stehen <code>$currentUser</code> und
@@ -196,32 +363,34 @@ render('@meinmodul/liste', ['eintraege' =&gt; db_fetchAll('SELECT * FROM meine_t
       Das Einbinden aller aktiven Module übernimmt der Kern von da an allein.
     </div>
 
-    <h3 style="font-size:16px;margin:26px 0 10px">Eigene Tabellen</h3>
+    <h3 style="font-size:16px;margin:30px 0 10px">Einstellungen je Modul</h3>
+<pre><code>$cfg = module_config('zitate');            <span class="comment">// Array, leer wenn nichts gesetzt</span>
+$cfg['anzahl'] = 3;
+set_module_config('zitate', $cfg);         <span class="comment">// als JSON in modules.config</span></code></pre>
+
+    <h3 style="font-size:16px;margin:30px 0 10px">Was der Kern bereitstellt</h3>
     <p class="sub" style="margin-bottom:12px">
-      <code>install.sql</code> läuft einmal, beim <em>ersten</em> Aktivieren. Danach nie
-      wieder — auch nicht nach Aus- und wieder Einschalten.
+      Nach dem <code>require</code> der <code>bootstrap.php</code> stehen diese Funktionen
+      zur Verfügung. Es gibt keine eigene Modul-API daneben — was der Kern benutzt,
+      benutzt dein Modul auch.
     </p>
-<pre><code>CREATE TABLE IF NOT EXISTS meine_tabelle (
-  id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  user_id    INT UNSIGNED NOT NULL,
-  text       TEXT NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;</code></pre>
-    <div class="note" style="margin-top:14px">
-      <strong>Zwei Fallstricke.</strong> Die Datei wird an Semikolons zerlegt — ein
-      Semikolon in einem Zeichenketten-Wert oder in einem Trigger zerreißt die Anweisung.
-      Und Spalten mit <code>NOT NULL</code> ohne Vorgabewert musst du bei jedem
-      <code>INSERT</code> mitgeben: mit <code>STRICT_TRANS_TABLES</code> — der
-      Voreinstellung — bricht es sonst mit Fehler 1364 ab. Gib Spalten lieber ein
-      <code>DEFAULT</code> mit.
-    </div>
+    <table>
+      <tr><th>Aufruf</th><th>Tut</th></tr>
+      <tr><td><code>db_fetchAll($sql, $params)</code></td><td>Liste von Zeilen</td></tr>
+      <tr><td><code>db_fetch($sql, $params)</code></td><td>Eine Zeile oder <code>null</code></td></tr>
+      <tr><td><code>db_count($sql, $params)</code></td><td>Eine Zahl</td></tr>
+      <tr><td><code>db_execute($sql, $params)</code></td><td>Schreiben, liefert betroffene Zeilen</td></tr>
+      <tr><td><code>current_user()</code></td><td>Angemeldetes Konto oder <code>null</code></td></tr>
+      <tr><td><code>module_enabled($code)</code></td><td>Ist das Modul an?</td></tr>
+      <tr><td><code>module_config($code)</code> · <code>set_module_config($code, $cfg)</code></td><td>Einstellungen des Moduls</td></tr>
+      <tr><td><code>render($view, $daten)</code></td><td>Ansicht ins Layout setzen</td></tr>
+      <tr><td><code>e($text)</code></td><td>Ausgabe maskieren</td></tr>
+      <tr><td><code>verify_csrf($token)</code></td><td>Token prüfen</td></tr>
+      <tr><td><code>flash($text, $art)</code> · <code>redirect($url)</code></td><td>Meldung merken, umleiten</td></tr>
+      <tr><td><code>error_page($code, $titel, $text)</code></td><td>Fehlerseite im Layout</td></tr>
+    </table>
 
-    <h3 style="font-size:16px;margin:26px 0 10px">Einstellungen je Modul</h3>
-<pre><code>$cfg = module_config('meinmodul');          <span class="comment">// Array, leer wenn nichts gesetzt</span>
-$cfg['limit'] = 20;
-set_module_config('meinmodul', $cfg);       <span class="comment">// als JSON in modules.config</span></code></pre>
-
-    <h3 style="font-size:16px;margin:26px 0 10px">Was du einhalten solltest</h3>
+    <h3 style="font-size:16px;margin:30px 0 10px">Was du einhalten solltest</h3>
     <div class="grid">
       <div class="card">
         <h3>🔒 Nichts direkt aufrufbar</h3>
@@ -243,6 +412,17 @@ set_module_config('meinmodul', $cfg);       <span class="comment">// als JSON in
         <ul><li>Rechte über <code>current_user()</code> prüfen, nicht über das, was das
                 Formular mitschickt. Für Admin-Aktionen zusätzlich
                 <code>is_admin</code> oder <code>is_owner</code>.</li></ul>
+      </div>
+      <div class="card">
+        <h3>🔁 install.sql wiederholbar</h3>
+        <ul><li><code>CREATE TABLE IF NOT EXISTS</code> und <code>INSERT IGNORE</code>. Bricht
+                die Aktivierung mittendrin ab, läuft die Datei beim nächsten Versuch erneut.</li></ul>
+      </div>
+      <div class="card">
+        <h3>⚠️ Pflichtspalten mitgeben</h3>
+        <ul><li>Spalten mit <code>NOT NULL</code> ohne Vorgabewert gehören in jedes
+                <code>INSERT</code>. Mit <code>STRICT_TRANS_TABLES</code> bricht es sonst mit
+                Fehler 1364 ab.</li></ul>
       </div>
     </div>
   </div>
