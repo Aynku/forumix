@@ -40,9 +40,16 @@ ein Auswahlfeld. Bei Ankreuzfeldern zählt nur, *ob* etwas ankommt — ein
 Auswahlfeld sendet aber immer. „❌ Aus" wurde deshalb als „an" gespeichert,
 und zwar seit die Einstellung existiert.
 
+#### Karteileichen in der Feldliste
+
+In `$sectionFields['general']` standen noch acht Branding-Felder — Name, Logo,
+Slogan, Akzentfarbe, Standard-Theme, beide Fußzeilen-Felder und Custom CSS.
+Die liegen längst im Designbereich und werden von `save_design` geschrieben.
+Ohne Wirkung, aber irreführend beim Lesen. Raus.
+
 #### Geänderte Dateien
 - bootstrap.php (v0.18.58)
-- admin/index.php (captcha_enabled aus der Boolean-Liste)
+- admin/index.php (captcha_enabled aus der Boolean-Liste, Feldliste aufgeräumt)
 - views/admin/index.php (zwei Blöcke raus, Sektions-Marker, Nummerierung)
 
 ---

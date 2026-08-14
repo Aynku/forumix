@@ -117,11 +117,12 @@ if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $section = post_str('settings_section', '');  // 'general', 'email', 'registration', 'maintenance_mode'
 
     $sectionFields = [
+        // Ohne Branding: Name, Logo, Slogan, Akzentfarbe, Standard-Theme,
+        // Fusszeile und Custom CSS liegen im Designbereich und werden von
+        // save_design geschrieben. Hier standen sie nur noch als Karteileichen.
         'general' => [
-            'forum_name', 'forum_description', 'forum_logo',
-            'forum_slogan', 'forum_accent_color', 'forum_default_theme',
+            'forum_description',
             'forum_default_lang',
-            'forum_footer_text', 'forum_footer_links', 'forum_custom_css',
             'cookie_banner_enabled', 'cookie_banner_text',
             'min_post_length', 'max_post_length',
             'edit_window_minutes',
