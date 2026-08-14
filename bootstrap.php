@@ -154,6 +154,11 @@ if (!defined('FORUM_DEBUG') || FORUM_DEBUG !== true) {
 //
 const FORUM_VERSION_CODE = '0.18.55 Beta';
 
+// Standard-Quelltext-URL fuer AGPLv3 § 13: wer eine GEAENDERTE Fassung im Netz
+// betreibt, muss seinen Nutzern den Quelltext anbieten. Im Adminbereich unter
+// "Quelltext-URL" ueberschreibbar — dort gehoert dann das eigene Repository hin.
+const FORUMIX_SOURCE_URL = 'https://github.com/Aynku/forumix';
+
 try {
     $dbVersion = (string) get_setting('forum_version');
 

@@ -2435,6 +2435,18 @@
                 Format: <code>Label1|URL1, Label2|URL2</code> – kommagetrennt. Links öffnen in neuem Tab.
               </div>
             </div>
+
+            <div class="form-row">
+              <label>Quelltext-URL</label>
+              <input type="url" name="source_url" value="<?= e($branding['source_url']) ?>"
+                     placeholder="<?= e(FORUMIX_SOURCE_URL) ?>">
+              <div class="form-hint">
+                Erscheint als „Quelltext (AGPLv3)" im Fußbereich. <strong>Wenn du den Code
+                geändert hast, gehört hier dein eigenes Repository hin</strong> — die AGPLv3
+                verlangt in § 13, dass Besucher an den Quelltext der laufenden Fassung kommen.
+                Leer lassen entfernt den Link.
+              </div>
+            </div>
           </div>
 
           <?php /* ═══ TAB: PRESETS ═════════════════════════════ */ ?>

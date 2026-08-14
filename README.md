@@ -429,7 +429,25 @@ Ab dann pflegt sich's selbst.
 
 ## 📝 Lizenz
 
-Privates Projekt. Bei Interesse an Wiederverwendung: Kontakt aufnehmen.
+**GNU Affero General Public License v3.0** — vollständiger Text in [LICENSE](LICENSE).
+
+Kurzfassung, ohne juristischen Anspruch:
+
+- Du darfst die Software benutzen, ändern und weitergeben — auch geschäftlich.
+- Gibst du eine geänderte Fassung weiter **oder betreibst sie als Dienst im Netz**, musst du deinen Quelltext unter derselben Lizenz herausgeben. Genau das unterscheidet die AGPL von der GPL: bei Web-Software greift die GPL nicht, weil Betreiben keine Weitergabe ist.
+- Wer das Forum nur installiert und betreibt, ohne etwas zu ändern, muss gar nichts tun.
+
+> **Pflicht für Betreiber geänderter Fassungen (§ 13):** Nutzer müssen den Quelltext angeboten bekommen. Dafür gibt es die Einstellung **Quelltext-URL** im Adminbereich — sie hängt den Link an die „Powered by Forumix"-Zeile im Fußbereich. Wer den Code ändert, trägt dort sein eigenes Repository ein.
+
+### Mitgelieferte Fremdbestandteile
+
+| Bestandteil | Lizenz |
+|---|---|
+| CodeMirror 5.65.16 (`assets/codemirror/`) | MIT — [LICENSE](assets/codemirror/LICENSE) |
+| Inter, Open Sans, Lato, Nunito, Poppins, Chakra Petch (`assets/fonts/`) | SIL Open Font License 1.1 |
+| Roboto (`assets/fonts/`) | Apache License 2.0 |
+
+Alle drei sind mit der AGPLv3 verträglich. Einzelheiten in [assets/fonts/LICENSE.txt](assets/fonts/LICENSE.txt).
 
 ---
 

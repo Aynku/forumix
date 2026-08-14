@@ -362,7 +362,7 @@ if ($action === 'save_design' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // ── Layout-Felder (Footer)
-    $layoutKeys = ['forum_footer_text', 'forum_footer_links'];
+    $layoutKeys = ['forum_footer_text', 'forum_footer_links', 'source_url'];
     foreach ($layoutKeys as $k) {
         if (array_key_exists($k, $_POST)) {
             set_setting($k, trim((string) $_POST[$k]));
@@ -1584,6 +1584,7 @@ switch ($action) {
             'forum_footer_text'  => (string) get_setting('forum_footer_text'),
             'forum_footer_links' => (string) get_setting('forum_footer_links'),
             'forum_custom_css'   => (string) get_setting('forum_custom_css'),
+            'source_url'         => (string) get_setting('source_url', FORUMIX_SOURCE_URL),
         ];
         break;
 
