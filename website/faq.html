@@ -153,12 +153,6 @@ return [
     'on_disable'  =&gt; function () { <span class="comment">/* vor dem Ausschalten */</span> },
 ];</code></pre>
 
-    <div class="note" style="margin-top:14px">
-      <strong>Ehrlich dazu:</strong> ein Feld <code>requires</code> wird eingelesen, aber
-      <em>nirgends ausgewertet</em>. Abhängigkeiten zwischen Modulen gibt es also noch nicht —
-      verlass dich nicht darauf.
-    </div>
-
     <h3 style="font-size:16px;margin:26px 0 10px">Eigene Seite</h3>
     <p class="sub" style="margin-bottom:12px">
       Eine Modulseite wird direkt aufgerufen, etwa
@@ -197,9 +191,9 @@ render('@meinmodul/liste', ['eintraege' =&gt; db_fetchAll('SELECT * FROM meine_t
       <tr><td><code>home_top</code></td><td>Startseite, über der Forenübersicht</td></tr>
     </table>
     <div class="note" style="margin-top:14px">
-      Mehr gibt es aktuell <strong>nicht</strong> — genau ein Einhängepunkt. Wer einen
-      weiteren braucht, setzt <code>render_module_hook('name')</code> an die gewünschte
-      Stelle im Layout; das Laden funktioniert dann von allein.
+      <strong>Eigene Einhängepunkte</strong> setzt du selbst: ein
+      <code>render_module_hook('name')</code> an der gewünschten Stelle im Layout genügt.
+      Das Einbinden aller aktiven Module übernimmt der Kern von da an allein.
     </div>
 
     <h3 style="font-size:16px;margin:26px 0 10px">Eigene Tabellen</h3>
