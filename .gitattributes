@@ -4,3 +4,11 @@
 *.gif binary
 *.webp binary
 *.zip binary
+
+# Gehoert ins Repository, aber nicht in das Paket, das jemand hochlaedt.
+# "git archive" laesst diese Pfade weg — damit ist der Auslieferungsstand
+# genau das, was auf den Server soll, und nichts weiter.
+/website/       export-ignore
+/tools/         export-ignore
+/.gitattributes export-ignore
+/.gitignore     export-ignore

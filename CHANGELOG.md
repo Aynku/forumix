@@ -1,4 +1,4 @@
-# Aynku Forum – Änderungs-Historie
+# Forumix – Änderungs-Historie
 
 Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 

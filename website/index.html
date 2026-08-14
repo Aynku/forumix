@@ -49,6 +49,13 @@
   .badges{margin-top:26px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;
           font-size:12px; color:var(--faint)}
   .badge{border:1px solid var(--line); border-radius:99px; padding:4px 12px; background:var(--surface)}
+  /* Punkt vor "Forum ansehen": zeigt, dass da etwas laeuft und nicht nur ein
+     Bild davon zu sehen ist. */
+  .dot{
+    display:inline-block; width:7px; height:7px; border-radius:50%;
+    background:var(--green); margin-right:8px; vertical-align:1px;
+    box-shadow:0 0 0 3px rgba(74,222,128,.22);
+  }
 
   /* ── Abschnitte ── */
   section{padding:56px 0; border-bottom:1px solid var(--line)}
@@ -86,6 +93,13 @@
   th,td{text-align:left; padding:10px 0; border-bottom:1px solid var(--line)}
   th{color:var(--faint); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.06em}
   tr:last-child td{border-bottom:0}
+
+  /* ── Download ── */
+  .dl{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:20px}
+  .dl-main{display:flex; gap:14px; align-items:center; flex-wrap:wrap}
+  .dl-meta{color:var(--muted); font-size:14px}
+  .dl-hash{margin:14px 0 0; color:var(--faint); font-size:13px; line-height:1.9}
+  .dl-hash code{color:var(--muted)}
 
   .note{
     background:var(--surface2); border:1px solid var(--line);
@@ -130,7 +144,8 @@
     </p>
 
     <div class="cta">
-      <a class="btn btn-primary" href="https://github.com/Aynku/forumix">Quelltext ansehen</a>
+      <a class="btn btn-primary" href="#download">Herunterladen</a>
+      <a class="btn" href="https://forum.forumix.de"><span class="dot"></span>Forum ansehen</a>
       <a class="btn" href="#installation">Installation</a>
     </div>
 
@@ -142,6 +157,38 @@
     </div>
   </div>
 </header>
+
+<section id="forum">
+  <div class="wrap">
+    <h2><span class="dot"></span>Es läuft schon eins</h2>
+    <p class="sub">
+      Auf <strong>forum.forumix.de</strong> läuft Forumix selbst — dieselbe Fassung, die
+      hier zum Herunterladen steht. Anmelden, schreiben, ausprobieren. Und wenn beim
+      Aufsetzen etwas klemmt, fragst du genau dort.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <h3>🔎 Zum Ausprobieren</h3>
+        <ul>
+          <li>Kein Video und kein Bilderbuch, sondern die laufende Software.</li>
+          <li>Registrieren, Beiträge schreiben, Themen abonnieren, Benachrichtigungen bekommen.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>💬 Zum Fragen</h3>
+        <ul>
+          <li>Installation, nginx-Direktiven, eigene Anpassungen.</li>
+          <li>Fehler melden — im Forum oder als Issue im Repository.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cta" style="justify-content:flex-start; margin-top:20px">
+      <a class="btn btn-primary" href="https://forum.forumix.de">forum.forumix.de öffnen</a>
+    </div>
+  </div>
+</section>
 
 <section>
   <div class="wrap">
@@ -258,6 +305,35 @@
   </div>
 </section>
 
+<section id="download">
+  <div class="wrap">
+    <h2>Herunterladen</h2>
+    <p class="sub">
+      Ein Archiv, entpacken, hochladen. Darin ist alles enthalten — auch die Schriften
+      und der Editor, es wird nichts nachgeladen.
+    </p>
+
+    <div class="dl">
+      <div class="dl-main">
+        <a class="btn btn-primary" href="/download/forumix-0.18.58.zip">forumix-0.18.58.zip</a>
+        <span class="dl-meta">Vollpaket · für eine neue Installation</span>
+      </div>
+      <p class="dl-hash">
+        SHA-256 zum Nachrechnen:
+        <a href="/download/forumix-0.18.58.sha256">forumix-0.18.58.sha256</a><br>
+        <code>sha256sum -c forumix-0.18.58.sha256</code>
+      </p>
+    </div>
+
+    <div class="note">
+      <strong>Updates</strong> gibt es ab der nächsten Version zusätzlich als eigenes
+      Paket. Das enthält nur die geänderten Dateien und wird im Adminbereich unter
+      <em>Updates</em> hochgeladen — kein FTP, kein Überschreiben von Hand. Die
+      <code>config.php</code> und alles unter <code>uploads/</code> bleiben dabei unberührt.
+    </div>
+  </div>
+</section>
+
 <section id="installation">
   <div class="wrap">
     <h2>Installation</h2>
@@ -340,6 +416,7 @@ rm -rf install/</code></pre>
   <div class="wrap">
     <p>
       Forumix — freie Forensoftware ·
+      <a href="https://forum.forumix.de">Forum</a> ·
       <a href="https://github.com/Aynku/forumix">Quelltext</a> ·
       AGPLv3
     </p>
