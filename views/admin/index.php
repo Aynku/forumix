@@ -3271,15 +3271,15 @@
         </div>
 
         <!-- ─── CodeMirror einbinden ─── -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+        <link rel="stylesheet" href="<?= e(FORUM_URL) ?>/assets/codemirror/codemirror.min.css">
+        <link rel="stylesheet" href="<?= e(FORUM_URL) ?>/assets/codemirror/theme/dracula.min.css">
+        <script src="<?= e(FORUM_URL) ?>/assets/codemirror/codemirror.min.js"></script>
+        <script src="<?= e(FORUM_URL) ?>/assets/codemirror/mode/htmlmixed/htmlmixed.min.js"></script>
+        <script src="<?= e(FORUM_URL) ?>/assets/codemirror/mode/xml/xml.min.js"></script>
+        <script src="<?= e(FORUM_URL) ?>/assets/codemirror/mode/javascript/javascript.min.js"></script>
+        <script src="<?= e(FORUM_URL) ?>/assets/codemirror/mode/css/css.min.js"></script>
+        <script src="<?= e(FORUM_URL) ?>/assets/codemirror/addon/edit/matchbrackets.min.js"></script>
+        <script src="<?= e(FORUM_URL) ?>/assets/codemirror/addon/edit/closebrackets.min.js"></script>
 
         <script>
         (function () {

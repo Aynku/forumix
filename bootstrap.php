@@ -33,6 +33,34 @@ if (defined('FORUM_DEBUG') && FORUM_DEBUG === true) {
     ini_set('display_startup_errors', '1');
 }
 
+// ── Content-Security-Policy ─────────────────────────────────────
+//
+// Ehrlich zum Nutzen: script-src traegt 'unsafe-inline', weil das Forum an
+// vielen Stellen mit Inline-Skripten arbeitet. Gegen eingeschleustes Inline-JS
+// hilft diese Regel also NICHT. Was sie tut: Skripte, Stile, Schriften und
+// Verbindungen duerfen nur noch von der eigenen Domain kommen, <object> ist
+// tot, <base> und Formularziele sind festgenagelt. Ein Angreifer, der Markup
+// unterbringt, kann damit kein fremdes Skript nachladen und keine Daten
+// woanders hinschicken.
+//
+// Bilder duerfen von ueberall per https kommen — der [img]-BBCode erlaubt das
+// ausdruecklich. Wer das zumacht, bricht bestehende Beitraege.
+//
+// Notausgang: define('FORUM_CSP', false) in der config.php.
+if (!defined('FORUM_CSP') || FORUM_CSP !== false) {
+    header("Content-Security-Policy: "
+        . "default-src 'self'; "
+        . "base-uri 'self'; "
+        . "object-src 'none'; "
+        . "frame-ancestors 'self'; "
+        . "form-action 'self'; "
+        . "img-src 'self' data: https:; "
+        . "font-src 'self' data:; "
+        . "style-src 'self' 'unsafe-inline'; "
+        . "script-src 'self' 'unsafe-inline'; "
+        . "connect-src 'self'");
+}
+
 // ── Zeitzone festlegen ──────────────────────────────────────────
 // Bevorzugt aus config.php (FORUM_TIMEZONE), dann Settings-Default, sonst Berlin
 if (defined('FORUM_TIMEZONE')) {

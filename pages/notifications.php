@@ -41,6 +41,11 @@ if (isset($_GET['mark_all'])) {
 }
 
 if (isset($_GET['read'])) {
+    // Auch der Lese-Sprung braucht das Token: sonst markiert ein fremdes
+    // <img src="…/notifications.php?read=1"> die Benachrichtigung still ab.
+    if (!verify_csrf($_GET['csrf'] ?? '')) {
+        redirect(FORUM_URL . '/notifications.php');
+    }
     $nid = (int) $_GET['read'];
     mark_notifications_read((int) $cu['user_id'], $nid);
     // direkt zur Quelle springen

@@ -28,7 +28,7 @@
   {% endif %}
   {% for n in notifications %}
     <div class="notif-row pm-list-item {{ not n.is_read ? 'unread' : '' }}">
-      <a href="?read={{ n.notif_id }}"
+      <a href="?read={{ n.notif_id }}&csrf={{ csrfToken }}"
          class="notif-main"
          style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:12px;flex:1;min-width:0">
         <div style="font-size:18px">
