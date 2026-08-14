@@ -61,7 +61,18 @@ function module_enabled(string $code): bool {
 /**
  * Modul aktivieren – führt install.sql aus falls Erstinstallation
  */
+/**
+ * Modulname prüfen, bevor er in einen Pfad wandert — der Name kommt aus der
+ * Anfrage und landet in einem include.
+ */
+function module_code_is_valid(string $code): bool {
+    return preg_match('/^[a-z0-9_-]+$/i', $code) === 1;
+}
+
 function enable_module(string $code): array {
+    if (!module_code_is_valid($code)) {
+        return ['ok' => false, 'error' => 'Ungültiger Modulname'];
+    }
     $modulesDir = __DIR__ . '/../modules';
     $manifestFile = $modulesDir . '/' . $code . '/module.php';
     if (!file_exists($manifestFile)) {
@@ -105,6 +116,9 @@ function enable_module(string $code): array {
  * Modul deaktivieren (Daten bleiben in der DB erhalten)
  */
 function disable_module(string $code): array {
+    if (!module_code_is_valid($code)) {
+        return ['ok' => false, 'error' => 'Ungültiger Modulname'];
+    }
     try {
         $modulesDir = __DIR__ . '/../modules';
         $manifestFile = $modulesDir . '/' . $code . '/module.php';

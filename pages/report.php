@@ -5,8 +5,15 @@ require_once __DIR__ . '/../bootstrap.php';
 require_login();
 
 $postId = get_int('post');
-$post = db_fetch('SELECT p.*, t.thread_id FROM posts p JOIN threads t ON t.thread_id = p.thread_id WHERE p.post_id = ?', [$postId]);
+$post = db_fetch('SELECT p.*, t.thread_id, t.board_id FROM posts p JOIN threads t ON t.thread_id = p.thread_id WHERE p.post_id = ?', [$postId]);
 if (!$post) { http_response_code(404); die('Beitrag nicht gefunden.'); }
+
+// Die Seite zeigt eine Vorschau des Beitrags. Ohne Zugangspruefung waere sie
+// ein Leseweg in passwortgeschuetzte Foren: post_id hochzaehlen genuegt.
+if (!board_id_can_access((int) $post['board_id'])) {
+    http_response_code(403);
+    die('Kein Zugriff auf dieses Forum.');
+}
 
 $error = '';
 $success = false;

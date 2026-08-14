@@ -41,9 +41,16 @@ function create_poll(int $threadId, string $question, array $options, bool $mult
     } catch (Exception $e) { return false; }
 }
 
-function cast_vote(int $pollId, array $optionIds, int $userId): bool {
+/**
+ * Gibt Stimmen ab. $threadId ist der Thread, aus dem das Formular kam — die
+ * Umfrage muss dazu gehoeren. Ohne diese Bindung genuegte ein harmloser
+ * oeffentlicher Thread, um mit fremder poll_id in einer Umfrage abzustimmen,
+ * die man gar nicht sehen darf.
+ */
+function cast_vote(int $pollId, array $optionIds, int $userId, ?int $threadId = null): bool {
     $poll = db_fetch('SELECT * FROM polls WHERE poll_id = ?', [$pollId]);
     if (!$poll) return false;
+    if ($threadId !== null && (int) $poll['thread_id'] !== $threadId) return false;
     if ($poll['expires_at'] && strtotime($poll['expires_at']) < time()) return false;
     if (user_has_voted($pollId, $userId)) return false;
     if (!$poll['multi_choice']) $optionIds = [$optionIds[0] ?? null];

@@ -318,7 +318,7 @@ function update_run_sql(string $sql): array {
         return ['success' => true, 'log' => $log, 'error' => null];
     }
 
-    $pdo = db();  // bestehende PDO-Verbindung
+    $pdo = DB::get();  // bestehende PDO-Verbindung
     $count = 0;
     foreach ($statements as $stmt) {
         try {

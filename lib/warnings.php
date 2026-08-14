@@ -62,8 +62,10 @@ function check_warning_threshold(int $userId, int $modId): void {
     if ($pts < $threshold) return;
 
     try {
-        $u = db_fetch('SELECT is_banned, is_admin FROM users WHERE user_id = ?', [$userId]);
-        if (!$u || $u['is_admin'] || $u['is_banned']) return;
+        // is_owner muss mit: make_owner setzt is_admin auf 0, der Inhaber
+        // faellt sonst durch diesen Schutz und sperrt sich selbst aus.
+        $u = db_fetch('SELECT is_banned, is_admin, COALESCE(is_owner, 0) AS is_owner FROM users WHERE user_id = ?', [$userId]);
+        if (!$u || $u['is_admin'] || $u['is_owner'] || $u['is_banned']) return;
 
         db_execute(
             'UPDATE users SET is_banned = 1, ban_reason = ? WHERE user_id = ?',

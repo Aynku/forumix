@@ -26,7 +26,12 @@ class DB {
                     // Best-effort, kein Beinbruch
                 }
             } catch (PDOException $e) {
-                die('Datenbankverbindung fehlgeschlagen: ' . htmlspecialchars($e->getMessage()));
+                // Der Text nennt DB-Benutzer, Host und Datenbanknamen und ginge
+                // ohne Anmeldung an jeden Besucher — und zwar an display_errors
+                // vorbei, weil es ein eigenes die() ist.
+                error_log('[db] Verbindung fehlgeschlagen: ' . $e->getMessage());
+                http_response_code(503);
+                die('Die Datenbank ist gerade nicht erreichbar. Bitte später erneut versuchen.');
             }
         }
         return self::$instance;

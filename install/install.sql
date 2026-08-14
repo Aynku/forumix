@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `profile_privacy`    TEXT         DEFAULT NULL,
   -- Doppel-Opt-In für E-Mail-Änderung (v0.18.48)
   `pending_email`         VARCHAR(255) DEFAULT NULL,
-  `pending_email_token`   VARCHAR(64)  DEFAULT NULL,
+  `pending_email_token`   VARCHAR(255) DEFAULT NULL,
   `pending_email_expires` DATETIME     DEFAULT NULL,
   -- Letzte Aktivität (v0.18.52) — wird bei jedem Pageview + Post aktualisiert
   -- (last_login bleibt für echte Logins, nicht für Heartbeat)

@@ -62,13 +62,32 @@ if ($action === 'report_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(post_str('csrf'))) die('CSRF');
     $reportId = post_int('report_id');
     $newStatus = post_str('status');
+
+    // Dieselbe Board-Pruefung wie bei den Freigaben oben. Die Liste ist zwar
+    // gefiltert, die Aktion war es nicht — ein Forum-Mod konnte report_id
+    // hochzaehlen und Meldungen aus fremden Foren abhaken.
+    if (!$isGlobalMod) {
+        $r = db_fetch(
+            'SELECT t.board_id FROM reports r
+             JOIN posts p   ON p.post_id   = r.post_id
+             JOIN threads t ON t.thread_id = p.thread_id
+             WHERE r.report_id = ?',
+            [$reportId]
+        );
+        if (!$r || !in_array((int) $r['board_id'], $boardIds, true)) {
+            flash('Du bist kein Mod in diesem Forum.', 'error');
+            redirect(FORUM_URL . '/mod.php?action=reports');
+        }
+    }
+
     if (in_array($newStatus, ['open', 'reviewed', 'dismissed'], true)) {
         try {
             db_execute('UPDATE reports SET status = ?, reviewed_by = ?, reviewed_at = NOW() WHERE report_id = ?',
                 [$newStatus, $cu['user_id'], $reportId]);
             flash('Meldung aktualisiert.', 'success');
         } catch (Exception $e) {
-            flash('Fehler: ' . $e->getMessage(), 'error');
+            error_log('[mod] report_action: ' . $e->getMessage());
+            flash('Meldung konnte nicht aktualisiert werden.', 'error');
         }
     }
     redirect(FORUM_URL . '/mod.php?action=reports');

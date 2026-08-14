@@ -44,18 +44,22 @@ function current_user(): ?array {
     return $u ?: null;
 }
 
-function register_user(string $username, string $email, string $password) {
+function register_user(string $username, string $email, string $password, int $isApproved = 1) {
     $existing = db_count('SELECT COUNT(*) FROM users WHERE username = ? OR email = ?', [$username, $email]);
     if ($existing > 0) return false;
 
     $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => HASH_COST]);
     $ip   = client_ip();
 
-    // Versuche erst mit IP-Spalten – fallback auf Schema ohne IP-Spalten
+    // is_approved gehoert in das INSERT, nicht in ein nachgelagertes UPDATE:
+    // die Spalte steht im Schema auf DEFAULT 1, das Konto entstuende sonst
+    // freigegeben und muesste nachtraeglich gesperrt werden. Schlaegt das
+    // UPDATE fehl, bliebe ein freies Konto zurueck, das in der Freigabeliste
+    // nicht einmal auftaucht.
     try {
         $userId = db_execute(
-            'INSERT INTO users (username, email, password, registration_ip, last_ip) VALUES (?, ?, ?, ?, ?)',
-            [$username, $email, $hash, $ip, $ip]
+            'INSERT INTO users (username, email, password, registration_ip, last_ip, is_approved) VALUES (?, ?, ?, ?, ?, ?)',
+            [$username, $email, $hash, $ip, $ip, $isApproved]
         );
     } catch (PDOException $e) {
         $userId = db_execute(
@@ -191,5 +195,11 @@ function csrf_token(): string {
     return $_SESSION['csrf_token'];
 }
 function verify_csrf(string $token): bool {
-    return hash_equals($_SESSION['csrf_token'] ?? '', $token);
+    // Ohne Token in der Sitzung ist nichts zu vergleichen — sonst waere
+    // hash_equals('', '') wahr und ein leeres csrf= wuerde die Pruefung
+    // bestehen. Der Fall tritt real auf: eine Sitzung, die per
+    // remember_try_login() entsteht, hat noch keinen Token, weil ihn nur
+    // render() erzeugt.
+    if (empty($_SESSION['csrf_token']) || $token === '') return false;
+    return hash_equals($_SESSION['csrf_token'], $token);
 }

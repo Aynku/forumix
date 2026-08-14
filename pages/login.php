@@ -87,8 +87,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $u = db_fetch('SELECT * FROM users WHERE username = ? AND is_banned = 0 AND COALESCE(is_deleted, 0) = 0', [post_str('username')]);
             if ($u && !empty($u['password']) && password_verify(post_str('password'), $u['password'])) {
+                // E-Mail-Bestätigung: der Schalter im Adminbereich verspricht
+                // „User können sich erst einloggen, nachdem sie ihre E-Mail
+                // bestätigt haben" — geprüft wurde es bisher nirgends.
+                if ((string) get_setting('email_verification_required', '0') === '1'
+                    && (int) ($u['email_verified'] ?? 1) === 0) {
+                    $error = 'Bitte bestätige zuerst deine E-Mail-Adresse. Den Link findest du in der Mail von der Registrierung.';
+                }
                 // Admin-Approval-Check: noch nicht freigegebene Accounts können sich nicht einloggen
-                if ((int) ($u['is_approved'] ?? 1) === 0) {
+                elseif ((int) ($u['is_approved'] ?? 1) === 0) {
                     $error = 'Dein Konto wartet noch auf Freigabe durch das Admin-Team. Du erhältst eine E-Mail sobald freigeschaltet.';
                     // KEIN captcha_failed_attempt – legitimer Fall, nicht verdächtig
                 }

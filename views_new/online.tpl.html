@@ -26,11 +26,11 @@
 <div class="card">
   <table class="forum-table">
     <thead>
-      <tr><th>Benutzer</th><th>Ort</th><th>Zuletzt gesehen</th>{% if isMod %}<th>IP</th>{% endif %}</tr>
+      <tr><th>Benutzer</th><th>Ort</th><th>Zuletzt gesehen</th>{% if showIps %}<th>IP</th>{% endif %}</tr>
     </thead>
     <tbody>
       {% if not users %}
-        <tr><td colspan="{{ isMod ? 4 : 3 }}" style="text-align:center;padding:20px;color:var(--text-faint)">
+        <tr><td colspan="{{ showIps ? 4 : 3 }}" style="text-align:center;padding:20px;color:var(--text-faint)">
           Niemand online.
         </td></tr>
       {% endif %}
@@ -59,7 +59,7 @@
           </td>
           <td style="font-size:12px;color:var(--text-muted)">{{ u.location }}</td>
           <td style="font-size:12px;color:var(--text-muted)">{{ format_date(u.last_seen) }}</td>
-          {% if isMod %}
+          {% if showIps %}
             <td><code style="font-size:11px">{{ u.ip|default('–') }}</code></td>
           {% endif %}
         </tr>

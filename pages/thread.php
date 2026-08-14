@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['poll_vote'])) {
     $opts   = $_POST['option'] ?? [];
     if (!is_array($opts)) $opts = [$opts];
     $cu = current_user();
-    if (cast_vote($pollId, $opts, (int) $cu['user_id'])) {
+    if (cast_vote($pollId, $opts, (int) $cu['user_id'], $threadId)) {
         flash('Stimme abgegeben!', 'success');
     } else {
         flash('Abstimmung fehlgeschlagen.', 'error');

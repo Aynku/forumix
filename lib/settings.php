@@ -5,8 +5,9 @@ if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
 /**
  * In-memory cache für Einstellungen
  */
-function settings_cache(): array {
+function settings_cache(bool $reset = false): array {
     static $cache = null;
+    if ($reset) { $cache = null; return []; }
     if ($cache === null) {
         try {
             $rows  = db_fetchAll('SELECT setting_key, setting_value FROM settings');
@@ -32,8 +33,9 @@ function set_setting(string $key, $value): void {
          ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)',
         [$key, (string) $value]
     );
-    // Cache invalidieren
-    $GLOBALS['_settings_cache_reset'] = true;
+    // Cache wirklich verwerfen — das frühere Flag hat nie jemand gelesen,
+    // get_setting() lieferte im selben Request weiter den alten Wert.
+    settings_cache(true);
 }
 
 /**

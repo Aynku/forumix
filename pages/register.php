@@ -70,35 +70,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ((string) get_setting('registration_terms_required', '1') === '1' && empty($_POST['accept_terms'])) {
             $error = 'Bitte stimme den Nutzungsbedingungen zu, um fortzufahren.';
         } else {
-            $uid = register_user($un, $em, $pw);
+            $approvalRequired = user_approval_required();
+            $emailRequired    = (string) get_setting('email_verification_required', '0') === '1';
+
+            // Einladung nur PRÜFEN, eingelöst wird sie nach dem Anlegen —
+            // invitation_consume() braucht die user_id.
+            $inviteCode   = strtoupper(trim(post_str('invite_code')));
+            $inv          = null;
+            $skipApproval = false;
+            if ($inviteCode !== '' && $approvalRequired) {
+                $inv = invitation_find_by_code($inviteCode);
+                if (invitation_status($inv, $em) === 'valid') {
+                    $skipApproval = true;
+                }
+                // Ungültige Codes werden still ignoriert – User landet in der Queue
+                // (kein Error, sonst könnte man Codes durchprobieren)
+            }
+
+            $isApproved = ($approvalRequired && !$skipApproval) ? 0 : 1;
+
+            $uid = register_user($un, $em, $pw, $isApproved);
             if ($uid === false) {
                 $error = 'Benutzername oder E-Mail bereits vergeben.';
             } else {
                 captcha_reset_attempts('register');
 
-                $approvalRequired = user_approval_required();
-                $emailRequired    = (string) get_setting('email_verification_required', '0') === '1';
-
-                // ── Invite-Code prüfen (überspringt Approval) ──
-                $inviteCode = strtoupper(trim(post_str('invite_code')));
-                $skipApproval = false;
-                if ($inviteCode !== '' && $approvalRequired) {
-                    $inv = invitation_find_by_code($inviteCode);
-                    $status = invitation_status($inv, $em);
-                    if ($status === 'valid') {
-                        if (invitation_consume((int) $inv['invitation_id'], (int) $uid)) {
-                            $skipApproval = true;
-                        }
+                // Einlösen. Klappt es nicht, geht es in die sichere Richtung:
+                // das Konto wandert in die Warteschlange statt durchzurutschen.
+                if ($skipApproval && $inv) {
+                    if (!invitation_consume((int) $inv['invitation_id'], (int) $uid)) {
+                        try { db_execute('UPDATE users SET is_approved = 0 WHERE user_id = ?', [$uid]); }
+                        catch (Exception $e) {}
+                        $isApproved = 0;
                     }
-                    // Ungültige Codes werden still ignoriert – User landet in der Queue
-                    // (kein Error, sonst könnte man Codes durchprobieren)
                 }
 
-                // Wenn Admin-Approval aktiv UND kein gültiger Invite: is_approved = 0
-                if ($approvalRequired && !$skipApproval) {
-                    try {
-                        db_execute('UPDATE users SET is_approved = 0 WHERE user_id = ?', [$uid]);
-                    } catch (Exception $e) {}
+                if ($isApproved === 0) {
                     try {
                         $newUser = db_fetch('SELECT * FROM users WHERE user_id = ?', [$uid]);
                         if ($newUser) send_admin_new_registration_email($newUser);

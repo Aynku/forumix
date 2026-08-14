@@ -29,11 +29,11 @@
 <div class="card">
   <table class="forum-table">
     <thead>
-      <tr><th>Benutzer</th><th>Ort</th><th>Zuletzt gesehen</th><?php if ($isMod): ?><th>IP</th><?php endif; ?></tr>
+      <tr><th>Benutzer</th><th>Ort</th><th>Zuletzt gesehen</th><?php if ($showIps): ?><th>IP</th><?php endif; ?></tr>
     </thead>
     <tbody>
       <?php if (empty($users)): ?>
-        <tr><td colspan="<?= $isMod ? 4 : 3 ?>" style="text-align:center;padding:20px;color:var(--text-faint)">
+        <tr><td colspan="<?= $showIps ? 4 : 3 ?>" style="text-align:center;padding:20px;color:var(--text-faint)">
           Niemand online.
         </td></tr>
       <?php endif; ?>
@@ -62,7 +62,7 @@
           </td>
           <td style="font-size:12px;color:var(--text-muted)"><?= e($u['location']) ?></td>
           <td style="font-size:12px;color:var(--text-muted)"><?= e(format_date($u['last_seen'])) ?></td>
-          <?php if ($isMod): ?>
+          <?php if ($showIps): ?>
             <td><code style="font-size:11px"><?= e($u['ip'] ?? '–') ?></code></td>
           <?php endif; ?>
         </tr>

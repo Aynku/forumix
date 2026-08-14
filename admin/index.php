@@ -166,11 +166,19 @@ if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         'registration_terms_required',
     ];
 
+    // Felder, die im Formular absichtlich leer bleiben, wenn sich nichts
+    // aendern soll — sonst loescht ein Speichern das gesetzte Passwort. Das
+    // Feld traegt kein value-Attribut, damit das Passwort nicht im Quelltext
+    // der Seite steht.
+    $keepIfEmpty = ['smtp_pass'];
+
     foreach ($allowed as $key) {
         if (in_array($key, $booleans, true)) {
             set_setting($key, isset($_POST[$key]) ? '1' : '0');
         } elseif (array_key_exists($key, $_POST)) {
-            set_setting($key, trim((string) $_POST[$key]));
+            $val = trim((string) $_POST[$key]);
+            if ($val === '' && in_array($key, $keepIfEmpty, true)) continue;
+            set_setting($key, $val);
         }
     }
 
@@ -386,6 +394,7 @@ if ($action === 'preview_design' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── DESIGN: PREVIEW LÖSCHEN ──────────────────────────────────────
 if ($action === 'clear_preview') {
+    if (!verify_csrf($_GET['csrf'] ?? '')) die('CSRF-Fehler');
     unset($_SESSION['theme_preview']);
     redirect(FORUM_URL . '/admin/?action=design');
 }
@@ -648,6 +657,15 @@ if ($action === 'save_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $content = $_POST['content'] ?? '';
     $cu      = current_user();
 
+    // STRENG: nur der Owner — genau wie upload_update. Der Template-Übersetzer
+    // erzeugt aus {{ system("...") }} selbst PHP; template_content_is_safe()
+    // blockt nur wörtliche <?php-Tags und kann das nicht verhindern. Ein
+    // Template-Override läuft danach bei jedem Besucher.
+    if (empty($cu['is_owner'])) {
+        flash('Nur der Owner darf Templates bearbeiten.', 'error');
+        redirect(FORUM_URL . '/admin/?action=templates');
+    }
+
     // Whitelist: nur Templates die als Datei existieren dürfen geändert werden
     if ($name === '' || !file_exists(__DIR__ . '/../views_new/' . $name . '.tpl.html')) {
         flash('Unbekanntes Template.', 'error');
@@ -882,7 +900,7 @@ if (in_array($action, ['approve_thread', 'approve_post', 'reject_thread', 'rejec
 if ($action === 'run_migration' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(post_str('csrf'))) die('CSRF');
 
-    // Nur Owner darf Migrationen ausführen (kritische Aktion)
+    // Admin oder Owner (require_admin oben deckt es bereits ab)
     $cu = current_user();
     if (empty($cu['is_owner']) && empty($cu['is_admin'])) {
         flash('Nur Admins/Owner dürfen Migrationen ausführen.', 'error');
@@ -1107,6 +1125,14 @@ if ($action === 'issue_warning' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $pts = post_int('points', 1);
     $rsn = post_str('reason');
     $exp = post_str('expires');
+    $target = $uid > 0 ? db_fetch('SELECT * FROM users WHERE user_id = ?', [$uid]) : null;
+    if ($target && !can_modify_user($cu, $target)) {
+        // Sonst laesst sich der Inhaber ueber die Warn-Schwelle automatisch
+        // sperren — make_owner setzt is_admin = 0, und check_warning_threshold
+        // prueft nur auf is_admin.
+        flash('Dieser Benutzer darf nicht verwarnt werden.', 'error');
+        redirect(FORUM_URL . '/admin/?action=warnings&user=' . $uid);
+    }
     if ($uid > 0 && $pts > 0 && mb_strlen($rsn) >= 3) {
         issue_warning($uid, (int) $cu['user_id'], $pts, $rsn, $exp ?: null);
         flash('Warnung ausgesprochen (' . $pts . ' Pkt).', 'success');

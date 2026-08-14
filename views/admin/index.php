@@ -293,7 +293,7 @@
                       <?php if ($canDelete): ?>
                         <a href="<?= $base ?>delete_user&id=<?= $uid . $csrfQS ?>"
                            class="action-danger"
-                           onclick="return confirm('⚠️ Account von „<?= e($u['username']) ?>\" wirklich löschen?\n\nDer User wird zu „Gelöschter Benutzer\" anonymisiert. Beiträge bleiben erhalten, aber alle persönlichen Daten werden entfernt.\n\nDiese Aktion ist endgültig!')">🗑️ Account löschen</a>
+                           onclick="return confirm('⚠️ Account von „<?= e($u['username']) ?>“ wirklich löschen?\n\nDer User wird zu „Gelöschter Benutzer“ anonymisiert. Beiträge bleiben erhalten, aber alle persönlichen Daten werden entfernt.\n\nDiese Aktion ist endgültig!')">🗑️ Account löschen</a>
                       <?php endif; ?>
                     </div>
                   </div>
@@ -990,9 +990,10 @@
             </div>
             <div class="form-row">
               <label>SMTP-Passwort</label>
-              <input type="password" name="smtp_pass" value="<?= e($settings['smtp_pass'] ?? '') ?>"
-                     placeholder="•••••••••" autocomplete="new-password">
-              <div class="form-hint">Wird verschlüsselt in der DB gespeichert.</div>
+              <input type="password" name="smtp_pass"
+                     placeholder="<?= empty($settings['smtp_pass']) ? 'noch nicht gesetzt' : '•••••••••' ?>"
+                     autocomplete="new-password">
+              <div class="form-hint">Leer lassen = bestehendes Passwort behalten.</div>
             </div>
           </div>
 
@@ -2145,7 +2146,7 @@
       <?php if ($hasPreview ?? false): ?>
         <div class="alert alert-warning" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
           <span>⚠️ Du hast eine ungespeicherte Vorschau aktiv. Andere Admins sehen die jetzt auch (in deiner Session).</span>
-          <a href="?action=clear_preview" class="btn btn-ghost btn-sm">Vorschau verwerfen</a>
+          <a href="?action=clear_preview&csrf=<?= e($csrfToken) ?>" class="btn btn-ghost btn-sm">Vorschau verwerfen</a>
         </div>
       <?php endif; ?>
 
@@ -2567,7 +2568,7 @@
                 <?php if ($m['enabled']): ?>
                   <a href="?action=module_toggle&code=<?= urlencode($m['code']) ?>&enable=0&csrf=<?= e($csrfToken) ?>"
                      class="btn btn-danger btn-sm"
-                     onclick="return confirm('Modul „<?= e($m['name']) ?>" deaktivieren?')">
+                     onclick="return confirm('Modul „<?= e($m['name']) ?>“ deaktivieren?')">
                     🔴 Deaktivieren
                   </a>
                 <?php else: ?>
@@ -2799,7 +2800,7 @@
               </label>
               <div class="smiley-actions">
                 <button type="submit" class="btn btn-sm" title="Speichern">💾</button>
-                <a href="?action=delete_smiley&id=<?= (int) $s['smiley_id'] ?>&csrf=<?= e($csrfToken) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Smiley „<?= e($s['code']) ?>\" wirklich löschen?')" title="Löschen">🗑️</a>
+                <a href="?action=delete_smiley&id=<?= (int) $s['smiley_id'] ?>&csrf=<?= e($csrfToken) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Smiley „<?= e($s['code']) ?>“ wirklich löschen?')" title="Löschen">🗑️</a>
               </div>
             </form>
           <?php endforeach; ?>
@@ -2841,7 +2842,7 @@
               </label>
               <div class="smiley-actions">
                 <button type="submit" class="btn btn-sm" title="Speichern">💾</button>
-                <a href="?action=delete_smiley&id=<?= (int) $s['smiley_id'] ?>&csrf=<?= e($csrfToken) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Smiley „<?= e($s['code']) ?>\" wirklich löschen?')" title="Löschen">🗑️</a>
+                <a href="?action=delete_smiley&id=<?= (int) $s['smiley_id'] ?>&csrf=<?= e($csrfToken) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Smiley „<?= e($s['code']) ?>“ wirklich löschen?')" title="Löschen">🗑️</a>
               </div>
             </form>
           <?php endforeach; ?>
