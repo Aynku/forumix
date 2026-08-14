@@ -61,10 +61,14 @@ function qr_rs_generator(int $degree): array {
     $g = [1];
     [$exp] = qr_gf_tables();
     for ($i = 0; $i < $degree; $i++) {
+        // g(x) * (x + alpha^i), Index 0 ist der hoechste Grad:
+        // der x-Anteil bleibt im selben Index, der Konstantenanteil rutscht
+        // eins weiter. Vertauscht man das, entsteht das gespiegelte Polynom —
+        // in sich stimmig teilbar, aber nicht das der Norm.
         $next = array_fill(0, count($g) + 1, 0);
         foreach ($g as $k => $coef) {
-            $next[$k]     ^= qr_gf_mul($coef, $exp[$i]);
-            $next[$k + 1] ^= $coef;
+            $next[$k]     ^= $coef;
+            $next[$k + 1] ^= qr_gf_mul($coef, $exp[$i]);
         }
         $g = $next;
     }
@@ -297,15 +301,18 @@ function qr_apply_format(array $m, int $size, int $mask): array {
     $fmt = qr_format_bits($mask);
     for ($i = 0; $i < 15; $i++) {
         $bit = ($fmt >> $i) & 1;
-        // Kopie 1: um das linke obere Suchmuster
-        if ($i < 6)       { $m[8][$i] = $bit; }
-        elseif ($i === 6) { $m[8][7] = $bit; }
+        // Kopie 1 um das linke obere Suchmuster. Achtung auf die Reihenfolge:
+        // Bit 0 liegt in der SPALTE 8 (Zeile 0), nicht in der Zeile 8. Wer
+        // beides vertauscht, bekommt einen Code, den nur der eigene Leser
+        // versteht — in sich stimmig und fuer jeden Scanner unlesbar.
+        if ($i < 6)       { $m[$i][8] = $bit; }
+        elseif ($i === 6) { $m[7][8] = $bit; }
         elseif ($i === 7) { $m[8][8] = $bit; }
-        elseif ($i === 8) { $m[7][8] = $bit; }
-        else              { $m[14 - $i][8] = $bit; }
-        // Kopie 2: rechts oben und links unten
-        if ($i < 8) { $m[$size - 1 - $i][8] = $bit; }
-        else        { $m[8][$size - 15 + $i] = $bit; }
+        elseif ($i === 8) { $m[8][7] = $bit; }
+        else              { $m[8][14 - $i] = $bit; }
+        // Kopie 2: waagerecht rechts oben, senkrecht links unten
+        if ($i < 8) { $m[8][$size - 1 - $i] = $bit; }
+        else        { $m[$size - 15 + $i][8] = $bit; }
     }
     $m[$size - 8][8] = 1; // dunkles Modul
     return $m;
