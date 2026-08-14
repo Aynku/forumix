@@ -8,6 +8,61 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.18.56 (2026-08-14)
+
+### 🔒 Sicherheit, Logo und Fußbereich
+
+Sammelversion aus der Vorbereitung zur Veröffentlichung als Forumix.
+
+#### Session Fixation (Sicherheit)
+
+`session.use_strict_mode` wird jetzt vor `session_start()` gesetzt. Ohne das
+übernimmt PHP eine Sitzungs-ID, die der Besucher selbst mitbringt — jemand
+kann einem Opfer vorab eine ID unterschieben und dessen angemeldete Sitzung
+danach mitbenutzen. Die Einstellung steht im Code und nicht in der
+Server-Konfiguration, damit jede Installation sie mitbringt.
+
+#### Standard-Logo zeigte den falschen Namen (Bug-Fix)
+
+Die Logo-Vorschau im Adminbereich band `assets/logo_default.svg` als Bild ein
+statt das aus dem Forum-Namen erzeugte SVG. In einer frischen Installation
+stand dort deshalb ein fremder Forenname, obwohl im Feld darüber der eigene
+eingetragen war. Die Vorschau benutzt jetzt `forum_logo_render()` — dieselbe
+Funktion wie der Seitenkopf, also sieht man dort auch wirklich das, was die
+Besucher sehen.
+
+#### Fußbereich aufgeräumt
+
+Neben dem Forumix-Zeichen stand ein zweiter Link „Quelltext (AGPLv3)". Das
+Zeichen selbst ist jetzt der Link und verweist auf forumix.de, wo der
+Quelltext liegt; damit ist § 13 der AGPLv3 erfüllt, ohne Kleingedrucktes im
+Fuß. Die Einstellung „Quelltext-URL" bleibt und lenkt das Ziel um — wer den
+Code ändert, trägt dort sein eigenes Repository ein.
+
+#### Eingabefelder vom Typ url waren ungestylt
+
+`.form-row` zählt die Eingabetypen einzeln auf und `url` fehlte. Das Feld
+„Quelltext-URL" stand als schmaler Kasten zwischen zwei vollbreiten Feldern.
+`tel`, `search` und `time` gleich mit aufgenommen.
+
+#### Migration
+
+`migrate_v18_56.php` verbreitert `users.pending_email_token` auf
+`VARCHAR(255)`. Der Token wird gehasht abgelegt und passte nicht mehr in die
+alte Spaltenbreite — die Bestätigung einer E-Mail-Änderung lief dadurch ins
+Leere.
+
+#### Geänderte Dateien
+- bootstrap.php (v0.18.56, `FORUMIX_URL` statt `FORUMIX_SOURCE_URL`)
+- lib/auth.php (use_strict_mode)
+- views/layout.php (Fußbereich)
+- views/admin/index.php (Logo-Vorschau, Feld „Quelltext-URL")
+- admin/index.php (Vorgabe für `source_url` ist jetzt leer)
+- assets/style.css (Eingabetypen)
+- install/migrations/migrate_v18_56.php
+
+---
+
 ## v0.18.55 (2026-05-28)
 
 ### 📦 Erstes Update übers neue Paket-System + Versions-Schutz
