@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forumix — Forensoftware in nativem PHP</title>
+<meta name="description" content="Forumix ist eine vollständige Forensoftware in nativem PHP. Keine externen Abhängigkeiten, kein Composer, kein Framework. Freie Software unter AGPLv3.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 40'><rect width='44' height='34' rx='8' fill='%232563eb'/><rect x='8' y='9' width='28' height='4' rx='2' fill='%23fff'/><rect x='8' y='17' width='20' height='4' rx='2' fill='%23fff'/></svg>">
+<style>
+  :root{
+    --bg:#0a0a0b; --surface:#131316; --surface2:#1a1a1f;
+    --line:#24242b; --line2:#34343d;
+    --text:#e7e7ea; --muted:#a1a1aa; --faint:#71717a;
+    --accent:#2563eb; --accent-soft:#3b82f6;
+    --green:#4ade80;
+    --radius:14px;
+    --wrap:1000px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-soft); text-decoration:none}
+  a:hover{text-decoration:underline}
+  code,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9em}
+  .wrap{max-width:var(--wrap); margin:0 auto; padding:0 22px}
+
+  /* ── Kopf ── */
+  header{
+    padding:64px 0 52px; text-align:center;
+    background:radial-gradient(900px 320px at 50% -60px, rgba(37,99,235,.16), transparent 70%);
+    border-bottom:1px solid var(--line);
+  }
+  .logo{display:block;margin:0 auto 22px;height:52px;width:auto}
+  h1{font-size:clamp(28px,5vw,42px); line-height:1.15; margin:0 0 14px; letter-spacing:-.02em}
+  .lead{font-size:clamp(16px,2.2vw,19px); color:var(--muted); max-width:620px; margin:0 auto 30px}
+  .cta{display:flex; gap:12px; justify-content:center; flex-wrap:wrap}
+  .btn{
+    display:inline-block; padding:11px 22px; border-radius:10px; font-weight:600; font-size:15px;
+    border:1px solid var(--line2); color:var(--text); transition:.15s;
+  }
+  .btn:hover{text-decoration:none; border-color:var(--accent); transform:translateY(-1px)}
+  .btn-primary{background:var(--accent); border-color:var(--accent); color:#fff}
+  .btn-primary:hover{background:#1d4ed8; border-color:#1d4ed8}
+  .badges{margin-top:26px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;
+          font-size:12px; color:var(--faint)}
+  .badge{border:1px solid var(--line); border-radius:99px; padding:4px 12px; background:var(--surface)}
+
+  /* ── Abschnitte ── */
+  section{padding:56px 0; border-bottom:1px solid var(--line)}
+  section:last-of-type{border-bottom:0}
+  h2{font-size:22px; margin:0 0 8px; letter-spacing:-.01em}
+  .sub{color:var(--muted); margin:0 0 28px; font-size:15px; max-width:640px}
+
+  .grid{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:20px}
+  .card h3{margin:0 0 10px; font-size:15px; display:flex; align-items:center; gap:8px}
+  .card ul{margin:0; padding-left:18px; color:var(--muted); font-size:14px; line-height:1.85}
+  .card li::marker{color:var(--faint)}
+
+  /* ── Installation ── */
+  ol.steps{counter-reset:s; list-style:none; margin:0; padding:0; display:grid; gap:14px}
+  ol.steps li{
+    counter-increment:s; position:relative; padding:18px 20px 18px 58px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  }
+  ol.steps li::before{
+    content:counter(s); position:absolute; left:18px; top:17px;
+    width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff;
+    font-size:13px; font-weight:700; display:grid; place-items:center;
+  }
+  ol.steps strong{display:block; margin-bottom:4px; font-size:15px}
+  ol.steps p{margin:0; color:var(--muted); font-size:14px}
+  pre{
+    background:#0e0e11; border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px; overflow-x:auto; margin:12px 0 0; font-size:13px; line-height:1.7;
+  }
+  pre code{color:#c7d2fe}
+  .comment{color:var(--faint)}
+
+  table{width:100%; border-collapse:collapse; font-size:14px}
+  th,td{text-align:left; padding:10px 0; border-bottom:1px solid var(--line)}
+  th{color:var(--faint); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.06em}
+  tr:last-child td{border-bottom:0}
+
+  .note{
+    background:var(--surface2); border:1px solid var(--line);
+    border-left:3px solid var(--accent); border-radius:8px;
+    padding:14px 16px; color:var(--muted); font-size:14px; margin-top:18px;
+  }
+  .note strong{color:var(--text)}
+
+  footer{padding:36px 0 48px; text-align:center; color:var(--faint); font-size:13px}
+  footer a{color:var(--muted)}
+
+  @media (max-width:560px){
+    header{padding:44px 0 38px}
+    section{padding:42px 0}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <svg class="logo" viewBox="0 0 220 60" role="img" aria-label="Forumix">
+      <g transform="translate(2,4)">
+        <path d="M 28 6 L 46 6 Q 51 6 51 11 L 51 25 Q 51 30 46 30 L 44 30 L 44 38 L 36 30 L 28 30 Q 23 30 23 25 L 23 11 Q 23 6 28 6 Z"
+              fill="#e7e7ea" opacity=".5"/>
+        <path d="M 8 0 L 36 0 Q 42 0 42 6 L 42 22 Q 42 28 36 28 L 18 28 L 10 36 L 10 28 L 8 28 Q 2 28 2 22 L 2 6 Q 2 0 8 0 Z"
+              fill="#2563eb"/>
+        <rect x="8" y="8" width="28" height="3" rx="1.5" fill="#fff"/>
+        <rect x="8" y="14" width="22" height="3" rx="1.5" fill="#fff"/>
+        <rect x="8" y="20" width="18" height="3" rx="1.5" fill="#fff"/>
+      </g>
+      <text x="62" y="34" font-family="system-ui,-apple-system,sans-serif" font-size="26"
+            font-weight="700" letter-spacing="-.5">
+        <tspan fill="#e7e7ea">Forum</tspan><tspan fill="#2563eb">ix</tspan>
+      </text>
+    </svg>
+
+    <h1>Ein vollständiges Forum.<br>Ohne alles, was man sonst mitschleppt.</h1>
+    <p class="lead">
+      Forumix ist Forensoftware in nativem PHP — kein Composer, kein Framework,
+      kein Build-Schritt. Hochladen, Installer aufrufen, fertig.
+    </p>
+
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/Aynku/forumix">Quelltext ansehen</a>
+      <a class="btn" href="#installation">Installation</a>
+    </div>
+
+    <div class="badges">
+      <span class="badge">PHP 8.1+</span>
+      <span class="badge">MySQL / MariaDB</span>
+      <span class="badge">keine Abhängigkeiten</span>
+      <span class="badge">AGPLv3</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Was drin ist</h2>
+    <p class="sub">
+      Kein Grundgerüst, das man erst mit Erweiterungen brauchbar macht. Was ein Forum
+      braucht, ist eingebaut.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <h3>💬 Inhalte</h3>
+        <ul>
+          <li>Kategorien, Foren, Themen, Beiträge</li>
+          <li>BBCode mit Zitat-Sprung zum Original</li>
+          <li>Umfragen, auch mit Mehrfachauswahl</li>
+          <li>Datei-Anhänge und Bilder</li>
+          <li>Tags, Lesezeichen, Abos</li>
+          <li>@Erwähnungen mit Vorschlagsliste</li>
+          <li>Passwortgeschützte Foren</li>
+          <li>Private Nachrichten</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>👥 Mitglieder</h3>
+        <ul>
+          <li>Profile mit Banner, Avatar, Signatur</li>
+          <li>Ränge nach Beitragszahl</li>
+          <li>Achievements und Aktivitätskarte</li>
+          <li>Wer ist online, inklusive Bot-Erkennung</li>
+          <li>Zwei-Faktor-Anmeldung mit Backup-Codes</li>
+          <li>Angemeldet bleiben über geteilte Token</li>
+          <li>Selbstlöschung des Kontos</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>🛡️ Moderation</h3>
+        <ul>
+          <li>Inhaber, Admins, globale und Forum-Moderatoren</li>
+          <li>Freigabe je Forum für Themen und Antworten</li>
+          <li>Meldungen mit Bearbeitungsstand</li>
+          <li>Verwarnungen mit automatischer Sperre</li>
+          <li>Bearbeitungsverlauf je Beitrag</li>
+          <li>Moderationsprotokoll</li>
+          <li>IP-Sperren</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>🎨 Aussehen</h3>
+        <ul>
+          <li>Farben, Schrift und Abstände im Adminbereich</li>
+          <li>Hell und dunkel, vom Mitglied wählbar</li>
+          <li>Logo entsteht aus dem Forum-Namen</li>
+          <li>Eigene Vorlagen mit Auto-Escape</li>
+          <li>Sieben Schriften, alle selbst gehostet</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>🔐 Sicherheit</h3>
+        <ul>
+          <li>Durchgehend vorbereitete SQL-Anweisungen</li>
+          <li>CSRF-Token an jeder schreibenden Aktion</li>
+          <li>bcrypt, Sitzungserneuerung beim Login</li>
+          <li>Bremsen für Login, Registrierung, 2FA</li>
+          <li>Dreistufiges Captcha</li>
+          <li>Content-Security-Policy ab Werk</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>⚙️ Betrieb</h3>
+        <ul>
+          <li>Sicherungen für Datenbank und Dateien</li>
+          <li>Update-Pakete mit Prüfung vor dem Einspielen</li>
+          <li>Migrationen aus dem Adminbereich</li>
+          <li>Wartungsmodus</li>
+          <li>Modulsystem für Erweiterungen</li>
+          <li>Eigene Seiten für Impressum und Datenschutz</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Nichts, was nach Hause telefoniert</h2>
+    <p class="sub">
+      Ein Forum ruft im Auslieferungszustand keinen fremden Server auf. Keine Schriften
+      von Google, keine Skripte von einem CDN, kein QR-Dienst für die Zwei-Faktor-Einrichtung,
+      keine Rückmeldung an den Hersteller.
+    </p>
+    <div class="grid">
+      <div class="card">
+        <h3>Schriften liegen lokal</h3>
+        <ul><li>Sieben Familien mitgeliefert, latin und latin-ext. Kein Aufruf bei
+                fonts.googleapis.com, also keine Besucher-IP in fremden Protokollen.</li></ul>
+      </div>
+      <div class="card">
+        <h3>QR-Code selbst erzeugt</h3>
+        <ul><li>Der Code für die Zwei-Faktor-Einrichtung entsteht auf dem eigenen Server.
+                Der Schlüssel verlässt die Maschine nicht.</li></ul>
+      </div>
+      <div class="card">
+        <h3>Editor selbst gehostet</h3>
+        <ul><li>Auch der Code-Editor im Adminbereich kommt aus dem eigenen
+                Verzeichnis, nicht von einem Content-Netzwerk.</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="installation">
+  <div class="wrap">
+    <h2>Installation</h2>
+    <p class="sub">Datenbank anlegen, Dateien hochladen, Installer aufrufen. Kein Composer,
+       kein Node, kein Build.</p>
+
+    <ol class="steps">
+      <li>
+        <strong>Datenbank anlegen</strong>
+        <p>Eine leere Datenbank und ein Benutzer, der nur darauf Rechte hat.</p>
+<pre><code>CREATE DATABASE forum CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'forum'@'localhost' IDENTIFIED BY 'starkes_passwort';
+GRANT ALL ON forum.* TO 'forum'@'localhost';</code></pre>
+      </li>
+      <li>
+        <strong>Dateien hochladen und Rechte setzen</strong>
+        <p>Inhalt des Pakets in das Web-Verzeichnis, dann drei Ordner beschreibbar machen.</p>
+<pre><code>chmod 775 cache/templates uploads uploads/avatars uploads/attachments</code></pre>
+      </li>
+      <li>
+        <strong>Installer aufrufen</strong>
+        <p>Vier Schritte: Voraussetzungen, Datenbank, Schema, Inhaber-Konto.
+           Danach den Ordner <code>install/</code> löschen.</p>
+<pre><code>https://deine-domain.tld/install/
+<span class="comment"># nach Abschluss:</span>
+rm -rf install/</code></pre>
+      </li>
+    </ol>
+
+    <div class="note">
+      <strong>Unter nginx</strong> müssen ein paar Regeln in den Server-Block, weil nginx keine
+      <code>.htaccess</code> liest — ohne sie sind Vorlagen, Sicherungen und der Übersetzungs-Cache
+      von außen erreichbar. Der fertige Block steht in der README des Pakets, samt Befehlen zum
+      Nachmessen.
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Voraussetzungen</h2>
+    <table>
+      <tr><th>Sache</th><th>Anforderung</th></tr>
+      <tr><td>PHP</td><td>8.1 oder neuer, mit <code>pdo_mysql</code>, <code>mbstring</code>, <code>json</code>, <code>openssl</code></td></tr>
+      <tr><td>Datenbank</td><td>MySQL 5.7+ oder MariaDB 10.3+</td></tr>
+      <tr><td>Webserver</td><td>nginx mit PHP-FPM, oder Apache mit <code>mod_rewrite</code></td></tr>
+      <tr><td>Optional</td><td><code>ZipArchive</code> für Datei-Sicherungen, ein Mailserver für Benachrichtigungen</td></tr>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Lizenz</h2>
+    <p class="sub">
+      Forumix ist freie Software unter der <strong>GNU Affero General Public License v3</strong>.
+      Benutzen, ändern und weitergeben ist erlaubt, auch geschäftlich.
+    </p>
+    <div class="grid">
+      <div class="card">
+        <h3>Für Betreiber</h3>
+        <ul><li>Installieren und betreiben, ohne etwas zu ändern: keine Pflichten.</li></ul>
+      </div>
+      <div class="card">
+        <h3>Für Entwickler</h3>
+        <ul><li>Wer den Code ändert und die Fassung im Netz anbietet, muss seinen Quelltext
+                unter derselben Lizenz herausgeben. Genau hier greift die AGPL, wo die GPL
+                bei Web-Software ins Leere läuft.</li></ul>
+      </div>
+      <div class="card">
+        <h3>Name und Logo</h3>
+        <ul><li>Der Code ist frei, der Name „Forumix“ und das Logo sind es nicht.
+                Ein Fork darf alles — nur nicht so heißen.</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>
+      Forumix — freie Forensoftware ·
+      <a href="https://github.com/Aynku/forumix">Quelltext</a> ·
+      AGPLv3
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
