@@ -239,9 +239,10 @@ set_module_config('meinmodul', $cfg);       <span class="comment">// als JSON in
                 <code>e()</code>. Für Beitragstext gibt es die BBCode-Ausgabe des Kerns.</li></ul>
       </div>
       <div class="card">
-        <h3>📄 Endungen im Update-Paket</h3>
-        <ul><li>Der Paket-Installer nimmt nur bekannte Endungen an (php, css, js, sql,
-                html, Bilder, Schriften). Dateien ohne Endung fallen durch.</li></ul>
+        <h3>🚪 Nur mit gültigem Konto</h3>
+        <ul><li>Rechte über <code>current_user()</code> prüfen, nicht über das, was das
+                Formular mitschickt. Für Admin-Aktionen zusätzlich
+                <code>is_admin</code> oder <code>is_owner</code>.</li></ul>
       </div>
     </div>
   </div>
