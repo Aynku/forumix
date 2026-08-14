@@ -8,6 +8,27 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.18.60 (2026-08-14)
+
+### 🧩 install.sql eines Moduls muss wiederholbar sein
+
+`enable_module()` fuehrt zuerst `install.sql` aus und traegt das Modul **danach**
+in die Tabelle `modules` ein. Scheitert der zweite Schritt, stehen die Tabellen
+des Moduls schon, die Zeile fehlt aber — beim naechsten Versuch laeuft
+`install.sql` erneut. Die Saatdaten des FAQ-Moduls haben feste Schluessel und
+brachen dann mit "Duplicate entry" ab, mit einer ganz anderen Fehlermeldung als
+beim ersten Mal.
+
+Die beiden `INSERT` im FAQ-Modul sind jetzt `INSERT IGNORE`. Fuer eigene Module
+gilt dasselbe: `install.sql` muss einen zweiten Durchlauf unbeschadet
+ueberstehen.
+
+#### Geänderte Dateien
+- bootstrap.php (v0.18.60)
+- modules/faq/install.sql (Saatdaten wiederholbar)
+
+---
+
 ## v0.18.59 (2026-08-14)
 
 ### 🐛 Zwei INSERTs ohne Pflichtspalte

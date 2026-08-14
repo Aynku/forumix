@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forumix — Häufige Fragen</title>
+<meta name="description" content="Häufige Fragen zum Betrieb von Forumix und eine Anleitung, wie eigene Module aufgebaut sind.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 40'><rect width='44' height='34' rx='8' fill='%232563eb'/><rect x='8' y='9' width='28' height='4' rx='2' fill='%23fff'/><rect x='8' y='17' width='20' height='4' rx='2' fill='%23fff'/></svg>">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="/">Forum<span>ix</span></a>
+    <a href="/#download">Download</a>
+    <a href="/faq.html">FAQ</a>
+    <a href="/faq.html#module">Module</a>
+    <a href="https://forum.forumix.de" target="_blank" rel="noopener">Forum</a>
+  </div>
+</nav>
+
+<header style="padding:44px 0 34px">
+  <div class="wrap">
+    <h1>Häufige Fragen</h1>
+    <p class="lead">
+      Fragen zum Betrieb, und weiter unten der Aufbau eigener Module.
+      Was hier steht, ist am Code nachgesehen — nicht aus der Erinnerung.
+    </p>
+    <div class="cta">
+      <a class="btn" href="/">Zur Startseite</a>
+      <a class="btn" href="https://forum.forumix.de" target="_blank" rel="noopener"><span class="dot"></span>Fragen im Forum</a>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Betrieb</h2>
+    <p class="sub">Die Fragen, die beim Aufsetzen und danach am häufigsten kommen.</p>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Warum kein Composer?</h3>
+        <ul><li>Weil ein Forum auf jedem Webspace laufen soll, auch ohne Shell-Zugang.
+                Alles Fremde liegt im Paket: Schriften, Code-Editor, QR-Erzeugung.
+                Entpacken und hochladen genügt.</li></ul>
+      </div>
+      <div class="card">
+        <h3>Wie aktualisiere ich?</h3>
+        <ul>
+          <li>Update-Paket herunterladen, im Adminbereich unter <em>Updates</em> hochladen.
+              Es enthält nur die geänderten Dateien.</li>
+          <li>Kein FTP nötig, und <code>config.php</code> sowie alles unter
+              <code>uploads/</code> bleiben unberührt.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Meine <code>.htaccess</code> wirkt nicht</h3>
+        <ul><li>Dann läuft nginx. Der liest <code>.htaccess</code> nicht — <strong>ohne
+                Fehlermeldung</strong>. Die Regeln gehören in den Server-Block, siehe unten.</li></ul>
+      </div>
+      <div class="card">
+        <h3>Wo liegen die Einstellungen?</h3>
+        <ul><li>In der Datenbank, nicht in Dateien. In der <code>config.php</code> stehen
+                nur Zugangsdaten und ein paar Schalter, die vor der Datenbank greifen
+                müssen.</li></ul>
+      </div>
+      <div class="card">
+        <h3>E-Mail kommt nicht an</h3>
+        <ul>
+          <li><em>Adminbereich → E-Mail</em>: Zugangsdaten eintragen, speichern, dann die
+              Test-Mail darunter benutzen.</li>
+          <li>Ohne SMTP-Server fällt das Forum auf <code>mail()</code> zurück — das landet
+              oft im Spam.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Hinter einem Reverse Proxy</h3>
+        <ul><li>Sonst sieht das Forum die IP des Proxys statt die des Besuchers. In die
+                <code>config.php</code>:
+                <code>define('TRUSTED_PROXIES', ['127.0.0.1']);</code> — nur dann werden
+                Weiterleitungs-Kopfzeilen überhaupt gelesen.</li></ul>
+      </div>
+      <div class="card">
+        <h3>Etwas geht kaputt, ich sehe nichts</h3>
+        <ul>
+          <li>Fehler gehen ins Protokoll, nie auf den Bildschirm. Zum Entwickeln:
+              <code>define('FORUM_DEBUG', true);</code></li>
+          <li>Es gilt eine Content-Security-Policy. Bricht ein eingebundenes Skript,
+              schaltet <code>define('FORUM_CSP', false);</code> sie ab — als Notausgang,
+              nicht als Dauerzustand.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Aussehen ändern</h3>
+        <ul>
+          <li><em>Adminbereich → Design</em>: Farben, Schrift, Abstände, Kopfzeile.</li>
+          <li>Ohne eigenes Logo wird eines aus dem Forennamen erzeugt. Ein eigenes:
+              <code>assets/logo.svg</code> ablegen — lokale SVGs werden eingebettet, ein
+              <code>currentColor</code> darin geht dann in hell und dunkel mit.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>nginx statt Apache?</strong> Dann brauchst du die Regeln aus den mitgelieferten
+      <code>.htaccess</code>-Dateien als Direktiven im Server-Block — vor allem: kein PHP unter
+      <code>uploads/</code>, und <code>lib/</code>, <code>views/</code>, <code>views_new/</code>,
+      <code>cache/</code>, <code>lang/</code>, <code>backup/</code> dichtmachen. Frag im Forum
+      nach dem fertigen Block, statt ihn nachzubauen.
+    </div>
+  </div>
+</section>
+
+<section id="module">
+  <div class="wrap">
+    <h2>Module</h2>
+    <p class="sub">
+      Ein Modul ist ein Ordner unter <code>modules/</code>. Es wird im Adminbereich
+      ein- und ausgeschaltet, bringt sein eigenes Tabellenschema mit und kann eigene
+      Seiten, Ansichten und Einhängepunkte liefern. Deaktivieren löscht keine Daten.
+    </p>
+
+    <h3 style="font-size:16px;margin:26px 0 10px">Aufbau</h3>
+<pre><code>modules/meinmodul/
+  module.php        <span class="comment">Pflicht — gibt ein Array zurück (das Manifest)</span>
+  install.sql       <span class="comment">optional — läuft EINMAL beim ersten Aktivieren</span>
+  meinmodul.php     <span class="comment">optional — eigene Seite, direkt aufrufbar</span>
+  views/liste.php   <span class="comment">optional — render('@meinmodul/liste')</span>
+  hooks/home_top.php<span class="comment">optional — wird an dieser Stelle eingebunden</span></code></pre>
+
+    <div class="note" style="margin-top:14px">
+      Der Ordnername ist der <strong>Code</strong> des Moduls und muss zum Feld
+      <code>code</code> im Manifest passen. Erlaubt sind nur
+      <code>a–z 0–9 _ -</code> — der Name landet in einem Dateipfad, deshalb die enge Regel.
+    </div>
+
+    <h3 style="font-size:16px;margin:26px 0 10px">Das Manifest</h3>
+<pre><code>&lt;?php
+<span class="comment">// modules/meinmodul/module.php</span>
+if (!defined('FORUM_RUNNING')) return [];
+
+return [
+    'code'        =&gt; 'meinmodul',        <span class="comment">// Pflicht, = Ordnername</span>
+    'name'        =&gt; 'Mein Modul',
+    'description' =&gt; 'Was es tut, in einem Satz.',
+    'icon'        =&gt; '🧩',
+    'version'     =&gt; '1.0',
+    'author'      =&gt; 'Dein Name',
+    'on_enable'   =&gt; function () { <span class="comment">/* nach dem Einschalten */</span> },
+    'on_disable'  =&gt; function () { <span class="comment">/* vor dem Ausschalten */</span> },
+];</code></pre>
+
+    <div class="note" style="margin-top:14px">
+      <strong>Ehrlich dazu:</strong> ein Feld <code>requires</code> wird eingelesen, aber
+      <em>nirgends ausgewertet</em>. Abhängigkeiten zwischen Modulen gibt es also noch nicht —
+      verlass dich nicht darauf.
+    </div>
+
+    <h3 style="font-size:16px;margin:26px 0 10px">Eigene Seite</h3>
+    <p class="sub" style="margin-bottom:12px">
+      Eine Modulseite wird direkt aufgerufen, etwa
+      <code>/modules/meinmodul/meinmodul.php</code>. Sie startet das Forum selbst und
+      muss zwei Dinge prüfen.
+    </p>
+<pre><code>&lt;?php
+if (!defined('FORUM_RUNNING')) define('FORUM_RUNNING', true);
+require_once __DIR__ . '/../../bootstrap.php';
+
+<span class="comment">// 1. Ist das Modul überhaupt an? Sonst sieht man es auch im Aus-Zustand.</span>
+if (!module_enabled('meinmodul')) {
+    http_response_code(404);
+    render('error', ['title' =&gt; 'Nicht gefunden', 'message' =&gt; 'Nicht aktiv.']);
+    return;
+}
+
+<span class="comment">// 2. Bei jedem POST das Token prüfen — ohne das kann eine fremde Seite
+//    Aktionen im Namen eines angemeldeten Besuchers auslösen.</span>
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf($_POST['csrf'] ?? '')) {
+        error_page(400, 'Sicherheits-Token ungültig');
+    }
+}
+
+render('@meinmodul/liste', ['eintraege' =&gt; db_fetchAll('SELECT * FROM meine_tabelle')]);</code></pre>
+
+    <h3 style="font-size:16px;margin:26px 0 10px">Einhängepunkte</h3>
+    <p class="sub" style="margin-bottom:12px">
+      Eine Datei <code>hooks/&lt;name&gt;.php</code> wird an der passenden Stelle eingebunden,
+      sofern das Modul aktiv ist. Im Geltungsbereich stehen <code>$currentUser</code> und
+      <code>$csrfToken</code> bereit.
+    </p>
+    <table>
+      <tr><th>Name</th><th>Wo</th></tr>
+      <tr><td><code>home_top</code></td><td>Startseite, über der Forenübersicht</td></tr>
+    </table>
+    <div class="note" style="margin-top:14px">
+      Mehr gibt es aktuell <strong>nicht</strong> — genau ein Einhängepunkt. Wer einen
+      weiteren braucht, setzt <code>render_module_hook('name')</code> an die gewünschte
+      Stelle im Layout; das Laden funktioniert dann von allein.
+    </div>
+
+    <h3 style="font-size:16px;margin:26px 0 10px">Eigene Tabellen</h3>
+    <p class="sub" style="margin-bottom:12px">
+      <code>install.sql</code> läuft einmal, beim <em>ersten</em> Aktivieren. Danach nie
+      wieder — auch nicht nach Aus- und wieder Einschalten.
+    </p>
+<pre><code>CREATE TABLE IF NOT EXISTS meine_tabelle (
+  id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id    INT UNSIGNED NOT NULL,
+  text       TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;</code></pre>
+    <div class="note" style="margin-top:14px">
+      <strong>Zwei Fallstricke.</strong> Die Datei wird an Semikolons zerlegt — ein
+      Semikolon in einem Zeichenketten-Wert oder in einem Trigger zerreißt die Anweisung.
+      Und Spalten mit <code>NOT NULL</code> ohne Vorgabewert musst du bei jedem
+      <code>INSERT</code> mitgeben: mit <code>STRICT_TRANS_TABLES</code> — der
+      Voreinstellung — bricht es sonst mit Fehler 1364 ab. Gib Spalten lieber ein
+      <code>DEFAULT</code> mit.
+    </div>
+
+    <h3 style="font-size:16px;margin:26px 0 10px">Einstellungen je Modul</h3>
+<pre><code>$cfg = module_config('meinmodul');          <span class="comment">// Array, leer wenn nichts gesetzt</span>
+$cfg['limit'] = 20;
+set_module_config('meinmodul', $cfg);       <span class="comment">// als JSON in modules.config</span></code></pre>
+
+    <h3 style="font-size:16px;margin:26px 0 10px">Was du einhalten solltest</h3>
+    <div class="grid">
+      <div class="card">
+        <h3>🔒 Nichts direkt aufrufbar</h3>
+        <ul><li>Jede Datei, die kein Einstiegspunkt ist, beginnt mit dem Wächter
+                <code>if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }</code></li></ul>
+      </div>
+      <div class="card">
+        <h3>🧷 Immer vorbereitete Anweisungen</h3>
+        <ul><li><code>db_fetchAll('… WHERE id = ?', [$id])</code> — nie Werte in den
+                SQL-Text kleben, auch nicht „nur diese eine Zahl".</li></ul>
+      </div>
+      <div class="card">
+        <h3>🖨️ Ausgabe maskieren</h3>
+        <ul><li>Alles, was aus der Datenbank oder vom Besucher kommt, durch
+                <code>e()</code>. Für Beitragstext gibt es die BBCode-Ausgabe des Kerns.</li></ul>
+      </div>
+      <div class="card">
+        <h3>📄 Endungen im Update-Paket</h3>
+        <ul><li>Der Paket-Installer nimmt nur bekannte Endungen an (php, css, js, sql,
+                html, Bilder, Schriften). Dateien ohne Endung fallen durch.</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>
+      Forumix — freie Forensoftware ·
+      <a href="/">Startseite</a> ·
+      <a href="https://forum.forumix.de" target="_blank" rel="noopener">Forum</a> ·
+      AGPLv3
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

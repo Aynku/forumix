@@ -21,6 +21,24 @@ a:hover{text-decoration:underline}
 code,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9em}
 .wrap{max-width:var(--wrap); margin:0 auto; padding:0 22px}
 
+/* ── Kopfleiste ──
+   Bleibt beim Scrollen stehen. Wer die FAQ sucht, soll sie nicht erst am Ende
+   der Seite finden. */
+.nav{
+  position:sticky; top:0; z-index:10;
+  background:rgba(10,10,11,.88); backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.nav .wrap{display:flex; align-items:center; gap:20px; height:50px}
+.nav a{color:var(--muted); font-size:14px; font-weight:500}
+.nav a:hover{color:var(--text); text-decoration:none}
+.nav .brand{color:var(--text); font-weight:700; margin-right:auto; font-size:15px}
+.nav .brand span{color:var(--accent-soft)}
+@media (max-width:520px){
+  .nav .wrap{gap:14px; font-size:13px}
+  .nav .brand{font-size:14px}
+}
+
 /* ── Kopf ── */
 header{
   padding:64px 0 52px; text-align:center;

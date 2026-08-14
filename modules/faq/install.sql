@@ -19,13 +19,13 @@ CREATE TABLE IF NOT EXISTS `faq_items` (
   INDEX `idx_position` (`position`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `faq_categories` (`cat_id`, `title`, `icon`, `position`) VALUES
+INSERT IGNORE INTO `faq_categories` (`cat_id`, `title`, `icon`, `position`) VALUES
 (1, 'Allgemein',  '🏠', 10),
 (2, 'Beiträge',   '💬', 20),
 (3, 'Konto',      '👤', 30),
 (4, 'Moderation', '🛡️', 40);
 
-INSERT INTO `faq_items` (`cat_id`, `question`, `answer`, `position`) VALUES
+INSERT IGNORE INTO `faq_items` (`cat_id`, `question`, `answer`, `position`) VALUES
 (1, 'Was ist dieses Forum?', 'Dieses Forum ist eine Community-Plattform, in der sich Mitglieder austauschen, Fragen stellen und diskutieren können. Du findest verschiedene Bereiche zu unterschiedlichen Themen – wähl einfach einen aus, der dich interessiert, und schau dich um!', 10),
 (1, 'Muss ich mich registrieren um mitzulesen?', 'Nein, das Mitlesen ist für alle frei möglich. Zum [b]Schreiben von Beiträgen[/b] oder zum Reagieren brauchst du allerdings ein eigenes Konto. Die Registrierung dauert nur einen Moment.', 20),
 (1, 'Kostet die Nutzung etwas?', 'Nein, das Forum ist komplett kostenlos. Keine Premium-Mitgliedschaften, keine versteckten Kosten, keine Werbung.', 30),
