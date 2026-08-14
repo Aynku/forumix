@@ -737,6 +737,10 @@
 
       <form method="post" action="?action=save_settings">
         <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
+        <?php /* Ohne Marker gilt das alte Verhalten: dann zaehlt save_settings
+                 auch die Schalter der eigenen Menuepunkte zu diesem Formular
+                 und setzt sie auf 0, weil sie hier fehlen. */ ?>
+        <input type="hidden" name="settings_section" value="general">
 
         <div class="alert alert-info" style="margin-bottom:16px">
           💡 <strong>Hinweis:</strong> Branding (Logo, Name, Slogan), Farben, Footer und Custom CSS findest du jetzt im neuen Bereich
@@ -763,67 +767,7 @@
           </div>
         </div>
 
-        <?php /* ═══ 2. REGISTRIERUNG & BENUTZER ══════════════════════ */ ?>
-        <div class="form-card" style="margin-bottom:16px">
-          <h2>👤 Registrierung & Benutzer</h2>
-          <div class="form-row">
-            <label>
-              <input type="checkbox" name="registration_enabled" value="1"
-                <?= ($settings['registration_enabled'] ?? '1') === '1' ? 'checked' : '' ?>>
-              Registrierungen erlauben
-            </label>
-            <div class="form-hint">Wenn deaktiviert: nur bestehende User können sich einloggen.</div>
-          </div>
-          <div class="form-row">
-            <label>
-              <input type="checkbox" name="email_verification_required" value="1"
-                <?= ($settings['email_verification_required'] ?? '0') === '1' ? 'checked' : '' ?>>
-              E-Mail-Bestätigung bei Registrierung erforderlich
-            </label>
-            <div class="form-hint">User können sich erst einloggen, nachdem sie ihre E-Mail bestätigt haben. Benötigt funktionierende SMTP-Konfiguration.</div>
-          </div>
-          <div class="form-row">
-            <label>
-              <input type="checkbox" name="registration_approval_required" value="1"
-                <?= ($settings['registration_approval_required'] ?? '0') === '1' ? 'checked' : '' ?>>
-              Admin-Freigabe für neue Registrierungen erforderlich
-            </label>
-            <div class="form-hint">Neue Accounts müssen vom Admin-Team freigeschaltet werden, bevor sie sich einloggen können. Admins bekommen E-Mail-Benachrichtigung. Empfohlen für Test-/Privat-Foren.</div>
-          </div>
-
-          <?php if (($settings['registration_approval_required'] ?? '0') === '1'): ?>
-            <div style="background:rgba(74,157,74,0.06);padding:14px;border-radius:6px;border-left:3px solid #4a9d4a;margin:6px 0 14px">
-              <div style="font-weight:600;margin-bottom:6px">✉️ Einladungs-Codes</div>
-              <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px;line-height:1.5">
-                Du kannst Personen einladen die du persönlich kennst – sie umgehen die Admin-Freigabe-Pflicht.
-                Codes sind one-shot und laufen nach 7 Tagen ab.
-              </p>
-              <a href="?action=invitations" class="btn btn-ghost btn-sm">→ Einladungen verwalten</a>
-            </div>
-          <?php endif; ?>
-          <div class="form-row">
-            <label>
-              <input type="checkbox" name="registration_terms_required" value="1"
-                <?= ($settings['registration_terms_required'] ?? '1') === '1' ? 'checked' : '' ?>>
-              Zustimmung zu Nutzungsbedingungen erforderlich
-            </label>
-            <div class="form-hint">User müssen bei der Registrierung den <a href="?action=pages">Nutzungsbedingungen</a> aktiv zustimmen (DSGVO-konform). Empfohlen.</div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-            <div class="form-row">
-              <label>Min. Benutzernamen-Länge</label>
-              <input type="number" name="min_username_length" min="2" max="50"
-                     value="<?= e($settings['min_username_length'] ?? '3') ?>">
-            </div>
-            <div class="form-row">
-              <label>Min. Passwortlänge</label>
-              <input type="number" name="min_password_length" min="4" max="100"
-                     value="<?= e($settings['min_password_length'] ?? '6') ?>">
-            </div>
-          </div>
-        </div>
-
-        <?php /* ═══ 3. BEITRÄGE & THREADS ════════════════════════════ */ ?>
+        <?php /* ═══ 2. BEITRÄGE & THREADS ════════════════════════════ */ ?>
         <div class="form-card" style="margin-bottom:16px">
           <h2>📝 Beiträge & Threads</h2>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
@@ -867,7 +811,7 @@
           </div>
         </div>
 
-        <?php /* ═══ 4. MODERATION & SICHERHEIT ═══════════════════════ */ ?>
+        <?php /* ═══ 3. MODERATION & SICHERHEIT ═══════════════════════ */ ?>
         <div class="form-card" style="margin-bottom:16px">
           <h2>🛡️ Moderation & Sicherheit</h2>
 
@@ -943,25 +887,7 @@
           </div>
         </div>
 
-        <?php /* ═══ 6. WARTUNG ═══════════════════════════════════════ */ ?>
-        <div class="form-card" style="margin-bottom:16px">
-          <h2>🛠️ Wartung</h2>
-          <div class="form-row">
-            <label>
-              <input type="checkbox" name="maintenance_mode" value="1"
-                <?= ($settings['maintenance_mode'] ?? '0') === '1' ? 'checked' : '' ?>>
-              Wartungsmodus aktivieren
-            </label>
-            <div class="form-hint">Nur Admins/Owner können das Forum erreichen. Andere User sehen die Wartungs-Nachricht.</div>
-          </div>
-          <div class="form-row">
-            <label>Wartungs-Nachricht</label>
-            <textarea name="maintenance_message" style="min-height:80px"
-                      placeholder="Wir sind kurz weg und basteln am Forum. Bis gleich!"><?= e($settings['maintenance_message'] ?? '') ?></textarea>
-          </div>
-        </div>
-
-        <?php /* ═══ 7. RECHTLICHES & DATENSCHUTZ ═════════════════════ */ ?>
+        <?php /* ═══ 4. RECHTLICHES & DATENSCHUTZ ═════════════════════ */ ?>
         <div class="form-card" style="margin-bottom:16px">
           <h2>🍪 Cookie-Hinweis (optional)</h2>
           <div class="form-row">

@@ -158,10 +158,14 @@ if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $allowed = $sectionFields[$section];
     }
 
+    // Nur Ankreuzfelder gehoeren hierher: die schicken nichts, wenn sie leer
+    // sind, deshalb zaehlt allein ihre Anwesenheit. captcha_enabled stand hier
+    // faelschlich mit drin, ist im Formular aber ein Auswahlfeld — und das
+    // sendet immer einen Wert. "Aus" kam dadurch nie an.
     $booleans = [
         'registration_enabled', 'maintenance_mode', 'show_ips_to_mods',
         'email_verification_required', 'notify_mods_on_report',
-        'cookie_banner_enabled', 'captcha_enabled',
+        'cookie_banner_enabled',
         'registration_approval_required',
         'registration_terms_required',
     ];

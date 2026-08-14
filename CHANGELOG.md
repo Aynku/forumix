@@ -8,6 +8,45 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.18.58 (2026-08-14)
+
+### 🧹 Doppelte Einstellungen entfernt
+
+#### Registrierung und Wartung standen zweimal
+
+Wie zuvor beim SMTP: beide sind in eigene Menüpunkte umgezogen, die alten
+Blöcke blieben im großen Einstellungs-Formular stehen. Wer sie dort änderte,
+überschrieb still, was er auf der eigenen Seite eingestellt hatte. Beide raus,
+die Abschnitte neu durchnummeriert.
+
+Systematisch nachgesehen statt gesucht: alle Formularfelder je Menüpunkt
+gegeneinander gestellt. Außer Registrierung und Wartung war nichts doppelt —
+gleiche Feldnamen wie `title` oder `position` gehören zu ganz anderen
+Formularen.
+
+#### Speichern hätte die Schalter abgeräumt (Bug-Fix)
+
+Das große Formular schickte keinen Sektions-Marker mit. Ohne den nimmt
+`save_settings` das alte Verhalten und behandelt die Felder **aller** Sektionen
+als zu diesem Formular gehörig — und Ankreuzfelder, die nicht mitkommen,
+gelten als abgewählt. Nach dem Entfernen der Blöcke hätte ein Klick auf
+„Einstellungen speichern" also Registrierung, E-Mail-Bestätigung und
+Wartungsmodus ausgeschaltet. Das Formular trägt jetzt `general`.
+
+#### CAPTCHA ließ sich nicht abschalten (Bug-Fix)
+
+`captcha_enabled` stand in der Liste der Ankreuzfelder, ist im Formular aber
+ein Auswahlfeld. Bei Ankreuzfeldern zählt nur, *ob* etwas ankommt — ein
+Auswahlfeld sendet aber immer. „❌ Aus" wurde deshalb als „an" gespeichert,
+und zwar seit die Einstellung existiert.
+
+#### Geänderte Dateien
+- bootstrap.php (v0.18.58)
+- admin/index.php (captcha_enabled aus der Boolean-Liste)
+- views/admin/index.php (zwei Blöcke raus, Sektions-Marker, Nummerierung)
+
+---
+
 ## v0.18.57 (2026-08-14)
 
 ### 🎨 Standard-Logo, Schriftstärken und doppeltes SMTP
