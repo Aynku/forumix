@@ -253,9 +253,11 @@
         </p>
 
         <div style="text-align:center;margin:18px 0">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=<?= e(urlencode($otpUrl)) ?>"
-               alt="QR Code"
-               style="background:#fff;padding:10px;border-radius:8px;border:1px solid var(--border)">
+          <?php /* Kein QR vom Fremddienst — die URL trüge den 2FA-Schlüssel. */ ?>
+          <div style="padding:14px;border:1px dashed var(--border);border-radius:8px;color:var(--text-muted);font-size:13px">
+            Trage den Code unten in deiner Authenticator-App unter
+            <strong>„Schlüssel manuell eingeben"</strong> ein.
+          </div>
         </div>
 
         <div style="background:var(--bg-surface2);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:16px;text-align:center">

@@ -1180,7 +1180,11 @@ if ($action === 'add_tag' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $slug = preg_replace('/[^a-z0-9]/', '', strtolower(post_str('slug')));
     $name = post_str('name');
     $desc = post_str('description');
+    // Der Wert landet unescaped-wirksam in style="color:…" — ohne Formatpruefung
+    // liesse sich dort CSS unterbringen, das von jedem Besucher eine fremde URL
+    // abruft.
     $col  = post_str('color', '#888');
+    if (!preg_match('/^#[0-9a-fA-F]{3,8}$/', $col)) $col = '#888';
     if ($slug && $name) {
         try {
             db_execute('INSERT INTO tags (slug, name, description, color) VALUES (?, ?, ?, ?)',

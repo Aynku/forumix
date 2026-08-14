@@ -689,6 +689,11 @@ document.addEventListener('click', function (e) {
     return { left: 0, top: textarea.offsetHeight };
   }
 
+  function mentionEscape(str) {
+    return String(str ?? '').replace(/[&<>"']/g, c =>
+      ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
   function renderMatches() {
     if (!popup) return;
     if (currentMatches.length === 0) {
@@ -700,9 +705,11 @@ document.addEventListener('click', function (e) {
       if (u.is_owner) badge = '<span class="mention-badge" style="background:#7c3aed">👑</span>';
       else if (u.is_admin) badge = '<span class="mention-badge" style="background:#dc2626">A</span>';
       else if (u.is_mod) badge = '<span class="mention-badge" style="background:#f59e0b">M</span>';
+      // Name und Avatar-URL kommen roh aus der API und landen in innerHTML —
+      // beides muss escaped werden, Attribute inklusive Anführungszeichen.
       return '<div class="mention-item' + (i === selectedIndex ? ' active' : '') + '" data-idx="' + i + '">'
-           + '<img src="' + u.avatar + '" alt="">'
-           + '<span class="mention-name">' + u.name + '</span>'
+           + '<img src="' + mentionEscape(u.avatar) + '" alt="">'
+           + '<span class="mention-name">' + mentionEscape(u.name) + '</span>'
            + badge
            + '</div>';
     }).join('');

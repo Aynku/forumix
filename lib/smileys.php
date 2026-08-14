@@ -93,7 +93,7 @@ function parse_smileys(string $html): string {
 
     foreach ($list as $code => [$emoji, $desc]) {
         $pattern = '/(?<![a-zA-Z0-9])' . preg_quote($code, '/') . '(?![a-zA-Z0-9])/u';
-        $replace = '<span class="smiley" title="' . e($desc) . '">' . $emoji . '</span>';
+        $replace = '<span class="smiley" title="' . e($desc) . '">' . e($emoji) . '</span>';
         $html = preg_replace($pattern, $replace, $html);
     }
 
