@@ -2185,7 +2185,6 @@
             </div>
 
             <h3 style="margin-top:18px">Logo</h3>
-            <?php $logoUrl = forum_logo_url(); ?>
             <div style="padding:14px;background:var(--bg-surface2);border-radius:var(--radius-sm);text-align:center;margin-bottom:10px">
               <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">
                 Aktuelle Vorschau
@@ -2193,9 +2192,11 @@
                   <span style="color:var(--color-warning)">· Standard-Logo</span>
                 <?php endif; ?>
               </div>
-              <img src="<?= e($logoUrl) ?>?<?= time() ?>" alt="Logo-Vorschau"
-                   style="max-height:100px;max-width:100%;color:var(--text-base)">
+              <?php // Dasselbe wie im Kopf der Seite, sonst zeigt die Vorschau etwas anderes als die Besucher sehen ?>
+              <div style="max-height:100px;color:var(--text-base)"
+                   class="logo-preview"><?= forum_logo_render('Logo-Vorschau') ?></div>
             </div>
+            <style>.logo-preview svg, .logo-preview img { max-height:100px; max-width:100%; height:auto }</style>
             <div class="form-row">
               <label>Logo-URL (optional)</label>
               <input type="text" name="forum_logo" value="<?= e($branding['forum_logo']) ?>"

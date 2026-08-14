@@ -9,6 +9,11 @@ if (session_status() === PHP_SESSION_NONE) {
             || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
             || (($_SERVER['SERVER_PORT'] ?? '') === '443');
 
+    // Sitzungs-IDs, die der Besucher selbst mitbringt, nicht uebernehmen.
+    // Ohne das koennte jemand einem Opfer eine ID unterschieben und danach
+    // dessen angemeldete Sitzung mitbenutzen (Session Fixation).
+    ini_set('session.use_strict_mode', '1');
+
     session_set_cookie_params([
         'lifetime' => SESSION_LIFETIME,
         'path'     => '/',
