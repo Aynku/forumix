@@ -8,6 +8,53 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.18.57 (2026-08-14)
+
+### 🎨 Standard-Logo, Schriftstärken und doppeltes SMTP
+
+#### Der Punkt im Standard-Logo verrutschte (Bug-Fix)
+
+Der Punkt hinter dem Forennamen stand als eigener Kreis an einer gerechneten
+Stelle: `Zeichenzahl × Schriftgröße × 0.55`. Diese Schätzung stimmt bei keinem
+Namen genau, also wanderte der Abstand — bei schmalen Namen klaffte eine Lücke,
+bei breiten rutschte der Punkt in den Text hinein.
+
+Der Punkt hängt jetzt als `tspan` im Text selbst, damit der Browser den
+Abstand misst statt PHP ihn zu raten. Größe und Höhe sind aus den echten
+Maßen von Inter 800 abgeleitet (Punkt 0.312 em breit, 0.290 em über der
+Grundlinie), sodass er aussieht wie der bisherige Kreis.
+
+Dieselbe Schätzung bestimmte auch die Zeichenfläche — bei einem breiten Namen
+war sie zu klein und **der Name wurde rechts abgeschnitten**. Die Breite wird
+jetzt je Zeichenklasse geschätzt, mit 12 % Aufschlag. Gegen die Schriftmaße
+geprüft, auch mit Namen wie „MMMMMMMMMMMMMM".
+
+#### Logo wurde mit Stärke 700 statt 800 gezeichnet (Bug-Fix)
+
+Inter ist eine variable Schrift und trägt alle Stärken von 100 bis 900 in
+einer Datei. In `fonts.css` stand sie viermal mit je einem festen Wert
+(400/500/600/700) auf derselben Datei — damit klemmt der Browser die Achse auf
+diesen Wert. Das Logo fragt 800 an und bekam 700. Jetzt zwei Deklarationen mit
+`font-weight: 100 900`, das sind 46 Zeilen weniger.
+
+#### SMTP stand zweimal im Adminbereich
+
+Beim Umzug in einen eigenen Menüpunkt blieb der alte Block in den
+Einstellungen stehen. Er ist raus.
+
+Dabei fiel auf, dass die Test-Mail auf der neuen Seite an
+`?action=send_test_email` schickte — **diese Aktion gibt es nicht**, der Knopf
+lief ins Leere. Sie benutzt jetzt denselben Weg wie vorher der alte Block:
+`send_test_mail` mit Rückmeldung direkt unter dem Feld.
+
+#### Geänderte Dateien
+- bootstrap.php (v0.18.57)
+- lib/settings.php (Logo-Geometrie)
+- assets/fonts.css (Inter als Stärkebereich)
+- views/admin/index.php (SMTP-Block entfernt, Test-Mail repariert)
+
+---
+
 ## v0.18.56 (2026-08-14)
 
 ### 🔒 Sicherheit, Logo und Fußbereich

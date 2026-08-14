@@ -943,85 +943,6 @@
           </div>
         </div>
 
-        <?php /* ═══ 5. E-MAIL-VERSAND (SMTP) ═════════════════════════ */ ?>
-        <div class="form-card" style="margin-bottom:16px">
-          <h2>📧 E-Mail-Versand (SMTP)</h2>
-          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">
-            Wird für Passwort-Reset und E-Mail-Verifikation benötigt.
-            Wenn kein SMTP-Server konfiguriert ist, fällt das System auf die PHP-mail()-Funktion zurück.
-          </p>
-
-          <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px">
-            <div class="form-row">
-              <label>SMTP-Host</label>
-              <input type="text" name="smtp_host" value="<?= e($settings['smtp_host'] ?? '') ?>"
-                     placeholder="smtp.gmail.com / smtp.web.de / ...">
-              <div class="form-hint">Leer lassen für PHP-mail()-Fallback.</div>
-            </div>
-            <div class="form-row">
-              <label>Verbindung</label>
-              <?php
-                $enc  = $settings['smtp_encryption'] ?? 'tls';
-                $port = (int) ($settings['smtp_port'] ?? 587);
-                // Combo aus enc + port
-                if ($enc === 'tls' && $port === 2525) $combo = 'tls2525';
-                elseif ($enc === 'tls')               $combo = 'tls';
-                elseif ($enc === 'ssl')               $combo = 'ssl';
-                elseif ($enc === 'none')              $combo = 'none';
-                else                                  $combo = 'tls';
-              ?>
-              <select name="smtp_connection">
-                <option value="tls"     <?= $combo === 'tls'     ? 'selected' : '' ?>>🔒 STARTTLS · Port 587 (empfohlen)</option>
-                <option value="ssl"     <?= $combo === 'ssl'     ? 'selected' : '' ?>>🔐 SSL/TLS · Port 465</option>
-                <option value="tls2525" <?= $combo === 'tls2525' ? 'selected' : '' ?>>🔒 STARTTLS · Port 2525 (falls 587 blockiert)</option>
-                <option value="none"    <?= $combo === 'none'    ? 'selected' : '' ?>>⚠️ Unverschlüsselt · Port 25</option>
-              </select>
-              <div class="form-hint">
-                Falls 587 nicht funktioniert (Hoster-Firewall): Port 2525 probieren – wird seltener blockiert.
-              </div>
-            </div>
-          </div>
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-            <div class="form-row">
-              <label>SMTP-Benutzername</label>
-              <input type="text" name="smtp_user" value="<?= e($settings['smtp_user'] ?? '') ?>"
-                     placeholder="meist die E-Mail-Adresse" autocomplete="off">
-            </div>
-            <div class="form-row">
-              <label>SMTP-Passwort</label>
-              <input type="password" name="smtp_pass"
-                     placeholder="<?= empty($settings['smtp_pass']) ? 'noch nicht gesetzt' : '•••••••••' ?>"
-                     autocomplete="new-password">
-              <div class="form-hint">Leer lassen = bestehendes Passwort behalten.</div>
-            </div>
-          </div>
-
-          <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px">
-            <div class="form-row">
-              <label>Absender-E-Mail</label>
-              <input type="email" name="smtp_from" value="<?= e($settings['smtp_from'] ?? '') ?>"
-                     placeholder="noreply@example.com">
-            </div>
-            <div class="form-row">
-              <label>Absender-Name</label>
-              <input type="text" name="smtp_from_name" value="<?= e($settings['smtp_from_name'] ?? '') ?>"
-                     placeholder="<?= e(forum_name()) ?>">
-            </div>
-          </div>
-
-          <div class="form-row" style="border-top:1px dashed var(--border);padding-top:14px;margin-top:14px">
-            <label>🧪 Test-Mail senden</label>
-            <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
-              <input type="email" id="test-mail-to" placeholder="deine@email.de" style="flex:1;min-width:200px">
-              <button type="button" id="send-test-mail-btn" class="btn btn-ghost">📤 Test senden</button>
-            </div>
-            <div class="form-hint" id="test-mail-status">
-              Sendet eine Test-E-Mail mit der aktuellen Konfiguration. <strong>Speichere zuerst</strong> deine Änderungen!
-            </div>
-          </div>
-        </div>
-
         <?php /* ═══ 6. WARTUNG ═══════════════════════════════════════ */ ?>
         <div class="form-card" style="margin-bottom:16px">
           <h2>🛠️ Wartung</h2>
@@ -1126,20 +1047,24 @@
         </form>
       </div>
 
-      <?php /* Test-Mail-Bereich (wenn existiert) */ ?>
+      <?php /* Die IDs gehoeren zum Skript in forum.js: es schickt die Adresse
+               an ?action=send_test_mail und schreibt die Antwort in den Hinweis
+               darunter. Vorher stand hier ein Formular auf send_test_email —
+               diese Aktion gibt es nicht, der Knopf lief also ins Leere. */ ?>
       <div class="form-card">
         <h3 style="margin-top:0">🧪 Test-Mail senden</h3>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
           Sendet eine Test-Mail mit den aktuellen Einstellungen an die angegebene Adresse.
+          <strong>Speichere zuerst</strong> deine Änderungen.
         </p>
-        <form method="post" action="?action=send_test_email">
-          <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
-          <div class="form-row">
-            <label>An welche Adresse?</label>
-            <input type="email" name="test_email" required placeholder="deine@email.de">
+        <div class="form-row">
+          <label>An welche Adresse?</label>
+          <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+            <input type="email" id="test-mail-to" placeholder="deine@email.de" style="flex:1;min-width:200px">
+            <button type="button" id="send-test-mail-btn" class="btn btn-ghost">📤 Test senden</button>
           </div>
-          <button type="submit" class="btn btn-ghost">🧪 Test-Mail senden</button>
-        </form>
+          <div class="form-hint" id="test-mail-status"></div>
+        </div>
       </div>
 
     <?php /* ════════════ NEU v0.18.49: 📝 REGISTRIERUNG ════════════ */ ?>

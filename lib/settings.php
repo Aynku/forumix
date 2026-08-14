@@ -96,11 +96,21 @@ function forum_logo_svg(?string $name = null, ?string $accent = null): string {
     $len  = mb_strlen($name);
     $size = $len <= 8 ? 40 : ($len <= 14 ? 32 : ($len <= 22 ? 25 : 20));
 
-    // Grobe Textbreite: Inter in 800 laeuft mit rund 0.55em je Zeichen
-    $textW = (int) round($len * $size * 0.55);
+    // Breite je Zeichenklasse schaetzen. Das ist NUR fuer die Zeichenflaeche —
+    // wo der Punkt sitzt, misst der Browser selbst. Lieber etwas zu breit
+    // rechnen: zu schmal schneidet den Namen rechts ab.
+    $em = 0.45;   // Vorschub des Punktes plus Abstand
+    foreach (preg_split('//u', $name, -1, PREG_SPLIT_NO_EMPTY) as $ch) {
+        if (preg_match('/[MWmw@]/u', $ch))                 $em += 0.95;
+        elseif (preg_match('/[ijltfI.,;:!\'| ]/u', $ch))    $em += 0.36;
+        elseif (preg_match('/\p{Lu}/u', $ch))              $em += 0.70;
+        else                                               $em += 0.58;
+    }
     $textX = 95;
-    $dotX  = $textX + $textW + 14;
-    $viewW = max(320, $dotX + 16);
+    // Aufschlag von 12 %: die Schaetzung darf danebenliegen, und bis die
+    // eigene Schrift geladen ist zeichnet der Browser mit einer Ersatzschrift,
+    // die breiter sein kann. Zu viel Flaeche kostet Rand, zu wenig schneidet.
+    $viewW = max(320, $textX + (int) round($em * $size * 1.12) + 16);
 
     // Heller Verlaufspartner zur Akzentfarbe (einfach aufgehellt)
     $light = sprintf('%02x%02x%02x',
@@ -128,10 +138,18 @@ function forum_logo_svg(?string $name = null, ?string $accent = null): string {
       . '</g>'
       . '<text x="' . $textX . '" y="62" font-family="Inter, Segoe UI, system-ui, sans-serif"'
       . ' font-size="' . $size . '" font-weight="800" fill="url(#' . $uid . 'b)" letter-spacing="-1">'
-      . $esc($name) . '</text>'
+      . $esc($name)
+      // Der Punkt steht IM Text, damit der Browser den Abstand misst. Als
+      // eigener Kreis sass er an einer gerechneten Stelle und rutschte je nach
+      // Name mal in den Text, mal weit daneben. Die Faktoren stammen aus den
+      // Maßen von Inter 800 (Punkt 0.312em breit, 0.290em ueber der
+      // Grundlinie) und ergeben denselben Punkt wie vorher: Durchmesser ein
+      // Fuenftel der Schriftgroesse, Mitte ein Zehntel darueber.
+      . '<tspan dx="' . round($size * 0.02 + 1, 1) . '" dy="' . round($size * 0.086, 1) . '"'
+      . ' font-size="' . round($size * 0.64, 1) . '" fill="#' . $light . '">&#8226;</tspan>'
+      . '</text>'
       . '<text x="' . ($textX + 3) . '" y="86" font-family="Inter, Segoe UI, system-ui, sans-serif"'
       . ' font-size="11" font-weight="600" fill="#888a98" letter-spacing="4">FORUM</text>'
-      . '<circle cx="' . $dotX . '" cy="58" r="4" fill="#' . $light . '"/>'
       . '</svg>';
 }
 
