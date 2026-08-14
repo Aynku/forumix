@@ -8,6 +8,45 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.18.59 (2026-08-14)
+
+### 🐛 Zwei INSERTs ohne Pflichtspalte
+
+Beide Fehler haben dieselbe Ursache: eine Spalte ist `NOT NULL` und hat keinen
+Vorgabewert, das `INSERT` liefert sie aber nicht mit. Auf einem Server mit
+`STRICT_TRANS_TABLES` — der Voreinstellung von MySQL und MariaDB — scheitert
+das mit Fehler 1364.
+
+#### Module ließen sich nicht aktivieren
+
+`enable_module()` schrieb beim ersten Aktivieren nur `code`, `enabled` und
+`version` — `modules.name` fehlte. Die Ausnahme landete in der Fehlermeldung
+des Adminbereichs, das Modul blieb aus. Damit war das mitgelieferte
+FAQ-Modul in einer frischen Installation **nicht einschaltbar**.
+
+#### Die Beitragshistorie zeichnete nichts auf
+
+`record_post_edit()` schrieb kein `new_content`, obwohl die Spalte
+`TEXT NOT NULL` ist — und `TEXT` kann in MySQL keinen Vorgabewert haben. Der
+Fehler fiel niemandem auf, weil die Ausnahme mit einem leeren `catch`
+verschluckt wurde: Bearbeiten funktionierte, nur die Historie blieb für immer
+leer. Der neue Inhalt wird jetzt mitgegeben, und ein fehlgeschlagener Eintrag
+landet im Fehlerprotokoll statt im Nichts.
+
+#### Der Rest wurde mitgeprüft
+
+Alle `INSERT`-Anweisungen in `lib/`, `pages/`, `admin/` und `modules/` gegen
+die Pflichtspalten aus `install.sql` gestellt — 41 Tabellen. Außer diesen
+beiden Stellen war nichts offen.
+
+#### Geänderte Dateien
+- bootstrap.php (v0.18.59)
+- lib/modules.php (name im INSERT)
+- lib/edits.php (new_content im INSERT, Fehler ins Protokoll)
+- pages/edit_post.php (neuer Inhalt wird durchgereicht)
+
+---
+
 ## v0.18.58 (2026-08-14)
 
 ### 🧹 Doppelte Einstellungen entfernt

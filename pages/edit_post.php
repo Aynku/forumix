@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = '⚠️ Bei Bearbeitung eines fremden Beitrags ist ein Grund Pflicht.';
     } else {
         // Original-Inhalt im Edit-Log sichern
-        record_post_edit((int) $postId, (int) $cu['user_id'], $post['content'], $editReason);
+        record_post_edit((int) $postId, (int) $cu['user_id'], $post['content'], $content, $editReason);
 
         if ($isModEdit) {
             // Mod-Edit: speichern wer es war + Grund anzeigen

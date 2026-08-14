@@ -95,8 +95,12 @@ function enable_module(string $code): array {
                     if ($stmt !== '') DB::get()->exec($stmt);
                 }
             }
-            db_execute('INSERT INTO modules (code, enabled, version) VALUES (?, 1, ?)',
-                [$code, $manifest['version'] ?? '1.0']);
+            // name gehoert mit in das INSERT: die Spalte ist NOT NULL ohne
+            // Vorgabewert, und mit STRICT_TRANS_TABLES — der Voreinstellung —
+            // scheitert das Einfuegen sonst mit Fehler 1364. Damit liess sich
+            // ein Modul kein einziges Mal aktivieren.
+            db_execute('INSERT INTO modules (code, name, enabled, version) VALUES (?, ?, 1, ?)',
+                [$code, (string) ($manifest['name'] ?? $code), $manifest['version'] ?? '1.0']);
         } else {
             db_execute('UPDATE modules SET enabled = 1 WHERE code = ?', [$code]);
         }
