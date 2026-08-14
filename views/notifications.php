@@ -31,7 +31,7 @@
   <?php endif; ?>
   <?php foreach ($notifications as $n): ?>
     <div class="notif-row pm-list-item <?= !$n['is_read'] ? 'unread' : '' ?>">
-      <a href="?read=<?= (int) $n['notif_id'] ?>"
+      <a href="?read=<?= (int) $n['notif_id'] ?>&csrf=<?= e($csrfToken) ?>"
          class="notif-main"
          style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:12px;flex:1;min-width:0">
         <div style="font-size:18px">
