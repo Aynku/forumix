@@ -38,9 +38,13 @@ code,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-s
   border:1px solid transparent;
   transition:color .15s, background .15s, border-color .15s;
 }
+/* Blau wie bei den Knoepfen, die beim Zeigen ebenfalls einen blauen Rand
+   bekommen. Die Flaeche bleibt eine leichte Tuenchung — voll ausgefuellt
+   waere es so laut wie der Herunterladen-Knopf und wuerde ihm die Rolle
+   streitig machen. */
 .nav a:hover{
-  color:var(--text); background:var(--surface);
-  border-color:var(--line2); text-decoration:none;
+  color:var(--accent-soft); background:rgba(37,99,235,.12);
+  border-color:var(--accent); text-decoration:none;
 }
 /* Der Schriftzug steht nur da, wo kein grosses Logo darunter folgt. */
 .nav .brand{color:var(--text); font-weight:700; font-size:15px}
