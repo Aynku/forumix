@@ -8,5 +8,5 @@ return [
     'description' => 'Mini-Chat-Box auf der Startseite mit Live-Updates. Eingeloggte User können kurze Nachrichten posten.',
     'icon'        => '💬',
     'version'     => '1.0',
-    'author'      => 'aynku.de',
+    'author'      => 'Forumix',
 ];

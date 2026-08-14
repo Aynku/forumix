@@ -1113,7 +1113,7 @@
             <div class="form-row">
               <label>Absender-E-Mail</label>
               <input type="email" name="smtp_from" value="<?= e($settings['smtp_from'] ?? '') ?>"
-                     placeholder="webmaster@aynku.de">
+                     placeholder="webmaster@example.com">
             </div>
             <div class="form-row">
               <label>Absender-Name</label>
@@ -2461,7 +2461,7 @@
               <?php
                 $presets = [
                   'original' => [
-                    'name' => '🌑 Original (Aynku-Standard)', 'desc' => 'Neutral-schwarz mit Indigo-Akzent',
+                    'name' => '🌑 Original (Standard)', 'desc' => 'Neutral-schwarz mit Indigo-Akzent',
                     'preview' => ['#0a0a0b', '#131316', '#4f46e5', '#e7e7ea'],
                   ],
                   'discord' => [

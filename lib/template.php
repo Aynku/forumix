@@ -2,7 +2,7 @@
 if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
 
 /**
- * lib/template.php – Aynku Template Engine
+ * lib/template.php – Forumix Template Engine
  *
  * Eine schlanke, eigene Template-Engine im Stil von Twig/Blade.
  * - Auto-Escape standardmäßig

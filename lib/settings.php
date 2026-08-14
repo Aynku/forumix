@@ -72,17 +72,84 @@ function is_default_logo(): bool {
 }
 
 /**
- * Rendert das Forum-Logo als HTML.
- * Inlines theme-adaptive SVGs (mit currentColor) damit sie sich an Light/Dark anpassen können.
- * Sonst klassisches <img>-Tag.
+ * Erzeugt das Standard-Logo aus dem Forum-Namen.
  *
- * @param string $alt Alternative-Text für Accessibility
- * @return string HTML-Code
+ * Kein fester Name mehr in der Datei: Sprechblase, Name und Akzentpunkt
+ * werden zur Laufzeit gesetzt, damit jede Installation ihr eigenes Logo hat,
+ * ohne dass jemand eine SVG-Datei bearbeiten muss. Farbe kommt aus der
+ * Akzentfarbe des Themes, der Punkt rutscht mit der Namenslaenge mit.
+ */
+function forum_logo_svg(?string $name = null, ?string $accent = null): string {
+    $name = trim($name ?? forum_name());
+
+    // „Aynku Forum" würde über dem Untertitel FORUM zu „Aynku Forum FORUM“.
+    // Ein angehängtes Forum/Board/Community fällt deshalb im Schriftzug weg —
+    // solange etwas übrig bleibt.
+    $short = preg_replace('/\s+(forum|board|community)\s*$/iu', '', $name);
+    if (is_string($short) && trim($short) !== '') $name = trim($short);
+
+    if ($name === '') $name = 'Forum';
+    $accent = ltrim($accent ?? forum_accent_color(), '#');
+    if (!preg_match('/^[0-9a-fA-F]{6}$/', $accent)) $accent = '4f46e5';
+
+    // Lange Namen kleiner setzen, damit das Logo nicht ausufert
+    $len  = mb_strlen($name);
+    $size = $len <= 8 ? 40 : ($len <= 14 ? 32 : ($len <= 22 ? 25 : 20));
+
+    // Grobe Textbreite: Inter in 800 laeuft mit rund 0.55em je Zeichen
+    $textW = (int) round($len * $size * 0.55);
+    $textX = 95;
+    $dotX  = $textX + $textW + 14;
+    $viewW = max(320, $dotX + 16);
+
+    // Heller Verlaufspartner zur Akzentfarbe (einfach aufgehellt)
+    $light = sprintf('%02x%02x%02x',
+        min(255, (int) (hexdec(substr($accent, 0, 2)) * 0.45 + 140)),
+        min(255, (int) (hexdec(substr($accent, 2, 2)) * 0.45 + 140)),
+        min(255, (int) (hexdec(substr($accent, 4, 2)) * 0.45 + 140)));
+
+    $esc = static fn(string $s) => htmlspecialchars($s, ENT_QUOTES | ENT_XML1, 'UTF-8');
+    $uid = 'lg' . substr(md5($accent . $name), 0, 6);   // eindeutige Verlaufs-IDs je Logo
+
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' . $viewW . ' 120" height="100"'
+      . ' preserveAspectRatio="xMinYMid meet" role="img" aria-label="' . $esc($name) . '">'
+      . '<defs>'
+      . '<linearGradient id="' . $uid . 'a" x1="0%" y1="0%" x2="100%" y2="100%">'
+      . '<stop offset="0%" stop-color="#' . $light . '"/><stop offset="100%" stop-color="#' . $accent . '"/></linearGradient>'
+      . '<linearGradient id="' . $uid . 'b" x1="0%" y1="0%" x2="100%" y2="0%">'
+      . '<stop offset="0%" stop-color="#' . $accent . '"/><stop offset="100%" stop-color="#' . $light . '"/></linearGradient>'
+      . '</defs>'
+      . '<g transform="translate(10, 20)">'
+      . '<rect x="0" y="0" width="68" height="60" rx="18" ry="18" fill="url(#' . $uid . 'a)"/>'
+      . '<path d="M 18 60 L 22 76 L 32 60 Z" fill="url(#' . $uid . 'a)"/>'
+      . '<circle cx="18" cy="30" r="5" fill="white" opacity="0.95"/>'
+      . '<circle cx="34" cy="30" r="5" fill="white" opacity="0.95"/>'
+      . '<circle cx="50" cy="30" r="5" fill="white" opacity="0.95"/>'
+      . '</g>'
+      . '<text x="' . $textX . '" y="62" font-family="Inter, Segoe UI, system-ui, sans-serif"'
+      . ' font-size="' . $size . '" font-weight="800" fill="url(#' . $uid . 'b)" letter-spacing="-1">'
+      . $esc($name) . '</text>'
+      . '<text x="' . ($textX + 3) . '" y="86" font-family="Inter, Segoe UI, system-ui, sans-serif"'
+      . ' font-size="11" font-weight="600" fill="#888a98" letter-spacing="4">FORUM</text>'
+      . '<circle cx="' . $dotX . '" cy="58" r="4" fill="#' . $light . '"/>'
+      . '</svg>';
+}
+
+/**
+ * Rendert das Forum-Logo als HTML.
+ * Ohne eigenes Logo wird es aus dem Forum-Namen erzeugt; lokale SVGs werden
+ * eingebettet (damit currentColor auf Light und Dark greift), alles andere
+ * kommt als <img>.
  */
 function forum_logo_render(string $alt): string {
     $url = forum_logo_url();
     // Custom Setting / Custom Logo aus DB?
     $custom = get_setting('forum_logo');
+
+    // Kein eigenes Logo hinterlegt → aus dem Forum-Namen erzeugen
+    if (!$custom && is_default_logo()) {
+        return forum_logo_svg();
+    }
 
     // Wenn's das Default-SVG ist (oder ein lokales SVG): inline einbetten für currentColor-Support
     if (!$custom && (is_default_logo() || str_ends_with($url, '.svg'))) {

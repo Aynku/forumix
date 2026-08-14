@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════
--- Aynku Forum – Komplettes Schema v0.18.1
+-- Forumix – Komplettes Schema v0.18.1
 -- ═══════════════════════════════════════════════════════════════════════
 -- Wird vom Installer ausgeführt. Enthält ALLE Schema-Definitionen und
 -- Default-Daten konsolidiert aus den historischen Migrationen v0.1 – v0.17.7.

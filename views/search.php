@@ -51,7 +51,7 @@
 
       <div class="form-row">
         <label>👤 Autor (Benutzername)</label>
-        <input type="text" name="author_name" value="<?= e($author) ?>" placeholder="z.B. Aynku">
+        <input type="text" name="author_name" value="<?= e($author) ?>" placeholder="z.B. Mitgliedsname">
       </div>
 
       <div class="form-row">
@@ -90,7 +90,7 @@
 
     <?php if ($currentUser && $hasQuery): ?>
       <div class="search-save-row">
-        <input type="text" id="save_name" placeholder="Name für diese Suche, z.B. „Aynkus News"" maxlength="100" style="max-width:280px">
+        <input type="text" id="save_name" placeholder="Name für diese Suche, z.B. „Neues aus dem Team"" maxlength="100" style="max-width:280px">
         <button type="button" class="btn btn-ghost btn-sm" id="save-search-btn">⭐ Diese Suche speichern</button>
       </div>
     <?php endif; ?>

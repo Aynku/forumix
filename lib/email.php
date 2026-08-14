@@ -148,7 +148,7 @@ function _send_via_smtp(string $to, string $subject, string $body, bool $html,
         'MIME-Version: 1.0',
         'Content-Type: ' . $contentType . '; charset=UTF-8',
         'Content-Transfer-Encoding: base64',
-        'X-Mailer: aynku-forum',
+        'X-Mailer: Forumix',
     ];
 
     fwrite($sock, implode("\r\n", $headers) . "\r\n\r\n" . $encodedBody . "\r\n.\r\n");

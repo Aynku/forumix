@@ -1688,5 +1688,5 @@ document.addEventListener('click', function (e) {
   });
 
   // Manuell aufrufbar (für dynamisch hinzugefügte Editoren)
-  window.AynkuEditor = { init: initEditor };
+  window.ForumixEditor = { init: initEditor };
 })();

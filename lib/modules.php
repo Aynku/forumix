@@ -33,7 +33,7 @@ function available_modules(): array {
             'description'  => $manifest['description'] ?? '',
             'icon'         => $manifest['icon']        ?? '🧩',
             'version'      => $manifest['version']     ?? '1.0',
-            'author'       => $manifest['author']      ?? 'aynku.de',
+            'author'       => $manifest['author']      ?? 'unbekannt',
             'requires'     => $manifest['requires']    ?? [],
             'enabled'      => !empty($dbStatus[$code]['enabled']),
             'installed'    => isset($dbStatus[$code]),

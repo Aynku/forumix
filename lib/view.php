@@ -31,7 +31,7 @@ function render(string $view, array $data = []): void {
 
     $data = array_merge($globals, $data);
 
-    // View-Datei finden: erst neue .aynku-Templates, dann alte PHP-Views
+    // View-Datei finden: erst die neuen .tpl.html, dann die alten PHP-Views
     $newTpl = __DIR__ . '/../views_new/' . $view . TPL_EXTENSION;
     if (file_exists($newTpl)) {
         // Neue Engine: kompiliertes Template einbinden

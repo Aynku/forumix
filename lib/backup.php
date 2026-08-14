@@ -30,14 +30,19 @@ function backup_ensure_dir(): void {
  */
 function list_backups(): array {
     backup_ensure_dir();
-    $files = glob(BACKUP_DIR . '/aynku_backup_*.{sql,zip}', GLOB_BRACE) ?: [];
+    // Neue Sicherungen heissen forumix_*, aeltere aynku_* werden weiter
+    // gefunden — sonst waeren vorhandene Backups nach dem Umbenennen weg.
+    $files = array_merge(
+        glob(BACKUP_DIR . '/forumix_backup_*.{sql,zip}', GLOB_BRACE) ?: [],
+        glob(BACKUP_DIR . '/aynku_backup_*.{sql,zip}', GLOB_BRACE) ?: []
+    );
     $result = [];
     foreach ($files as $f) {
         $name = basename($f);
         // Format: aynku_backup_<type>_<timestamp>[_<note>].<ext>
         // type: db | files | full
         $type = 'unknown';
-        if (preg_match('/aynku_backup_(db|files|full)_/', $name, $m)) {
+        if (preg_match('/(?:forumix|aynku)_backup_(db|files|full)_/', $name, $m)) {
             $type = $m[1];
         }
         // Notiz nachladen falls vorhanden
@@ -63,7 +68,7 @@ function list_backups(): array {
 function backup_is_safe_filename(string $filename): bool {
     if (str_contains($filename, '/') || str_contains($filename, '\\')) return false;
     if (str_contains($filename, '..')) return false;
-    if (!preg_match('/^aynku_backup_(db|files|full)_[\d\-_]+\.(sql|zip)$/', $filename)) return false;
+    if (!preg_match('/^(?:forumix|aynku)_backup_(db|files|full)_[\d\-_]+\.(sql|zip)$/', $filename)) return false;
     return true;
 }
 
@@ -76,7 +81,7 @@ function backup_database(?string $note = null): ?string {
     @set_time_limit(0);
 
     $timestamp = date('Y-m-d_H-i-s');
-    $filename  = "aynku_backup_db_{$timestamp}.sql";
+    $filename  = "forumix_backup_db_{$timestamp}.sql";
     $path      = BACKUP_DIR . '/' . $filename;
 
     $fp = @fopen($path, 'w');
@@ -84,7 +89,7 @@ function backup_database(?string $note = null): ?string {
 
     try {
         // Header
-        fwrite($fp, "-- Aynku Forum DB-Backup\n");
+        fwrite($fp, "-- Forumix DB-Backup\n");
         fwrite($fp, "-- Erstellt: " . date('Y-m-d H:i:s') . "\n");
         fwrite($fp, "-- Version: " . FORUM_VERSION_CODE . "\n");
         fwrite($fp, "-- DB: " . DB_NAME . "\n\n");
@@ -167,7 +172,7 @@ function backup_files(?string $note = null): ?string {
     @set_time_limit(0);
 
     $timestamp = date('Y-m-d_H-i-s');
-    $filename  = "aynku_backup_files_{$timestamp}.zip";
+    $filename  = "forumix_backup_files_{$timestamp}.zip";
     $path      = BACKUP_DIR . '/' . $filename;
 
     $zip = new ZipArchive();
@@ -246,7 +251,7 @@ function backup_full(?string $note = null): ?string {
 
     // 3. Beides in ein Komplett-ZIP packen
     $timestamp = date('Y-m-d_H-i-s');
-    $fullName  = "aynku_backup_full_{$timestamp}.zip";
+    $fullName  = "forumix_backup_full_{$timestamp}.zip";
     $fullPath  = BACKUP_DIR . '/' . $fullName;
 
     $zip = new ZipArchive();
@@ -258,7 +263,7 @@ function backup_full(?string $note = null): ?string {
     $zip->addFile($dbPath, 'database.sql');
     $zip->addFile($filePath, 'files.zip');
     $zip->setArchiveComment(
-        "Aynku Forum Komplett-Backup\n" .
+        "Forumix Komplett-Backup\n" .
         "Erstellt: " . date('Y-m-d H:i:s') . "\n" .
         "Version: " . FORUM_VERSION_CODE
     );

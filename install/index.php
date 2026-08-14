@@ -1,6 +1,6 @@
 <?php
 /**
- * Aynku Forum – Web-Installer
+ * Forumix – Web-Installer
  * --------------------------------------------------------------------------
  * Autark: lädt NICHT bootstrap.php, nutzt eine eigene PDO-Verbindung.
  * Setzt bei Aufruf von /install/ ein frisches Forum auf:
@@ -361,7 +361,7 @@ function render_page(string $title, string $body, int $cur = 0): void {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>{$title} – Aynku Forum Installer</title>
+<title>{$title} – Forumix Installer</title>
 <style>
   :root{--bg:#15171a;--card:#1d2024;--bd:#2c3036;--fg:#e6e8ea;--mut:#9aa0a6;
         --acc:#7aa2f7;--okc:#5bbf63;--err:#e5534b;--errbg:#2a1d1d}
@@ -406,7 +406,7 @@ function render_page(string $title, string $body, int $cur = 0): void {
   .hint{color:var(--mut);font-size:13px} code{background:#0f1114;padding:2px 6px;border-radius:5px}
   .ok-big{color:var(--okc);font-size:15px}
 </style></head><body><div class="wrap">
-<h1>Aynku Forum</h1><p class="sub">Installation</p>
+<h1>Forumix</h1><p class="sub">Installation</p>
 {$nav}{$body}
 </div></body></html>
 HTML;
@@ -451,8 +451,8 @@ if ($step === 2) {
         <div><label>Passwort</label><input type="password" name="db_pass" value=""></div>
       </div>
       <hr style="border:0;border-top:1px solid var(--bd);margin:22px 0">
-      <label>Forum-Name</label><input type="text" name="forum_name" value="' . $val('forum_name', 'Aynku Forum') . '" required>
-      <label>Forum-URL</label><input type="url" name="forum_url" value="' . $val('forum_url', 'https://www.aynku.de') . '" required>
+      <label>Forum-Name</label><input type="text" name="forum_name" value="' . $val('forum_name', 'Mein Forum') . '" required>
+      <label>Forum-URL</label><input type="url" name="forum_url" value="' . $val('forum_url', ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . ($_SERVER['HTTP_HOST'] ?? '')) . '" required>
       <button type="submit">Verbindung testen →</button>
     </form></div>';
 }
