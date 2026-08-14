@@ -1584,7 +1584,7 @@ switch ($action) {
             'forum_footer_text'  => (string) get_setting('forum_footer_text'),
             'forum_footer_links' => (string) get_setting('forum_footer_links'),
             'forum_custom_css'   => (string) get_setting('forum_custom_css'),
-            'source_url'         => (string) get_setting('source_url', FORUMIX_SOURCE_URL),
+            'source_url'         => (string) get_setting('source_url', ''),
         ];
         break;
 

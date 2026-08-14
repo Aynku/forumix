@@ -339,16 +339,18 @@ $forumName = forum_name();
 
     <?php
       /* ── Zeile 4: Powered by Forumix ──
-         AGPLv3 § 13 verlangt, dass Nutzer einer im Netz betriebenen Fassung
-         an den Quelltext kommen. Der Link steht deshalb hier und nicht in
-         einer Unterseite. Wer den Code aendert, traegt im Adminbereich unter
-         "Quelltext-URL" sein eigenes Repository ein. */
+         Das Zeichen verweist auf forumix.de, wo auch der Quelltext liegt —
+         damit ist AGPLv3 § 13 erfuellt. Wer den Code aendert, traegt im
+         Adminbereich unter "Quelltext-URL" sein eigenes Repository ein. */
       $sourceUrl = '';
-      try { $sourceUrl = trim((string) get_setting('source_url', FORUMIX_SOURCE_URL)); }
-      catch (Exception $e) { $sourceUrl = FORUMIX_SOURCE_URL; }
+      try { $sourceUrl = trim((string) get_setting('source_url', '')); }
+      catch (Exception $e) { $sourceUrl = ''; }
+      if ($sourceUrl === '') $sourceUrl = FORUMIX_URL;
     ?>
     <p class="powered-by" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">
       Powered by
+      <a href="<?= e($sourceUrl) ?>" rel="noopener" target="_blank"
+         style="display:inline-flex;color:inherit;text-decoration:none">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 60" height="24" style="vertical-align:middle"
            role="img" aria-label="Forumix">
         <g transform="translate(2, 4)">
@@ -364,11 +366,7 @@ $forumName = forum_name();
           <tspan fill="currentColor">Forum</tspan><tspan fill="#2563eb">ix</tspan>
         </text>
       </svg>
-      <?php if ($sourceUrl !== ''): ?>
-        <span style="color:var(--text-faint)">·</span>
-        <a href="<?= e($sourceUrl) ?>" rel="nofollow noopener" target="_blank"
-           style="font-size:12px;color:var(--text-muted)">Quelltext (AGPLv3)</a>
-      <?php endif; ?>
+      </a>
     </p>
   </footer>
 

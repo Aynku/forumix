@@ -2440,12 +2440,12 @@
             <div class="form-row">
               <label>Quelltext-URL</label>
               <input type="url" name="source_url" value="<?= e($branding['source_url']) ?>"
-                     placeholder="<?= e(FORUMIX_SOURCE_URL) ?>">
+                     placeholder="<?= e(FORUMIX_URL) ?>">
               <div class="form-hint">
-                Erscheint als „Quelltext (AGPLv3)" im Fußbereich. <strong>Wenn du den Code
-                geändert hast, gehört hier dein eigenes Repository hin</strong> — die AGPLv3
-                verlangt in § 13, dass Besucher an den Quelltext der laufenden Fassung kommen.
-                Leer lassen entfernt den Link.
+                Ziel des Forumix-Zeichens im Fußbereich. Leer zeigt auf
+                <code><?= e(FORUMIX_URL) ?></code>. <strong>Wenn du den Code geändert hast,
+                gehört hier dein eigenes Repository hin</strong> — die AGPLv3 verlangt in § 13,
+                dass Besucher an den Quelltext der laufenden Fassung kommen.
               </div>
             </div>
           </div>
