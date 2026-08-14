@@ -231,6 +231,7 @@ function theme_font_stack(string $key, string $custom = ''): string {
         'lato'      => "'Lato', system-ui, sans-serif",
         'nunito'    => "'Nunito', system-ui, sans-serif",
         'poppins'   => "'Poppins', system-ui, sans-serif",
+        'chakra-petch' => "'Chakra Petch', system-ui, sans-serif",
         'custom'    => $custom ?: "system-ui, sans-serif",
     ];
     return $fonts[$key] ?? $fonts['inter'];

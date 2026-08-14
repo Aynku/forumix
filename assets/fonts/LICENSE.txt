@@ -1,0 +1,30 @@
+Selbst gehostete Schriften
+==========================
+
+Diese Dateien werden vom Forum selbst ausgeliefert, damit beim Seitenaufruf
+keine Verbindung zu fonts.googleapis.com oder fonts.gstatic.com entsteht und
+keine Besucher-IP dorthin uebertragen wird.
+
+Enthalten sind nur die Subsets "latin" und "latin-ext" in den Schnitten, die
+das Theme benutzt. Der Browser laedt davon jeweils nur die aktive Familie.
+
+Lizenzen
+--------
+
+  Inter, Open Sans, Lato, Nunito, Poppins, Chakra Petch
+      SIL Open Font License 1.1 — https://openfontlicense.org
+      Weitergabe und Einbettung erlaubt, auch kommerziell.
+
+  Roboto
+      Apache License 2.0 — https://www.apache.org/licenses/LICENSE-2.0
+
+Alle genannten Schriften duerfen selbst gehostet werden. Die vollstaendigen
+Lizenztexte liegen bei den jeweiligen Projekten (Google Fonts / GitHub).
+
+Aktualisieren
+-------------
+
+Die Dateien stammen aus den Google-Fonts-Quellen. Zum Erneuern das CSS mit
+einem modernen Browser-User-Agent abrufen (sonst liefert Google TTF statt
+WOFF2), die latin/latin-ext-Bloecke herausziehen, die .woff2 hierher laden
+und in ../fonts.css auf die lokalen Pfade zeigen.

@@ -73,20 +73,12 @@ $forumName = forum_name();
   <link rel="stylesheet" href="<?= e(FORUM_URL) ?>/assets/style.css?v=<?= e(forum_version()) ?>">
   <link rel="alternate" type="application/rss+xml" title="<?= e($forumName) ?> RSS" href="<?= e(FORUM_URL) ?>/rss.php">
   <?php
-    // Google Fonts laden (falls nicht system/custom)
-    $gfontMap = [
-      'inter'     => 'Inter:wght@400;500;600;700',
-      'roboto'    => 'Roboto:wght@400;500;700',
-      'open-sans' => 'Open+Sans:wght@400;600;700',
-      'lato'      => 'Lato:wght@400;700',
-      'nunito'    => 'Nunito:wght@400;600;700',
-      'poppins'   => 'Poppins:wght@400;500;600;700',
-    ];
-    if (isset($gfontMap[$theme['theme_font_family']])):
+    // Schriften liegen lokal unter assets/fonts/ — kein Aufruf bei Google,
+    // damit keine Besucher-IP dorthin abfliesst (DSGVO).
+    $localFonts = ['inter', 'roboto', 'open-sans', 'lato', 'nunito', 'poppins', 'chakra-petch'];
+    if (in_array($theme['theme_font_family'], $localFonts, true)):
   ?>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=<?= e($gfontMap[$theme['theme_font_family']]) ?>&display=swap">
+    <link rel="stylesheet" href="<?= e(FORUM_URL) ?>/assets/fonts.css?v=<?= e(forum_version()) ?>">
   <?php endif; ?>
   <style>
     /* ─── Theme-Tokens aus DB-Settings ─── */

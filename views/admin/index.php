@@ -2338,6 +2338,7 @@
                     'lato'      => '🎯 Lato – semi-rund',
                     'nunito'    => '🍩 Nunito – verspielt, runde Formen',
                     'poppins'   => '⭕ Poppins – geometrisch, modern',
+                    'chakra-petch' => '🎮 Chakra Petch – technisch, kantig',
                     'custom'    => '🛠️ Custom – eigene Schriftart',
                   ];
                   foreach ($fontOpts as $k => $lab):
