@@ -8,6 +8,32 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.21.3 (2026-08-15)
+
+### 🔎 Eine Zusage, die die Software nicht eingehalten hat
+
+Unter dem SMTP-Passwort stand „Wird verschluesselt in der DB gespeichert."
+Das stimmte nicht. Es gibt an keiner Stelle eine Verschluesselung — das Passwort
+liegt im Klartext in der Tabelle `settings`. Das `base64_encode` in
+`lib/email.php` ist die SMTP-Anmeldung, kein Schutz.
+
+Fuer sich genommen ist Klartext hier nicht dramatisch: wer die Datenbank hat,
+hat meist ohnehin alles. Aber eine Zusage in der Oberflaeche, die nicht
+eingehalten wird, ist schlimmer als gar keine — jemand verlaesst sich darauf
+und schiebt einen Datenbank-Abzug weiter, weil „ist ja verschluesselt".
+
+Der Hinweis sagt jetzt, wie es ist, und rät zu einem eigenen Postfach.
+
+Nachrüsten waere kein Einzeiler: `forum_secret` steht selbst in der Datenbank
+und taugt deshalb nicht als Schluessel. Ein echter Schluessel muesste in die
+`config.php`, und bestehende Installationen haben dort keinen.
+
+#### Geänderte Dateien
+- bootstrap.php (v0.21.3)
+- views/admin/index.php (Hinweis am SMTP-Passwort)
+
+---
+
 ## v0.21.2 (2026-08-15)
 
 ### 🏷️ Tags lassen sich nachtraeglich aendern

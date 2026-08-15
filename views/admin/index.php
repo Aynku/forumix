@@ -955,7 +955,11 @@
               <label>SMTP-Passwort / API-Key</label>
               <input type="password" name="smtp_pass"
                      placeholder="<?= empty($settings['smtp_pass']) ? 'noch nicht gesetzt' : '••••••••••••' ?>">
-              <div class="form-hint">Leer lassen = bestehendes Passwort behalten. Wird verschlüsselt in der DB gespeichert.</div>
+              <div class="form-hint">
+                Leer lassen = bestehendes Passwort behalten.
+                <strong>Liegt unverschlüsselt in der Datenbank</strong> — nimm dafür ein
+                eigenes Postfach und nicht dein Haupt-Konto.
+              </div>
             </div>
             <div class="form-row">
               <label>Absender-E-Mail</label>
