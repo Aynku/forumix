@@ -8,6 +8,71 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.23.0 (2026-08-15)
+
+### 🖥️ Installer laeuft jetzt auch ohne Browser
+
+`php install/cli.php --config=setup.json` setzt ein Forum ohne Formular auf.
+Wer SSH hat, spart sich vier Seiten; fuer das kommende Hosting war es
+Voraussetzung — dort klickt niemand von Hand.
+
+Die Angaben kommen als **JSON, nicht als Argumente**. Argumente stehen in
+`ps` und waeren fuer jeden anderen Benutzer der Maschine lesbar, samt
+Datenbank- und Inhaber-Passwort. Ueber eine Datei (0600) oder die
+Standardeingabe sind sie es nicht.
+
+Der Kern liegt neu in `install/lib.php`: Voraussetzungen, Schema,
+Inhaber-Konto, `config.php`. Browser-Installer und Kommandozeile gehen
+durch **denselben** Code. Stuende die Arbeit zweimal nebeneinander, wuerde
+eine neue Tabelle irgendwann nur einen der beiden Wege erreichen — und das
+faellt erst auf, wenn ein fertig aufgesetztes Forum beim ersten Klick auf die
+Nase faellt.
+
+Zwei Warntexte des Browser-Installers sind hier echte Abbrueche: bereits
+installiert, und die Datenbank enthaelt schon Forumix-Tabellen (`install.sql`
+beginnt mit `DROP TABLE`).
+
+`"cleanup": true` raeumt den Installer nach Erfolg selbst weg.
+
+### 📧 Absender festnageln (fuer Installationen, die jemand anderes betreibt)
+
+Stehen `FORUM_MAIL_FROM` bzw. `FORUM_MAIL_FROM_NAME` in der `config.php`,
+gewinnen sie ueber die Einstellung im Adminbereich, und das Feld ist dort
+gesperrt. **Ohne die Konstanten aendert sich nichts** — kein Installer
+schreibt sie von selbst.
+
+Eine gesperrte Anzeige ist keine Sicherung: das Formular laesst sich auch
+ohne Browser abschicken. Der Wert faellt deshalb zusaetzlich im
+Speichern-Zweig heraus, bevor irgendetwas gespeichert wird.
+
+Gedacht fuer Faelle, in denen der Versand ueber fremde Reputation laeuft.
+Nuetzlich auch, wenn man sein Forum jemandem zur Verwaltung gibt: Absender
+raus aus dem Adminbereich, ohne ihm Adminrechte zu beschneiden.
+
+### 🐛 „Ordner install/ loeschen" hat die Migrationen kaputtgemacht
+
+Der Adminbereich holt die Datenbank-Anpassungen spaeterer Updates aus
+`install/migrations/`. Fehlt der Ordner, liefert `available_migrations()`
+eine leere Liste — **kein Fehler, keine Warnung**, die Update-Seite ist
+einfach leer, und keine Anpassung laeuft je.
+
+Der Rat stand im Installer, in der README und auf der Projektseite. Ueberall
+korrigiert: alles in `install/` loeschen, **ausser** `migrations/`. Die
+Migrationsdateien tragen einen `FORUM_RUNNING`-Riegel, ueber HTTP passiert
+also nichts.
+
+Wer den Ordner schon geloescht hat: einfach aus dem Paket zuruecklegen.
+
+### 🔢 Der README-Kopf hinkte ein ganzes MINOR hinterher
+
+Er nannte 0.21.2, waehrend der Code bei 0.22.2 stand — und er ist das Erste,
+was jemand auf GitHub liest. `tools/release.sh` prueft ihn jetzt mit, so wie
+es `bootstrap.php` schon prueft.
+
+**Keine Migration noetig.**
+
+---
+
 ## v0.22.2 (2026-08-15)
 
 ### 📧 Die Absenderadresse gilt auch ohne SMTP — und die Vorgabe taugte nicht
