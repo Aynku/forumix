@@ -217,17 +217,17 @@
 
     <div class="dl">
       <div class="dl-main">
-        <a class="btn btn-primary" href="/download/forumix-0.18.60.zip">forumix-0.18.60.zip</a>
+        <a class="btn btn-primary" href="/download/forumix-0.18.61.zip">forumix-0.18.61.zip</a>
         <span class="dl-meta"><strong>Vollpaket</strong> · neue Installation · entpacken und hochladen</span>
       </div>
       <div class="dl-main" style="margin-top:14px">
-        <a class="btn" href="/download/forumix-update-0.18.60.zip">forumix-update-0.18.60.zip</a>
+        <a class="btn" href="/download/forumix-update-0.18.61.zip">forumix-update-0.18.61.zip</a>
         <span class="dl-meta"><strong>Update</strong> · von 0.18.58 · Adminbereich → Updates</span>
       </div>
       <p class="dl-hash">
         SHA-256 zum Nachrechnen:
-        <a href="/download/forumix-0.18.60.sha256">forumix-0.18.60.sha256</a><br>
-        <code>sha256sum -c forumix-0.18.60.sha256</code>
+        <a href="/download/forumix-0.18.61.sha256">forumix-0.18.61.sha256</a><br>
+        <code>sha256sum -c forumix-0.18.61.sha256</code>
       </p>
     </div>
 
@@ -242,37 +242,57 @@
 <section id="installation">
   <div class="wrap">
     <h2>Installation</h2>
-    <p class="sub">Datenbank anlegen, Dateien hochladen, Installer aufrufen. Kein Composer,
-       kein Node, kein Build.</p>
+    <p class="sub">
+      Kein Composer, kein Node, kein Build-Schritt. Es reicht ein Webspace mit PHP und
+      MySQL, ein FTP-Programm und zehn Minuten.
+    </p>
 
     <ol class="steps">
       <li>
         <strong>Datenbank anlegen</strong>
-        <p>Eine leere Datenbank und ein Benutzer, der nur darauf Rechte hat.</p>
-<pre><code>CREATE DATABASE forum CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'forum'@'localhost' IDENTIFIED BY 'starkes_passwort';
-GRANT ALL ON forum.* TO 'forum'@'localhost';</code></pre>
+        <p>Im Kundenmenü deines Hosters — bei Plesk, cPanel oder Confixx heißt der Punkt
+           meist „Datenbanken". Leere Datenbank anlegen, Benutzer dazu, und die vier
+           Angaben notieren: <strong>Host</strong> (fast immer <code>localhost</code>),
+           <strong>Name</strong>, <strong>Benutzer</strong>, <strong>Passwort</strong>.
+           Als Zeichensatz <code>utf8mb4</code> wählen, falls gefragt wird.</p>
       </li>
       <li>
-        <strong>Dateien hochladen und Rechte setzen</strong>
-        <p>Inhalt des Pakets in das Web-Verzeichnis, dann drei Ordner beschreibbar machen.</p>
-<pre><code>chmod 775 cache/templates uploads uploads/avatars uploads/attachments</code></pre>
+        <strong>Dateien hochladen</strong>
+        <p>Das Archiv auf dem eigenen Rechner entpacken. Dann den <em>Inhalt</em> des
+           Ordners <code>forumix-x.y.z/</code> per FTP in das Web-Verzeichnis schieben —
+           je nach Hoster heißt das <code>httpdocs</code>, <code>public_html</code>,
+           <code>htdocs</code> oder <code>www</code>. Nicht den Ordner selbst hochladen,
+           sonst liegt das Forum später unter <code>/forumix-x.y.z/</code>.</p>
       </li>
       <li>
         <strong>Installer aufrufen</strong>
-        <p>Vier Schritte: Voraussetzungen, Datenbank, Schema, Inhaber-Konto.
-           Danach den Ordner <code>install/</code> löschen.</p>
-<pre><code>https://deine-domain.tld/install/
-<span class="comment"># nach Abschluss:</span>
-rm -rf install/</code></pre>
+        <p>Im Browser <code>https://deine-domain.tld/install/</code> öffnen. Er prüft
+           zuerst PHP-Version, Erweiterungen und Schreibrechte und sagt dir im Klartext,
+           was fehlt. Danach fragt er die vier Datenbank-Angaben ab, legt die Tabellen an
+           und zuletzt dein Inhaber-Konto.</p>
+      </li>
+      <li>
+        <strong>Ordner <code>install/</code> löschen</strong>
+        <p>Per FTP, gleich im Anschluss. Der Installer sperrt sich nach getaner Arbeit
+           zwar selbst und antwortet nur noch mit 403 — aber weg ist gründlicher als zu.</p>
       </li>
     </ol>
 
     <div class="note">
-      <strong>Unter nginx</strong> müssen ein paar Regeln in den Server-Block, weil nginx keine
-      <code>.htaccess</code> liest — ohne sie sind Vorlagen, Sicherungen und der Übersetzungs-Cache
-      von außen erreichbar. Der fertige Block steht in der README des Pakets, samt Befehlen zum
-      Nachmessen.
+      <strong>Wenn der Installer über Schreibrechte klagt:</strong> er legt zum Schluss die
+      <code>config.php</code> im Hauptverzeichnis an und braucht dafür Schreibzugriff. Auf
+      den meisten Webspaces passt das von allein. Wenn nicht, im FTP-Programm einen
+      Rechtsklick auf den Ordner → Dateirechte → <code>755</code>, bei manchen Hostern
+      <code>775</code>. Dasselbe gilt für <code>uploads/</code>, sonst lassen sich später
+      keine Avatare hochladen.
+    </div>
+
+    <div class="note">
+      <strong>Läuft dein Server mit nginx</strong> statt Apache, brauchst du ein paar Regeln
+      im Server-Block: nginx liest <code>.htaccess</code> nicht, und zwar ohne Fehlermeldung.
+      Ohne diese Regeln sind Vorlagen, Sicherungen und der Übersetzungs-Cache von außen
+      erreichbar. Der fertige Block steht in der README des Pakets. Auf einem normalen
+      Webspace mit Apache musst du nichts tun.
     </div>
 
     <div class="cta" style="justify-content:flex-start; margin-top:20px">

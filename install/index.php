@@ -23,7 +23,7 @@ define('FORUM_ROOT',  dirname(__DIR__));
 define('CONFIG_FILE', FORUM_ROOT . '/config.php');
 define('LOCK_FILE',   INSTALL_DIR . '/.installed');
 define('SQL_FILE',    INSTALL_DIR . '/install.sql');
-define('MIN_PHP',     '8.0.0');
+define('MIN_PHP',     '8.1.0');
 
 /* ── Self-Destruct: bereits installiert? ──────────────────────────────── */
 $alreadyInstalled = file_exists(LOCK_FILE);

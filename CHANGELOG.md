@@ -8,6 +8,21 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.18.61 (2026-08-14)
+
+### 🔧 Installer verlangt jetzt PHP 8.1
+
+`MIN_PHP` stand auf `8.0.0`, waehrend README und Projektseite 8.1 nannten. Ein
+Server mit 8.0 waere also durch die Voraussetzungspruefung gekommen und haette
+danach womoeglich am Forum selbst gescheitert — mit einer weit unklareren
+Fehlermeldung als der des Installers. Angeglichen.
+
+#### Geänderte Dateien
+- bootstrap.php (v0.18.61)
+- install/index.php (MIN_PHP)
+
+---
+
 ## v0.18.60 (2026-08-14)
 
 ### 🧩 install.sql eines Moduls muss wiederholbar sein
