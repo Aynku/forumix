@@ -1690,3 +1690,33 @@ document.addEventListener('click', function (e) {
   // Manuell aufrufbar (für dynamisch hinzugefügte Editoren)
   window.ForumixEditor = { init: initEditor };
 })();
+
+// ══════════ EDITOR: TEXTFELD WAECHST MIT ════════════════════════════
+// Das Feld hatte eine feste Hoehe. Beim Bearbeiten eines laengeren Beitrags
+// stand darunter eine Vorschau, die dreimal so hoch war wie das Feld, in dem
+// man tippt. Jetzt richtet sich die Hoehe nach dem Inhalt.
+(function () {
+  function anpassen(el) {
+    // Erst zurueck auf auto, sonst wuechse das Feld nur und schrumpfte nie.
+    el.style.height = 'auto';
+    var hoehe = el.scrollHeight;
+    var max   = Math.round(window.innerHeight * 0.7);
+    el.style.height   = Math.min(hoehe, max) + 'px';
+    el.style.overflowY = hoehe > max ? 'auto' : 'hidden';
+  }
+
+  function beobachten(el) {
+    if (el.dataset.autogrow) return;
+    el.dataset.autogrow = '1';
+    anpassen(el);
+    el.addEventListener('input', function () { anpassen(el); });
+    // Wer selbst am Ziehgriff zieht, will eine eigene Hoehe — dann raus.
+    el.addEventListener('mouseup', function () {
+      if (el.style.height && parseInt(el.style.height, 10) !== el.scrollHeight) {
+        el.removeEventListener('input', anpassen);
+      }
+    });
+  }
+
+  document.querySelectorAll('.editor-textarea').forEach(beobachten);
+})();

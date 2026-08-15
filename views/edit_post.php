@@ -20,6 +20,23 @@
           include __DIR__ . '/partials/editor.php';
         ?>
       </div>
+
+      <?php if (!empty($tagsEditable) && !empty($availableTags)): ?>
+      <div class="form-row">
+        <label>🏷️ Tags (max. 5)</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <?php foreach ($availableTags as $tg): ?>
+            <label class="tag-checkbox" style="border-color:<?= e($tg['color']) ?>">
+              <input type="checkbox" name="tags[]" value="<?= (int) $tg['tag_id'] ?>" style="margin:0"
+                     <?= !empty($tg['checked']) ? 'checked' : '' ?>>
+              <span style="color:<?= e($tg['color']) ?>"><?= e($tg['description'] ?? '') ?> <?= e($tg['name']) ?></span>
+            </label>
+          <?php endforeach; ?>
+        </div>
+        <div class="form-hint">Gelten für das ganze Thema, nicht für diesen Beitrag.</div>
+      </div>
+      <?php endif; ?>
+
       <div class="form-row">
         <label>
           Bearbeitungsgrund

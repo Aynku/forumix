@@ -23,6 +23,14 @@ if ($cu['user_id'] !== $post['user_id'] && !is_mod()) {
 $error = '';
 $isModEdit = $cu['user_id'] != $post['user_id'];  // bearbeitet jemand fremden Post?
 
+// Tags haengen am Thema, nicht am Beitrag. Bearbeitbar sind sie deshalb nur
+// beim ersten Beitrag — sonst gaebe es fuenf Stellen, die dasselbe setzen.
+// Ohne das liessen sich Tags ueberhaupt nur beim Erstellen vergeben, und ein
+// Tag wie "Gelöst" waere sinnlos: den braucht man ja gerade hinterher.
+$erstesPost   = (int) db_count('SELECT COALESCE(MIN(post_id), 0) FROM posts WHERE thread_id = ?',
+                               [(int) $post['thread_id']]);
+$tagsEditable = $erstesPost === (int) $postId;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $content    = post_str('content');
@@ -70,13 +78,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('Beitrag gespeichert.', 'success');
         }
 
+        if ($tagsEditable) {
+            // Kein Feld gesendet heisst "keine Tags" — sonst liessen sich
+            // vergebene Tags nie wieder abwaehlen.
+            set_thread_tags((int) $post['thread_id'],
+                            is_array($_POST['tags'] ?? null) ? $_POST['tags'] : []);
+        }
+
         redirect(FORUM_URL . '/thread.php?id=' . $post['thread_id'] . '#post' . $postId);
     }
 }
 
 render('edit_post', [
-    'title'     => 'Beitrag bearbeiten',
-    'post'      => $post,
-    'error'     => $error,
-    'isModEdit' => $isModEdit,
+    'title'         => 'Beitrag bearbeiten',
+    'post'          => $post,
+    'error'         => $error,
+    'isModEdit'     => $isModEdit,
+    'tagsEditable'  => $tagsEditable,
+    // Mit 'checked' angereichert: die Vorlagen-Engine kennt kein "in", der
+    // Vergleich muss also hier passieren.
+    'availableTags' => $tagsEditable ? (static function () use ($post) {
+        $gesetzt = array_map('intval', array_column(thread_tags((int) $post['thread_id']), 'tag_id'));
+        $alle    = all_tags();
+        foreach ($alle as &$t) $t['checked'] = in_array((int) $t['tag_id'], $gesetzt, true);
+        unset($t);
+        return $alle;
+    })() : [],
 ]);

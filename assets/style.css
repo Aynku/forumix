@@ -4192,7 +4192,11 @@ body.header-compact .header-slogan {
   font-size: 15px;
   line-height: 1.5;
   resize: vertical;
-  min-height: 140px;
+  /* Waechst per JS mit dem Inhalt (siehe forum.js). Der Wert hier ist die
+     Untergrenze fuer den leeren Editor — vorher war er die einzige Hoehe,
+     und beim Bearbeiten eines langen Beitrags war das Eingabefeld dann
+     kleiner als die Vorschau darunter. */
+  min-height: 220px;
   outline: none;
 }
 

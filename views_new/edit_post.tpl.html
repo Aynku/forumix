@@ -14,6 +14,22 @@
       <div class="form-row">
         {{ render_editor('content', 'content', post.content, 'Beitrag bearbeiten…', true, false)|raw }}
       </div>
+      {% if tagsEditable and availableTags %}
+      <div class="form-row">
+        <label>🏷️ Tags (max. 5)</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          {% for tg in availableTags %}
+            <label class="tag-checkbox" style="border-color:{{ tg.color }}">
+              <input type="checkbox" name="tags[]" value="{{ tg.tag_id }}" style="margin:0"
+                     {{ tg.checked ? 'checked' : '' }}>
+              <span style="color:{{ tg.color }}">{{ tg.description|default('') }} {{ tg.name }}</span>
+            </label>
+          {% endfor %}
+        </div>
+        <div class="form-hint">Gelten für das ganze Thema, nicht für diesen Beitrag.</div>
+      </div>
+      {% endif %}
+
       <div class="form-row">
         <label>
           Bearbeitungsgrund

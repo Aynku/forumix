@@ -8,6 +8,37 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.21.2 (2026-08-15)
+
+### 🏷️ Tags lassen sich nachtraeglich aendern
+
+Tags konnten bisher **nur beim Erstellen** eines Themas vergeben werden. Damit
+war ausgerechnet der Tag „Gelöst" sinnlos — den braucht man ja hinterher.
+
+Beim Bearbeiten des **ersten** Beitrags stehen die Tags jetzt zur Auswahl.
+Nur dort, weil sie am Thema haengen und nicht am Beitrag; sonst gaebe es in
+einem langen Thema fuenf Stellen, die dasselbe setzen. Wird kein Tag
+angekreuzt, sind danach auch keine gesetzt — sonst liesse sich ein einmal
+vergebener Tag nie wieder loswerden.
+
+### ✍️ Das Eingabefeld war kleiner als die Vorschau darunter
+
+`.editor-textarea` hatte eine feste Hoehe von 140 Pixeln. Die Vorschau
+darunter waechst mit dem Inhalt — beim Bearbeiten eines laengeren Beitrags
+tippte man also in einem Kaestchen, unter dem dreimal so viel Text stand.
+
+Das Feld richtet sich jetzt nach seinem Inhalt, bis maximal 70 % der
+Fensterhoehe, danach scrollt es. Untergrenze fuer den leeren Editor sind 220
+statt 140 Pixel. Wer den Ziehgriff selbst benutzt, behaelt seine Hoehe.
+
+#### Geänderte Dateien
+- bootstrap.php (v0.21.2)
+- pages/edit_post.php (Tags lesen und schreiben)
+- views/edit_post.php · views_new/edit_post.tpl.html (Auswahl)
+- assets/style.css · assets/forum.js (mitwachsendes Textfeld)
+
+---
+
 ## v0.21.1 (2026-08-14)
 
 ### 🐛 Auf einer Modulseite leuchtete der falsche Menuepunkt
