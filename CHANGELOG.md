@@ -8,6 +8,34 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.19.0 (2026-08-14)
+
+### ✨ Neues Modul: Termine
+
+Terminliste mit eigener Seite unter `/modules/termine/termine.php`. Kommende
+Termine oben, vergangene darunter ausgegraut. Anlegen, Aendern und Loeschen
+duerfen Admins und der Inhaber, lesen darf jeder.
+
+Ueber den Einhaengepunkt `home_top` erscheinen zusaetzlich die naechsten drei
+Termine auf der Startseite — und nur dann, wenn wirklich etwas ansteht. Ein
+leerer Kasten ist schlechter als gar keiner.
+
+**Am Kern wurde nichts geaendert.** Das Modul kommt mit dem aus, was die
+Schnittstelle heute hergibt: eigene Tabelle, eigene Seite, eigene Ansicht, ein
+Einhaengepunkt. Eine Migration braucht es nicht — `install.sql` laeuft beim
+ersten Aktivieren und ist auf Wiederholung ausgelegt.
+
+Standardmaessig ist das Modul **aus**. Adminbereich → Module → einschalten.
+
+#### Neue Dateien
+- modules/termine/module.php
+- modules/termine/install.sql
+- modules/termine/termine.php
+- modules/termine/views/termine.php
+- modules/termine/hooks/home_top.php
+
+---
+
 ## v0.18.61 (2026-08-14)
 
 ### 🔧 Installer verlangt jetzt PHP 8.1
