@@ -8,6 +8,35 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.19.1 (2026-08-14)
+
+### 🧭 Module melden ihren Menuepunkt selbst an
+
+Beim Aktivieren des neuen Termin-Moduls fiel auf: es gab keinen Link dorthin.
+Der Grund stand im Layout — die FAQ war dort **fest verdrahtet**, mit einem
+`if (module_enabled('faq'))` um den Link herum. Jedes weitere Modul haette
+also eine Zeile im Kern gebraucht, obwohl Module genau das nicht sollen.
+
+Ein Modul traegt seinen Punkt jetzt im Manifest ein:
+
+    'menu' => ['label' => '📅 Termine', 'url' => 'modules/termine/termine.php']
+
+`module_menu_links()` sammelt die Punkte aller **aktiven** Module ein, das
+Layout laeuft in Navigation und Fussbereich einmal darueber. Weggelassen heisst
+kein Eintrag. Absolute Adressen und `..` werden verworfen — ein Modul soll
+keinen fremden Link in die Navigation des Forums haengen koennen.
+
+Die FAQ benutzt denselben Weg wie jedes andere Modul; ihr Sonderfall im Layout
+ist weg.
+
+#### Geänderte Dateien
+- bootstrap.php (v0.19.1)
+- lib/modules.php (`menu` im Manifest, `module_menu_links()`)
+- views/layout.php (Sonderfall FAQ raus, Schleife rein)
+- modules/faq/module.php · modules/termine/module.php (Menuepunkt)
+
+---
+
 ## v0.19.0 (2026-08-14)
 
 ### ✨ Neues Modul: Termine

@@ -254,10 +254,11 @@ $forumName = forum_name();
               📊 Aktuelles
             </a>
           <?php endif; ?>
-          <?php if (function_exists('module_enabled') && module_enabled('faq')): ?>
-            <a href="<?= e(FORUM_URL) ?>/modules/faq/faq.php">
-              ❓ FAQ
-            </a>
+          <?php /* Module melden ihre Punkte im Manifest an, siehe module_menu_links(). */ ?>
+          <?php if (function_exists('module_menu_links')): ?>
+            <?php foreach (module_menu_links() as $ml): ?>
+              <a href="<?= e($ml['url']) ?>"><?= e($ml['label']) ?></a>
+            <?php endforeach; ?>
           <?php endif; ?>
         </div>
       </div>
@@ -316,8 +317,10 @@ $forumName = forum_name();
       &bull; <a href="<?= e(FORUM_URL) ?>/privacy.php">Datenschutz</a>
       &bull; <a href="<?= e(FORUM_URL) ?>/terms.php">Nutzungsbedingungen</a>
       &bull; <a href="#" onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'?'}));return false;" title="Tastatur-Shortcuts anzeigen">⌨️ Shortcuts</a>
-      <?php if (function_exists('module_enabled') && module_enabled('faq')): ?>
-        &bull; <a href="<?= e(FORUM_URL) ?>/modules/faq/faq.php">❓ FAQ</a>
+      <?php if (function_exists('module_menu_links')): ?>
+        <?php foreach (module_menu_links() as $ml): ?>
+          &bull; <a href="<?= e($ml['url']) ?>"><?= e($ml['label']) ?></a>
+        <?php endforeach; ?>
       <?php endif; ?>
       <?php if ($footerLinks):
         // Format: "Label1|URL1, Label2|URL2"

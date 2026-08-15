@@ -152,6 +152,11 @@
                 Tabelle nötig, nur um sich drei Werte zu merken.</li></ul>
       </div>
       <div class="card">
+        <h3>🧭 Eintrag in der Navigation</h3>
+        <ul><li>Ein Feld im Manifest genügt, und der Punkt steht in der Kopfzeile und im
+                Fußbereich — nur solange das Modul aktiv ist.</li></ul>
+      </div>
+      <div class="card">
         <h3>🔔 Ein- und Ausschalten</h3>
         <ul><li>Zwei optionale Funktionen im Manifest laufen beim Aktivieren und beim
                 Deaktivieren — für Aufräumarbeiten oder eine erste Befüllung.</li></ul>
@@ -203,6 +208,8 @@ return [
     'icon'        =&gt; '🧩',
     'version'     =&gt; '1.0',
     'author'      =&gt; 'Dein Name',
+    <span class="comment">// Punkt in Navigation und Fußbereich. Weglassen = kein Eintrag.</span>
+    'menu'        =&gt; ['label' =&gt; '🧩 Mein Modul', 'url' =&gt; 'modules/meinmodul/meinmodul.php'],
     'on_enable'   =&gt; function () { <span class="comment">/* nach dem Einschalten */</span> },
     'on_disable'  =&gt; function () { <span class="comment">/* vor dem Ausschalten */</span> },
 ];</code></pre>
@@ -225,6 +232,7 @@ return [
     'icon'        =&gt; '💭',
     'version'     =&gt; '1.0',
     'author'      =&gt; 'Dein Name',
+    'menu'        =&gt; ['label' =&gt; '💭 Zitate', 'url' =&gt; 'modules/zitate/zitate.php'],
 ];</code></pre>
 
     <p class="sub" style="margin:18px 0 6px"><strong>2.</strong> <code>modules/zitate/install.sql</code></p>

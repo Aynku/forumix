@@ -35,6 +35,7 @@ function available_modules(): array {
             'version'      => $manifest['version']     ?? '1.0',
             'author'       => $manifest['author']      ?? 'unbekannt',
             'requires'     => $manifest['requires']    ?? [],
+            'menu'         => $manifest['menu']        ?? null,
             'enabled'      => !empty($dbStatus[$code]['enabled']),
             'installed'    => isset($dbStatus[$code]),
             'installed_at' => $dbStatus[$code]['installed_at'] ?? null,
@@ -165,6 +166,40 @@ function set_module_config(string $code, array $config): bool {
             [json_encode($config), $code]);
         return true;
     } catch (Exception $e) { return false; }
+}
+
+/**
+ * Menuepunkte der aktiven Module, fuer Navigation und Fussbereich.
+ *
+ * Vorher stand jeder Modul-Link fest im Layout — die FAQ mit einem eigenen
+ * if darum. Jedes weitere Modul haette eine Zeile im Kern gebraucht, obwohl
+ * Module genau das nicht sollen. Jetzt meldet ein Modul seinen Punkt im
+ * Manifest an:
+ *
+ *   'menu' => ['label' => '📅 Termine', 'url' => 'modules/termine/termine.php']
+ *
+ * Mehrere Punkte gehen auch, dann eine Liste solcher Arrays. Die URL ist
+ * relativ zur Forum-Wurzel; etwas anderes wird nicht angenommen, damit ein
+ * Modul keinen fremden Link in die Navigation des Forums haengen kann.
+ */
+function module_menu_links(): array {
+    $links = [];
+    foreach (available_modules() as $mod) {
+        if (!$mod['enabled'] || empty($mod['menu'])) continue;
+
+        $menu      = $mod['menu'];
+        $eintraege = isset($menu['url']) ? [$menu] : $menu;
+        if (!is_array($eintraege)) continue;
+
+        foreach ($eintraege as $e) {
+            if (!is_array($e) || empty($e['url']) || empty($e['label'])) continue;
+            $url = ltrim((string) $e['url'], '/');
+            // Keine absoluten Adressen und kein Ausbrechen aus dem Forum.
+            if (preg_match('#^[a-z]+://#i', $url) || str_contains($url, '..')) continue;
+            $links[] = ['label' => (string) $e['label'], 'url' => FORUM_URL . '/' . $url];
+        }
+    }
+    return $links;
 }
 
 /**

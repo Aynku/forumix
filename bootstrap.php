@@ -152,7 +152,7 @@ if (!defined('FORUM_DEBUG') || FORUM_DEBUG !== true) {
 // die Anzeige im Footer und im Cache-Busting immer aktuell, ohne dass
 // manuell SQL gefahren werden muss.
 //
-const FORUM_VERSION_CODE = '0.19.0 Beta';
+const FORUM_VERSION_CODE = '0.19.1 Beta';
 
 // Heimat der Software. Das Forumix-Zeichen im Fussbereich verweist hierher —
 // dort liegt auch der Quelltext, womit AGPLv3 § 13 erfuellt ist. Wer den Code
