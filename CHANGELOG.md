@@ -8,6 +8,35 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.22.2 (2026-08-15)
+
+### 📧 Die Absenderadresse gilt auch ohne SMTP — und die Vorgabe taugte nicht
+
+Die Felder heissen „SMTP-Absender", werden aber **vor** der Entscheidung
+gelesen, ob ueber SMTP oder ueber `mail()` versendet wird. Sie gelten also in
+beiden Faellen. Am Feld stand nichts davon.
+
+Schlimmer war die Vorgabe: ohne Eintrag baut das Forum
+`noreply@<Host aus der Forum-Adresse>`. Bei einem Forum unter
+`www.beispiel.de` wird daraus `noreply@www.beispiel.de` — und SPF und DKIM
+haengen fast immer an `beispiel.de` ohne Vorsatz. Die Mail geht dann
+**unbeglaubigt** raus: keine Signatur, kein SPF-Treffer, keine
+DMARC-Ausrichtung. Solange die eigene DMARC-Regel auf `p=none` steht, faellt
+das niemandem auf — beim Hochziehen auf `quarantine` faellt aller Forenversand
+durch.
+
+Ein fuehrendes `www.` faellt jetzt weg. Bei anderen Subdomains hilft das
+nicht — welcher Teil die eigentliche Domain ist, laesst sich ohne
+Suffix-Liste nicht sagen. Deshalb steht es jetzt am Feld: Adresse setzen, und
+zwar eine der Domain, fuer die Versand eingerichtet ist.
+
+#### Geänderte Dateien
+- bootstrap.php (v0.22.2)
+- lib/email.php (Vorgabe ohne www.)
+- views/admin/index.php (Hinweis am Absenderfeld)
+
+---
+
 ## v0.22.1 (2026-08-15)
 
 ### 🔇 Der Hinweis zum Schluessel erschien auch ohne SMTP

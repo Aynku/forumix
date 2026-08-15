@@ -16,6 +16,14 @@ function send_email(string $to, string $subject, string $body, bool $html = true
 
     if (!$fromAddr) {
         $host = parse_url(FORUM_URL, PHP_URL_HOST) ?: 'localhost';
+        // Ein fuehrendes www. faellt weg: DKIM-Signierung und SPF haengen fast
+        // immer an der Domain ohne, und eine Absenderadresse auf einer
+        // Subdomain ohne eigene Eintraege geht unbeglaubigt raus.
+        //
+        // Bei anderen Subdomains (forum.example.com) hilft das nicht — welcher
+        // Teil die eigentliche Domain ist, laesst sich ohne Liste nicht sagen.
+        // Deshalb steht am Feld im Adminbereich, dass man es setzen soll.
+        if (str_starts_with($host, 'www.')) $host = substr($host, 4);
         $fromAddr = 'noreply@' . $host;
     }
 

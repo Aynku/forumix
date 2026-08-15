@@ -967,7 +967,15 @@
             <div class="form-row">
               <label>Absender-E-Mail</label>
               <input type="email" name="smtp_from" value="<?= e($settings['smtp_from'] ?? '') ?>"
-                     placeholder="webmaster@example.com">
+                     placeholder="noreply@deine-domain.de">
+              <div class="form-hint">
+                <strong>Gilt auch ohne SMTP</strong>, also auch beim Versand über
+                <code>mail()</code>. Leer lassen baut eine Adresse aus der Forum-Adresse —
+                das geht schief, sobald das Forum auf einer Subdomain läuft: SPF und
+                DKIM hängen fast immer an der Domain ohne Vorsatz, und eine Mail von
+                einer Subdomain ohne eigene Einträge geht unbeglaubigt raus.
+                Nimm eine Adresse der Domain, für die Versand eingerichtet ist.
+              </div>
             </div>
             <div class="form-row">
               <label>Absender-Name</label>
