@@ -208,7 +208,9 @@ return [
     'icon'        =&gt; '🧩',
     'version'     =&gt; '1.0',
     'author'      =&gt; 'Dein Name',
-    <span class="comment">// Punkt in Navigation und Fußbereich. Weglassen = kein Eintrag.</span>
+    <span class="comment">// Punkt in Navigation und Fußbereich. Weglassen = kein Eintrag.
+    // 'admin' =&gt; true blendet ihn für alle außer der Verwaltung aus — das ist
+    // Bequemlichkeit, die Seite dahinter muss ihre Rechte selbst prüfen.</span>
     'menu'        =&gt; ['label' =&gt; '🧩 Mein Modul', 'url' =&gt; 'modules/meinmodul/meinmodul.php'],
     'on_enable'   =&gt; function () { <span class="comment">/* nach dem Einschalten */</span> },
     'on_disable'  =&gt; function () { <span class="comment">/* vor dem Ausschalten */</span> },
@@ -362,8 +364,11 @@ render('@zitate/liste', [
       <code>$csrfToken</code> bereit.
     </p>
     <table>
-      <tr><th>Name</th><th>Wo</th></tr>
-      <tr><td><code>home_top</code></td><td>Startseite, über der Forenübersicht</td></tr>
+      <tr><th>Name</th><th>Wo</th><th>Zusätzlich im Geltungsbereich</th></tr>
+      <tr><td><code>layout_top</code></td><td>Über allem, auf jeder Seite</td><td>–</td></tr>
+      <tr><td><code>home_top</code></td><td>Startseite, über der Forenübersicht</td><td>–</td></tr>
+      <tr><td><code>thread_top</code></td><td>Thema, über dem ersten Beitrag</td><td><code>$thread</code></td></tr>
+      <tr><td><code>post_footer</code></td><td>Unter jedem Beitrag im Thema</td><td><code>$post</code>, <code>$thread</code></td></tr>
     </table>
     <div class="note" style="margin-top:14px">
       <strong>Eigene Einhängepunkte</strong> setzt du selbst: ein

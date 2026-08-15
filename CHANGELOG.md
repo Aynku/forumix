@@ -8,6 +8,72 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.21.0 (2026-08-14)
+
+### ✨ Drei Module und drei neue Einhaengepunkte
+
+#### Kontaktformular
+
+Seite, ueber die auch Nicht-Mitglieder schreiben koennen. Die Nachricht geht
+per Mail an die Impressum-Adresse **und** wird in der Datenbank abgelegt. Wenn
+der Mailversand klemmt, ist sie trotzdem da — ein Kontaktformular, das still
+verliert, ist schlimmer als gar keins. Bremse auf drei Nachrichten je Stunde
+und IP, dazu ein Honigtopf gegen Skripte.
+
+#### Als Loesung markieren
+
+Der Fragesteller — oder die Moderation — zeichnet eine Antwort als Loesung
+aus. Der Beitrag bekommt einen gruenen Balken, oben im Thema steht ein Kasten
+mit Sprung dorthin. Ein Thema hat hoechstens eine Loesung; das erzwingt der
+Primaerschluessel, nicht der Code. Der erste Beitrag ist die Frage und laesst
+sich nicht selbst markieren.
+
+#### Ankuendigungsband
+
+Band ueber der ganzen Seite fuer Wartungshinweise. Text, Farbe und
+Ein-/Ausschalter liegen ohne eigene Tabelle im Konfigurationsfeld des Moduls.
+Wer es wegklickt, sieht es nicht wieder — bis der Text sich aendert, denn der
+Schluessel im Browser haengt am Text.
+
+### 🪝 Neue Einhaengepunkte
+
+`layout_top` (ueber allem), `thread_top` (ueber dem ersten Beitrag) und
+`post_footer` (unter jedem Beitrag). Dafuer nimmt `render_module_hook()` jetzt
+einen zweiten Wert: Zusatzvariablen fuer den Haken. Ein Haken mitten in der
+Beitragsschleife nuetzt nichts, wenn er nicht weiss, um welchen Beitrag es
+geht. `EXTR_SKIP` sorgt dafuer, dass ein Modul `$currentUser` nicht
+ueberschreiben kann.
+
+Beide Vorlagenwelten sind versorgt: die alten PHP-Ansichten rufen direkt auf,
+fuer die `.tpl.html`-Vorlagen puffert die Seite die Ausgabe und gibt sie als
+Zeichenkette weiter — dasselbe Vorgehen, das `home_top` schon benutzt.
+
+### 🧭 Menuepunkte nur fuer die Verwaltung
+
+`'menu' => [..., 'admin' => true]` blendet den Punkt fuer alle anderen aus.
+Das Ankuendigungsband braucht das: ein Link auf eine Seite, die ohnehin nur
+Admins bedienen duerfen, hat in der Navigation aller nichts zu suchen.
+
+### 🧪 Geprueft wurde daneben, nicht im Betrieb
+
+Auf keiner der beiden laufenden Installationen gab es ein Thema — die
+Themenansicht liess sich dort also gar nicht pruefen. Dafuer steht jetzt ein
+eigener Pruefstand mit eigener Datenbank und Testinhalten. Beide neuen Haken
+sind dort durch die neue Vorlagenwelt hindurch nachgewiesen.
+
+#### Neue Dateien
+- modules/kontakt/ (module.php, install.sql, kontakt.php, views/kontakt.php)
+- modules/loesung/ (module.php, install.sql, lib.php, markieren.php, hooks/post_footer.php, hooks/thread_top.php)
+- modules/banner/ (module.php, banner.php, views/banner.php, hooks/layout_top.php)
+
+#### Geänderte Dateien
+- bootstrap.php (v0.21.0)
+- lib/modules.php (Kontext fuer Haken, `admin` im Menuefeld)
+- views/layout.php (`layout_top`)
+- pages/thread.php · views/thread.php · views_new/thread.tpl.html (`thread_top`, `post_footer`)
+
+---
+
 ## v0.20.0 (2026-08-14)
 
 ### ✨ Neues Modul: Downloads

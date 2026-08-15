@@ -193,6 +193,12 @@ function module_menu_links(): array {
 
         foreach ($eintraege as $e) {
             if (!is_array($e) || empty($e['url']) || empty($e['label'])) continue;
+
+            // 'admin' => true blendet den Punkt fuer alle anderen aus. Das ist
+            // Bequemlichkeit, keine Absicherung — die Seite dahinter muss ihre
+            // Rechte selbst pruefen.
+            if (!empty($e['admin']) && !(is_admin() || is_owner())) continue;
+
             $url = ltrim((string) $e['url'], '/');
             // Keine absoluten Adressen und kein Ausbrechen aus dem Forum.
             if (preg_match('#^[a-z]+://#i', $url) || str_contains($url, '..')) continue;
@@ -206,10 +212,15 @@ function module_menu_links(): array {
  * Render-Hook: Modul kann an verschiedenen Stellen Inhalt injizieren.
  * Wird im Layout aufgerufen, z.B. {render_module_hook('home_top')}
  */
-function render_module_hook(string $hookName): void {
+function render_module_hook(string $hookName, array $context = []): void {
     // Wichtige Variablen für Hooks im Scope verfügbar machen
     $currentUser = current_user();
     $csrfToken   = $_SESSION['csrf_token'] ?? '';
+
+    // Ein Haken mitten in einer Schleife nuetzt nichts, wenn er nicht weiss,
+    // um welchen Beitrag es geht. EXTR_SKIP, damit ein Modul $currentUser
+    // nicht ueberschreiben kann.
+    if ($context) extract($context, EXTR_SKIP);
 
     foreach (available_modules() as $code => $mod) {
         if (!$mod['enabled']) continue;

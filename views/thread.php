@@ -103,6 +103,8 @@
 
 <?= $pagination ?>
 
+<?= $threadTopHtml ?? '' ?>
+
 <?php foreach ($posts as $i => $post): ?>
 <div class="post-card<?= empty($post['is_approved']) ? ' post-pending' : '' ?>" id="post<?= (int) $post['post_id'] ?>">
   <?php if (empty($post['is_approved'])): ?>
@@ -244,6 +246,7 @@
          onclick="return confirm('Beitrag löschen?')">🗑️ <?= e(t('delete')) ?></a>
     <?php endif; ?>
   </div>
+  <?= $post['hookFooter'] ?? '' ?>
 </div>
 <?php endforeach; ?>
 

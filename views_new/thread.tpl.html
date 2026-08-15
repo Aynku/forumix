@@ -98,6 +98,8 @@
 
 {{ pagination|raw }}
 
+{{ threadTopHtml|raw }}
+
 {% for post in posts %}
 <div class="post-card{{ post.is_approved ? '' : ' post-pending' }}" id="post{{ post.post_id }}">
   {% if not post.is_approved %}
@@ -231,6 +233,7 @@
          onclick="return confirm('Beitrag löschen?')">🗑️ {{ t('delete') }}</a>
     {% endif %}
   </div>
+  {{ post.hookFooter|raw }}
 </div>
 {% endfor %}
 

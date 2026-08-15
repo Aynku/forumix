@@ -135,6 +135,9 @@ $forumName = forum_name();
 <body class="header-<?= e($theme['theme_header_style'] ?? 'default') ?> density-<?= e($theme['theme_density'] ?? 'normal') ?>">
 <div id="app">
 
+  <?php /* Einhaengepunkt ueber allem — fuer Baender, Hinweise, Warnungen. */ ?>
+  <?php if (function_exists('render_module_hook')) render_module_hook('layout_top'); ?>
+
   <header id="site-header">
 
     <!-- ── ZEILE 0: Logo-Banner ── -->

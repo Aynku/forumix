@@ -192,6 +192,13 @@ foreach ($posts as &$p) {
         $enrichedReactions[] = $r;
     }
     $p['reactions'] = $enrichedReactions;
+
+    // Modul-Haken unter dem Beitrag. Die neue Vorlagen-Engine kann keine
+    // void-Funktion einbinden, deshalb hier puffern und als fertigen String
+    // mitgeben — dasselbe Vorgehen wie bei 'home_top' auf der Startseite.
+    ob_start();
+    render_module_hook('post_footer', ['post' => $p, 'thread' => $thread]);
+    $p['hookFooter'] = ob_get_clean();
 }
 unset($p);
 
@@ -218,10 +225,16 @@ if (current_user()) {
 // Tags zum Thread laden
 $threadTags = thread_tags($threadId);
 
+// Haken oberhalb des ersten Beitrags, gleiches Vorgehen wie unten am Beitrag.
+ob_start();
+render_module_hook('thread_top', ['thread' => $thread]);
+$threadTopHtml = ob_get_clean();
+
 render('thread', [
-    'title'        => $thread['title'],
-    'thread'       => $thread,
-    'threadTags'   => $threadTags,
+    'title'         => $thread['title'],
+    'threadTopHtml' => $threadTopHtml,
+    'thread'        => $thread,
+    'threadTags'    => $threadTags,
     'posts'        => $posts,
     'pag'          => $pag,
     'pagination'   => pagination_html($pag, FORUM_URL . '/thread.php?id=' . $threadId),
