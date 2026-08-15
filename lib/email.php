@@ -11,6 +11,29 @@ if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
 function send_email(string $to, string $subject, string $body, bool $html = true): bool {
     if (!filter_var($to, FILTER_VALIDATE_EMAIL)) return false;
 
+    // Stundengrenze, falls sie in der config.php steht. Ohne die Konstante
+    // aendert sich nichts.
+    //
+    // Gedacht fuer Installationen, die jemand anderes betreibt: der Versand
+    // laeuft ueber dessen Server und dessen Ruf. Ein Forum, das ploetzlich
+    // tausend Einladungen verschickt, kostet nicht sich selbst die
+    // Zustellbarkeit, sondern alle anderen auf derselben Maschine.
+    //
+    // Der Zaehler gilt fuer die ganze Installation, nicht je Empfaenger —
+    // sonst waere er wirkungslos: man schickt ja an viele verschiedene.
+    if (defined('FORUM_MAIL_MAX_PER_HOUR') && (int) FORUM_MAIL_MAX_PER_HOUR > 0) {
+        if (!rate_limit_check('mail_out', (int) FORUM_MAIL_MAX_PER_HOUR, 3600, 'instanz')) {
+            // Nicht stumm verschlucken: eine Mail, die nie ankommt, sucht
+            // sonst niemand — und der Betreiber wundert sich, warum die
+            // Bestaetigung ausbleibt.
+            error_log(sprintf(
+                'Forumix: Mail-Stundengrenze von %d erreicht, Nachricht an %s nicht verschickt (%s)',
+                (int) FORUM_MAIL_MAX_PER_HOUR, $to, $subject
+            ));
+            return false;
+        }
+    }
+
     // Steht der Absender in der config.php, gewinnt er immer. Gedacht fuer
     // Installationen, die jemand anderes betreibt als der Admin des Forums:
     // dort haengt der Versand an fremder Reputation, und ein frei gesetzter

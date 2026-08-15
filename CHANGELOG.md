@@ -8,6 +8,32 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.24.0 (2026-08-15)
+
+### 📧 Stundengrenze fuer den Mailversand
+
+Steht `FORUM_MAIL_MAX_PER_HOUR` in der `config.php`, verschickt die
+Installation hoechstens so viele Mails je Stunde. **Ohne die Konstante aendert
+sich nichts** — kein Installer schreibt sie von selbst.
+
+Gedacht fuer Installationen, die jemand anderes betreibt: der Versand laeuft
+ueber dessen Server und dessen Ruf. Ein Forum, das ploetzlich tausend
+Einladungen verschickt, kostet nicht sich selbst die Zustellbarkeit, sondern
+alle anderen auf derselben Maschine.
+
+Gezaehlt wird fuer die ganze Installation, nicht je Empfaenger — sonst waere
+die Grenze wirkungslos, man schickt ja an viele verschiedene. Benutzt wird der
+Zaehler, den es fuer Anmeldung und Registrierung ohnehin gibt
+(`lib/ratelimit.php`), kein zweiter daneben.
+
+Eine abgewiesene Mail landet im Fehlerprotokoll. Stumm verschlucken waere das
+Schlimmste: der Betreiber wundert sich sonst, warum die Bestaetigung ausbleibt,
+und niemand sucht danach.
+
+**Keine Migration noetig.**
+
+---
+
 ## v0.23.0 (2026-08-15)
 
 ### 🖥️ Installer laeuft jetzt auch ohne Browser

@@ -3,7 +3,7 @@
 Ein vollständiges Community-Forum in nativem PHP. **Keine externen Abhängigkeiten, kein Composer, kein Framework, kein Build-Schritt.**
 
 ```
-Aktuelle Version: 0.23.0 Beta
+Aktuelle Version: 0.24.0 Beta
 Projektseite:     https://forumix.de
 Zum Ausprobieren: https://forum.forumix.de   ← läuft selbst mit Forumix
 Download:         https://forumix.de/#download
@@ -143,7 +143,10 @@ php install/cli.php --config=setup.json && rm setup.json
 `config.php` schreiben, etwa ein fest verankerter Mail-Absender:
 
 ```json
-"extra": {"FORUM_MAIL_FROM": "noreply@example.com"}
+"extra": {
+  "FORUM_MAIL_FROM": "noreply@example.com",
+  "FORUM_MAIL_MAX_PER_HOUR": 50
+}
 ```
 
 Ist die Konstante gesetzt, gewinnt sie immer und das Feld im Adminbereich ist
