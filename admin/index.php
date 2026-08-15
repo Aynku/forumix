@@ -1406,8 +1406,11 @@ switch ($action) {
         // Installationen von vor dem Schluessel haben keinen. Statt sie nur
         // darauf hinzuweisen, gibt es die fertige Zeile zum Kopieren — einmal
         // je Sitzung dieselbe, sonst waere sie nach jedem Neuladen eine andere.
+        // Der Hinweis erscheint nur, wenn es auch etwas zu schuetzen gibt. Wer
+        // ueber mail() versendet, hat gar kein SMTP-Passwort — dem muss man
+        // keinen Kasten hinstellen.
         $vars['cryptReady'] = forum_crypt_available();
-        if (!$vars['cryptReady']) {
+        if (!$vars['cryptReady'] && !empty($s['smtp_pass'])) {
             if (empty($_SESSION['crypt_key_vorschlag'])) {
                 $_SESSION['crypt_key_vorschlag'] = forum_crypt_new_key();
             }

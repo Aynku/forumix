@@ -8,6 +8,23 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.22.1 (2026-08-15)
+
+### 🔇 Der Hinweis zum Schluessel erschien auch ohne SMTP
+
+Wer ueber `mail()` versendet, hat gar kein SMTP-Passwort — und bekam trotzdem
+den Kasten mit der Anleitung, wie man es verschluesselt. Ein Rat, etwas zu
+schuetzen, das man nicht hat, ist Laerm.
+
+Der Kasten erscheint jetzt nur, wenn ein SMTP-Passwort gesetzt ist und der
+Schluessel fehlt. Der Hinweis am Feld selbst bleibt in beiden Faellen richtig.
+
+#### Geänderte Dateien
+- bootstrap.php (v0.22.1)
+- admin/index.php (Bedingung fuer den Hinweis)
+
+---
+
 ## v0.22.0 (2026-08-15)
 
 ### 🔐 Das SMTP-Passwort liegt jetzt verschluesselt in der Datenbank
