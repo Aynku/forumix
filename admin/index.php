@@ -183,7 +183,10 @@ if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (array_key_exists($key, $_POST)) {
             $val = trim((string) $_POST[$key]);
             if ($val === '' && in_array($key, $keepIfEmpty, true)) continue;
-            set_setting($key, $val);
+            // Das SMTP-Passwort geht verschluesselt in die Datenbank, sofern
+            // ein Schluessel in der config.php steht. Ohne Schluessel bleibt
+            // es wie bisher im Klartext — siehe lib/crypto.php.
+            set_setting($key, $key === 'smtp_pass' ? forum_encrypt($val) : $val);
         }
     }
 
@@ -1399,6 +1402,17 @@ switch ($action) {
         $s = [];
         foreach ($rows as $r) $s[$r['setting_key']] = $r['setting_value'];
         $vars['settings'] = $s;
+
+        // Installationen von vor dem Schluessel haben keinen. Statt sie nur
+        // darauf hinzuweisen, gibt es die fertige Zeile zum Kopieren — einmal
+        // je Sitzung dieselbe, sonst waere sie nach jedem Neuladen eine andere.
+        $vars['cryptReady'] = forum_crypt_available();
+        if (!$vars['cryptReady']) {
+            if (empty($_SESSION['crypt_key_vorschlag'])) {
+                $_SESSION['crypt_key_vorschlag'] = forum_crypt_new_key();
+            }
+            $vars['cryptKeyVorschlag'] = $_SESSION['crypt_key_vorschlag'];
+        }
         break;
 
     case 'registration':

@@ -957,8 +957,11 @@
                      placeholder="<?= empty($settings['smtp_pass']) ? 'noch nicht gesetzt' : '••••••••••••' ?>">
               <div class="form-hint">
                 Leer lassen = bestehendes Passwort behalten.
-                <strong>Liegt unverschlüsselt in der Datenbank</strong> — nimm dafür ein
-                eigenes Postfach und nicht dein Haupt-Konto.
+                <?php if (!empty($cryptReady)): ?>
+                  Wird verschlüsselt in der Datenbank abgelegt.
+                <?php else: ?>
+                  <strong>Liegt unverschlüsselt in der Datenbank.</strong>
+                <?php endif; ?>
               </div>
             </div>
             <div class="form-row">
@@ -972,6 +975,24 @@
                      placeholder="<?= e(FORUM_NAME) ?>">
             </div>
           </div>
+
+          <?php if (empty($cryptReady) && !empty($cryptKeyVorschlag)): ?>
+            <div class="note" style="margin-top:14px">
+              <strong>🔐 Passwort verschlüsselt ablegen</strong>
+              <p style="margin:6px 0">
+                Diese Installation hat noch keinen Schlüssel, das SMTP-Passwort liegt
+                deshalb im Klartext in der Datenbank. Nimm diese Zeile in deine
+                <code>config.php</code> auf und speichere das Passwort danach einmal neu:
+              </p>
+              <pre style="white-space:pre-wrap;word-break:break-all;background:var(--bg-body);padding:10px;border-radius:6px;margin:0"><code>define('FORUM_CRYPT_KEY', '<?= e($cryptKeyVorschlag) ?>');</code></pre>
+              <p style="margin:8px 0 0;font-size:13px">
+                Den Schlüssel danach <strong>nicht mehr ändern</strong> und beim Umzug
+                mitnehmen — sonst ist das Gespeicherte nicht mehr lesbar. Er schützt gegen
+                einen abhandengekommenen Datenbank-Abzug, nicht gegen jemanden, der den
+                Server hat: der liest die <code>config.php</code> mit.
+              </p>
+            </div>
+          <?php endif; ?>
 
           <button type="submit" class="btn btn-primary" style="margin-top:14px">💾 SMTP-Einstellungen speichern</button>
         </form>

@@ -8,6 +8,49 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.22.0 (2026-08-15)
+
+### 🔐 Das SMTP-Passwort liegt jetzt verschluesselt in der Datenbank
+
+In 0.21.3 wurde die falsche Zusage aus der Oberflaeche entfernt. Jetzt gibt es,
+was dort vorher behauptet wurde.
+
+**Wogegen das hilft und wogegen nicht.** Es schuetzt gegen einen
+abhandengekommenen Datenbank-Abzug — eine Sicherung auf einem fremden Rechner,
+eine weitergereichte Kopie, eine SQL-Luecke. Es schuetzt **nicht** gegen
+jemanden, der den Server hat: der liest die `config.php` und damit den
+Schluessel. Genau deshalb steht der Schluessel dort und nicht in der Datenbank
+— das vorhandene `forum_secret` waere als Schluessel wertlos, es liegt neben
+dem, was es schuetzen soll.
+
+Verfahren ist AES-256-GCM. Das Ergebnis traegt seine eigene Pruefsumme: ein
+veraenderter Wert entschluesselt nicht falsch, sondern gar nicht.
+
+**Neue Installationen** bekommen den Schluessel vom Installer, jede einen
+eigenen.
+
+**Bestehende Installationen bleiben unangetastet.** Ohne Schluessel arbeitet
+alles wie bisher im Klartext — lieber weiterlaufen als jemanden aus seinem
+Mailversand aussperren. Wer umstellen will, findet unter *Adminbereich →
+E-Mail* die fertige Zeile fuer die `config.php` und speichert das Passwort
+danach einmal neu. Auch dann bleiben alte Klartext-Werte lesbar: nur was das
+Vorzeichen `enc:v1:` traegt, wird entschluesselt.
+
+Der Hinweis am Feld sagt jetzt in beiden Faellen die Wahrheit — verschluesselt
+oder nicht.
+
+#### Neue Dateien
+- lib/crypto.php
+
+#### Geänderte Dateien
+- bootstrap.php (v0.22.0, laedt lib/crypto.php)
+- install/index.php (schreibt `FORUM_CRYPT_KEY` in die config.php)
+- admin/index.php (verschluesselt beim Speichern, Vorschlag fuer den Schluessel)
+- lib/email.php (entschluesselt beim Versand)
+- views/admin/index.php (Hinweis und Anleitung)
+
+---
+
 ## v0.21.3 (2026-08-15)
 
 ### 🔎 Eine Zusage, die die Software nicht eingehalten hat

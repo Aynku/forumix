@@ -173,6 +173,14 @@ define('FORUM_NAME',    {FNAME});
 define('FORUM_URL',     {FURL});
 define('FORUM_INSTALLED', true);
 
+// Schluessel fuer Werte, die verschluesselt in der Datenbank liegen — derzeit
+// das SMTP-Passwort. Er steht hier und nicht in der Datenbank, sonst laege er
+// neben dem, was er schuetzen soll.
+//
+// NICHT AENDERN und nicht verlieren: danach laesst sich das Gespeicherte nicht
+// mehr lesen. Beim Umzug auf einen anderen Server muss diese Zeile mit.
+define('FORUM_CRYPT_KEY', {CRYPTKEY});
+
 define('UPLOAD_DIR',           __DIR__ . '/uploads/');
 define('AVATAR_DIR',           __DIR__ . '/uploads/avatars/');
 define('MAX_AVATAR_SIZE',      512 * 1024);
@@ -192,6 +200,7 @@ PHP;
         '{CHARSET}' => $v($c['charset']),
         '{FNAME}'   => $v($c['forum_name']),
         '{FURL}'    => $v($c['forum_url']),
+        '{CRYPTKEY}'=> $v(bin2hex(random_bytes(32))),
     ]);
     if (file_put_contents(CONFIG_FILE, $out) === false) {
         return false;

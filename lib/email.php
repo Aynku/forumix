@@ -55,7 +55,9 @@ function _send_via_smtp(string $to, string $subject, string $body, bool $html,
     $host = (string) get_setting('smtp_host', '');
     $port = (int)    get_setting('smtp_port', 587);
     $user = (string) get_setting('smtp_user', '');
-    $pass = (string) get_setting('smtp_pass', '');
+    // Kann verschluesselt abgelegt sein, siehe lib/crypto.php. Ohne
+    // Vorzeichen kommt der Wert unveraendert zurueck.
+    $pass = forum_decrypt((string) get_setting('smtp_pass', ''));
     $enc  = (string) get_setting('smtp_encryption', 'tls');
 
     $timeout = 10;
