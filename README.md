@@ -1,13 +1,20 @@
-# Aynku Forum
+# Forumix
 
-Ein schlankes, modernes Community-Forum in nativem PHP. **Keine externen Abhängigkeiten, kein Composer, kein Framework.**
+Ein vollständiges Community-Forum in nativem PHP. **Keine externen Abhängigkeiten, kein Composer, kein Framework, kein Build-Schritt.**
 
 ```
-Aktuelle Version: 0.18.55 Beta
-Live unter:       https://www.aynku.de
+Aktuelle Version: 0.21.2 Beta
+Projektseite:     https://forumix.de
+Zum Ausprobieren: https://forum.forumix.de   ← läuft selbst mit Forumix
+Download:         https://forumix.de/#download
 ```
+
+Das Forum unter **forum.forumix.de** ist keine Demo-Installation neben der
+Software, sondern dieselbe Fassung, die hier im Repository liegt. Dort laufen
+auch Fragen und Fehlermeldungen auf.
 
 > Versionsgeschichte → [CHANGELOG.md](CHANGELOG.md)
+> Häufige Fragen und der Aufbau eigener Module → https://forumix.de/faq.html
 
 ---
 
@@ -154,7 +161,7 @@ Folgenden Block einfügen:
 
 ```nginx
 # ════════════════════════════════════════════════════════════════
-# Aynku Forum – nginx-Routing + Schutz
+# Forumix – nginx-Routing + Schutz
 # ════════════════════════════════════════════════════════════════
 
 # Sensible Einzeldateien blockieren
@@ -326,6 +333,15 @@ forum/
 ├── 📂 cache/
 │   └── templates/           ← Kompilierte Templates (auto-generiert)
 │
+├── 📂 modules/              ← Erweiterungen, im Admin ein-/ausschaltbar
+│   ├── faq/                 ← Häufige Fragen
+│   ├── shoutbox/            ← Mini-Chat auf der Startseite
+│   ├── termine/             ← Terminliste
+│   ├── downloads/           ← Dateiablage
+│   ├── kontakt/             ← Kontaktformular
+│   ├── loesung/             ← Antwort als Lösung markieren
+│   └── banner/              ← Ankündigungsband
+│
 ├── 📂 uploads/              ← User-Uploads
 │   ├── avatars/
 │   ├── attachments/
@@ -335,6 +351,21 @@ forum/
     ├── index.php
     └── install.sql
 ```
+
+### Module
+
+Sieben Module liegen bei, **alle standardmäßig aus**. Einschalten unter
+Adminbereich → *Module*; erst dann legt ein Modul seine Tabellen an. Wieder
+Ausschalten löscht keine Daten.
+
+Ein Modul ist ein Ordner unter `modules/` mit einer `module.php`. Es kann
+eigene Seiten und Ansichten mitbringen, eigene Tabellen anlegen, sich über
+Einhängepunkte (`layout_top`, `home_top`, `thread_top`, `post_footer`) ins
+Layout hängen und einen Menüpunkt anmelden — ohne dass am Kern etwas geändert
+werden muss.
+
+Wie man eins baut, steht mit vollständigem Beispiel auf
+[forumix.de/faq.html#module](https://forumix.de/faq.html#module).
 
 ---
 
@@ -355,6 +386,16 @@ MAJOR . MINOR . PATCH
 
 ### Wie ein Update einspielen
 
+Auf [forumix.de](https://forumix.de/#download) liegen zu jeder Version zwei
+Archive: das **Vollpaket** für eine neue Installation und das **Update-Paket**
+mit nur den geänderten Dateien.
+
+**Mit dem Update-Paket** (empfohlen): Adminbereich → **Updates** → Archiv
+hochladen. Es wird vor dem Einspielen geprüft, `config.php` und `uploads/`
+bleiben unberührt. Kein FTP nötig.
+
+**Von Hand:**
+
 1. **Backup ziehen** (DB + `uploads/` + `config.php`)
 2. **Neue Dateien hochladen** – alte überschreiben
    - **NICHT überschreiben:** `config.php`, `uploads/`
@@ -372,8 +413,14 @@ Falls eine Migration nötig wäre (bei MINOR-Updates), liegt sie in `install/mig
 
 ## 🖼️ Logo / Branding
 
-- **Standard:** `assets/logo_default.svg`
-- **Eigenes Logo:** als `assets/logo_custom.svg` (oder .png) hochladen → wird automatisch verwendet
+- **Standard:** wird aus dem Forum-Namen erzeugt, es gibt keine Bilddatei dafür.
+  Ein angehängtes „Forum" oder „Community" fällt im Schriftzug weg, die Farbe
+  kommt aus der Akzentfarbe des Themes.
+- **Eigenes Logo:** `assets/logo.svg` (oder .png/.jpg/.webp) ablegen → wird
+  automatisch genommen. Ein **lokales SVG wird eingebettet**, nicht verlinkt —
+  `currentColor` darin geht damit in hell und dunkel mit.
+- **Über eine Adresse:** Adminbereich → **Design** → Logo-URL. Das wird als
+  Bild eingebunden, dann greift `currentColor` nicht.
 - **Theme-Farben:** im Admin unter **Design** anpassbar
 
 ---
@@ -437,7 +484,7 @@ Kurzfassung, ohne juristischen Anspruch:
 - Gibst du eine geänderte Fassung weiter **oder betreibst sie als Dienst im Netz**, musst du deinen Quelltext unter derselben Lizenz herausgeben. Genau das unterscheidet die AGPL von der GPL: bei Web-Software greift die GPL nicht, weil Betreiben keine Weitergabe ist.
 - Wer das Forum nur installiert und betreibt, ohne etwas zu ändern, muss gar nichts tun.
 
-> **Pflicht für Betreiber geänderter Fassungen (§ 13):** Nutzer müssen den Quelltext angeboten bekommen. Dafür gibt es die Einstellung **Quelltext-URL** im Adminbereich — sie hängt den Link an die „Powered by Forumix"-Zeile im Fußbereich. Wer den Code ändert, trägt dort sein eigenes Repository ein.
+> **Pflicht für Betreiber geänderter Fassungen (§ 13):** Nutzer müssen den Quelltext angeboten bekommen. Im Fußbereich steht dafür das Forumix-Zeichen, und das ist ein Link — ohne eigene Einstellung zeigt er auf forumix.de, wo der Quelltext liegt. Wer den Code **ändert**, trägt unter Adminbereich → **Design** → *Quelltext-URL* sein eigenes Repository ein; dann zeigt das Zeichen dorthin.
 
 ### Mitgelieferte Fremdbestandteile
 
