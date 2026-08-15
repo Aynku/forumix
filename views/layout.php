@@ -234,7 +234,16 @@ $forumName = forum_name();
           <?php
             $script = $_GET['_page'] ?? '';
             if ($script === '') $script = 'home';
-            $isHome = in_array($script, ['home', 'index', 'board', 'thread', 'new_thread', 'edit_post', 'tag'], true);
+
+            // Modulseiten laufen nicht ueber den Router, es gibt dort also kein
+            // _page. Ohne diese Unterscheidung faellt $script auf 'home' zurueck
+            // und die Forenuebersicht leuchtet, obwohl man auf einer Modulseite
+            // steht.
+            $aktuellerPfad = (string) (parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '');
+            $imModul       = str_contains($aktuellerPfad, '/modules/');
+
+            $isHome = !$imModul
+                && in_array($script, ['home', 'index', 'board', 'thread', 'new_thread', 'edit_post', 'tag'], true);
           ?>
           <a href="<?= e(FORUM_URL) ?>/index.php" class="<?= $isHome ? 'active' : '' ?>">
             📋 Forum
@@ -260,7 +269,9 @@ $forumName = forum_name();
           <?php /* Module melden ihre Punkte im Manifest an, siehe module_menu_links(). */ ?>
           <?php if (function_exists('module_menu_links')): ?>
             <?php foreach (module_menu_links() as $ml): ?>
-              <a href="<?= e($ml['url']) ?>"><?= e($ml['label']) ?></a>
+              <?php $mlPfad = (string) (parse_url($ml['url'], PHP_URL_PATH) ?: ''); ?>
+              <a href="<?= e($ml['url']) ?>"
+                 class="<?= ($mlPfad !== '' && $mlPfad === $aktuellerPfad) ? 'active' : '' ?>"><?= e($ml['label']) ?></a>
             <?php endforeach; ?>
           <?php endif; ?>
         </div>

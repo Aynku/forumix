@@ -8,6 +8,29 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.21.1 (2026-08-14)
+
+### 🐛 Auf einer Modulseite leuchtete der falsche Menuepunkt
+
+Wer die FAQ oeffnete, sah „📋 Forum" hervorgehoben. Grund: die Navigation
+liest den aktiven Punkt aus `_page`, und das setzt der Router. Eine Modulseite
+laeuft aber **nicht** ueber den Router — sie wird direkt aufgerufen. Ohne
+`_page` fiel die Ermittlung auf `home` zurueck, und damit galt die
+Forenuebersicht als aktiv.
+
+Der Fehler steckt seit dem ersten Modul im Layout; bei genau einem Modul ist
+er nur niemandem aufgefallen.
+
+Die Navigation vergleicht jetzt zusaetzlich den Pfad der laufenden Anfrage.
+Auf einer Modulseite leuchtet der Punkt des Moduls, und die Forenuebersicht
+bleibt dunkel.
+
+#### Geänderte Dateien
+- bootstrap.php (v0.21.1)
+- views/layout.php (Pfadvergleich statt nur `_page`)
+
+---
+
 ## v0.21.0 (2026-08-14)
 
 ### ✨ Drei Module und drei neue Einhaengepunkte
