@@ -2,8 +2,8 @@
 /**
  * Forumix – Web-Installer
  * --------------------------------------------------------------------------
- * Autark: lädt NICHT bootstrap.php, nutzt eine eigene PDO-Verbindung.
- * Setzt bei Aufruf von /install/ ein frisches Forum auf:
+ * Die eigentliche Arbeit steht in install/lib.php — dort, wo cli.php sie
+ * ebenfalls findet. Hier ist nur der Weg durch den Browser:
  *   1. Voraussetzungs-Check   (PHP, Erweiterungen, Schreibrechte, install.sql)
  *   2. DB-Verbindung          (Eingabe + Live-Test, Daten in Session)
  *   3. Schema anlegen         (install.sql ausführen)
@@ -18,30 +18,19 @@ declare(strict_types=1);
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
 session_start();
 
-define('INSTALL_DIR', __DIR__);
-define('FORUM_ROOT',  dirname(__DIR__));
-define('CONFIG_FILE', FORUM_ROOT . '/config.php');
-define('LOCK_FILE',   INSTALL_DIR . '/.installed');
-define('SQL_FILE',    INSTALL_DIR . '/install.sql');
-define('MIN_PHP',     '8.1.0');
+define('FORUM_INSTALLER', 'web');
+require __DIR__ . '/lib.php';
 
 /* ── Self-Destruct: bereits installiert? ──────────────────────────────── */
-$alreadyInstalled = file_exists(LOCK_FILE);
-if (!$alreadyInstalled && file_exists(CONFIG_FILE)) {
-    // Zusatz-Absicherung: config mit FORUM_INSTALLED=true => als installiert behandeln
-    $cfg = @file_get_contents(CONFIG_FILE);
-    if ($cfg !== false && preg_match('/FORUM_INSTALLED\s*,\s*true/i', $cfg)) {
-        $alreadyInstalled = true;
-    }
-}
-if ($alreadyInstalled) {
+if (install_already_done()) {
     http_response_code(403);
     render_page('Bereits installiert', '
         <div class="card">
             <h2>Forum ist bereits installiert</h2>
             <p>Dieser Installer wurde gesperrt, weil das Forum schon eingerichtet ist.</p>
-            <p class="hint">Aus Sicherheitsgründen sollte der Ordner <code>install/</code>
-            jetzt vom Server gelöscht werden.</p>
+            <p class="hint">Aus Sicherheitsgründen sollte im Ordner <code>install/</code>
+            jetzt alles gelöscht werden — <strong>außer</strong> dem Unterordner
+            <code>install/migrations/</code>, den das Forum für spätere Updates braucht.</p>
         </div>');
     exit;
 }
@@ -60,155 +49,6 @@ function csrf_ok(): bool {
 
 $step   = (int) ($_GET['step'] ?? 1);
 $errors = [];
-
-/* ════════════════════════════════════════════════════════════════════════
- *  Hilfsfunktionen
- * ════════════════════════════════════════════════════════════════════════ */
-
-function check_requirements(): array {
-    $r = [];
-    $r[] = ['PHP ≥ ' . MIN_PHP, version_compare(PHP_VERSION, MIN_PHP, '>='), 'Aktuell: ' . PHP_VERSION];
-    foreach (['pdo', 'pdo_mysql', 'mbstring', 'json', 'openssl'] as $ext) {
-        $r[] = ['Erweiterung ' . $ext, extension_loaded($ext), ''];
-    }
-    $r[] = ['install.sql vorhanden', is_readable(SQL_FILE), SQL_FILE];
-    $r[] = ['Forum-Root beschreibbar (für config.php)', is_writable(FORUM_ROOT), FORUM_ROOT];
-    // uploads/ ist optional vorhanden – nur warnen, nicht blockieren
-    $up = FORUM_ROOT . '/uploads';
-    $r[] = ['uploads/ beschreibbar', !is_dir($up) || is_writable($up),
-            is_dir($up) ? $up : '(wird ggf. später angelegt)'];
-    return $r;
-}
-
-function pdo_connect(array $c): PDO {
-    $dsn = sprintf('mysql:host=%s;dbname=%s;charset=%s', $c['host'], $c['name'], $c['charset']);
-    return new PDO($dsn, $c['user'], $c['pass'], [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES   => false,
-    ]);
-}
-
-/** Zerlegt eine SQL-Datei in einzelne Statements – string-aware (respektiert
- *  ' und " sowie Backslash-Escapes), damit Semikolons in Werten nicht trennen. */
-function split_sql(string $sql): array {
-    $out = []; $buf = ''; $inStr = false; $strCh = ''; $esc = false;
-    $len = strlen($sql);
-    for ($i = 0; $i < $len; $i++) {
-        $ch = $sql[$i];
-        $buf .= $ch;
-        if ($inStr) {
-            if ($esc)              { $esc = false; }
-            elseif ($ch === '\\')  { $esc = true; }
-            elseif ($ch === $strCh){ $inStr = false; }
-            continue;
-        }
-        if ($ch === "'" || $ch === '"') { $inStr = true; $strCh = $ch; }
-        elseif ($ch === ';') {
-            $out[] = $buf; $buf = '';
-        }
-    }
-    if (trim($buf) !== '') { $out[] = $buf; }
-
-    // Kommentarzeilen entfernen, Leeres verwerfen
-    $clean = [];
-    foreach ($out as $stmt) {
-        $lines = array_filter(
-            explode("\n", $stmt),
-            static fn($l) => strncmp(ltrim($l), '--', 2) !== 0
-        );
-        $s = trim(rtrim(trim(implode("\n", $lines)), ';'));
-        if ($s !== '') { $clean[] = $s; }
-    }
-    return $clean;
-}
-
-function run_schema(PDO $pdo): int {
-    $sql = file_get_contents(SQL_FILE);
-    if ($sql === false) {
-        throw new RuntimeException('install.sql konnte nicht gelesen werden.');
-    }
-    $count = 0;
-    foreach (split_sql($sql) as $stmt) {
-        $pdo->exec($stmt);
-        $count++;
-    }
-    return $count;
-}
-
-function setting_set(PDO $pdo, string $key, string $value): void {
-    // Die settings-Tabelle hat KEINE updated_at-Spalte (siehe install.sql).
-    // Statement identisch zum Laufzeit-Code in lib/settings.php::set_setting().
-    $pdo->prepare(
-        'INSERT INTO settings (setting_key, setting_value)
-         VALUES (?, ?)
-         ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)'
-    )->execute([$key, $value]);
-}
-
-function create_owner(PDO $pdo, string $user, string $email, string $pass): void {
-    $hash = password_hash($pass, PASSWORD_BCRYPT, ['cost' => 12]);
-    $ip   = $_SERVER['REMOTE_ADDR'] ?? null;
-    $pdo->prepare(
-        'INSERT INTO users
-            (user_id, username, password, email, is_admin, is_owner, is_mod,
-             email_verified, `rank`, registered_at, registration_ip, last_activity_at)
-         VALUES (1, ?, ?, ?, 1, 1, 0, 1, ?, NOW(), ?, NOW())'
-    )->execute([$user, $hash, $email, 'Inhaber', $ip]);
-}
-
-function write_config(array $c): bool {
-    $v = static fn($s) => var_export($s, true); // sicheres String-Quoting
-    $tpl = <<<PHP
-<?php
-// config.php – automatisch erzeugt durch den Installer am {DATE}
-
-define('DB_HOST',    {HOST});
-define('DB_NAME',    {NAME});
-define('DB_USER',    {USER});
-define('DB_PASS',    {PASS});
-define('DB_CHARSET', {CHARSET});
-
-define('FORUM_NAME',    {FNAME});
-define('FORUM_URL',     {FURL});
-define('FORUM_INSTALLED', true);
-
-// Schluessel fuer Werte, die verschluesselt in der Datenbank liegen — derzeit
-// das SMTP-Passwort. Er steht hier und nicht in der Datenbank, sonst laege er
-// neben dem, was er schuetzen soll.
-//
-// NICHT AENDERN und nicht verlieren: danach laesst sich das Gespeicherte nicht
-// mehr lesen. Beim Umzug auf einen anderen Server muss diese Zeile mit.
-define('FORUM_CRYPT_KEY', {CRYPTKEY});
-
-define('UPLOAD_DIR',           __DIR__ . '/uploads/');
-define('AVATAR_DIR',           __DIR__ . '/uploads/avatars/');
-define('MAX_AVATAR_SIZE',      512 * 1024);
-define('ALLOWED_AVATAR_TYPES', ['image/jpeg','image/png','image/gif','image/webp']);
-
-define('SESSION_LIFETIME', 60 * 60 * 24 * 14);
-define('POSTS_PER_PAGE',   20);
-define('THREADS_PER_PAGE', 25);
-define('HASH_COST',        12);
-PHP;
-    $out = strtr($tpl, [
-        '{DATE}'    => date('Y-m-d H:i'),
-        '{HOST}'    => $v($c['host']),
-        '{NAME}'    => $v($c['name']),
-        '{USER}'    => $v($c['user']),
-        '{PASS}'    => $v($c['pass']),
-        '{CHARSET}' => $v($c['charset']),
-        '{FNAME}'   => $v($c['forum_name']),
-        '{FURL}'    => $v($c['forum_url']),
-        '{CRYPTKEY}'=> $v(bin2hex(random_bytes(32))),
-    ]);
-    if (file_put_contents(CONFIG_FILE, $out) === false) {
-        return false;
-    }
-    // enthält die DB-Zugangsdaten im Klartext, nicht für andere lesbar
-    @chmod(CONFIG_FILE, 0640);
-    return true;
-}
 
 /* ════════════════════════════════════════════════════════════════════════
  *  POST-Handling pro Schritt
@@ -284,19 +124,7 @@ if ($step === 4) {
             $pass  = (string) ($_POST['owner_pass'] ?? '');
             $pass2 = (string) ($_POST['owner_pass2'] ?? '');
 
-            if (mb_strlen($user) < 3 || mb_strlen($user) > 30) {
-                $errors[] = 'Benutzername: 3 bis 30 Zeichen.';
-            } elseif (!preg_match('/^[\p{L}\p{N} ._-]+$/u', $user)) {
-                // gleiche Regel wie in pages/register.php
-                $errors[] = 'Benutzername darf nur Buchstaben, Ziffern, Leerzeichen, '
-                          . 'Punkt, Unterstrich und Bindestrich enthalten.';
-            }
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $errors[] = 'Bitte eine gültige E-Mail-Adresse angeben.';
-            }
-            if (mb_strlen($pass) < 8) {
-                $errors[] = 'Passwort: mindestens 8 Zeichen.';
-            }
+            $errors = array_merge($errors, validate_owner($user, $email, $pass));
             if ($pass !== $pass2) {
                 $errors[] = 'Die beiden Passwörter stimmen nicht überein.';
             }
@@ -311,7 +139,8 @@ if ($step === 4) {
                         $errors[] = 'Es existiert bereits ein Benutzer. Bitte die '
                                   . 'users-Tabelle leeren oder den Schema-Schritt erneut ausführen.';
                     } else {
-                        create_owner($pdo, $user, $email, $pass);
+                        create_owner($pdo, $user, $email, $pass,
+                                     $_SERVER['REMOTE_ADDR'] ?? null);
                         // CAPTCHA-HMAC-Secret erzeugen (gleiches Lazy-Pattern wie unsubscribe_secret)
                         setting_set($pdo, 'forum_secret', bin2hex(random_bytes(32)));
                         setting_set($pdo, 'forum_name',   $c['forum_name']);
@@ -502,8 +331,11 @@ if ($step === 5) {
     echo '<div class="card"><h2 class="ok-big">✓ Installation abgeschlossen</h2>
     <p>Das Forum ist eingerichtet. <code>config.php</code> wurde geschrieben und der
        Installer ist ab jetzt gesperrt.</p>
-    <div class="warn">🔒 <strong>Letzter Schritt:</strong> Bitte den Ordner
-       <code>install/</code> vom Server löschen.</div>
+    <div class="warn">🔒 <strong>Letzter Schritt:</strong> Bitte im Ordner
+       <code>install/</code> die Dateien <code>index.php</code>, <code>cli.php</code>,
+       <code>lib.php</code> und <code>install.sql</code> löschen.<br>
+       Den Unterordner <code>install/migrations/</code> <strong>stehen lassen</strong> —
+       daraus holt sich der Adminbereich die Datenbank-Anpassungen späterer Updates.</div>
     <a class="btn" href="' . htmlspecialchars(rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '', 2), '/') . '/') . '">Zum Forum →</a>
     </div>';
 }

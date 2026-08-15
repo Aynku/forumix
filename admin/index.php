@@ -177,6 +177,16 @@ if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // der Seite steht.
     $keepIfEmpty = ['smtp_pass'];
 
+    // Steht der Absender fest in der config.php, ist das Feld im Formular
+    // gesperrt. Das allein reicht nicht: gesperrt ist es nur im Browser, und
+    // ein Formular laesst sich auch ohne Browser abschicken. Deshalb faellt
+    // der Wert hier heraus, bevor irgendetwas gespeichert wird.
+    $festeAbsender = array_filter([
+        'smtp_from'      => defined('FORUM_MAIL_FROM'),
+        'smtp_from_name' => defined('FORUM_MAIL_FROM_NAME'),
+    ]);
+    $allowed = array_diff($allowed, array_keys($festeAbsender));
+
     foreach ($allowed as $key) {
         if (in_array($key, $booleans, true)) {
             set_setting($key, isset($_POST[$key]) ? '1' : '0');

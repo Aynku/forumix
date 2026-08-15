@@ -3,7 +3,7 @@
 Ein vollständiges Community-Forum in nativem PHP. **Keine externen Abhängigkeiten, kein Composer, kein Framework, kein Build-Schritt.**
 
 ```
-Aktuelle Version: 0.21.2 Beta
+Aktuelle Version: 0.22.2 Beta
 Projektseite:     https://forumix.de
 Zum Ausprobieren: https://forum.forumix.de   ← läuft selbst mit Forumix
 Download:         https://forumix.de/#download
@@ -109,10 +109,47 @@ auch Fragen und Fehlermeldungen auf.
    - Admin-Account anlegen → wird automatisch zum **Owner**
    - Fertig
 
-6. **`install/`-Ordner löschen** (Wichtig!)
+6. **Installer entfernen** (Wichtig!)
    ```bash
-   rm -rf install/
+   rm install/index.php install/cli.php install/lib.php install/install.sql install/.installed
    ```
+
+   > ⚠️ Den Unterordner **`install/migrations/` stehen lassen.** Daraus holt der
+   > Adminbereich die Datenbank-Anpassungen späterer Updates. Ist er weg, zeigt
+   > die Update-Seite einfach nichts an — ohne Fehlermeldung — und die
+   > Anpassungen laufen nie.
+
+### Ohne Browser: Installer auf der Kommandozeile
+
+Wer SSH hat, spart sich die vier Formularseiten. Die Angaben kommen als JSON,
+nicht als Argumente — Argumente stehen in `ps` und wären damit für jeden
+anderen Benutzer der Maschine lesbar, samt beider Passwörter.
+
+```bash
+cat > setup.json <<'JSON'
+{
+  "db":    {"host":"localhost","name":"forum","user":"forum_user","pass":"…"},
+  "forum": {"name":"Mein Forum","url":"https://forum.example.com"},
+  "owner": {"user":"Chef","email":"chef@example.com","pass":"…"},
+  "cleanup": true
+}
+JSON
+chmod 600 setup.json
+php install/cli.php --config=setup.json && rm setup.json
+```
+
+`"cleanup": true` räumt den Installer nach Erfolg selbst weg (und lässt
+`migrations/` stehen). Über `"extra"` lassen sich zusätzliche Konstanten in die
+`config.php` schreiben, etwa ein fest verankerter Mail-Absender:
+
+```json
+"extra": {"FORUM_MAIL_FROM": "noreply@example.com"}
+```
+
+Ist die Konstante gesetzt, gewinnt sie immer und das Feld im Adminbereich ist
+gesperrt. Ohne sie bleibt alles wie gehabt. Gedacht für Installationen, die
+jemand anderes betreibt als der Forum-Admin: dort hängt der Versand an fremder
+Reputation.
 
 ---
 
@@ -347,9 +384,12 @@ forum/
 │   ├── attachments/
 │   └── banners/
 │
-└── 📂 install/              ← Installer (nach Setup löschen!)
-    ├── index.php
-    └── install.sql
+└── 📂 install/
+    ├── index.php            ← Installer im Browser (nach Setup löschen)
+    ├── cli.php              ← Installer auf der Kommandozeile (nach Setup löschen)
+    ├── lib.php              ← gemeinsamer Kern beider Wege (nach Setup löschen)
+    ├── install.sql          ← Schema (nach Setup löschen)
+    └── 📂 migrations/       ← BLEIBT: DB-Anpassungen späterer Updates
 ```
 
 ### Module
@@ -428,7 +468,7 @@ Falls eine Migration nötig wäre (bei MINOR-Updates), liegt sie in `install/mig
 ## 🔐 Sicherheits-Tipps
 
 ### Nach der Installation
-- ✅ `install/`-Ordner löschen
+- ✅ Installer löschen (`install/index.php`, `cli.php`, `lib.php`, `install.sql`) — `install/migrations/` stehen lassen
 - ✅ Owner-Account: starkes Passwort + 2FA aktivieren
 - ✅ DB-User nur auf das eine Schema berechtigt
 - ✅ `config.php` darf nicht öffentlich lesbar sein (siehe nginx-Block)

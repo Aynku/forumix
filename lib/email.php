@@ -11,8 +11,17 @@ if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
 function send_email(string $to, string $subject, string $body, bool $html = true): bool {
     if (!filter_var($to, FILTER_VALIDATE_EMAIL)) return false;
 
-    $fromAddr = (string) get_setting('smtp_from', '');
-    $fromName = (string) get_setting('smtp_from_name', FORUM_NAME);
+    // Steht der Absender in der config.php, gewinnt er immer. Gedacht fuer
+    // Installationen, die jemand anderes betreibt als der Admin des Forums:
+    // dort haengt der Versand an fremder Reputation, und ein frei gesetzter
+    // Absender kostet nicht den Absender, sondern den Betreiber.
+    // Ohne die Konstante bleibt alles wie gehabt — Feld im Adminbereich.
+    $fromAddr = defined('FORUM_MAIL_FROM')
+        ? (string) FORUM_MAIL_FROM
+        : (string) get_setting('smtp_from', '');
+    $fromName = defined('FORUM_MAIL_FROM_NAME')
+        ? (string) FORUM_MAIL_FROM_NAME
+        : (string) get_setting('smtp_from_name', FORUM_NAME);
 
     if (!$fromAddr) {
         $host = parse_url(FORUM_URL, PHP_URL_HOST) ?: 'localhost';

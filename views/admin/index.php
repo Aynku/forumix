@@ -966,6 +966,14 @@
             </div>
             <div class="form-row">
               <label>Absender-E-Mail</label>
+              <?php if (defined('FORUM_MAIL_FROM')): ?>
+                <input type="email" value="<?= e(FORUM_MAIL_FROM) ?>" disabled>
+                <div class="form-hint">
+                  Diese Installation hat den Absender in der <code>config.php</code>
+                  festgelegt. Er lässt sich hier nicht ändern — der Versand läuft über
+                  den Server des Betreibers, und dessen Zustellbarkeit hängt daran.
+                </div>
+              <?php else: ?>
               <input type="email" name="smtp_from" value="<?= e($settings['smtp_from'] ?? '') ?>"
                      placeholder="noreply@deine-domain.de">
               <div class="form-hint">
@@ -976,11 +984,17 @@
                 einer Subdomain ohne eigene Einträge geht unbeglaubigt raus.
                 Nimm eine Adresse der Domain, für die Versand eingerichtet ist.
               </div>
+              <?php endif; ?>
             </div>
             <div class="form-row">
               <label>Absender-Name</label>
+              <?php if (defined('FORUM_MAIL_FROM_NAME')): ?>
+                <input type="text" value="<?= e(FORUM_MAIL_FROM_NAME) ?>" disabled>
+                <div class="form-hint">In der <code>config.php</code> festgelegt.</div>
+              <?php else: ?>
               <input type="text" name="smtp_from_name" value="<?= e($settings['smtp_from_name'] ?? '') ?>"
                      placeholder="<?= e(FORUM_NAME) ?>">
+              <?php endif; ?>
             </div>
           </div>
 
