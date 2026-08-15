@@ -8,6 +8,42 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.20.0 (2026-08-14)
+
+### ✨ Neues Modul: Downloads
+
+Dateiablage mit eigener Seite unter `/modules/downloads/downloads.php`.
+Admins stellen Dateien ein und gruppieren sie ueber ein freies Kategoriefeld,
+lesen und herunterladen darf jeder. Je Eintrag werden die Abrufe gezaehlt.
+
+Die Regeln fuer Dateien sind **dieselben wie bei den Beitrags-Anhaengen** des
+Kerns: der Typ wird am Inhalt bestimmt statt am Namen, es gilt dieselbe
+Liste erlaubter Typen, und der Name auf der Platte wird erzeugt
+(`dl_<zufall>.<endung>`). Der Name des Hochladenden liegt getrennt daneben und
+kommt nur beim Ausliefern zum Einsatz.
+
+Ausgeliefert wird ueber `datei.php` statt ueber einen direkten Link ins
+Upload-Verzeichnis. Das kostet einen Umweg, bringt aber drei Dinge: die Abrufe
+lassen sich zaehlen, der Name auf der Platte bleibt unsichtbar, und wer spaeter
+eine Zugangsregel einbauen will, hat genau eine Stelle dafuer. Der Dateiname in
+der Kopfzeile wird von Zeilenumbruechen und Anfuehrungszeichen befreit, sonst
+liesse sich der Kopfzeilen-Satz von aussen erweitern.
+
+Schlaegt das Speichern in der Datenbank fehl, wird die bereits abgelegte Datei
+wieder entfernt — sonst laege sie ohne Eintrag herum und waere weder sichtbar
+noch loeschbar.
+
+Standardmaessig ist das Modul **aus**. Adminbereich → Module → einschalten.
+
+#### Neue Dateien
+- modules/downloads/module.php
+- modules/downloads/install.sql
+- modules/downloads/downloads.php
+- modules/downloads/datei.php
+- modules/downloads/views/downloads.php
+
+---
+
 ## v0.19.1 (2026-08-14)
 
 ### 🧭 Module melden ihren Menuepunkt selbst an
