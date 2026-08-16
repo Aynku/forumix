@@ -918,10 +918,19 @@ if (in_array($action, ['approve_thread', 'approve_post', 'reject_thread', 'rejec
 if ($action === 'run_migration' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
 
-    // Admin oder Owner (require_admin oben deckt es bereits ab)
+    // Von aussen betreute Installation: der Betreiber des Dienstes faehrt die
+    // Migrationen, hier ist der Weg zu. Riegel im Handler, nicht nur in der
+    // Ansicht — eine ausgeblendete Schaltflaeche ist keine Sicherung.
+    if (update_extern()) {
+        flash('Diese Installation wird vom Betreiber aktuell gehalten. Migrationen laufen dort.', 'error');
+        redirect(FORUM_URL . '/admin/?action=updates');
+    }
+
+    // Nur der Owner. Eine Migration aendert das Schema unter laufendem Betrieb;
+    // das ist Sache des Inhabers, nicht jedes Admins, den er ernannt hat.
     $cu = current_user();
-    if (empty($cu['is_owner']) && empty($cu['is_admin'])) {
-        flash('Nur Admins/Owner dürfen Migrationen ausführen.', 'error');
+    if (empty($cu['is_owner'])) {
+        flash('Nur der Owner darf Migrationen ausführen.', 'error');
         redirect(FORUM_URL . '/admin/?action=updates');
     }
 
@@ -939,6 +948,12 @@ if ($action === 'run_migration' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 // ─── UPDATE-PAKET HOCHLADEN (v0.18.54) ────────────────────────────
 if ($action === 'upload_update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+
+    // Von aussen betreute Installation: hier wird nichts eingespielt.
+    if (update_extern()) {
+        flash('Diese Installation wird vom Betreiber aktuell gehalten. Update-Pakete können hier nicht eingespielt werden.', 'error');
+        redirect(FORUM_URL . '/admin/?action=updates');
+    }
 
     // STRENG: Nur der Owner darf Pakete einspielen (RCE-Vektor)
     $cu = current_user();
@@ -1570,7 +1585,11 @@ switch ($action) {
 
         $vars['migrations'] = $available;
         $vars['executed']   = $executed;
-        $vars['canUpload']  = !empty(current_user()['is_owner']);
+        $vars['extern']     = update_extern();
+        // Bei externer Betreuung liegt der Weg still — dann auch keine
+        // Schaltflaeche, die beim Druecken nur eine Absage zurueckgibt.
+        $vars['canUpload']  = !update_extern() && !empty(current_user()['is_owner']);
+        $vars['canMigrate'] = !update_extern() && !empty(current_user()['is_owner']);
 
         // v0.18.54: Detail-Ergebnis der letzten Installation (einmalig anzeigen)
         $vars['updateResult'] = $_SESSION['_update_result'] ?? null;

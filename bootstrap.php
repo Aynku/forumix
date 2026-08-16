@@ -153,7 +153,7 @@ if (!defined('FORUM_DEBUG') || FORUM_DEBUG !== true) {
 // die Anzeige im Footer und im Cache-Busting immer aktuell, ohne dass
 // manuell SQL gefahren werden muss.
 //
-const FORUM_VERSION_CODE = '0.24.0 Beta';
+const FORUM_VERSION_CODE = '0.25.0 Beta';
 
 // Heimat der Software. Das Forumix-Zeichen im Fussbereich verweist hierher —
 // dort liegt auch der Quelltext, womit AGPLv3 § 13 erfuellt ist. Wer den Code
@@ -195,6 +195,22 @@ try {
         define('FORUM_VERSION_DB', $dbVersion);
     }
 } catch (Exception $e) {}
+
+/**
+ * Wird diese Installation von aussen aktuell gehalten?
+ *
+ * `define('FORUM_UPDATE_EXTERN', true)` in der config.php schaltet den
+ * Update-Weg im Adminbereich ab: keine Pakete einspielen, keine Migrationen
+ * ausloesen. Gedacht fuers Hosting — dort steht in der Leistungsbeschreibung,
+ * dass der Betreiber des Dienstes die Installation aktuell haelt, und ein
+ * Paket-Upload ist per Bauart Codeausfuehrung auf fremdem Webspace.
+ *
+ * Die Seite bleibt sichtbar und zeigt Version und Verlauf weiter. Deaktiviert,
+ * nicht geloescht: eine Seite, die fehlt, liest sich wie ein Fehler.
+ */
+function update_extern(): bool {
+    return defined('FORUM_UPDATE_EXTERN') && FORUM_UPDATE_EXTERN;
+}
 
 /**
  * Liefert die aktuelle Forum-Version.

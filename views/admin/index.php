@@ -2498,6 +2498,22 @@
     <?php elseif ($action === 'updates'): ?>
       <h2>🚀 Forum-Updates</h2>
 
+      <?php /* ── Von aussen betreut (v0.25.0) ── */ ?>
+      <?php if (!empty($extern)): ?>
+      <div class="card" style="margin-bottom:18px;padding:18px 22px;border-left:3px solid var(--color-accent)">
+        <h3 style="margin:0 0 8px">🛠️ Updates macht der Betreiber</h3>
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin:0">
+          Dieses Forum wird gehostet. Server, Datenbank und Zertifikat stellt der Betreiber
+          des Dienstes — und er hält die Installation aktuell. Neue Versionen werden dort
+          eingespielt, du musst nichts tun und kannst hier nichts einspielen.
+        </p>
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin:10px 0 0">
+          Installierte Version: <strong><?= e(forum_version()) ?></strong>.
+          Was bisher gelaufen ist, steht unten im Verlauf.
+        </p>
+      </div>
+      <?php endif; ?>
+
       <?php /* ── Update-Paket hochladen (v0.18.54, nur Owner) ── */ ?>
       <?php if (!empty($canUpload)): ?>
       <div class="card" style="margin-bottom:18px;padding:20px 22px">
@@ -2527,7 +2543,7 @@
           Alles andere → Abbruch. Pfad-Traversal (<code>..</code>) wird blockiert.
         </div>
       </div>
-      <?php else: ?>
+      <?php elseif (empty($extern)): ?>
       <div class="card" style="margin-bottom:18px;padding:16px 20px;background:var(--bg-surface2);border-left:3px solid var(--color-warning)">
         <p style="font-size:13px;color:var(--text-muted);margin:0">
           ℹ️ Update-Pakete können nur vom <strong>Owner</strong> eingespielt werden.
@@ -2581,6 +2597,7 @@
                 <td><?= e($m['name']) ?></td>
                 <td><span class="role-tag" style="background:#f59e0b">⏳ Ausstehend</span></td>
                 <td style="text-align:right">
+                  <?php if (!empty($canMigrate)): ?>
                   <form method="post" action="?action=run_migration" style="display:inline">
                     <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                     <input type="hidden" name="version" value="<?= e($m['version']) ?>">
@@ -2589,6 +2606,11 @@
                       ▶️ Jetzt ausführen
                     </button>
                   </form>
+                  <?php elseif (!empty($extern)): ?>
+                  <span style="font-size:12px;color:var(--text-muted)">läuft über den Betreiber</span>
+                  <?php else: ?>
+                  <span style="font-size:12px;color:var(--text-muted)">nur der Owner</span>
+                  <?php endif; ?>
                 </td>
               </tr>
             <?php endforeach; ?>

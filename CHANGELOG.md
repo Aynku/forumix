@@ -8,6 +8,60 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.25.0 (2026-08-16)
+
+### 🛠️ Betreute Installationen: `FORUM_UPDATE_EXTERN`
+
+Steht `define('FORUM_UPDATE_EXTERN', true)` in der `config.php`, laeuft der
+Update-Weg im Adminbereich still: keine Pakete einspielen, keine Migrationen
+ausloesen. **Ohne die Konstante aendert sich nichts.**
+
+Gedacht fuers Hosting. Wer ein Forum gestellt bekommt, bekommt auch die
+Aktualisierung gestellt — und ein Paket-Upload ist per Bauart Codeausfuehrung
+auf fremdem Webspace, den sich der Betreiber mit anderen teilt.
+
+Der Riegel sitzt in beiden Handlern, nicht nur in der Ansicht: eine
+ausgeblendete Schaltflaeche ist keine Sicherung. Die Seite selbst bleibt und
+zeigt Version und Verlauf weiter; statt der Schaltflaechen steht dort, wer sich
+kuemmert. Eine Seite, die fehlt, liest sich wie ein Fehler.
+
+### 🔒 Migrationen nur noch vom Owner
+
+Vorher durfte sie jeder Admin ausloesen. Eine Migration aendert das Schema
+unter laufendem Betrieb — das ist Sache des Inhabers, nicht jedes Admins, den
+er ernannt hat. **Wer bisher als Admin migriert hat, kann das nicht mehr**; der
+Owner kann es weiterhin.
+
+### ⌨️ `install/migrate.php` — Migrationen ohne Browser
+
+    php install/migrate.php --status          zeigt, was aussteht
+    php install/migrate.php                   faehrt alle ausstehenden
+    php install/migrate.php --version=v18_56  faehrt genau eine
+    php install/migrate.php --json            Ausgabe fuer Maschinen
+
+Bisher gab es die Anpassungen nur klickweise im Adminbereich. Fuer eine
+betreute Installation ist das kein Weg — dort faehrt sie der Betreiber von
+aussen mit.
+
+Die Datei bleibt beim Aufraeumen liegen, wie `install/migrations/` auch, und
+macht deshalb ueber HTTP hart dicht (`PHP_SAPI !== 'cli'` → 403). Sie verlaesst
+sich nicht darauf, dass eine Konstante fehlt.
+
+Bricht eine Migration ab, laeuft der Rest NICHT weiter: die naechste Anpassung
+baut in aller Regel auf der vorigen auf, und wer durchlaeuft, macht aus einem
+Fehler zwei.
+
+### 📦 Fuer Paketbauer
+
+Ab hier gilt: **jede Datenbankaenderung bekommt eine Migrationsdatei, und die
+bleibt im Paket** — mindestens zurueck bis zur aeltesten Version, die noch
+irgendwo laeuft. Nicht ueber `update.sql`; das steckt nur im Updatepaket, und
+betreute Installationen bekommen das Vollpaket. Fehlt die Datei, liefert
+`available_migrations()` eine leere Liste: kein Fehler, keine Warnung, neuer
+Code auf alter Tabelle.
+
+---
+
 ## v0.24.0 (2026-08-15)
 
 ### 📧 Stundengrenze fuer den Mailversand
