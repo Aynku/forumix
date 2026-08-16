@@ -448,7 +448,7 @@ Beim ersten Request nach dem Upload macht sich das Forum selbst zurecht:
 - Versionsnummer in der DB wird automatisch hochgesetzt (Self-Healing)
 - Footer zeigt sofort die neue Version
 
-Falls eine Migration nötig wäre (bei MINOR-Updates), liegt sie in `install/migrations/` und wird im Admin unter **System → Updates** angeboten.
+Falls eine Migration nötig wäre (bei MINOR-Updates), liegt sie in `install/migrations/` und wird im Admin unter **Wartung → Updates** angeboten.
 
 ### Details pro Version → [CHANGELOG.md](CHANGELOG.md)
 

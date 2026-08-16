@@ -1,7 +1,7 @@
 # Datenbank-Anpassungen
 
 Hier liegen die Migrationen: `migrate_v<version>.php`, eine je Änderung am
-Schema. Gefahren werden sie im Adminbereich unter *Updates* oder ohne Browser
+Schema. Gefahren werden sie im Adminbereich unter *Wartung → Updates* oder ohne Browser
 mit `php install/migrate.php`.
 
 **Der Ordner bleibt stehen, auch wenn er leer ist.** Er ist die einzige Quelle
