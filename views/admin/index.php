@@ -48,6 +48,10 @@
                   'templates' => '🖼️ Templates',
               ],
           ],
+          // System ist, wie die Installation EINGESTELLT ist. Wartung ist, was
+          // man an ihr TUT. Backups und Updates standen bei den Einstellungen
+          // und gehoeren nach dieser Regel herueber — zumal sie ein Handgriff
+          // sind: Sicherung anlegen, Update einspielen, notfalls Wartungsmodus.
           'system' => [
               'label' => '⚙️ System',
               'items' => [
@@ -55,13 +59,13 @@
                   'email'        => '📧 E-Mail',
                   'registration' => '📝 Registrierung',
                   'modules'      => '🧩 Module',
-                  'backups'      => '💾 Backups',
-                  'updates'      => '🚀 Updates',
               ],
           ],
           'maintenance_group' => [
               'label' => '🛠️ Wartung',
               'items' => [
+                  'backups'           => '💾 Backups',
+                  'updates'           => '🚀 Updates',
                   'maintenance_mode'  => '🛠️ Wartungsmodus',
                   'maintenance'       => '🧹 Tools',
               ],
