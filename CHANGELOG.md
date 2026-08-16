@@ -8,6 +8,32 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.25.1 (2026-08-16)
+
+### 🛠️ Backups und Updates stehen jetzt unter Wartung
+
+Die Trennung war unscharf: unter *System* standen vier Einstellungsseiten und
+zwei Handlungsseiten. Die Regel, die traegt — **System ist, wie die
+Installation eingestellt ist; Wartung ist, was man an ihr tut.**
+
+Backups geht mit. Nur *Updates* zu verschieben haette das Paar
+auseinandergerissen, und es ist ein Handgriff: Sicherung anlegen, Update
+einspielen, notfalls Wartungsmodus.
+
+### 🧹 `migrate_v18_56.php` entfernt
+
+Sie verbreiterte `users.pending_email_token` auf `VARCHAR(255)`. Schon das
+aelteste je veroeffentlichte Paket — 0.18.58 — legt die Spalte so an; eine
+Installation, der sie fehlen koennte, muesste aelter als 0.18.56 sein, und so
+eine wurde nie ausgeliefert.
+
+**`install/migrations/` bleibt** und traegt jetzt eine README mit der Regel
+fuer kuenftige Freigaben. Der Ordner ist die einzige Quelle fuer
+`available_migrations()`; fehlt er, kommt eine leere Liste zurueck — ohne
+Fehler und ohne Warnung.
+
+---
+
 ## v0.25.0 (2026-08-16)
 
 ### 🛠️ Betreute Installationen: `FORUM_UPDATE_EXTERN`
