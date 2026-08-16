@@ -240,7 +240,10 @@ function forum_accent_color(): string {
         $c = get_setting('forum_accent_color');
         if ($c && preg_match('/^[a-fA-F0-9]{6}$/', $c)) return $c;
     } catch (Exception $e) {}
-    return '4f46e5'; // Default-Indigo
+    // Default-Indigo. Dieselbe Farbe steht in install/install.sql — beide
+    // muessen zusammenpassen, sonst kommt jede frische Installation in einer
+    // anderen Farbe hoch als der Code fuer den Standard haelt.
+    return '4f46e5';
 }
 
 /**

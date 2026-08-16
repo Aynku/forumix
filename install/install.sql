@@ -567,7 +567,12 @@ INSERT IGNORE INTO `settings` (`setting_key`, `setting_value`) VALUES
   ('forum_version',          '0.18.52 Beta'),
   ('forum_footer_text',      ''),
   ('forum_footer_links',     ''),
-  ('forum_accent_color',     '7c3aed'),
+  -- Muss zum Rueckfall in bootstrap.php (forum_accent_color) passen. Der wird
+  -- nie erreicht, weil der Installer die Einstellung immer schreibt — stand
+  -- hier ein anderer Wert, kam JEDE frische Installation in einer Farbe hoch,
+  -- die der Code fuer den Standard nicht haelt. Bis 0.25.1 war das so: Code
+  -- sagte Indigo, Installer schrieb Violett.
+  ('forum_accent_color',     '4f46e5'),
   ('show_ips_to_mods',       '1'),
   ('warning_ban_threshold',  '10'),
   ('registration_enabled',   '1'),
