@@ -8,6 +8,22 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.25.3 (2026-08-16)
+
+### 📝 „Betreiber" hiess zwei verschiedene Dinge
+
+Auf betreuten Installationen stand ueber der Update-Seite *„Updates macht der
+Betreiber"*. Wer das liest, ist selbst Betreiber seines Forums — die
+Ueberschrift sagte ihm also „das machst du", und der Satz darunter das
+Gegenteil. Dazu „haelt die Installation aktuell" und „werden dort eingespielt":
+zweimal dasselbe, und „dort" zeigte auf nichts.
+
+Jetzt heisst es **Anbieter**, an allen vier Stellen — Ueberschrift, Text, die
+beiden abweisenden Meldungen und der Hinweis am festgelegten Mail-Absender.
+Das Wort kollidiert mit nichts und sagt, wer gemeint ist.
+
+---
+
 ## v0.25.2 (2026-08-16)
 
 ### 🛠️ Betreute Installationen: auch die Hinweise passen jetzt
