@@ -922,7 +922,7 @@ if ($action === 'run_migration' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Migrationen, hier ist der Weg zu. Riegel im Handler, nicht nur in der
     // Ansicht — eine ausgeblendete Schaltflaeche ist keine Sicherung.
     if (update_extern()) {
-        flash('Diese Installation wird von deinem Anbieter aktuell gehalten. Migrationen laufen dort.', 'error');
+        flash('Diese Installation aktualisiert der Betreiber des Dienstes. Migrationen laufen dort.', 'error');
         redirect(FORUM_URL . '/admin/?action=updates');
     }
 
@@ -951,7 +951,7 @@ if ($action === 'upload_update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Von aussen betreute Installation: hier wird nichts eingespielt.
     if (update_extern()) {
-        flash('Diese Installation wird von deinem Anbieter aktuell gehalten. Hier lassen sich keine Pakete einspielen.', 'error');
+        flash('Diese Installation aktualisiert der Betreiber des Dienstes. Hier lassen sich keine Pakete einspielen.', 'error');
         redirect(FORUM_URL . '/admin/?action=updates');
     }
 

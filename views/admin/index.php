@@ -975,7 +975,7 @@
                 <div class="form-hint">
                   Diese Installation hat den Absender in der <code>config.php</code>
                   festgelegt. Er lässt sich hier nicht ändern — der Versand läuft über
-                  den Server deines Anbieters, und dessen Zustellbarkeit hängt daran.
+                  den Server des Betreibers, und dessen Zustellbarkeit hängt daran.
                 </div>
               <?php else: ?>
               <input type="email" name="smtp_from" value="<?= e($settings['smtp_from'] ?? '') ?>"
@@ -2505,12 +2505,11 @@
       <?php /* ── Von aussen betreut (v0.25.0) ── */ ?>
       <?php if (!empty($extern)): ?>
       <div class="card" style="margin-bottom:18px;padding:18px 22px;border-left:3px solid var(--color-accent)">
-        <h3 style="margin:0 0 8px">🛠️ Um Updates kümmert sich dein Anbieter</h3>
+        <h3 style="margin:0 0 8px">🛠️ Updates macht der Betreiber des Dienstes</h3>
         <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin:0">
-          Dieses Forum wird für dich betrieben: Server, Datenbank und Zertifikat kommen
-          von der Stelle, die es dir eingerichtet hat — und von dort kommen auch neue
-          Forumix-Versionen. Du musst dafür nichts tun, und hier lässt sich nichts
-          einspielen.
+          Dieses Forum wird gehostet: Server, Datenbank und Zertifikat stellt der
+          Betreiber des Dienstes, und von dort kommen auch neue Forumix-Versionen.
+          Du musst dafür nichts tun, und hier lässt sich nichts einspielen.
         </p>
         <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin:10px 0 0">
           Installierte Version: <strong><?= e(forum_version()) ?></strong>.
@@ -2612,7 +2611,7 @@
                     </button>
                   </form>
                   <?php elseif (!empty($extern)): ?>
-                  <span style="font-size:12px;color:var(--text-muted)">macht dein Anbieter</span>
+                  <span style="font-size:12px;color:var(--text-muted)">macht der Betreiber</span>
                   <?php else: ?>
                   <span style="font-size:12px;color:var(--text-muted)">nur der Owner</span>
                   <?php endif; ?>

@@ -8,6 +8,26 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.25.4 (2026-08-16)
+
+### 📝 Wortwahl auf betreuten Installationen
+
+0.25.3 hatte „Betreiber" durch „Anbieter" ersetzt und den Text dabei
+verschwurbelt („von der Stelle, die es dir eingerichtet hat"). Der Grund war ein
+Denkfehler: „Betreiber" kollidiert im HOSTING-DIENST, wo die Kundentabelle so
+heisst — im Forum selbst heisst niemand so, dort gibt es Inhaber, Admins und
+Moderatoren.
+
+Jetzt steht ueberall **Betreiber des Dienstes**, und die Abweisungen sagen
+aktiv „Diese Installation aktualisiert der Betreiber des Dienstes" statt
+„wird aktuell gehalten".
+
+Auch die Wegbeschreibungen zeigen jetzt auf **Wartung → Updates** — der Punkt
+ist in 0.25.1 dorthin gewandert, README und Projektseite schickten Leute
+weiter an die alte Stelle.
+
+---
+
 ## v0.25.3 (2026-08-16)
 
 ### 📝 „Betreiber" hiess zwei verschiedene Dinge
