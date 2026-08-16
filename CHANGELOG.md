@@ -8,6 +8,38 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.25.2 (2026-08-16)
+
+### 🛠️ Betreute Installationen: auch die Hinweise passen jetzt
+
+Unter dem Satz „Updates macht der Betreiber" stand weiter der Kasten *Wichtige
+Hinweise* — „vor jedem Update ein Backup anlegen", „nur der Owner kann Pakete
+einspielen", „bei Fehlern das Backup zurückspielen". Rat fuer eine Handlung,
+die es dort gar nicht gibt, zwei Zeilen unter der Ansage, dass sich jemand
+anderes kuemmert.
+
+Der Kasten erscheint nur noch, wo man selbst einspielt.
+
+### 🎨 Frische Installationen kommen indigo hoch, nicht violett
+
+`bootstrap.php` nennt `4f46e5` den Standard („Default-Indigo"), `install.sql`
+schrieb `7c3aed`. Der Rueckfall im Code wird nie erreicht — der Installer
+schreibt die Einstellung immer — also gewann seit jeher der Installer, und
+jedes neue Forum war violett. Der Wert stand seit der ersten Bestandsaufnahme
+so drin; das war keine Entscheidung.
+
+**Betrifft nur neue Installationen.** Bestehende behalten ihre Farbe.
+
+### 📁 `install/migrations/README.md`
+
+Die Regel fuers Aufraeumen steht jetzt dort, wo jemand steht, wenn er eine
+Migration anlegt oder wegwirft: `install.sql` ist der Schnitt, und Wegwerfen
+ist eine Zusage („Aufstieg ab X"), keine Aufraeumarbeit. Nachtraeglich pruefen
+laesst es sich nicht — `bootstrap.php` zieht `forum_version` beim ersten Aufruf
+hoch und ueberschreibt damit die Herkunft.
+
+---
+
 ## v0.25.1 (2026-08-16)
 
 ### 🛠️ Backups und Updates stehen jetzt unter Wartung

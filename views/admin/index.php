@@ -2672,7 +2672,11 @@
       </div>
       <?php endif; ?>
 
-      <?php /* ── Hinweise ── */ ?>
+      <?php /* ── Hinweise ──
+             Nur dort, wo man selbst einspielt. Auf einer betreuten Installation
+             wäre es Rat für eine Handlung, die es nicht gibt — und stünde zwei
+             Zeilen unter dem Satz, dass sich der Betreiber kümmert. ── */ ?>
+      <?php if (empty($extern)): ?>
       <div class="card" style="margin-top:18px;padding:16px 20px;background:var(--bg-surface2);border-left:3px solid var(--color-warning)">
         <strong style="font-size:13px">⚠️ Wichtige Hinweise</strong>
         <ul style="margin:8px 0 0 18px;font-size:12px;color:var(--text-muted);line-height:1.8">
@@ -2682,6 +2686,7 @@
           <li>Bei Fehlern: Backup zurückspielen, Paket korrigieren, erneut einspielen</li>
         </ul>
       </div>
+      <?php endif; ?>
 
     <?php /* ════════════ WARTUNG ════════════ */ ?>
     <?php elseif ($action === 'smileys'): ?>
