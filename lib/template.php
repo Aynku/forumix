@@ -97,7 +97,13 @@ function tpl_compile_path(string $name): string {
 
     if ($needsCompile) {
         $sourceCode = $override !== null ? $override : file_get_contents($source);
-        $php = tpl_compile($sourceCode);
+        // Derselbe Riegel wie in jeder anderen PHP-Datei des Forums. Die
+        // kompilierten Vorlagen liegen unter cache/ und werden normalerweise
+        // vom Webserver gesperrt (.htaccess, nginx) — wenn diese Sperre auf
+        // einer Installation fehlt oder verlorengeht, laeuft eine Vorlage
+        // sonst direkt aufrufbar los, mit allem was darin steht.
+        $php = "<?php if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); } ?>\n"
+             . tpl_compile($sourceCode);
         file_put_contents($compiled, $php);
     }
 

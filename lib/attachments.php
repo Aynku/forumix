@@ -69,3 +69,55 @@ function format_filesize(int $bytes): string {
     if ($bytes < 1024 * 1024) return round($bytes / 1024, 1) . ' KB';
     return round($bytes / 1024 / 1024, 1) . ' MB';
 }
+
+/**
+ * Loescht die Anhaenge von Beitraegen — Dateien UND Datenbankzeilen.
+ *
+ * Ohne das blieben die Dateien nach dem Loeschen eines Beitrags im
+ * Upload-Ordner liegen und waren unter ihrer Adresse weiter abrufbar. Der
+ * Beitrag war weg, sein Bild nicht — wer die Adresse einmal hatte (oder sie
+ * ueber die Zeilen in der Datenbank fand), kam weiter daran.
+ *
+ * @param int[] $postIds
+ * @return int Zahl der geloeschten Dateien
+ */
+function delete_attachments_for_posts(array $postIds): int {
+    $postIds = array_values(array_unique(array_map('intval', $postIds)));
+    if (!$postIds) return 0;
+
+    $platzhalter = implode(',', array_fill(0, count($postIds), '?'));
+    $weg = 0;
+    try {
+        $reihen = db_fetchAll(
+            "SELECT attachment_id, filename FROM attachments WHERE post_id IN ($platzhalter)",
+            $postIds
+        );
+        foreach ($reihen as $r) {
+            $pfad = attachment_dir() . $r['filename'];
+            // realpath schuetzt davor, dass ein manipulierter Dateiname aus
+            // dem Ordner herausfuehrt.
+            $echt = realpath($pfad);
+            $ordner = realpath(attachment_dir());
+            if ($echt && $ordner && str_starts_with($echt, $ordner) && is_file($echt)) {
+                if (@unlink($echt)) $weg++;
+            }
+        }
+        db_execute("DELETE FROM attachments WHERE post_id IN ($platzhalter)", $postIds);
+    } catch (Throwable $e) {
+        error_log('[attachments] Loeschen fehlgeschlagen: ' . $e->getMessage());
+    }
+    return $weg;
+}
+
+/**
+ * Dasselbe fuer ein ganzes Thema.
+ */
+function delete_attachments_for_thread(int $threadId): int {
+    try {
+        $ids = array_column(
+            db_fetchAll('SELECT post_id FROM posts WHERE thread_id = ?', [$threadId]),
+            'post_id'
+        );
+    } catch (Throwable $e) { return 0; }
+    return delete_attachments_for_posts($ids);
+}

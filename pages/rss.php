@@ -53,6 +53,8 @@ if ($type === 'board' && $id > 0) {
             JOIN threads t ON t.thread_id = p.thread_id
             JOIN users u   ON u.user_id   = p.user_id
             WHERE p.thread_id = ?
+              AND COALESCE(p.is_approved, 1) = 1
+              AND COALESCE(t.is_approved, 1) = 1
             ORDER BY p.created_at DESC
             LIMIT 20
         ', [$id]);
@@ -67,7 +69,7 @@ if ($type === 'board' && $id > 0) {
         JOIN users u   ON u.user_id   = t.user_id
         JOIN boards b  ON b.board_id  = t.board_id
         LEFT JOIN posts p ON p.thread_id = t.thread_id
-        WHERE 1=1 ' . $boardFilter . '
+        WHERE COALESCE(t.is_approved, 1) = 1 ' . $boardFilter . '
         GROUP BY t.thread_id
         ORDER BY t.created_at DESC
         LIMIT 20
@@ -85,7 +87,12 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
   <lastBuildDate><?= date(DATE_RSS) ?></lastBuildDate>
   <?php foreach ($items as $item):
     $link = FORUM_URL . '/thread.php?id=' . (int) $item['thread_id'];
+    // Ein "]]>" im Text beendet den CDATA-Block — danach ist die Datei kein
+    // gueltiges XML mehr, und zwar der GANZE Feed, nicht nur dieser Eintrag.
+    // Der uebliche Weg: die Folge aufteilen, sodass sie den Block nicht
+    // schliesst und trotzdem unveraendert beim Leser ankommt.
     $excerpt = mb_substr(strip_tags($item['first_post'] ?? ''), 0, 300);
+    $excerpt = str_replace(']]>', ']]]]><![CDATA[>', $excerpt);
   ?>
   <item>
     <title><?= htmlspecialchars($item['title'], ENT_XML1) ?></title>

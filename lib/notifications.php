@@ -126,6 +126,18 @@ function notify_thread_subscribers(int $threadId, int $postId, int $authorId): v
 
         // Thread + Post + Author einmal holen — gleich für alle Subscribers
         $thread = db_fetch('SELECT thread_id, title FROM threads WHERE thread_id = ?', [$threadId]);
+        // Ist das Forum passwortgeschuetzt? Dann darf der Beitragstext nicht
+        // per Mail an jeden Abonnenten gehen. Ein Abo ueberlebt, dass ein
+        // Forum nachtraeglich geschuetzt wird oder jemand den Zugang verliert;
+        // die Mail traegt den Inhalt aber ins Postfach, ganz ohne Pruefung.
+        // Die Glocke bleibt — der Klick darauf laeuft ueber thread.php und
+        // wird dort geprueft.
+        $brett = db_fetch(
+            'SELECT b.board_id, b.password_hash FROM boards b
+             JOIN threads t ON t.board_id = b.board_id WHERE t.thread_id = ?',
+            [$threadId]
+        );
+        $geschuetzt = $brett && !empty($brett['password_hash']);
         $post   = db_fetch('SELECT content FROM posts WHERE post_id = ?', [$postId]);
         $author = db_fetch('SELECT username FROM users WHERE user_id = ?', [$authorId]);
 
@@ -138,6 +150,9 @@ function notify_thread_subscribers(int $threadId, int $postId, int $authorId): v
             ]);
 
             // E-Mail (nur wenn User es will UND wir die Daten haben)
+            if ($geschuetzt && !board_privileged_for_user((int) $brett['board_id'], (int) $s['user_id'])) {
+                continue;
+            }
             if (empty($s['notify_email'])) continue;
             if (empty($s['email']))        continue;
             if (!$thread || !$post || !$author) continue;

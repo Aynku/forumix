@@ -399,9 +399,18 @@ if (is_ip_banned()) {
 // Wartungsmodus
 $scriptName = basename($_SERVER['SCRIPT_NAME'] ?? '');
 $inMaintenance = (string) get_setting('maintenance_mode', '0') === '1';
+// Der PFAD entscheidet, nicht ein Teilstueck der ganzen Adresse: mit
+// str_contains() genuegte ein beliebiger Aufruf wie /index.php?x=/admin/
+// oder /suche?q=/install/, um den Wartungsmodus zu umgehen — die Zeichen
+// standen ja irgendwo in der Adresse. Der Abfragestring gehoert nicht dazu.
+$pfad = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+$basis = rtrim(parse_url(FORUM_URL, PHP_URL_PATH) ?? '', '/');
+if ($basis !== '' && str_starts_with($pfad, $basis)) {
+    $pfad = substr($pfad, strlen($basis));
+}
 $bypassMaintenance = in_array($scriptName, ['login.php', 'logout.php'], true)
-                  || str_contains($_SERVER['REQUEST_URI'] ?? '', '/install/')
-                  || str_contains($_SERVER['REQUEST_URI'] ?? '', '/admin/');
+                  || str_starts_with($pfad, '/install/')
+                  || str_starts_with($pfad, '/admin/');
 
 if ($inMaintenance && !$bypassMaintenance && !is_admin()) {
     http_response_code(503);

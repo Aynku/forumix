@@ -156,6 +156,7 @@ function reject_post(int $postId, string $reason = ''): bool {
             ]);
         } catch (Exception $e) {}
 
+        delete_attachments_for_posts([$postId]);
         db_execute('DELETE FROM posts WHERE post_id = ?', [$postId]);
         return true;
     } catch (Exception $e) { return false; }
@@ -175,6 +176,7 @@ function reject_thread(int $threadId, string $reason = ''): bool {
         } catch (Exception $e) {}
 
         // Erst zugehörige Posts löschen, dann den Thread
+        delete_attachments_for_thread($threadId);
         db_execute('DELETE FROM posts WHERE thread_id = ?', [$threadId]);
         db_execute('DELETE FROM threads WHERE thread_id = ?', [$threadId]);
         return true;

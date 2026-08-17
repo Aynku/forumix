@@ -152,3 +152,23 @@ function board_mask_last_post(array &$board): void {
     // Falls Vorschau-Text vorhanden, auch maskieren
     if (isset($board['last_post_excerpt'])) $board['last_post_excerpt'] = '••••••••••';
 }
+
+/**
+ * Wie board_has_privileged_access(), aber fuer einen beliebigen Benutzer.
+ *
+ * Noetig ueberall dort, wo NICHT der gerade Angemeldete gemeint ist — beim
+ * Versand von Benachrichtigungen etwa wird fuer fremde Konten entschieden.
+ * Die Sitzungsfreischaltung (board_session_unlocked) kann dort nicht gelten:
+ * sie haengt an einer Sitzung, die es beim Versand gar nicht gibt.
+ */
+function board_privileged_for_user(int $boardId, int $userId): bool {
+    try {
+        $u = db_fetch('SELECT is_owner, is_admin, is_mod FROM users WHERE user_id = ?', [$userId]);
+        if (!$u) return false;
+        if (!empty($u['is_owner']) || !empty($u['is_admin']) || !empty($u['is_mod'])) return true;
+        return db_count('SELECT COUNT(*) FROM board_moderators WHERE board_id = ? AND user_id = ?',
+                        [$boardId, $userId]) > 0;
+    } catch (Exception $e) {
+        return false;
+    }
+}

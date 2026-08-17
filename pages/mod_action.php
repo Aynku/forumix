@@ -90,6 +90,17 @@ switch ($action) {
         $t = db_fetch('SELECT board_id FROM threads WHERE thread_id = ?', [$threadId]);
         if ($t) {
             $rc = db_count('SELECT COUNT(*) FROM posts WHERE thread_id = ?', [$threadId]);
+            // Erst die Anhaenge, dann das Thema: nach dem DELETE gibt es die
+            // Beitraege nicht mehr, und die Dateien waeren nicht mehr
+            // zuzuordnen — sie blieben liegen und weiter abrufbar.
+            delete_attachments_for_thread($threadId);
+            // Beitragszaehler der Verfasser mitfuehren, sonst zeigt jedes
+            // Profil dauerhaft zu viele Beitraege an.
+            foreach (db_fetchAll('SELECT user_id, COUNT(*) AS n FROM posts WHERE thread_id = ? GROUP BY user_id',
+                                 [$threadId]) as $v) {
+                db_execute('UPDATE users SET post_count = GREATEST(0, post_count - ?) WHERE user_id = ?',
+                           [(int) $v['n'], (int) $v['user_id']]);
+            }
             db_execute('DELETE FROM threads WHERE thread_id = ?', [$threadId]);
             db_execute('UPDATE boards SET thread_count = GREATEST(0, thread_count - 1),
                                           post_count   = GREATEST(0, post_count - ?)
@@ -104,6 +115,7 @@ switch ($action) {
         ensure_board_permission(null, $postId);
         $p = db_fetch('SELECT p.*, t.board_id FROM posts p JOIN threads t ON t.thread_id = p.thread_id WHERE p.post_id = ?', [$postId]);
         if ($p) {
+            delete_attachments_for_posts([$postId]);
             db_execute('DELETE FROM posts WHERE post_id = ?', [$postId]);
             db_execute('UPDATE threads SET reply_count = GREATEST(0, reply_count - 1) WHERE thread_id = ?', [$p['thread_id']]);
             db_execute('UPDATE boards SET post_count = GREATEST(0, post_count - 1) WHERE board_id = ?', [$p['board_id']]);
