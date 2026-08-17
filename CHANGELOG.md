@@ -8,6 +8,61 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v0.25.5 (2026-08-17)
+
+### Aufgeraeumt: Oberflaeche im ganzen Forum ueberarbeitet
+
+Die Forenuebersicht traegt eine Zeile je Forum statt drei. Themen und Beitraege
+stehen rechtsbuendig in EINER Spalte mit gleicher Ziffernbreite, der letzte
+Beitrag bekommt eine eigene Betreffzeile statt drei gleich starker Zeilen, und
+die Moderatorenspalte erscheint nur, wenn in der Kategorie ueberhaupt jemand
+Moderator ist. Die Kopfzeile der Tabelle faellt weg — „12 Themen" sagt selbst,
+was es ist. Vor jedem Forum steht ein Monogramm aus dem Namen statt eines
+Klemmbretts, das ueberall gleich aussah.
+
+Die Beitragskarte ist ein Raster: Zeit und Nummer stehen jetzt in der
+Textspalte, nicht als grauer Balken ueber der ganzen Karte, die Aktionen
+darunter als Pillen. Fuer Gaeste faellt die leere Aktionsleiste weg.
+
+Flaechen sind matt — kein Verlauf hinter dem Logo, keine Schatten unter Karten.
+Die Grautoene sind leicht ins Blaue gezogen; ein neutrales Grau wirkt neben dem
+Indigo stumpf. Der Akzent wird im dunklen Erscheinungsbild aus dem eingestellten
+Wert aufgehellt, statt als zweite Einstellung gepflegt zu werden.
+
+Aus Beschriftungen sind rund 380 Bildzeichen verschwunden — Zitieren, Melden,
+Bearbeiten, Anpinnen, Menuepunkte, Ueberschriften. Geblieben sind die, die
+allein etwas bedeuten: Themenstatus, Rollenfarben.
+
+### Neu: Kopfstil „Eine Zeile"
+
+Logo, Menue und Bedienung nebeneinander auf einer Hoehe. Der Schriftzug ersetzt
+darin das Bildlogo, die Suche wandert in die Navigation. Zur Auswahl in der
+Verwaltung neben Standard, Zentriert und Kompakt; unter 900 Pixel Breite faellt
+der Kopf in den gewohnten Aufbau zurueck.
+
+Neue Foren starten mit diesem Kopf und der Systemschrift. Bestehende behalten,
+was eingestellt ist.
+
+### Module: `ort` im Manifest
+
+Ein Menuepunkt stand bisher gleichzeitig in der Kopfleiste UND in der
+Fusszeile. Ein Modul kann jetzt `'ort' => 'menue' | 'fuss' | 'beides'` angeben.
+Ohne Angabe bleibt es bei `beides`. Der Kontaktpunkt steht damit dort, wo man
+ihn sucht: neben dem Impressum.
+
+### Behoben
+
+- **Alle Beitraege trugen die Nummer #1.** Die Vorlagen-Engine hielt `loop` in
+  einer einzigen Variablen; eine innere Schleife legte sie neu an, und danach
+  zaehlte die aeussere auf der inneren weiter. Bei leerer innerer Schleife blieb
+  der Zaehler stehen. Betraf jede verschachtelte Schleife in jeder Vorlage.
+- **Die Werkseinstellung des Themes stand doppelt** — einmal in `bootstrap.php`,
+  einmal im Zuruecksetzen der Verwaltung. „Design zuruecksetzen" haette bald
+  eine andere Palette hergestellt als eine Neuinstallation. Jetzt eine Quelle:
+  `theme_defaults()`.
+
+---
+
 ## v0.25.4 (2026-08-16)
 
 ### 📝 Wortwahl auf betreuten Installationen
