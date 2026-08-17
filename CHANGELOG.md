@@ -8,6 +8,100 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.0.0 (2026-08-17)
+
+**Die erste stabile Freigabe.** Ab hier ist die Versionsnummer ein Versprechen:
+Datenbankstruktur, Modul-Schnittstelle und Vorlagenformat liegen fest. Was
+daran bricht, heisst 2.0.
+
+Der Funktionsumfang stand schon vorher — 26.000 Zeilen PHP, 47 Tabellen,
+Anmeldung mit Zwei-Faktor, Moderation, Sicherungen, Migrationen,
+Updatepakete, Themen-Editor, Modulsystem. Was fehlte, war der Nachweis, dass
+man sich darauf verlassen kann. Deshalb ging der 1.0 ein Audit voraus.
+
+### Audit
+
+Neun Pruefrichtungen ueber den gesamten Quelltext, 39 gemeldete Funde, jeder
+davon anschliessend von drei unabhaengigen Pruefern mit dem Auftrag
+angegriffen, ihn zu WIDERLEGEN. 32 haben das ueberstanden und sind behoben,
+7 sind gefallen. Der vollstaendige Bericht mit Hergang und Belegstellen liegt
+beim Betreiber.
+
+**Schwer:**
+
+- **Sitzungsfixierung beim Angemeldet-bleiben.** Von drei Wegen in eine
+  angemeldete Sitzung wechselte einer die Sitzungskennung nicht — ausgerechnet
+  der, den jeder Seitenaufruf geht. Eine untergeschobene Sitzung blieb nach der
+  automatischen Anmeldung gueltig. Alle drei Wege verwerfen jetzt zusaetzlich
+  den CSRF-Token, der ja schon vor der Anmeldung erzeugt wird.
+- **Ein Zwei-Faktor-Code galt mehrfach.** Bis zu 90 Sekunden lang war derselbe
+  Code beliebig oft einloesbar. Da die Passwort-Ruecksetzung per 2FA allein
+  gegen Benutzername und Code herausgegeben wird, reichte EIN abgefangener
+  Code fuer Ruecksetzung, Anmeldung und Zwei-Faktor-Schritt — eine
+  vollstaendige Kontouebernahme. Codes werden jetzt verbraucht, und eine
+  Ruecksetzung ohne Postfachzugriff meldet sich beim Kontoinhaber.
+- **Kopfzeilen-Einschleusung ueber den Absendernamen.** Ein Zeilenumbruch im
+  Feld haengte eine eigene Kopfzeile an jede ausgehende Mail (Bcc) oder ein
+  zweites RCPT TO in den SMTP-Dialog.
+- **Die Bremse zaehlte nach der Pruefung.** Zwischen Lesen und Erhoehen kamen
+  parallele Anfragen alle durch — jede Begrenzung liess sich umgehen, indem
+  man die Versuche gleichzeitig statt nacheinander schickte.
+- **Eine erfolgreiche Anmeldung loeschte die Bremse fuer alle Konten derselben
+  Adresse.** Mit einem eigenen gueltigen Konto liess sich der Zaehler fuer das
+  Durchprobieren aller anderen abraeumen.
+
+**Mittel:** Wartungsmodus ueber die Adresse umgehbar; RSS lieferte Beitraege
+aus der Freigabe-Warteschlange und liess sich mit einem `]]>` im Text ganz
+zerlegen; Anhaenge ueberlebten das Loeschen ihres Beitrags und blieben
+abrufbar; im Paket fehlte der Apache-Schutz fuer Vorlagen- und Cache-Ordner;
+Benachrichtigungsmails trugen Beitragstexte auch an Abonnenten ohne Zugang
+zum geschuetzten Forum.
+
+**Niedrig:** Reaktionen ohne Zugangspruefung; unfreigegebene Themen ueber ihre
+ID, in der Schnellsuche und in Schlagwortlisten sichtbar; Abmelden und
+Sprachwahl per Aufruf statt per Formular; SVG als Rollen-Avatar;
+Vorlagenname aus einem Parameter im Dateipfad; der E-Mail-Wechsel verriet,
+welche Adressen belegt sind; Zwei-Faktor-Geheimnisse im Klartext.
+
+### Weiter behoben
+
+- **Alle Beitraege trugen die Nummer #1.** Die Vorlagen-Engine hielt `loop` in
+  einer einzigen Variablen; eine innere Schleife ueberschrieb die aeussere.
+  Betraf jede verschachtelte Schleife in jeder Vorlage.
+- **Die Werkseinstellung des Themes stand doppelt** und waere auseinander
+  gelaufen: „Design zuruecksetzen" haette bald eine andere Palette hergestellt
+  als eine Neuinstallation.
+
+### Aufgeraeumt
+
+- **Die alten PHP-Ansichten sind weg.** Alle 35 lagen doppelt vor und wurden
+  nie gerendert, mussten aber bei jeder Aenderung mitgepflegt werden.
+- **Neu: `tools/pruefen.php`** — ein Prueflauf ohne Fremdpakete mit 36
+  Nachweisen. Jeder stellt einen Fund aus dem Audit nach.
+
+### Datenbank
+
+Zwei Migrationen, beide ueber *Wartung → Updates* oder
+`php install/migrate.php`:
+
+- `migrate_v25_6` legt `user_2fa.last_window` an (Verbrauchsvermerk fuer
+  Codes). **Ohne sie weist die Zwei-Faktor-Anmeldung jeden Code ab.**
+- `migrate_v25_7` verbreitert `user_2fa.secret` auf VARCHAR(255) und
+  verschluesselt vorhandene Geheimnisse, sofern ein `FORUM_CRYPT_KEY` in der
+  config.php steht. Ohne Schluessel bleibt alles im Klartext und
+  funktioniert unveraendert.
+
+### Aussehen
+
+Die Oberflaeche ist ueberarbeitet: eine Zeile je Forum statt drei, Zahlen
+rechtsbuendig in gleicher Ziffernbreite, Monogramme statt eines Symbols vor
+jedem Eintrag, matte Flaechen ohne Verlauf und Schatten, rund 380 Bildzeichen
+aus Beschriftungen entfernt. Neu ist der Kopfstil **Eine Zeile** und die
+Angabe `ort` im Modul-Manifest, damit ein Menuepunkt nicht gleichzeitig oben
+und unten steht.
+
+---
+
 ## v0.25.5 (2026-08-17)
 
 ### Aufgeraeumt: Oberflaeche im ganzen Forum ueberarbeitet
