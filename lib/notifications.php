@@ -225,7 +225,7 @@ function _send_reply_notification_email(
 /**
  * Liefert das Icon (Emoji) für einen Benachrichtigungs-Typ.
  *
- * Ausgelagert aus views/notifications.php im Zuge der Template-Migration:
+ * Ausgelagert aus der Ansicht im Zuge der Template-Migration:
  * die Template-Engine kann kein match(), daher lebt die Typ→Präsentation-
  * Zuordnung hier in der Domain-Schicht. Reine Funktion (nur $n['type']).
  */
@@ -246,7 +246,7 @@ function notification_icon(array $n): string {
 /**
  * Liefert den fertigen (HTML-sicheren) Anzeigetext einer Benachrichtigung.
  *
- * Ausgelagert aus views/notifications.php (siehe notification_icon). Escaped die
+ * Ausgelagert aus der Ansicht (siehe notification_icon). Escaped die
  * Nutzer-/Thread-Felder mit e() und gibt HTML zurück – im Template mit |raw
  * ausgeben. Verhalten 1:1 wie der frühere Inline-match()-Block.
  */

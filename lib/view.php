@@ -31,7 +31,9 @@ function render(string $view, array $data = []): void {
 
     $data = array_merge($globals, $data);
 
-    // View-Datei finden: erst die neuen .tpl.html, dann die alten PHP-Views
+    // Jede Kernansicht liegt als .tpl.html vor. Der PHP-Zweig darunter ist
+    // seit 0.25.6 nur noch fuer Modulansichten da (@modulcode/name) und fuer
+    // die drei Dateien, die es nie als Vorlage gab: layout, admin, mod.
     $newTpl = __DIR__ . '/../views_new/' . $view . TPL_EXTENSION;
     if (file_exists($newTpl)) {
         // Neue Engine: kompiliertes Template einbinden
@@ -41,10 +43,10 @@ function render(string $view, array $data = []): void {
         return;
     }
 
-    // ── Fallback: alte PHP-Views ──
+    // ── PHP-Ansichten: Module und die drei Sonderfaelle ──
     extract($data, EXTR_SKIP);
 
-    // View-Datei finden: erst im Core, dann in Modulen
+    // Erst im Kern (views/admin, views/mod), dann in Modulen
     $viewFile = __DIR__ . '/../views/' . $view . '.php';
     if (!file_exists($viewFile)) {
         // Modul-Views: Format "@modulcode/viewname" → modules/<code>/views/<viewname>.php
