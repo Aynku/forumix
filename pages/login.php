@@ -23,7 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $isBackup  = isset($_POST['use_backup']);
 
         // Eigene Bremse für den Code-Schritt, gezählt pro Konto
-        $row = db_fetch('SELECT secret FROM user_2fa WHERE user_id = ? AND enabled = 1', [$pendingId]);
+        // Nur noch die Existenz pruefen — das Geheimnis selbst braucht diese
+        // Seite nicht mehr, verify_totp_for_user() holt es sich.
+        $row = db_fetch('SELECT user_id FROM user_2fa WHERE user_id = ? AND enabled = 1', [$pendingId]);
         if (!rate_limit_check('login_2fa', 5, 900, 'user:' . $pendingId)) {
             unset($_SESSION['pending_2fa_user']);
             $step  = 'credentials';

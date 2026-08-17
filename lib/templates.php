@@ -49,6 +49,7 @@ function get_template_original_at_save(string $name): ?string {
  * Liefert den Original-Inhalt eines Templates (aus Datei).
  */
 function get_template_original(string $name): ?string {
+    if (!template_name_gueltig($name)) return null;
     $path = __DIR__ . '/../views_new/' . $name . '.tpl.html';
     if (!file_exists($path)) return null;
     return file_get_contents($path);
@@ -236,4 +237,22 @@ function template_diff(string $old, string $new): array {
     while ($j > 0) { array_unshift($result, ['type' => 'add', 'text' => $b[$j - 1]]); $j--; }
 
     return $result;
+}
+
+/**
+ * Prueft, ob ein Vorlagenname zulaessig ist.
+ *
+ * Der Name kommt aus einem Parameter (?action=templates&edit=...). Ohne
+ * Pruefung landet er ungefiltert in einem Dateipfad — mit "../" liesse sich
+ * damit ausserhalb von views_new/ lesen. Zugelassen sind nur Namen, die es
+ * dort auch wirklich gibt.
+ */
+function template_name_gueltig(string $name): bool {
+    if ($name === '' || strlen($name) > 100) return false;
+    if (!preg_match('/^[a-z0-9_\/-]+$/i', $name)) return false;
+    if (str_contains($name, '..')) return false;
+
+    $pfad = realpath(__DIR__ . '/../views_new/' . $name . '.tpl.html');
+    $ordner = realpath(__DIR__ . '/../views_new');
+    return $pfad !== false && $ordner !== false && str_starts_with($pfad, $ordner . DIRECTORY_SEPARATOR);
 }

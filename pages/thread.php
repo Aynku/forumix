@@ -15,6 +15,18 @@ $thread = db_fetch('
 
 if (!$thread) error_page(404, 'Thread nicht gefunden', 'Dieses Thema gibt es nicht oder es wurde entfernt.');
 
+// Noch nicht freigegeben? Dann sehen es nur der Verfasser und die Moderation.
+// Ueber die ID war es bisher fuer jeden aufrufbar — die Freigabe-Warteschlange
+// haelt gerade das zurueck, was noch niemand sehen soll.
+if (isset($thread['is_approved']) && (int) $thread['is_approved'] === 0) {
+    $cu = current_user();
+    $darf = $cu && ((int) $cu['user_id'] === (int) $thread['user_id']
+                    || board_has_privileged_access((int) $thread['board_id']));
+    if (!$darf) {
+        error_page(404, 'Thread nicht gefunden', 'Dieses Thema gibt es nicht oder es wurde entfernt.');
+    }
+}
+
 // Passwort-Schutz: wenn das Board geschützt ist und User keinen Zugang hat → zur Unlock-Seite
 $threadBoard = db_fetch('SELECT board_id, password_hash FROM boards WHERE board_id = ?', [$thread['board_id']]);
 if ($threadBoard && !board_user_can_access($threadBoard)) {

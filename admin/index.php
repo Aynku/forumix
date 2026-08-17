@@ -481,7 +481,12 @@ if ($action === 'upload_role_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect(FORUM_URL . '/admin/?action=settings');
     }
     $file = $_FILES['image'];
-    $allowed = ['image/png' => 'png', 'image/jpeg' => 'jpg', 'image/webp' => 'webp', 'image/svg+xml' => 'svg'];
+    // Kein SVG. Eine SVG-Datei ist ein XML-Dokument und darf Skripte
+    // enthalten; sie liegt hier unter einer festen, vorhersagbaren Adresse in
+    // der eigenen Herkunft (assets/role_admin_custom.svg). Wer sie oeffnet,
+    // fuehrt das Skript im Namen des Forums aus. Der Gewinn — ein
+    // beliebig skalierbares Abzeichen — wiegt das nicht auf.
+    $allowed = ['image/png' => 'png', 'image/jpeg' => 'jpg', 'image/webp' => 'webp'];
     $mime = mime_content_type($file['tmp_name']) ?: '';
     if (!isset($allowed[$mime])) {
         flash('Nur PNG, JPG, WEBP oder SVG erlaubt.', 'error');
@@ -679,8 +684,11 @@ if ($action === 'save_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect(FORUM_URL . '/admin/?action=templates');
     }
 
-    // Whitelist: nur Templates die als Datei existieren dürfen geändert werden
-    if ($name === '' || !file_exists(__DIR__ . '/../views_new/' . $name . '.tpl.html')) {
+    // Whitelist: nur Templates die als Datei existieren dürfen geändert werden.
+    // template_name_gueltig() prueft zusaetzlich den Namen selbst und dass der
+    // aufgeloeste Pfad wirklich in views_new/ liegt — file_exists() allein
+    // laesst "../../etwas" durch, wenn es die Datei dort gibt.
+    if (!template_name_gueltig($name)) {
         flash('Unbekanntes Template.', 'error');
     } elseif (!template_content_is_safe($content)) {
         flash('Template enthält PHP-Tags und wurde nicht gespeichert (Sicherheit).', 'error');
@@ -1659,6 +1667,9 @@ switch ($action) {
     case 'templates':
         $vars['templates']    = list_templates_with_status();
         $vars['editingTpl']   = $_GET['edit'] ?? null;
+        if ($vars['editingTpl'] && !template_name_gueltig((string) $vars['editingTpl'])) {
+            $vars['editingTpl'] = null;   // Name aus dem Parameter, nicht vertrauenswuerdig
+        }
         if ($vars['editingTpl']) {
             $name = $vars['editingTpl'];
             $vars['tplOriginal']     = get_template_original($name);

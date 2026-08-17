@@ -64,7 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'enable_2fa'
         db_execute(
             'INSERT INTO user_2fa (user_id, secret, enabled, backup_codes) VALUES (?, ?, 1, ?)
              ON DUPLICATE KEY UPDATE secret = VALUES(secret), enabled = 1, backup_codes = VALUES(backup_codes)',
-            [$userId, $secret, json_encode($codes)]
+            // Geheimnis und Ersatzcodes verschluesselt ablegen: aus einem
+            // Datenbankauszug (Sicherung, Fehlkonfiguration) liesse sich sonst
+            // fuer jedes Konto der zweite Faktor nachrechnen. Ohne
+            // FORUM_CRYPT_KEY bleibt alles wie bisher — forum_encrypt()
+            // reicht den Wert dann unveraendert durch.
+            [$userId, forum_encrypt($secret), forum_encrypt(json_encode($codes))]
         );
         // Backup-Codes über Session weiterreichen damit sie nach Redirect noch sichtbar sind
         $_SESSION['_2fa_new_backup_codes'] = $codes;

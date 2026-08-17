@@ -425,14 +425,15 @@ if ($inMaintenance && !$bypassMaintenance && !is_admin()) {
 }
 
 // Sprache via ?lang=xx setzen
+//
+// Das Cookie darf ein Aufruf setzen — es betrifft nur die eigene Ansicht und
+// ist mit einem zweiten Klick zurueckgestellt. Die DAUERHAFTE Einstellung im
+// Konto ist etwas anderes: die aenderte bisher jede fremde Seite mit, indem
+// sie ein Bild auf /index.php?lang=en einbettete. Dafuer gibt es jetzt die
+// Sprachwahl in den Einstellungen (mit Token).
 if (isset($_GET['lang']) && in_array($_GET['lang'], ['de', 'en'], true)) {
     setcookie('forum_lang', $_GET['lang'], time() + 60 * 60 * 24 * 365, '/');
     $_COOKIE['forum_lang'] = $_GET['lang'];
-    if (is_logged_in()) {
-        $cu = current_user();
-        try { db_execute('UPDATE users SET language = ? WHERE user_id = ?', [$_GET['lang'], $cu['user_id']]); }
-        catch (Exception $e) {}
-    }
 }
 
 // Online-Status tracken (außer im API-Endpunkt, um Last zu sparen)

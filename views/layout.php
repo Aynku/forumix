@@ -224,7 +224,12 @@ $forumName = forum_name();
                   <span id="theme-icon">🌙</span> <span>Theme wechseln</span>
                 </button>
                 <div class="user-menu-divider"></div>
-                <a href="<?= e(FORUM_URL) ?>/logout.php" class="user-menu-logout"><?= e(t('logout')) ?></a>
+                <?php /* Abmelden aendert etwas — deshalb ein Formular mit Token,
+                         kein Link. Sieht im Menue aus wie die anderen Punkte. */ ?>
+                <form method="post" action="<?= e(FORUM_URL) ?>/logout.php" class="user-menu-logout-form">
+                  <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                  <button type="submit" class="user-menu-logout"><?= e(t('logout')) ?></button>
+                </form>
               </div>
             </div>
           <?php else: ?>

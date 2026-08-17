@@ -109,7 +109,7 @@ function verify_totp_for_user(int $userId, string $code): bool {
                     [$userId]);
     if (!$row || empty($row['secret'])) return false;
 
-    $fenster = totp_window((string) $row['secret'], $code);
+    $fenster = totp_window(forum_decrypt((string) $row['secret']), $code);
     if ($fenster === null) return false;
 
     // Schon benutzt (oder ein aelteres Fenster nachgereicht)? Dann nicht.
@@ -152,13 +152,13 @@ function verify_backup_code(int $userId, string $code): bool {
     try {
         $row = db_fetch('SELECT backup_codes FROM user_2fa WHERE user_id = ?', [$userId]);
         if (!$row || !$row['backup_codes']) return false;
-        $codes = json_decode($row['backup_codes'], true);
+        $codes = json_decode(forum_decrypt((string) $row['backup_codes']), true);
         if (!is_array($codes)) return false;
         $idx = array_search($code, $codes, true);
         if ($idx === false) return false;
         unset($codes[$idx]);
         db_execute('UPDATE user_2fa SET backup_codes = ? WHERE user_id = ?',
-            [json_encode(array_values($codes)), $userId]);
+            [forum_encrypt(json_encode(array_values($codes))), $userId]);
         return true;
     } catch (Exception $e) { return false; }
 }

@@ -76,11 +76,17 @@ function email_change_initiate(int $userId, string $newEmail): array {
         return ['ok' => false, 'error' => 'Diese E-Mail-Adresse ist bereits hinterlegt.'];
     }
 
-    // E-Mail schon von anderem User belegt?
+    // E-Mail schon von einem anderen Konto belegt?
+    //
+    // Die Antwort darf das nicht verraten: sonst ist das Feld eine Auskunft
+    // darueber, wer hier ein Konto hat — man tippt Adressen ein und liest ab,
+    // welche belegt sind. Deshalb bricht der Vorgang still ab und meldet
+    // dasselbe wie ein Erfolg. Die Bestaetigungsmail geht dann eben nicht
+    // raus, und der Wechsel findet nicht statt.
     $existing = db_fetch('SELECT user_id FROM users WHERE email = ? AND user_id != ?',
         [$newEmail, $userId]);
     if ($existing) {
-        return ['ok' => false, 'error' => 'Diese E-Mail-Adresse ist bereits in Verwendung.'];
+        return ['ok' => true, 'stillschweigend' => true];
     }
 
     // Token erzeugen: HMAC über (user_id, new_email, expiry)

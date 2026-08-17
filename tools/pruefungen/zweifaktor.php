@@ -32,6 +32,8 @@ $pdo = new PDO(
     [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
 );
 
+// twofactor.php entschluesselt beim Lesen — crypto.php gehoert dazu.
+if (!defined('CRYPT_PREFIX')) require_once $wurzel . '/lib/crypto.php';
 require_once $wurzel . '/lib/twofactor.php';
 
 /** Die geprueften Funktionen brauchen db_fetch/db_affected — hier auf $pdo gelegt. */

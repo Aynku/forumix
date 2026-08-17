@@ -4991,3 +4991,17 @@ body.header-compact .header-slogan {
   color: var(--color-accent);
   text-decoration: underline;
 }
+
+
+/* Abmelden ist ein Formular, sieht im Benutzermenue aber aus wie die
+   Menuepunkte daneben. */
+.user-menu-logout-form { margin: 0; }
+button.user-menu-logout {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
