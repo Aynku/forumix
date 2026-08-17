@@ -8,6 +8,15 @@ if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
  *
  * Return: true bei Erfolg, false bei Fehler.
  */
+/**
+ * Entfernt alles, was eine Kopfzeile oder einen SMTP-Befehl beenden koennte:
+ * CR, LF und NUL. Keine Maskierung, kein Ersetzen — solche Zeichen haben in
+ * einem Absendernamen oder einer Adresse nichts zu suchen.
+ */
+function mail_kopf_saeubern(string $wert): string {
+    return trim(str_replace(["\r", "\n", "\0"], '', $wert));
+}
+
 function send_email(string $to, string $subject, string $body, bool $html = true): bool {
     if (!filter_var($to, FILTER_VALIDATE_EMAIL)) return false;
 
@@ -45,6 +54,18 @@ function send_email(string $to, string $subject, string $body, bool $html = true
     $fromName = defined('FORUM_MAIL_FROM_NAME')
         ? (string) FORUM_MAIL_FROM_NAME
         : (string) get_setting('smtp_from_name', FORUM_NAME);
+
+    // Zeilenumbrueche raus, bevor irgendetwas davon in eine Kopfzeile oder in
+    // einen SMTP-Befehl geraet. Beide Werte kommen aus einem Eingabefeld im
+    // Adminbereich; ein \r\n darin haengt eine zweite Kopfzeile an (Bcc: …)
+    // oder ein zweites RCPT TO in den SMTP-Dialog. Der Empfaenger wird schon
+    // seit jeher geprueft, der Absender war es nie.
+    $fromName = mail_kopf_saeubern($fromName);
+    $fromAddr = mail_kopf_saeubern($fromAddr);
+    if ($fromAddr !== '' && !filter_var($fromAddr, FILTER_VALIDATE_EMAIL)) {
+        error_log('[mail] Absenderadresse unbrauchbar, benutze Standard: ' . $fromAddr);
+        $fromAddr = '';
+    }
 
     if (!$fromAddr) {
         $host = parse_url(FORUM_URL, PHP_URL_HOST) ?: 'localhost';
@@ -164,7 +185,7 @@ function _send_via_smtp(string $to, string $subject, string $body, bool $html,
     $send('MAIL FROM: <' . $fromAddr . '>');
     if (!$expect('250')) { fclose($sock); return false; }
 
-    $send('RCPT TO: <' . $to . '>');
+    $send('RCPT TO: <' . mail_kopf_saeubern($to) . '>');
     if (!$expect('250')) { fclose($sock); return false; }
 
     $send('DATA');

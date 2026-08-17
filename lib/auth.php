@@ -83,8 +83,12 @@ function login_user(string $username, string $password) {
     // Wenn is_approved-Spalte existiert und auf 0 steht: kein Login möglich
     if (array_key_exists('is_approved', $u) && (int) $u['is_approved'] === 0) return false;
 
-    // Schutz vor Session-Fixation: Neue Session-ID nach Login
+    // Schutz vor Session-Fixation: Neue Session-ID nach Login. Der CSRF-Token
+    // muss mit — er wird beim ersten Seitenaufruf erzeugt, also schon VOR der
+    // Anmeldung, und waere sonst dem bekannt, der die Sitzung untergeschoben
+    // hat.
     if (session_status() === PHP_SESSION_ACTIVE) {
+        unset($_SESSION['csrf_token']);
         @session_regenerate_id(true);
     }
 

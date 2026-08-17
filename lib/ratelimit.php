@@ -21,29 +21,29 @@ function rate_limit_check(string $action, int $maxAttempts, int $windowSec, stri
             db_execute('DELETE FROM rate_limits WHERE expires_at < NOW()');
         }
 
-        $row = db_fetch(
-            'SELECT count, expires_at FROM rate_limits WHERE key_hash = ? AND action = ?',
-            [$hash, $action]
-        );
-
-        if (!$row || strtotime($row['expires_at']) < time()) {
-            // Neuer Eintrag oder abgelaufen
-            db_execute(
-                'INSERT INTO rate_limits (key_hash, action, count, expires_at)
-                 VALUES (?, ?, 1, DATE_ADD(NOW(), INTERVAL ? SECOND))
-                 ON DUPLICATE KEY UPDATE count = 1, expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)',
-                [$hash, $action, $windowSec, $windowSec]
-            );
-            return true;
-        }
-
-        if ((int) $row['count'] >= $maxAttempts) return false;
-
+        // ERST hochzaehlen, DANN entscheiden. Vorher wurde gelesen, geprueft
+        // und anschliessend erhoeht — zwischen Lesen und Erhoehen passen
+        // beliebig viele parallele Anfragen, die alle denselben Zaehlerstand
+        // sehen und alle durchkommen. Genau das umgeht jede Bremse, indem man
+        // die Versuche gleichzeitig statt nacheinander schickt.
+        //
+        // Ein einzelnes INSERT ... ON DUPLICATE KEY UPDATE ist unteilbar: die
+        // Zeile ist waehrenddessen gesperrt, jede Anfrage bekommt ihren
+        // eigenen Zaehlerstand.
         db_execute(
-            'UPDATE rate_limits SET count = count + 1 WHERE key_hash = ? AND action = ?',
+            'INSERT INTO rate_limits (key_hash, action, count, expires_at)
+             VALUES (?, ?, 1, DATE_ADD(NOW(), INTERVAL ? SECOND))
+             ON DUPLICATE KEY UPDATE
+                count      = IF(expires_at < NOW(), 1, count + 1),
+                expires_at = IF(expires_at < NOW(), DATE_ADD(NOW(), INTERVAL ? SECOND), expires_at)',
+            [$hash, $action, $windowSec, $windowSec]
+        );
+
+        $stand = db_count(
+            'SELECT count FROM rate_limits WHERE key_hash = ? AND action = ?',
             [$hash, $action]
         );
-        return true;
+        return $stand <= $maxAttempts;
     } catch (Exception $e) {
         // Bei Fehler nicht blockieren
         return true;

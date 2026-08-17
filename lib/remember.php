@@ -109,6 +109,19 @@ function remember_try_login(): ?array {
         remember_create((int) $user['user_id']);
     }
 
+    // Schutz vor Session-Fixation — genauso wie beim Anmelden mit Passwort
+    // (lib/auth.php). Dieser Weg hier ist der dritte in eine angemeldete
+    // Sitzung und wurde dabei uebersehen: bootstrap.php ruft ihn bei JEDEM
+    // Aufruf auf, und ohne Wechsel der Kennung bleibt eine untergeschobene
+    // Sitzung nach der automatischen Anmeldung gueltig.
+    //
+    // Der CSRF-Token muss mit: er haengt an der alten Sitzung und waere dem,
+    // der sie untergeschoben hat, sonst bekannt.
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        unset($_SESSION['csrf_token']);
+        @session_regenerate_id(true);
+    }
+
     // Session setzen
     $_SESSION['user_id']  = (int) $user['user_id'];
     $_SESSION['login_at'] = time();

@@ -67,17 +67,60 @@ function totp_code(string $secret, ?int $timeStep = null): string {
 }
 
 /**
+ * Prueft einen 6-stelligen Code gegen den Secret und liefert das Zeitfenster,
+ * in dem er gilt — oder null. Toleranz: ±1 Fenster (die Uhren gehen nie ganz
+ * gleich).
+ *
+ * Reine Rechnung, ohne Datenbank. Fuer die Anmeldung ist das ZU WENIG, weil
+ * derselbe Code damit bis zu 90 Sekunden lang immer wieder passt: dafuer
+ * verify_totp_for_user() nehmen, das den Verbrauch vermerkt.
+ */
+function totp_window(string $secret, string $code): ?int {
+    $code = preg_replace('/\D/', '', $code);
+    if (strlen($code) !== 6) return null;
+    $now = (int) floor(time() / 30);
+    for ($i = -1; $i <= 1; $i++) {
+        if (hash_equals(totp_code($secret, $now + $i), $code)) return $now + $i;
+    }
+    return null;
+}
+
+/**
  * Prüft einen 6-stelligen Code gegen den Secret.
  * Erlaubt ±1 Zeitfenster Toleranz (Clock Skew).
+ *
+ * Nur fuer das EINRICHTEN gedacht, wo es noch kein Konto mit gespeichertem
+ * Geheimnis gibt. Ueberall sonst gehoert verify_totp_for_user() hin.
  */
 function verify_totp(string $secret, string $code): bool {
-    $code = preg_replace('/\D/', '', $code);
-    if (strlen($code) !== 6) return false;
-    $now = floor(time() / 30);
-    for ($i = -1; $i <= 1; $i++) {
-        if (hash_equals(totp_code($secret, $now + $i), $code)) return true;
-    }
-    return false;
+    return totp_window($secret, $code) !== null;
+}
+
+/**
+ * Prueft den Code eines Kontos und verbraucht ihn dabei.
+ *
+ * Der Verbrauch wird ueber ein bedingtes UPDATE vermerkt: nur wenn das
+ * gespeicherte Fenster noch kleiner ist, wird geschrieben — und nur dann gilt
+ * der Code. Zwei gleichzeitige Anfragen mit demselben Code koennen so nicht
+ * beide durchkommen, weil die zweite null geaenderte Zeilen sieht.
+ */
+function verify_totp_for_user(int $userId, string $code): bool {
+    $row = db_fetch('SELECT secret, last_window FROM user_2fa WHERE user_id = ? AND enabled = 1',
+                    [$userId]);
+    if (!$row || empty($row['secret'])) return false;
+
+    $fenster = totp_window((string) $row['secret'], $code);
+    if ($fenster === null) return false;
+
+    // Schon benutzt (oder ein aelteres Fenster nachgereicht)? Dann nicht.
+    if ($row['last_window'] !== null && (int) $row['last_window'] >= $fenster) return false;
+
+    $geaendert = db_affected(
+        'UPDATE user_2fa SET last_window = ?
+          WHERE user_id = ? AND (last_window IS NULL OR last_window < ?)',
+        [$fenster, $userId, $fenster]
+    );
+    return $geaendert > 0;
 }
 
 /**

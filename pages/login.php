@@ -32,10 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             unset($_SESSION['pending_2fa_user']);
             $error = 'Sitzung abgelaufen.';
         } else {
-            $ok = $isBackup ? verify_backup_code($pendingId, $code) : verify_totp($row['secret'], $code);
+            // verify_totp_for_user() vermerkt den Verbrauch — sonst gilt derselbe
+            // Code bis zu 90 Sekunden lang immer wieder.
+            $ok = $isBackup ? verify_backup_code($pendingId, $code)
+                            : verify_totp_for_user($pendingId, $code);
             if ($ok) {
                 // Login abschließen; Session-ID erneuern wie in login_user()
                 if (session_status() === PHP_SESSION_ACTIVE) {
+                    unset($_SESSION['csrf_token']);
                     @session_regenerate_id(true);
                 }
                 $_SESSION['user_id'] = $pendingId;
@@ -47,7 +51,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         [$ip, $pendingId]);
                 } catch (Exception $e) {}
                 try { log_user_ip($pendingId, 'login', $ip); } catch (Exception $e) {}
-                rate_limit_reset('login');
+                // Auch hier nur die eigene Kontobremse, nicht die der Adresse.
+                $angemeldet = db_fetch('SELECT username FROM users WHERE user_id = ?', [$pendingId]);
+                if ($angemeldet) {
+                    rate_limit_reset('login_konto', 'konto:' . mb_strtolower(trim((string) $angemeldet['username'])));
+                }
 
                 // Remember-Me-Token erstellen (wenn Checkbox gesetzt war)
                 if ($rememberMe) {
@@ -82,8 +90,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
 
         $maxAttempts = (int) get_setting('rate_limit_login', 5);
+        // Zwei Bremsen statt einer:
+        //
+        // Nach IP, damit einer nicht hunderte Konten durchprobiert. Und nach
+        // KONTO, damit das Durchprobieren eines Passworts nicht dadurch
+        // weiterlaeuft, dass der Angreifer die Adresse wechselt — und damit
+        // eine erfolgreiche Anmeldung nicht die Bremse fuer alle anderen
+        // Konten derselben Adresse loescht. Das war der Fall: rate_limit_reset
+        // ohne Schluessel raeumt den IP-Zaehler ab, also auch die Versuche
+        // gegen jedes andere Konto.
+        $kontoName  = post_str('username');
+        $kontoBremse = 'konto:' . mb_strtolower(trim($kontoName));
         if (!rate_limit_check('login', $maxAttempts, 900)) {
             $error = 'Zu viele Login-Versuche. Bitte warte ' . ceil(rate_limit_remaining('login') / 60) . ' Minuten.';
+        } elseif ($kontoName !== '' && !rate_limit_check('login_konto', $maxAttempts, 900, $kontoBremse)) {
+            $error = 'Zu viele Login-Versuche für dieses Konto. Bitte warte '
+                   . ceil(rate_limit_remaining('login_konto', $kontoBremse) / 60) . ' Minuten.';
         } else {
             $u = db_fetch('SELECT * FROM users WHERE username = ? AND is_banned = 0 AND COALESCE(is_deleted, 0) = 0', [post_str('username')]);
             if ($u && !empty($u['password']) && password_verify(post_str('password'), $u['password'])) {
@@ -106,7 +128,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     $user = login_user(post_str('username'), post_str('password'));
                     if ($user) {
-                        rate_limit_reset('login');
+                        // Nur die eigene Kontobremse loesen. Der IP-Zaehler
+                        // bleibt stehen: sonst raeumt ein Angreifer mit einem
+                        // eigenen gueltigen Konto die Bremse fuer alle
+                        // uebrigen Versuche derselben Adresse ab.
+                        rate_limit_reset('login_konto', $kontoBremse);
                         captcha_reset_attempts('login');
 
                         // Remember-Me-Token erstellen

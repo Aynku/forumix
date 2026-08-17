@@ -72,14 +72,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 );
                 $ok = false;
                 if ($user) {
-                    $row = db_fetch('SELECT secret FROM user_2fa WHERE user_id = ? AND enabled = 1', [$user['user_id']]);
-                    if ($row && verify_totp($row['secret'], $code)) {
+                    // Verbrauchend pruefen: der Code darf danach nicht noch
+                    // einmal gelten, sonst reicht ein einziger abgefangener
+                    // Code fuer Ruecksetzung UND anschliessende Anmeldung.
+                    if (verify_totp_for_user((int) $user['user_id'], $code)) {
                         $ok = true;
                     }
                 }
                 if ($ok) {
                     $token = create_password_reset((int) $user['user_id']);
                     captcha_reset_attempts('forgot');
+                    // Dieser Weg braucht weder Passwort noch Zugriff aufs
+                    // Postfach. Wer ihn geht, muss dem Inhaber wenigstens
+                    // auffallen — sonst merkt der die Uebernahme erst, wenn er
+                    // sich selbst nicht mehr anmelden kann.
+                    passwort_ruecksetzung_melden((int) $user['user_id'], $method);
                     if ($token) {
                         flash('Identität bestätigt. Lege jetzt ein neues Passwort fest.', 'success');
                         redirect(FORUM_URL . '/reset.php?token=' . urlencode($token));
@@ -112,6 +119,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($ok) {
                     $token = create_password_reset((int) $user['user_id']);
                     captcha_reset_attempts('forgot');
+                    // Dieser Weg braucht weder Passwort noch Zugriff aufs
+                    // Postfach. Wer ihn geht, muss dem Inhaber wenigstens
+                    // auffallen — sonst merkt der die Uebernahme erst, wenn er
+                    // sich selbst nicht mehr anmelden kann.
+                    passwort_ruecksetzung_melden((int) $user['user_id'], $method);
                     if ($token) {
                         flash('Backup-Code akzeptiert. Lege jetzt ein neues Passwort fest. Hinweis: Der verwendete Backup-Code wurde verbraucht.', 'success');
                         redirect(FORUM_URL . '/reset.php?token=' . urlencode($token));

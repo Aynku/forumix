@@ -192,6 +192,14 @@ if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             set_setting($key, isset($_POST[$key]) ? '1' : '0');
         } elseif (array_key_exists($key, $_POST)) {
             $val = trim((string) $_POST[$key]);
+            // Mailfelder duerfen keine Zeilenumbrueche enthalten — sonst haengt
+            // ein Absendername eine eigene Kopfzeile an die ausgehende Post.
+            // lib/email.php saeubert ebenfalls; hier wird es abgewiesen, damit
+            // gar nichts Unbrauchbares in den Einstellungen landet.
+            if (str_starts_with($key, 'smtp_') && preg_match('/[\r\n\0]/', $val)) {
+                flash('Zeilenumbrueche sind in Mail-Feldern nicht erlaubt.', 'error');
+                continue;
+            }
             if ($val === '' && in_array($key, $keepIfEmpty, true)) continue;
             // Das SMTP-Passwort geht verschluesselt in die Datenbank, sofern
             // ein Schluessel in der config.php steht. Ohne Schluessel bleibt

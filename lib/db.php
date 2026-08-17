@@ -56,6 +56,18 @@ function db_execute(string $sql, array $params = []): int {
     return (int) DB::get()->lastInsertId();
 }
 
+/**
+ * Wie db_execute(), liefert aber die Zahl der GEAENDERTEN Zeilen statt der
+ * letzten Einfuege-Kennung. Noetig ueberall dort, wo ein bedingtes UPDATE die
+ * Entscheidung traegt ("nur schreiben, wenn noch niemand anderes war") — mit
+ * lastInsertId() sieht so ein UPDATE immer nach Misserfolg aus.
+ */
+function db_affected(string $sql, array $params = []): int {
+    $stmt = DB::get()->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->rowCount();
+}
+
 function db_count(string $sql, array $params = []): int {
     $stmt = DB::get()->prepare($sql);
     $stmt->execute($params);

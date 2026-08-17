@@ -53,3 +53,40 @@ function send_password_reset_email(array $user, string $token): bool {
     ');
     return send_email($user['email'], 'Passwort zurücksetzen', $body);
 }
+
+/**
+ * Meldet dem Kontoinhaber, dass eine Ruecksetzung ohne Postfachzugriff
+ * angestossen wurde — ueber Zwei-Faktor oder einen Ersatzcode.
+ *
+ * Warum: bei diesen beiden Wegen genuegen Benutzername und ein Code. Ohne
+ * diese Nachricht merkt der Inhaber die Uebernahme erst, wenn sein Passwort
+ * nicht mehr passt. Die Mail enthaelt bewusst KEINEN Link — sie warnt nur.
+ */
+function melde_ruecksetzung_ohne_postfach(int $userId, string $weg): void {
+    try {
+        $u = db_fetch('SELECT username, email FROM users WHERE user_id = ?', [$userId]);
+        if (!$u || empty($u['email'])) return;
+
+        $bezeichnung = $weg === 'backup' ? 'einen Ersatzcode' : 'den Zwei-Faktor-Code';
+        $betreff = 'Passwort-Ruecksetzung angefordert';
+        $text = '<p>Hallo ' . e($u['username']) . ',</p>'
+              . '<p>fuer dein Konto wurde soeben eine Passwort-Ruecksetzung ueber '
+              . $bezeichnung . ' angefordert. Warst du das, kannst du diese '
+              . 'Nachricht ignorieren.</p>'
+              . '<p><strong>Warst du das nicht</strong>, ist dein zweiter Faktor in '
+              . 'fremden Haenden. Melde dich an, richte die Zwei-Faktor-Anmeldung '
+              . 'neu ein und vergib neue Ersatzcodes.</p>';
+
+        send_email($u['email'], $betreff, $text);
+    } catch (Throwable $e) {
+        // Der Versand darf den Vorgang nicht aufhalten.
+        error_log('[reset] Warnmail fehlgeschlagen: ' . $e->getMessage());
+    }
+}
+
+/**
+ * Kurzer Name fuer den Aufruf aus pages/forgot.php.
+ */
+function passwort_ruecksetzung_melden(int $userId, string $weg): void {
+    melde_ruecksetzung_ohne_postfach($userId, $weg);
+}
