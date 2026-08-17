@@ -1,7 +1,7 @@
 <?php if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); } ?>
 <?php /** @var array $tags */ ?>
 
-<div class="section-heading">🏷️ Alle Tags</div>
+<div class="section-heading">Alle Tags</div>
 
 <div class="card" style="padding:18px">
   <?php if (empty($tags)): ?>

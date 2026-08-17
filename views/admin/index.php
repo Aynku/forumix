@@ -2316,6 +2316,7 @@
                 <option value="default"  <?= ($theme['theme_header_style'] ?? 'default') === 'default'  ? 'selected' : '' ?>>📋 Standard (Logo links, Suche + User-Menü rechts)</option>
                 <option value="centered" <?= ($theme['theme_header_style'] ?? '') === 'centered' ? 'selected' : '' ?>>⚖️ Zentriert (Logo mittig, klassisch)</option>
                 <option value="compact"  <?= ($theme['theme_header_style'] ?? '') === 'compact'  ? 'selected' : '' ?>>🤏 Kompakt (kleineres Banner)</option>
+                <option value="inline"   <?= ($theme['theme_header_style'] ?? '') === 'inline'   ? 'selected' : '' ?>>📏 Eine Zeile (Logo, Menü und Suche nebeneinander)</option>
               </select>
               <div class="form-hint">Bestimmt die Anordnung im Forum-Header.</div>
             </div>

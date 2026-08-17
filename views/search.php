@@ -7,11 +7,11 @@
   $isFiltered = $boardId || $author || $dateFrom || $dateTo || $hasReactions || $hasAttachments || $sortBy !== 'date_desc';
 ?>
 
-<div class="section-heading">🔍 <?= e(t('search')) ?></div>
+<div class="section-heading"><?= e(t('search')) ?></div>
 
 <?php if ($currentUser && !empty($savedSearches)): ?>
   <div class="saved-searches-bar">
-    <div class="saved-searches-label">⭐ Deine gespeicherten Suchen:</div>
+    <div class="saved-searches-label">Deine gespeicherten Suchen:</div>
     <div class="saved-searches-items">
       <?php foreach ($savedSearches as $s): ?>
         <span class="saved-search-chip">
@@ -28,17 +28,17 @@
 
 <form method="get" action="<?= e(FORUM_URL) ?>/search.php" class="form-card search-form">
   <div class="search-main-row">
-    <input type="text" name="q" value="<?= e($query) ?>" placeholder="🔍 Suchbegriff (min. 3 Zeichen)…" autofocus>
+    <input type="text" name="q" value="<?= e($query) ?>" placeholder="Suchbegriff (min. 3 Zeichen)…" autofocus>
     <button type="submit" class="btn btn-primary">Suchen</button>
     <button type="button" class="btn btn-ghost" id="toggle-filters">
-      <span id="filter-toggle-label">⚙️ Filter <?= $isFiltered ? '(aktiv)' : '' ?></span>
+      <span id="filter-toggle-label">Filter <?= $isFiltered ? '(aktiv)' : '' ?></span>
     </button>
   </div>
 
   <div class="search-filters <?= $isFiltered ? 'open' : '' ?>" id="search-filters">
     <div class="search-filter-grid">
       <div class="form-row">
-        <label>📋 Forum</label>
+        <label>Forum</label>
         <select name="board">
           <option value="0">– alle Foren –</option>
           <?php foreach ($boards as $b): ?>
@@ -50,22 +50,22 @@
       </div>
 
       <div class="form-row">
-        <label>👤 Autor (Benutzername)</label>
+        <label>Autor (Benutzername)</label>
         <input type="text" name="author_name" value="<?= e($author) ?>" placeholder="z.B. Mitgliedsname">
       </div>
 
       <div class="form-row">
-        <label>📅 Datum von</label>
+        <label>Datum von</label>
         <input type="date" name="date_from" value="<?= e($dateFrom) ?>">
       </div>
 
       <div class="form-row">
-        <label>📅 Datum bis</label>
+        <label>Datum bis</label>
         <input type="date" name="date_to" value="<?= e($dateTo) ?>">
       </div>
 
       <div class="form-row">
-        <label>🔀 Sortierung</label>
+        <label>Sortierung</label>
         <select name="sort">
           <option value="date_desc" <?= $sortBy === 'date_desc' ? 'selected' : '' ?>>Neueste zuerst</option>
           <option value="date_asc"  <?= $sortBy === 'date_asc'  ? 'selected' : '' ?>>Älteste zuerst</option>
@@ -76,14 +76,14 @@
       </div>
 
       <div class="form-row search-filter-checkboxes">
-        <label>🎯 Erweitert</label>
+        <label>Erweitert</label>
         <label class="search-chk">
           <input type="checkbox" name="has_reactions" value="1" <?= $hasReactions ? 'checked' : '' ?>>
-          ⭐ Mit Reaktionen
+          Mit Reaktionen
         </label>
         <label class="search-chk">
           <input type="checkbox" name="has_attachments" value="1" <?= $hasAttachments ? 'checked' : '' ?>>
-          📎 Mit Anhängen
+          Mit Anhängen
         </label>
       </div>
     </div>
@@ -91,7 +91,7 @@
     <?php if ($currentUser && $hasQuery): ?>
       <div class="search-save-row">
         <input type="text" id="save_name" placeholder="Name für diese Suche, z.B. „Neues aus dem Team"" maxlength="100" style="max-width:280px">
-        <button type="button" class="btn btn-ghost btn-sm" id="save-search-btn">⭐ Diese Suche speichern</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="save-search-btn">Diese Suche speichern</button>
       </div>
     <?php endif; ?>
   </div>
@@ -118,10 +118,10 @@
           <div class="search-result-title"><?= e($r['thread_title']) ?></div>
           <div class="search-result-snippet"><?= $r['snippet'] ?>…</div>
           <div class="search-result-stats">
-            💬 <?= (int) $r['reply_count'] ?>
+            <?= (int) $r['reply_count'] ?>
             <?php if ((int) $r['reaction_count'] > 0): ?> · ⭐ <?= (int) $r['reaction_count'] ?><?php endif; ?>
-            <?php if ((int) $r['attachment_count'] > 0): ?> · 📎 <?= (int) $r['attachment_count'] ?><?php endif; ?>
-            · 👁 <?= (int) $r['view_count'] ?>
+            <?php if ((int) $r['attachment_count'] > 0): ?> · <?= (int) $r['attachment_count'] ?><?php endif; ?>
+            · <?= (int) $r['view_count'] ?>
           </div>
         </a>
       <?php endforeach; ?>

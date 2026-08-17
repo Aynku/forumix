@@ -1,12 +1,12 @@
 <?php if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); } ?>
 <?php /** @var array $post; @var string $error; @var bool $isModEdit */ ?>
-<div class="section-heading">✏️ Beitrag bearbeiten</div>
+<div class="section-heading">Beitrag bearbeiten</div>
 <div class="form-card">
-    <?php if (!empty($error)): ?><div class="flash flash-error">❌ <?= e($error) ?></div><?php endif; ?>
+    <?php if (!empty($error)): ?><div class="flash flash-error"><?= e($error) ?></div><?php endif; ?>
 
     <?php if (!empty($isModEdit)): ?>
       <div class="flash" style="background:rgba(220,38,38,.12);border:1px solid var(--color-danger);color:var(--color-danger);margin-bottom:16px">
-        ⚠️ Du bearbeitest den Beitrag eines anderen Benutzers.
+        Du bearbeitest den Beitrag eines anderen Benutzers.
         Der Grund ist Pflicht und wird sichtbar unter dem Beitrag angezeigt.
       </div>
     <?php endif; ?>
@@ -23,7 +23,7 @@
 
       <?php if (!empty($tagsEditable) && !empty($availableTags)): ?>
       <div class="form-row">
-        <label>🏷️ Tags (max. 5)</label>
+        <label>Tags (max. 5)</label>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           <?php foreach ($availableTags as $tg): ?>
             <label class="tag-checkbox" style="border-color:<?= e($tg['color']) ?>">
@@ -51,7 +51,7 @@
                <?= !empty($isModEdit) ? 'required minlength="3"' : '' ?>>
         <div class="form-hint">
           <?php if (!empty($isModEdit)): ?>
-            🔴 Der Grund erscheint rot unter dem Beitrag und ist für alle sichtbar.
+            Der Grund erscheint rot unter dem Beitrag und ist für alle sichtbar.
           <?php else: ?>
             Sichtbar für Moderatoren im Edit-Verlauf.
           <?php endif; ?>

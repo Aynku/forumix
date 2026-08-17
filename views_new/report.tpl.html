@@ -1,8 +1,8 @@
-<div class="section-heading">🚨 Beitrag melden</div>
+<div class="section-heading">Beitrag melden</div>
 
 <div class="form-card">
   {% if error %}
-    <div class="flash flash-error">❌ {{ error }}</div>
+    <div class="flash flash-error">{{ error }}</div>
   {% endif %}
 
   <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
@@ -36,7 +36,7 @@
     </div>
 
     <div style="display:flex;gap:8px">
-      <button type="submit" class="btn btn-danger">🚨 Meldung absenden</button>
+      <button type="submit" class="btn btn-danger">Meldung absenden</button>
       <a href="{{ url('/thread.php?id=') }}{{ post.thread_id }}" class="btn btn-ghost">Abbrechen</a>
     </div>
   </form>

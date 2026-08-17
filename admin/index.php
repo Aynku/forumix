@@ -452,22 +452,9 @@ if ($action === 'send_test_mail' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 // ─── DESIGN: AUF DEFAULTS ZURÜCKSETZEN ───────────────────────────
 if ($action === 'reset_design' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
-    $defaults = [
-        'theme_color_bg_body'       => '0a0a0b', 'theme_color_bg_surface'    => '131316',
-        'theme_color_bg_surface2'   => '1a1a1f', 'theme_color_text_base'     => 'e7e7ea',
-        'theme_color_text_muted'    => 'a1a1aa', 'theme_color_text_faint'    => '71717a',
-        'theme_color_border'        => '24242b', 'theme_color_border_strong' => '34343d',
-        'theme_color_success'       => '4ade80', 'theme_color_warning'       => 'fbbf24',
-        'theme_color_danger'        => 'f87171',
-        'theme_color_bg_body_light' => 'f7f7f8', 'theme_color_bg_surface_light'    => 'ffffff',
-        'theme_color_bg_surface2_light'   => 'f3f3f5', 'theme_color_text_base_light'     => '18181b',
-        'theme_color_text_muted_light'    => '52525b', 'theme_color_text_faint_light'    => '71717a',
-        'theme_color_border_light'        => 'e8e8eb', 'theme_color_border_strong_light' => 'd4d4d8',
-        'theme_font_family'    => 'inter', 'theme_font_custom'    => '',
-        'theme_font_size_base' => '14',
-        'theme_radius_preset'  => 'medium', 'theme_density' => 'normal', 'theme_max_width' => '1200',
-    ];
-    foreach ($defaults as $k => $v) set_setting($k, $v);
+    // Dieselbe Liste, die auch ein frisches Forum bekommt — sonst stellt
+    // "Zuruecksetzen" irgendwann eine Palette her, die es nirgends sonst gibt.
+    foreach (theme_defaults() as $k => $v) set_setting($k, $v);
     unset($_SESSION['theme_preview']);
     flash('Design auf Standardwerte zurückgesetzt.', 'success');
     redirect(FORUM_URL . '/admin/?action=design');

@@ -2,24 +2,24 @@
 <?php /** @var array $team; @var array $members; @var array $pag; @var string $pagination; @var string $sort; @var int $totalUsers */ ?>
 
 <div class="section-heading">
-  👥 Mitglieder
+  Mitglieder
   <span style="font-size:12px;color:var(--text-muted);font-weight:400;text-transform:none">
     <?= number_format((int) $totalUsers, 0, ',', '.') ?> registriert
   </span>
 </div>
 
-<?php /* ════════════ TEAM ════════════ */ ?>
+<?php /* TEAM */ ?>
 <?php if (!empty($team['owners']) || !empty($team['admins']) || !empty($team['mods']) || !empty($team['board_mods'])): ?>
 <div class="card" style="margin-bottom:18px">
   <div class="card-header">
-    <span class="card-title">🛡️ Das Team</span>
+    <span class="card-title">Das Team</span>
   </div>
 
   <?php /* Owner – kann mehrere geben */ ?>
   <?php if (!empty($team['owners'])): ?>
     <div class="team-section">
       <div class="team-section-label" style="color:#7c3aed">
-        👑 <?= count($team['owners']) > 1 ? 'Inhaber:innen' : 'Inhaber' ?>
+        <?= count($team['owners']) > 1 ? 'Inhaber:innen' : 'Inhaber' ?>
       </div>
       <div class="team-grid">
         <?php foreach ($team['owners'] as $u): ?>
@@ -33,8 +33,8 @@
                 <strong style="color:#7c3aed"><?= e($u['username']) ?></strong>
               </div>
               <div class="team-meta">
-                📝 <?= (int) $u['post_count'] ?> &middot;
-                📅 seit <?= e(date('m/Y', strtotime($u['registered_at']))) ?>
+                <?= (int) $u['post_count'] ?> &middot;
+                seit <?= e(date('m/Y', strtotime($u['registered_at']))) ?>
               </div>
             </div>
           </a>
@@ -46,7 +46,7 @@
   <?php /* Admins */ ?>
   <?php if (!empty($team['admins'])): ?>
     <div class="team-section">
-      <div class="team-section-label" style="color:#dc2626">🔴 Administratoren</div>
+      <div class="team-section-label" style="color:#dc2626">Administratoren</div>
       <div class="team-grid">
         <?php foreach ($team['admins'] as $u): ?>
           <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $u['user_id'] ?>" class="team-card">
@@ -57,8 +57,8 @@
                 <strong style="color:#dc2626"><?= e($u['username']) ?></strong>
               </div>
               <div class="team-meta">
-                📝 <?= (int) $u['post_count'] ?> &middot;
-                📅 seit <?= e(date('m/Y', strtotime($u['registered_at']))) ?>
+                <?= (int) $u['post_count'] ?> &middot;
+                seit <?= e(date('m/Y', strtotime($u['registered_at']))) ?>
               </div>
             </div>
           </a>
@@ -70,7 +70,7 @@
   <?php /* Globale Mods */ ?>
   <?php if (!empty($team['mods'])): ?>
     <div class="team-section">
-      <div class="team-section-label" style="color:#f59e0b">🟠 Globale Moderatoren</div>
+      <div class="team-section-label" style="color:#f59e0b">Globale Moderatoren</div>
       <div class="team-grid">
         <?php foreach ($team['mods'] as $u): ?>
           <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $u['user_id'] ?>" class="team-card">
@@ -81,8 +81,8 @@
                 <strong style="color:#f59e0b"><?= e($u['username']) ?></strong>
               </div>
               <div class="team-meta">
-                📝 <?= (int) $u['post_count'] ?> &middot;
-                📅 seit <?= e(date('m/Y', strtotime($u['registered_at']))) ?>
+                <?= (int) $u['post_count'] ?> &middot;
+                seit <?= e(date('m/Y', strtotime($u['registered_at']))) ?>
               </div>
             </div>
           </a>
@@ -94,7 +94,7 @@
   <?php /* Forum-Mods */ ?>
   <?php if (!empty($team['board_mods'])): ?>
     <div class="team-section">
-      <div class="team-section-label" style="color:#f59e0b">🟡 Forum-Moderatoren</div>
+      <div class="team-section-label" style="color:#f59e0b">Forum-Moderatoren</div>
       <div class="team-grid">
         <?php foreach ($team['board_mods'] as $u): ?>
           <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $u['user_id'] ?>" class="team-card">
@@ -108,7 +108,7 @@
                 <?php
                   $titles = array_map(fn($b) => $b['title'], $u['boards']);
                 ?>
-                🛡️ <?= e(implode(', ', $titles)) ?>
+                <?= e(implode(', ', $titles)) ?>
               </div>
             </div>
           </a>
@@ -119,15 +119,15 @@
 </div>
 <?php endif; ?>
 
-<?php /* ════════════ ALLE MITGLIEDER ════════════ */ ?>
+<?php /* ALLE MITGLIEDER */ ?>
 <div class="section-heading">
   Alle Mitglieder
   <span>
-    <a href="?sort=posts" class="btn btn-ghost btn-xs <?= $sort === 'posts' ? 'btn-primary' : '' ?>">📝 Aktivste</a>
-    <a href="?sort=newest" class="btn btn-ghost btn-xs <?= $sort === 'newest' ? 'btn-primary' : '' ?>">🆕 Neueste</a>
-    <a href="?sort=oldest" class="btn btn-ghost btn-xs <?= $sort === 'oldest' ? 'btn-primary' : '' ?>">📅 Älteste</a>
-    <a href="?sort=name" class="btn btn-ghost btn-xs <?= $sort === 'name' ? 'btn-primary' : '' ?>">🔤 Name</a>
-    <a href="?sort=active" class="btn btn-ghost btn-xs <?= $sort === 'active' ? 'btn-primary' : '' ?>">⏰ Zuletzt aktiv</a>
+    <a href="?sort=posts" class="btn btn-ghost btn-xs <?= $sort === 'posts' ? 'btn-primary' : '' ?>">Aktivste</a>
+    <a href="?sort=newest" class="btn btn-ghost btn-xs <?= $sort === 'newest' ? 'btn-primary' : '' ?>">Neueste</a>
+    <a href="?sort=oldest" class="btn btn-ghost btn-xs <?= $sort === 'oldest' ? 'btn-primary' : '' ?>">Älteste</a>
+    <a href="?sort=name" class="btn btn-ghost btn-xs <?= $sort === 'name' ? 'btn-primary' : '' ?>">Name</a>
+    <a href="?sort=active" class="btn btn-ghost btn-xs <?= $sort === 'active' ? 'btn-primary' : '' ?>">Zuletzt aktiv</a>
   </span>
 </div>
 

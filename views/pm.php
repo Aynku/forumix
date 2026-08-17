@@ -3,21 +3,21 @@
 
 <div class="section-heading">
   <?php
-    if ($pmView === 'new')         echo '📝 Neue Nachricht';
-    elseif ($pmView === 'read')    echo '📨 Nachricht lesen';
-    elseif ($pmView === 'sent')    echo '📤 Gesendet';
-    else                            echo '📬 Posteingang';
+    if ($pmView === 'new')         echo 'Neue Nachricht';
+    elseif ($pmView === 'read')    echo 'Nachricht lesen';
+    elseif ($pmView === 'sent')    echo 'Gesendet';
+    else                            echo 'Posteingang';
   ?>
   <div style="display:flex;gap:8px">
-    <a href="<?= e(FORUM_URL) ?>/pm.php" class="btn btn-ghost btn-sm">📬 Eingang</a>
-    <a href="<?= e(FORUM_URL) ?>/pm.php?action=sent" class="btn btn-ghost btn-sm">📤 Gesendet</a>
+    <a href="<?= e(FORUM_URL) ?>/pm.php" class="btn btn-ghost btn-sm">Eingang</a>
+    <a href="<?= e(FORUM_URL) ?>/pm.php?action=sent" class="btn btn-ghost btn-sm">Gesendet</a>
     <a href="<?= e(FORUM_URL) ?>/pm.php?new=1" class="btn btn-primary btn-sm">+ Neue PN</a>
   </div>
 </div>
 
 <?php if ($pmView === 'new'): ?>
   <div class="form-card">
-    <?php if (!empty($error)): ?><div class="flash flash-error">❌ <?= e($error) ?></div><?php endif; ?>
+    <?php if (!empty($error)): ?><div class="flash flash-error"><?= e($error) ?></div><?php endif; ?>
     <form method="post">
       <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
       <div class="form-row">
@@ -37,7 +37,7 @@
         ?>
       </div>
       <div style="display:flex;gap:8px">
-        <button type="submit" class="btn btn-primary">📨 Senden</button>
+        <button type="submit" class="btn btn-primary">Senden</button>
         <a href="<?= e(FORUM_URL) ?>/pm.php" class="btn btn-ghost">Abbrechen</a>
       </div>
     </form>
@@ -57,7 +57,7 @@
       <?php endif; ?>
       &bull; <?= e(format_date($pm['sent_at'])) ?>
       <?php if ($isSenderView): ?>
-        &bull; <span style="font-style:italic"><?= $pm['is_read'] ? '✓ Gelesen' : '○ Noch nicht gelesen' ?></span>
+        &bull; <span style="font-style:italic"><?= $pm['is_read'] ? 'Gelesen' : 'Noch nicht gelesen' ?></span>
       <?php endif; ?>
     </p>
     <hr style="border:none;border-top:1px solid var(--border);margin-bottom:14px">
@@ -66,10 +66,10 @@
     <div style="display:flex;gap:8px">
       <?php if (!$isSenderView): ?>
         <a href="<?= e(FORUM_URL) ?>/pm.php?new=1&to=<?= (int) $pm['sender_id'] ?>&subject=<?= urlencode('Re: ' . $pm['subject']) ?>"
-           class="btn btn-primary btn-sm">↩️ Antworten</a>
+           class="btn btn-primary btn-sm">Antworten</a>
       <?php endif; ?>
       <a href="<?= e(FORUM_URL) ?>/pm.php?action=delete&id=<?= (int) $pm['pm_id'] ?>&csrf=<?= e($csrfToken) ?><?= $isSenderView ? '&from=sent' : '' ?>"
-         class="btn btn-danger btn-sm" onclick="return confirm('Löschen?')">🗑️ Löschen</a>
+         class="btn btn-danger btn-sm" onclick="return confirm('Löschen?')">Löschen</a>
       <a href="<?= e(FORUM_URL) ?>/pm.php<?= $isSenderView ? '?action=sent' : '' ?>" class="btn btn-ghost btn-sm">← Zurück</a>
     </div>
   </div>
@@ -83,7 +83,7 @@
       <div class="pm-list-item <?= (!$msg['is_read'] && $pmView !== 'sent') ? 'unread' : '' ?>">
         <div style="flex:1;min-width:0">
           <a href="<?= e(FORUM_URL) ?>/pm.php?action=read&id=<?= (int) $msg['pm_id'] ?>" class="pm-subject">
-            <?php if (!$msg['is_read'] && $pmView !== 'sent'): ?>🔵 <?php endif; ?><?= e($msg['subject']) ?>
+            <?php if (!$msg['is_read'] && $pmView !== 'sent'): ?><?php endif; ?><?= e($msg['subject']) ?>
           </a>
           <div class="thread-meta">
             <?= $pmView === 'sent' ? 'An' : 'Von' ?>:

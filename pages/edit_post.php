@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Beitrag zu kurz.';
     } elseif ($isModEdit && mb_strlen($editReason) < 3) {
         // Mod-Edit erfordert Grund-Pflicht
-        $error = '⚠️ Bei Bearbeitung eines fremden Beitrags ist ein Grund Pflicht.';
+        $error = 'Bei Bearbeitung eines fremden Beitrags ist ein Grund Pflicht.';
     } else {
         // Original-Inhalt im Edit-Log sichern
         record_post_edit((int) $postId, (int) $cu['user_id'], $post['content'], $content, $editReason);

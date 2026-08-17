@@ -1,15 +1,15 @@
 <div class="section-heading">
-  {% if pmView == 'new' %}📝 Neue Nachricht{% elseif pmView == 'read' %}📨 Nachricht lesen{% elseif pmView == 'sent' %}📤 Gesendet{% else %}📬 Posteingang{% endif %}
+  {% if pmView == 'new' %}Neue Nachricht{% elseif pmView == 'read' %}Nachricht lesen{% elseif pmView == 'sent' %}Gesendet{% else %}Posteingang{% endif %}
   <div style="display:flex;gap:8px">
-    <a href="{{ url('/pm.php') }}" class="btn btn-ghost btn-sm">📬 Eingang</a>
-    <a href="{{ url('/pm.php?action=sent') }}" class="btn btn-ghost btn-sm">📤 Gesendet</a>
+    <a href="{{ url('/pm.php') }}" class="btn btn-ghost btn-sm">Eingang</a>
+    <a href="{{ url('/pm.php?action=sent') }}" class="btn btn-ghost btn-sm">Gesendet</a>
     <a href="{{ url('/pm.php?new=1') }}" class="btn btn-primary btn-sm">+ Neue PN</a>
   </div>
 </div>
 
 {% if pmView == 'new' %}
   <div class="form-card">
-    {% if error %}<div class="flash flash-error">❌ {{ error }}</div>{% endif %}
+    {% if error %}<div class="flash flash-error">{{ error }}</div>{% endif %}
     <form method="post">
       <input type="hidden" name="csrf" value="{{ csrfToken }}">
       <div class="form-row">
@@ -25,7 +25,7 @@
         {{ render_editor('content', 'content', formContent ?? '', 'Deine private Nachricht…', true, false)|raw }}
       </div>
       <div style="display:flex;gap:8px">
-        <button type="submit" class="btn btn-primary">📨 Senden</button>
+        <button type="submit" class="btn btn-primary">Senden</button>
         <a href="{{ url('/pm.php') }}" class="btn btn-ghost">Abbrechen</a>
       </div>
     </form>
@@ -43,7 +43,7 @@
       {% endif %}
       &bull; {{ format_date(pm.sent_at) }}
       {% if isSenderView %}
-        &bull; <span style="font-style:italic">{{ pm.is_read ? '✓ Gelesen' : '○ Noch nicht gelesen' }}</span>
+        &bull; <span style="font-style:italic">{{ pm.is_read ? 'Gelesen' : 'Noch nicht gelesen' }}</span>
       {% endif %}
     </p>
     <hr style="border:none;border-top:1px solid var(--border);margin-bottom:14px">
@@ -52,10 +52,10 @@
     <div style="display:flex;gap:8px">
       {% if not isSenderView %}
         <a href="{{ url('/pm.php?new=1&to=') }}{{ pm.sender_id }}&subject={{ urlencode('Re: ' . pm.subject) }}"
-           class="btn btn-primary btn-sm">↩️ Antworten</a>
+           class="btn btn-primary btn-sm">Antworten</a>
       {% endif %}
       <a href="{{ url('/pm.php?action=delete&id=') }}{{ pm.pm_id }}&csrf={{ csrfToken }}{{ (isSenderView ? '&from=sent' : '')|raw }}"
-         class="btn btn-danger btn-sm" onclick="return confirm('Löschen?')">🗑️ Löschen</a>
+         class="btn btn-danger btn-sm" onclick="return confirm('Löschen?')">Löschen</a>
       <a href="{{ url('/pm.php') }}{{ (isSenderView ? '?action=sent' : '')|raw }}" class="btn btn-ghost btn-sm">← Zurück</a>
     </div>
   </div>
@@ -69,7 +69,7 @@
       <div class="pm-list-item {{ (not msg.is_read and pmView != 'sent') ? 'unread' : '' }}">
         <div style="flex:1;min-width:0">
           <a href="{{ url('/pm.php?action=read&id=') }}{{ msg.pm_id }}" class="pm-subject">
-            {% if not msg.is_read and pmView != 'sent' %}🔵 {% endif %}{{ msg.subject }}
+            {% if not msg.is_read and pmView != 'sent' %}{% endif %}{{ msg.subject }}
           </a>
           <div class="thread-meta">
             {{ pmView == 'sent' ? 'An' : 'Von' }}:

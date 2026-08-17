@@ -2,7 +2,7 @@
 <?php /** @var array $profile; @var array $overview; @var array $earned; @var int $total; @var int $points */ ?>
 
 <div class="section-heading">
-  🏆 Achievements von <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $profile['user_id'] ?>"><?= e($profile['username']) ?></a>
+  Achievements von <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $profile['user_id'] ?>"><?= e($profile['username']) ?></a>
 </div>
 
 <div class="stat-grid" style="margin-bottom:18px">
@@ -34,9 +34,9 @@
       <div class="achievement-meta">
         <span class="achievement-points">+<?= (int) $a['points'] ?> Pkt</span>
         <?php if ($isEarned): ?>
-          <span class="achievement-earned">✓ <?= e(format_date($a['earned_at'])) ?></span>
+          <span class="achievement-earned"><?= e(format_date($a['earned_at'])) ?></span>
         <?php else: ?>
-          <span class="achievement-locked">🔒 Noch nicht</span>
+          <span class="achievement-locked">Noch nicht</span>
         <?php endif; ?>
       </div>
     </div>

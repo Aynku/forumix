@@ -19,7 +19,6 @@ try {
 ?>
 <div class="card" style="margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
             border-left:3px solid var(--color-success)">
-  <span style="font-size:22px">✅</span>
   <div style="flex:1;min-width:200px">
     <strong style="color:var(--color-success)">Dieses Thema ist gelöst</strong>
     <div style="font-size:13px;color:var(--text-muted);margin-top:2px">

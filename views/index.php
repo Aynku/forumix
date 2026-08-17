@@ -6,21 +6,14 @@
 
 <?php foreach ($categories as $cat): ?>
   <div class="category-label"><?= e($cat['title']) ?></div>
+  <?php $zeigeMods = boards_have_mods($cat['boards'], $boardMods); ?>
   <div class="card">
+    <?php /* Ohne Kopfzeile: die Zahlen tragen ihre Bezeichnung selbst. */ ?>
     <table class="forum-table forum-table-responsive">
-      <thead>
-        <tr>
-          <th colspan="2">Forum</th>
-          <th style="text-align:center;width:70px">Threads</th>
-          <th style="text-align:center;width:70px">Beiträge</th>
-          <th style="width:220px">Letzter Beitrag</th>
-          <th style="width:160px">Moderatoren</th>
-        </tr>
-      </thead>
       <tbody>
         <?php if (empty($cat['boards'])): ?>
           <tr>
-            <td colspan="6" style="text-align:center;color:var(--text-faint);padding:20px">
+            <td colspan="4" style="text-align:center;color:var(--text-faint);padding:20px">
               Noch keine Foren in dieser Kategorie.
             </td>
           </tr>
@@ -28,8 +21,12 @@
         <?php foreach ($cat['boards'] as $b): ?>
         <?php $bIsLocked = !empty($b['password_hash']) && !board_user_can_access($b); ?>
         <tr class="forum-row">
-          <td class="forum-icon-cell" style="width:52px">
-            <div class="board-icon-wrap"><?= $bIsLocked ? '🔒' : '📋' ?></div>
+          <td class="forum-icon-cell" style="width:48px">
+            <?php if ($bIsLocked): ?>
+              <div class="board-icon-wrap is-locked" title="Gesperrt">🔒</div>
+            <?php else: ?>
+              <div class="board-icon-wrap"><?= e(board_initials($b['title'])) ?></div>
+            <?php endif; ?>
           </td>
           <td class="forum-main-cell">
             <a href="<?= e(FORUM_URL) ?>/board.php?id=<?= (int) $b['board_id'] ?>" class="board-title-link">
@@ -42,21 +39,26 @@
               <div class="board-desc"><?= e($b['description']) ?></div>
             <?php endif; ?>
           </td>
-          <td class="stat-cell" data-label="Threads"><?= number_format((int) $b['thread_count'], 0, ',', '.') ?></td>
-          <td class="stat-cell" data-label="Beiträge"><?= number_format((int) $b['post_count'], 0, ',', '.') ?></td>
+          <td class="stat-cell">
+            <b><?= number_format((int) $b['thread_count'], 0, ',', '.') ?></b>
+            <span class="stat-label">Themen</span><br>
+            <b><?= number_format((int) $b['post_count'], 0, ',', '.') ?></b>
+            <span class="stat-label">Beiträge</span>
+          </td>
           <td class="last-post-cell" data-label="Letzter Beitrag">
             <?php if (!empty($b['last_post_date'])): ?>
               <a href="<?= e(FORUM_URL) ?>/thread.php?id=<?= (int) $b['last_thread_id'] ?>">
-                <?= e(truncate($b['last_thread_title'] ?? '...', 32)) ?>
-              </a><br>
-              <span style="color:var(--text-faint)"><?= e(format_date($b['last_post_date'])) ?></span><br>
-              von <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $b['last_user_id'] ?>">
-                <?= e($b['last_username']) ?>
+                <?= e(truncate($b['last_thread_title'] ?? '...', 44)) ?>
               </a>
+              <span class="last-post-meta">
+                von <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $b['last_user_id'] ?>"><?= e($b['last_username']) ?></a>
+                · <?= e(format_date($b['last_post_date'])) ?>
+              </span>
             <?php else: ?>
               <span style="color:var(--text-faint)">Noch kein Beitrag</span>
             <?php endif; ?>
           </td>
+          <?php if ($zeigeMods): ?>
           <td class="mod-cell" data-label="Mods">
             <?php
               $mods = $boardMods[(int) $b['board_id']] ?? [];
@@ -75,6 +77,7 @@
               </div>
             <?php endif; ?>
           </td>
+          <?php endif; ?>
         </tr>
         <?php endforeach; ?>
       </tbody>
@@ -89,7 +92,7 @@
   <div class="card info-box">
     <div class="card-header">
       <span class="card-title">
-        🟢 <a href="<?= e(FORUM_URL) ?>/online.php" style="color:inherit">Wer ist online?</a>
+        <a href="<?= e(FORUM_URL) ?>/online.php" style="color:inherit">Wer ist online?</a>
       </span>
       <span style="font-size:11px;color:var(--text-muted)">
         <a href="<?= e(FORUM_URL) ?>/online.php" style="color:var(--text-muted)"><?= (int) $onlineStats['total'] ?> insgesamt →</a>
@@ -99,7 +102,7 @@
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">
         <?= (int) $onlineStats['members'] ?> Mitglieder &middot;
         <?= (int) $onlineStats['guests'] ?> Gäste<?php if (!empty($onlineStats['bots'])): ?> &middot;
-        🤖 <?= (int) $onlineStats['bots'] ?> Bots<?php endif; ?>
+        <?= (int) $onlineStats['bots'] ?> Bots<?php endif; ?>
       </div>
       <?php if (empty($onlineList)): ?>
         <p style="color:var(--text-faint);font-size:12px;font-style:italic">Niemand online.</p>
@@ -131,20 +134,20 @@
   <?php /* ── BOX: Forum-Statistiken ── */ ?>
   <div class="card info-box">
     <div class="card-header">
-      <span class="card-title">📊 Forum-Statistik</span>
+      <span class="card-title">Forum-Statistik</span>
     </div>
     <div style="padding:12px 16px;font-size:13px;line-height:1.9">
       <div>
-        💬 <strong><?= number_format((int) $forumStats['threads'], 0, ',', '.') ?></strong> Threads
+        <strong><?= number_format((int) $forumStats['threads'], 0, ',', '.') ?></strong> Themen
         &middot;
-        📝 <strong><?= number_format((int) $forumStats['posts'], 0, ',', '.') ?></strong> Beiträge
+        <strong><?= number_format((int) $forumStats['posts'], 0, ',', '.') ?></strong> Beiträge
       </div>
       <div>
-        👥 <strong><?= number_format((int) $forumStats['members'], 0, ',', '.') ?></strong> Mitglieder
+        <strong><?= number_format((int) $forumStats['members'], 0, ',', '.') ?></strong> Mitglieder
       </div>
       <?php if (!empty($forumStats['newest'])): ?>
         <div>
-          🆕 Neuestes Mitglied:
+          Neuestes Mitglied:
           <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $forumStats['newest']['user_id'] ?>">
             <strong><?= e($forumStats['newest']['username']) ?></strong>
           </a>

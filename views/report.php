@@ -1,11 +1,11 @@
 <?php if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); } ?>
 <?php /** @var array $post; @var array $reasons; @var string $error */ ?>
 
-<div class="section-heading">🚨 Beitrag melden</div>
+<div class="section-heading">Beitrag melden</div>
 
 <div class="form-card">
   <?php if ($error): ?>
-    <div class="flash flash-error">❌ <?= e($error) ?></div>
+    <div class="flash flash-error"><?= e($error) ?></div>
   <?php endif; ?>
 
   <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
@@ -39,7 +39,7 @@
     </div>
 
     <div style="display:flex;gap:8px">
-      <button type="submit" class="btn btn-danger">🚨 Meldung absenden</button>
+      <button type="submit" class="btn btn-danger">Meldung absenden</button>
       <a href="<?= e(FORUM_URL) ?>/thread.php?id=<?= (int) $post['thread_id'] ?>" class="btn btn-ghost">Abbrechen</a>
     </div>
   </form>

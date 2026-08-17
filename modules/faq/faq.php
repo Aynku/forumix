@@ -112,7 +112,7 @@ $byCategory = [];
 foreach ($items as $it) $byCategory[(int) $it['cat_id']][] = $it;
 
 render('@faq/faq', [
-    'title'       => '❓ FAQ – Häufige Fragen',
+    'title'       => 'FAQ – Häufige Fragen',
     'categories'  => $categories,
     'byCategory'  => $byCategory,
     'canAdmin'    => $canAdmin,

@@ -83,7 +83,7 @@ $forumName = forum_name();
   <style>
     /* ─── Theme-Tokens aus DB-Settings ─── */
     :root {
-      --color-accent: #<?= e($accentHex) ?>;
+      --color-accent-roh: #<?= e($accentHex) ?>;
       --color-accent-soft: <?= e($accentSoft) ?>;
       --color-success: #<?= e($theme['theme_color_success']) ?>;
       --color-warning: #<?= e($theme['theme_color_warning']) ?>;
@@ -138,13 +138,24 @@ $forumName = forum_name();
   <?php /* Einhaengepunkt ueber allem — fuer Baender, Hinweise, Warnungen. */ ?>
   <?php if (function_exists('render_module_hook')) render_module_hook('layout_top'); ?>
 
+  <?php
+    // Der einzeilige Kopf traegt Logo, Menue und Bedienung nebeneinander.
+    // Dafuer muss Platz her: der Schriftzug ersetzt das Bildlogo, und die
+    // Suche wandert aus dem Band in die Navigation. Ohne das quetschen sich
+    // fuenf Gruppen in eine Zeile, und keine davon hat noch Luft.
+    $einzeilig = (($theme['theme_header_style'] ?? 'default') === 'inline');
+  ?>
   <header id="site-header">
 
     <!-- ── ZEILE 0: Logo-Banner ── -->
     <div class="header-banner">
       <div class="header-inner">
         <a href="<?= e(FORUM_URL) ?>/index.php" id="forum-logo-banner" title="<?= e($forumName) ?>">
-          <?= forum_logo_render($forumName) ?>
+          <?php if ($einzeilig): ?>
+            <span class="forum-wortmarke"><?= e($forumName) ?></span>
+          <?php else: ?>
+            <?= forum_logo_render($forumName) ?>
+          <?php endif; ?>
         </a>
         <?php $slogan = '';
               try { $slogan = (string) get_setting('forum_slogan'); } catch (Exception $e) {} ?>
@@ -157,10 +168,11 @@ $forumName = forum_name();
     <!-- ── ZEILE 1: Suche, User-Bereich ── -->
     <div class="header-top">
       <div class="header-inner">
+        <?php if (!$einzeilig): ?>
         <form id="header-search" method="get" action="<?= e(FORUM_URL) ?>/search.php" role="search" autocomplete="off">
           <div id="quicksearch-wrap">
             <input type="text" name="q" id="quicksearch-input"
-                   placeholder="🔍 <?= e(t('search')) ?>…"
+                   placeholder="<?= e(t('search')) ?>…"
                    autocomplete="off"
                    aria-label="<?= e(t('search')) ?>"
                    aria-autocomplete="list"
@@ -169,6 +181,7 @@ $forumName = forum_name();
           </div>
           <button type="submit"><?= e(t('search')) ?></button>
         </form>
+        <?php endif; ?>
 
         <div id="header-user">
           <?php if ($currentUser): ?>
@@ -186,8 +199,8 @@ $forumName = forum_name();
                 <span style="font-size:10px;opacity:.6">▾</span>
               </button>
               <div class="user-menu-dropdown">
-                <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $currentUser['user_id'] ?>">👤 Mein Profil</a>
-                <a href="<?= e(FORUM_URL) ?>/settings.php">⚙️ Einstellungen</a>
+                <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $currentUser['user_id'] ?>">Mein Profil</a>
+                <a href="<?= e(FORUM_URL) ?>/settings.php">Einstellungen</a>
                 <div class="user-menu-divider"></div>
                 <?php
                   // Mod-Link: für Admins, Mods, Owner und Board-Mods
@@ -199,10 +212,10 @@ $forumName = forum_name();
                   }
                 ?>
                 <?php if ($showModLink): ?>
-                  <a href="<?= e(FORUM_URL) ?>/mod.php">🛡️ Moderator-Bereich</a>
+                  <a href="<?= e(FORUM_URL) ?>/mod.php">Moderator-Bereich</a>
                 <?php endif; ?>
                 <?php if ($isAdmin): ?>
-                  <a href="<?= e(FORUM_URL) ?>/admin/">⚙️ <?= e(t('admin')) ?></a>
+                  <a href="<?= e(FORUM_URL) ?>/admin/"><?= e(t('admin')) ?></a>
                 <?php endif; ?>
                 <?php if ($showModLink || $isAdmin): ?>
                   <div class="user-menu-divider"></div>
@@ -211,7 +224,7 @@ $forumName = forum_name();
                   <span id="theme-icon">🌙</span> <span>Theme wechseln</span>
                 </button>
                 <div class="user-menu-divider"></div>
-                <a href="<?= e(FORUM_URL) ?>/logout.php" class="user-menu-logout">🚪 <?= e(t('logout')) ?></a>
+                <a href="<?= e(FORUM_URL) ?>/logout.php" class="user-menu-logout"><?= e(t('logout')) ?></a>
               </div>
             </div>
           <?php else: ?>
@@ -246,29 +259,37 @@ $forumName = forum_name();
                 && in_array($script, ['home', 'index', 'board', 'thread', 'new_thread', 'edit_post', 'tag'], true);
           ?>
           <a href="<?= e(FORUM_URL) ?>/index.php" class="<?= $isHome ? 'active' : '' ?>">
-            📋 Forum
+            Forum
           </a>
           <a href="<?= e(FORUM_URL) ?>/members.php" class="<?= ($script === 'members' || $script === 'online') ? 'active' : '' ?>">
-            👥 Mitglieder
+            Mitglieder
           </a>
           <?php if ($currentUser): ?>
             <a href="<?= e(FORUM_URL) ?>/dashboard.php" class="<?= $script === 'dashboard' ? 'active' : '' ?>">
-              📊 Dashboard
+              Dashboard
             </a>
             <a href="<?= e(FORUM_URL) ?>/bookmarks.php" class="<?= $script === 'bookmarks' ? 'active' : '' ?>">
-              🔖 Lesezeichen
+              Lesezeichen
             </a>
             <a href="<?= e(FORUM_URL) ?>/achievements.php" class="<?= $script === 'achievements' ? 'active' : '' ?>">
-              🏆 Achievements
+              Achievements
             </a>
           <?php else: ?>
             <a href="<?= e(FORUM_URL) ?>/search.php?recent=1" class="<?= $script === 'search' ? 'active' : '' ?>">
-              📊 Aktuelles
+              Aktuelles
+            </a>
+          <?php endif; ?>
+          <?php /* Ohne Suchfeld im Kopfband muss die Suche hier stehen —
+                   sonst waere sie im einzeiligen Kopf nur noch ueber die
+                   Adresszeile erreichbar. */ ?>
+          <?php if ($einzeilig): ?>
+            <a href="<?= e(FORUM_URL) ?>/search.php" class="<?= $script === 'search' ? 'active' : '' ?>">
+              <?= e(t('search')) ?>
             </a>
           <?php endif; ?>
           <?php /* Module melden ihre Punkte im Manifest an, siehe module_menu_links(). */ ?>
-          <?php if (function_exists('module_menu_links')): ?>
-            <?php foreach (module_menu_links() as $ml): ?>
+          <?php if (function_exists('module_menu_links_fuer')): ?>
+            <?php foreach (module_menu_links_fuer('menue') as $ml): ?>
               <?php $mlPfad = (string) (parse_url($ml['url'], PHP_URL_PATH) ?: ''); ?>
               <a href="<?= e($ml['url']) ?>"
                  class="<?= ($mlPfad !== '' && $mlPfad === $aktuellerPfad) ? 'active' : '' ?>"><?= e($ml['label']) ?></a>
@@ -282,7 +303,7 @@ $forumName = forum_name();
   <?php if (!empty($breadcrumb)): ?>
   <nav id="breadcrumb">
     <div class="bc-inner">
-      <a href="<?= e(FORUM_URL) ?>/index.php">🏠 <?= e(t('home')) ?></a>
+      <a href="<?= e(FORUM_URL) ?>/index.php"><?= e(t('home')) ?></a>
       <?php foreach ($breadcrumb as $bc): ?>
         <span class="sep">›</span>
         <a href="<?= e($bc['url']) ?>"><?= e($bc['title']) ?></a>
@@ -327,15 +348,19 @@ $forumName = forum_name();
 
     <?php /* ── Zeile 2: Links ── */ ?>
     <p style="margin-bottom:8px;text-align:center">
+      <?php /* Reihenfolge nach Zusammengehoerigkeit: erst die Seiten, auf
+               denen steht, wer das hier betreibt und wie man ihn erreicht,
+               dann das Rechtliche. Die Tastenkuerzel sind eine Bequemlichkeit
+               und stehen deshalb am Ende. */ ?>
       <a href="<?= e(FORUM_URL) ?>/imprint.php">Impressum</a>
-      &bull; <a href="<?= e(FORUM_URL) ?>/privacy.php">Datenschutz</a>
-      &bull; <a href="<?= e(FORUM_URL) ?>/terms.php">Nutzungsbedingungen</a>
-      &bull; <a href="#" onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'?'}));return false;" title="Tastatur-Shortcuts anzeigen">⌨️ Shortcuts</a>
-      <?php if (function_exists('module_menu_links')): ?>
-        <?php foreach (module_menu_links() as $ml): ?>
+      <?php if (function_exists('module_menu_links_fuer')): ?>
+        <?php foreach (module_menu_links_fuer('fuss') as $ml): ?>
           &bull; <a href="<?= e($ml['url']) ?>"><?= e($ml['label']) ?></a>
         <?php endforeach; ?>
       <?php endif; ?>
+      &bull; <a href="<?= e(FORUM_URL) ?>/privacy.php">Datenschutz</a>
+      &bull; <a href="<?= e(FORUM_URL) ?>/terms.php">Nutzungsbedingungen</a>
+      &bull; <a href="#" onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'?'}));return false;" title="Tastatur-Shortcuts anzeigen">Shortcuts</a>
       <?php if ($footerLinks):
         // Format: "Label1|URL1, Label2|URL2"
         $pairs = array_filter(array_map('trim', explode(',', $footerLinks)));
@@ -400,7 +425,7 @@ $forumName = forum_name();
 ?>
 <div id="cookie-banner" class="cookie-banner" hidden>
   <div class="cookie-banner-inner">
-    <div class="cookie-banner-text">🍪 <?= e($cookieText) ?></div>
+    <div class="cookie-banner-text"><?= e($cookieText) ?></div>
     <button type="button" id="cookie-banner-accept" class="btn btn-primary btn-sm">Verstanden</button>
   </div>
 </div>

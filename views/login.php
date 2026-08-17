@@ -3,8 +3,8 @@
 <div style="max-width:420px;margin:0 auto">
   <div class="form-card">
     <?php if ($step === 'twofa'): ?>
-      <h2>🔐 Zwei-Faktor-Authentifizierung</h2>
-      <?php if (!empty($error)): ?><div class="flash flash-error">❌ <?= e($error) ?></div><?php endif; ?>
+      <h2>Zwei-Faktor-Authentifizierung</h2>
+      <?php if (!empty($error)): ?><div class="flash flash-error"><?= e($error) ?></div><?php endif; ?>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
         Gib den 6-stelligen Code aus deiner Authenticator-App ein.
       </p>
@@ -29,8 +29,8 @@
         <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">Bestätigen</button>
       </form>
     <?php else: ?>
-      <h2>🔑 Anmelden</h2>
-      <?php if (!empty($error)): ?><div class="flash flash-error">❌ <?= e($error) ?></div><?php endif; ?>
+      <h2>Anmelden</h2>
+      <?php if (!empty($error)): ?><div class="flash flash-error"><?= e($error) ?></div><?php endif; ?>
       <form method="post">
         <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
         <input type="hidden" name="_bt" value="<?= e($behaviorToken ?? '') ?>">
@@ -54,7 +54,7 @@
         <?php if (!empty($showCaptcha) && !empty($captcha)): ?>
           <div class="form-row captcha-row">
             <label>
-              🤖 Sicherheitsfrage:
+              Sicherheitsfrage:
               <strong style="font-size:18px;font-family:var(--font-mono)"><?= e($captcha['question']) ?> = ?</strong>
             </label>
             <input type="number" name="_captcha_answer" required autocomplete="off"
@@ -70,12 +70,12 @@
         <div class="form-row">
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
             <input type="checkbox" name="remember_me" value="1" style="width:16px;height:16px;cursor:pointer;accent-color:var(--color-accent)">
-            <span>🔒 Angemeldet bleiben (30 Tage)</span>
+            <span>Angemeldet bleiben (30 Tage)</span>
           </label>
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">Anmelden</button>
         <p style="text-align:center;margin-top:14px;font-size:12px">
-          <a href="<?= e(FORUM_URL) ?>/forgot.php">🔑 Passwort vergessen?</a>
+          <a href="<?= e(FORUM_URL) ?>/forgot.php">Passwort vergessen?</a>
         </p>
       </form>
       <p style="margin-top:16px;font-size:13px;text-align:center;color:var(--text-muted)">

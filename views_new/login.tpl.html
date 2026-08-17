@@ -2,9 +2,9 @@
   <div class="form-card">
     {% if step == 'twofa' %}
 
-      <h2>🔐 Zwei-Faktor-Authentifizierung</h2>
+      <h2>Zwei-Faktor-Authentifizierung</h2>
       {% if error %}
-        <div class="flash flash-error">❌ {{ error }}</div>
+        <div class="flash flash-error">{{ error }}</div>
       {% endif %}
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
         Gib den 6-stelligen Code aus deiner Authenticator-App ein.
@@ -32,9 +32,9 @@
 
     {% else %}
 
-      <h2>🔑 Anmelden</h2>
+      <h2>Anmelden</h2>
       {% if error %}
-        <div class="flash flash-error">❌ {{ error }}</div>
+        <div class="flash flash-error">{{ error }}</div>
       {% endif %}
       <form method="post">
         <input type="hidden" name="csrf" value="{{ csrfToken }}">
@@ -59,7 +59,7 @@
         {% if showCaptcha %}
           <div class="form-row captcha-row">
             <label>
-              🤖 Sicherheitsfrage:
+              Sicherheitsfrage:
               <strong style="font-size:18px;font-family:var(--font-mono)">{{ captcha.question }} = ?</strong>
             </label>
             <input type="number" name="_captcha_answer" required autocomplete="off"
@@ -75,12 +75,12 @@
         <div class="form-row">
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
             <input type="checkbox" name="remember_me" value="1" style="width:16px;height:16px;cursor:pointer;accent-color:var(--color-accent)">
-            <span>🔒 Angemeldet bleiben (30 Tage)</span>
+            <span>Angemeldet bleiben (30 Tage)</span>
           </label>
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">Anmelden</button>
         <p style="text-align:center;margin-top:14px;font-size:12px">
-          <a href="{{ url('/forgot.php') }}">🔑 Passwort vergessen?</a>
+          <a href="{{ url('/forgot.php') }}">Passwort vergessen?</a>
         </p>
       </form>
       <p style="margin-top:16px;font-size:13px;text-align:center;color:var(--text-muted)">

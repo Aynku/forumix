@@ -1,7 +1,7 @@
 <?php if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); } ?>
 <?php /** @var array $users; @var array $stats */ ?>
 
-<div class="section-heading">🟢 Wer ist online</div>
+<div class="section-heading">Wer ist online</div>
 
 <div class="stat-grid" style="margin-bottom:18px">
   <div class="stat-box">
@@ -57,7 +57,7 @@
                 <?= $bot['icon'] ?> <?= e($bot['name']) ?>
               </span>
             <?php else: ?>
-              <span style="color:var(--text-muted)">👻 Gast</span>
+              <span style="color:var(--text-muted)">Gast</span>
             <?php endif; ?>
           </td>
           <td style="font-size:12px;color:var(--text-muted)"><?= e($u['location']) ?></td>

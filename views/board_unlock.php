@@ -2,7 +2,7 @@
 <?php /** @var array $board; @var string $error */ ?>
 <div style="max-width:480px;margin:0 auto">
   <div class="form-card">
-    <h2>🔒 Passwort-geschütztes Forum</h2>
+    <h2>Passwort-geschütztes Forum</h2>
 
     <div style="padding:14px;background:var(--bg-surface2);border-radius:var(--radius-sm);margin-bottom:16px">
       <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">FORUM</div>
@@ -18,7 +18,7 @@
     </p>
 
     <?php if (!empty($error)): ?>
-      <div class="flash flash-error" style="margin-bottom:12px">❌ <?= e($error) ?></div>
+      <div class="flash flash-error" style="margin-bottom:12px"><?= e($error) ?></div>
     <?php endif; ?>
 
     <form method="post" autocomplete="off">
@@ -29,7 +29,7 @@
                placeholder="Passwort eingeben...">
       </div>
       <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
-        🔓 Entsperren
+        Entsperren
       </button>
     </form>
 

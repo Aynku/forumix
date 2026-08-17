@@ -1,10 +1,10 @@
-<div class="section-heading">✏️ Beitrag bearbeiten</div>
+<div class="section-heading">Beitrag bearbeiten</div>
 <div class="form-card">
-    {% if error %}<div class="flash flash-error">❌ {{ error }}</div>{% endif %}
+    {% if error %}<div class="flash flash-error">{{ error }}</div>{% endif %}
 
     {% if isModEdit %}
       <div class="flash" style="background:rgba(220,38,38,.12);border:1px solid var(--color-danger);color:var(--color-danger);margin-bottom:16px">
-        ⚠️ Du bearbeitest den Beitrag eines anderen Benutzers.
+        Du bearbeitest den Beitrag eines anderen Benutzers.
         Der Grund ist Pflicht und wird sichtbar unter dem Beitrag angezeigt.
       </div>
     {% endif %}
@@ -16,7 +16,7 @@
       </div>
       {% if tagsEditable and availableTags %}
       <div class="form-row">
-        <label>🏷️ Tags (max. 5)</label>
+        <label>Tags (max. 5)</label>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           {% for tg in availableTags %}
             <label class="tag-checkbox" style="border-color:{{ tg.color }}">
@@ -44,7 +44,7 @@
                {{ (isModEdit ? 'required minlength="3"' : '')|raw }}>
         <div class="form-hint">
           {% if isModEdit %}
-            🔴 Der Grund erscheint rot unter dem Beitrag und ist für alle sichtbar.
+            Der Grund erscheint rot unter dem Beitrag und ist für alle sichtbar.
           {% else %}
             Sichtbar für Moderatoren im Edit-Verlauf.
           {% endif %}

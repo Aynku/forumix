@@ -202,10 +202,32 @@ function module_menu_links(): array {
             $url = ltrim((string) $e['url'], '/');
             // Keine absoluten Adressen und kein Ausbrechen aus dem Forum.
             if (preg_match('#^[a-z]+://#i', $url) || str_contains($url, '..')) continue;
-            $links[] = ['label' => (string) $e['label'], 'url' => FORUM_URL . '/' . $url];
+            // 'ort' sagt, wo der Punkt erscheint: 'menue', 'fuss' oder
+            // 'beides'. Ohne Angabe bleibt es bei 'beides' — so war es vorher,
+            // und bestehende Module sollen sich nicht ploetzlich anders
+            // verhalten. Sinnvoll ist die Angabe trotzdem: ein Punkt, der oben
+            // UND unten steht, sagt zweimal dasselbe.
+            $ort = strtolower((string) ($e['ort'] ?? 'beides'));
+            if (!in_array($ort, ['menue', 'fuss', 'beides'], true)) $ort = 'beides';
+
+            $links[] = [
+                'label' => (string) $e['label'],
+                'url'   => FORUM_URL . '/' . $url,
+                'ort'   => $ort,
+            ];
         }
     }
     return $links;
+}
+
+/**
+ * Die Modulpunkte fuer eine Stelle: 'menue' (Kopfleiste) oder 'fuss'.
+ */
+function module_menu_links_fuer(string $ort): array {
+    return array_values(array_filter(
+        module_menu_links(),
+        fn ($l) => ($l['ort'] ?? 'beides') === 'beides' || ($l['ort'] ?? '') === $ort
+    ));
 }
 
 /**

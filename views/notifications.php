@@ -2,22 +2,22 @@
 <?php /** @var array $notifications */ ?>
 
 <div class="section-heading">
-  🔔 <?= e(t('notifications')) ?>
+  <?= e(t('notifications')) ?>
   <?php if (!empty($notifications)): ?>
     <span style="display:inline-flex;gap:6px">
       <a href="?mark_all=1&csrf=<?= e($csrfToken) ?>" class="btn btn-ghost btn-sm">
-        ✓ <?= e(t('mark_all_read')) ?>
+        <?= e(t('mark_all_read')) ?>
       </a>
       <a href="?delete_read=1&csrf=<?= e($csrfToken) ?>"
          class="btn btn-ghost btn-sm"
          onclick="return confirm('Alle bereits gelesenen Benachrichtigungen wirklich löschen?')">
-        🧹 Gelesene löschen
+        Gelesene löschen
       </a>
       <a href="?delete_all=1&csrf=<?= e($csrfToken) ?>"
          class="btn btn-ghost btn-sm action-danger"
          style="color:var(--color-danger);border-color:rgba(220,38,38,.3)"
          onclick="return confirm('WIRKLICH alle Benachrichtigungen löschen? Auch ungelesene!')">
-        🗑️ Alle löschen
+        Alle löschen
       </a>
     </span>
   <?php endif; ?>
@@ -59,11 +59,11 @@
                   'reply'    => t('notif_reply',   $from, $tt),
                   'mention'  => t('notif_mention', $from, $tt),
                   'pm'       => t('notif_pm',      $from, $ps),
-                  'warning'  => '⚠️ Du hast eine Verwarnung von <strong>' . $from . '</strong> erhalten',
-                  'report'   => '🚨 Neue Meldung von <strong>' . $from . '</strong>' . ($tt ? ' in „' . $tt . '"' : ''),
-                  'approved' => '✅ Dein Beitrag' . ($tt ? ' in „' . $tt . '"' : '') . ' wurde <strong>freigegeben</strong>',
-                  'rejected' => '🚫 Dein Beitrag' . ($tt ? ' in „' . $tt . '"' : '') . ' wurde leider <strong>abgelehnt</strong>',
-                  'mod_edit' => '✏️ Dein Beitrag' . ($tt ? ' in „' . $tt . '"' : '') . ' wurde von <strong>' . $from . '</strong> bearbeitet',
+                  'warning'  => 'Du hast eine Verwarnung von <strong>' . $from . '</strong> erhalten',
+                  'report'   => 'Neue Meldung von <strong>' . $from . '</strong>' . ($tt ? ' in „' . $tt . '"' : ''),
+                  'approved' => 'Dein Beitrag' . ($tt ? ' in „' . $tt . '"' : '') . ' wurde <strong>freigegeben</strong>',
+                  'rejected' => 'Dein Beitrag' . ($tt ? ' in „' . $tt . '"' : '') . ' wurde leider <strong>abgelehnt</strong>',
+                  'mod_edit' => 'Dein Beitrag' . ($tt ? ' in „' . $tt . '"' : '') . ' wurde von <strong>' . $from . '</strong> bearbeitet',
                   default    => 'Neue Benachrichtigung',
               };
             ?>

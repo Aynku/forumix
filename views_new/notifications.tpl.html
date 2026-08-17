@@ -1,20 +1,20 @@
 <div class="section-heading">
-  🔔 {{ t('notifications') }}
+  {{ t('notifications') }}
   {% if notifications %}
     <span style="display:inline-flex;gap:6px">
       <a href="?mark_all=1&csrf={{ csrfToken }}" class="btn btn-ghost btn-sm">
-        ✓ {{ t('mark_all_read') }}
+        {{ t('mark_all_read') }}
       </a>
       <a href="?delete_read=1&csrf={{ csrfToken }}"
          class="btn btn-ghost btn-sm"
          onclick="return confirm('Alle bereits gelesenen Benachrichtigungen wirklich löschen?')">
-        🧹 Gelesene löschen
+        Gelesene löschen
       </a>
       <a href="?delete_all=1&csrf={{ csrfToken }}"
          class="btn btn-ghost btn-sm action-danger"
          style="color:var(--color-danger);border-color:rgba(220,38,38,.3)"
          onclick="return confirm('WIRKLICH alle Benachrichtigungen löschen? Auch ungelesene!')">
-        🗑️ Alle löschen
+        Alle löschen
       </a>
     </span>
   {% endif %}

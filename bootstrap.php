@@ -247,6 +247,34 @@ function forum_accent_color(): string {
 }
 
 /**
+ * Zwei Buchstaben als Erkennungszeichen eines Forums: Anfangsbuchstaben der
+ * ersten beiden Woerter, sonst die ersten beiden Zeichen. "Fragen & Hilfe"
+ * wird FH, "Off-Topic" wird OT.
+ */
+function board_initials(string $title): string {
+    $worte = preg_split('/[\s\-–_&\/]+/u', trim($title), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+    $kurz  = '';
+    foreach ($worte as $w) {
+        $kurz .= mb_substr($w, 0, 1);
+        if (mb_strlen($kurz) === 2) break;
+    }
+    if ($kurz === '') $kurz = mb_substr(trim($title), 0, 2);
+    if (mb_strlen($kurz) === 1) $kurz .= mb_substr($worte[0] ?? $title, 1, 1);
+    return mb_strtoupper($kurz);
+}
+
+/**
+ * Hat in dieser Kategorie ueberhaupt ein Forum Moderatoren? Wenn nicht,
+ * faellt die Spalte weg, statt in jeder Zeile einen Gedankenstrich zu zeigen.
+ */
+function boards_have_mods(array $boards, array $boardMods): bool {
+    foreach ($boards as $b) {
+        if (!empty($boardMods[(int) ($b['board_id'] ?? 0)])) return true;
+    }
+    return false;
+}
+
+/**
  * Liefert alle Theme-Settings (Farben, Schrift, Form) mit Fallbacks.
  * Wird vom Layout aufgerufen um die CSS-Variablen zu erzeugen.
  */
@@ -254,38 +282,7 @@ function theme_settings(): array {
     static $cache = null;
     if ($cache !== null) return $cache;
 
-    $defaults = [
-        // Dark – Original-Theme (Discord/GitHub-Stil, aus style.css)
-        'theme_color_bg_body'       => '0a0a0b',
-        'theme_color_bg_surface'    => '131316',
-        'theme_color_bg_surface2'   => '1a1a1f',
-        'theme_color_text_base'     => 'e7e7ea',
-        'theme_color_text_muted'    => 'a1a1aa',
-        'theme_color_text_faint'    => '71717a',
-        'theme_color_border'        => '24242b',
-        'theme_color_border_strong' => '34343d',
-        'theme_color_success'       => '4ade80',
-        'theme_color_warning'       => 'fbbf24',
-        'theme_color_danger'        => 'f87171',
-        // Light
-        'theme_color_bg_body_light'       => 'f7f7f8',
-        'theme_color_bg_surface_light'    => 'ffffff',
-        'theme_color_bg_surface2_light'   => 'f3f3f5',
-        'theme_color_text_base_light'     => '18181b',
-        'theme_color_text_muted_light'    => '52525b',
-        'theme_color_text_faint_light'    => '71717a',
-        'theme_color_border_light'        => 'e8e8eb',
-        'theme_color_border_strong_light' => 'd4d4d8',
-        // Schrift
-        'theme_font_family'    => 'inter',
-        'theme_font_custom'    => '',
-        'theme_font_size_base' => '14',
-        // Form
-        'theme_radius_preset'  => 'medium',
-        'theme_density'        => 'normal',
-        'theme_max_width'      => '1200',
-        'theme_header_style'   => 'default',
-    ];
+    $defaults = theme_defaults();
 
     $out = [];
     foreach ($defaults as $key => $def) {
@@ -297,6 +294,54 @@ function theme_settings(): array {
         }
     }
     return $cache = $out;
+}
+
+/**
+ * Die Werkseinstellung des Themes — an EINER Stelle, weil die Verwaltung
+ * dieselbe Liste zum Zuruecksetzen braucht. Standen sie doppelt, wuerde
+ * "Zuruecksetzen" irgendwann eine andere Palette herstellen als eine
+ * Neuinstallation. (install/install.sql haelt die dritte Kopie — die laesst
+ * sich nicht vermeiden, sie legt die Zeilen ja erst an.)
+ */
+function theme_defaults(): array {
+    // Die Grautoene sind leicht ins Blaue gezogen. Ein neutrales Grau wirkt
+    // neben dem Indigo-Akzent stumpf; dieselbe Helligkeit mit etwas Blau
+    // darin liest sich als gewaehlt statt als Standardwert.
+    return [
+        // Dark
+        'theme_color_bg_body'       => '0d0f13',
+        'theme_color_bg_surface'    => '15181e',
+        'theme_color_bg_surface2'   => '1b1f26',
+        'theme_color_text_base'     => 'e4e6ea',
+        'theme_color_text_muted'    => '9aa0ab',
+        'theme_color_text_faint'    => '6b7280',
+        'theme_color_border'        => '252a33',
+        'theme_color_border_strong' => '333a45',
+        'theme_color_success'       => '4ade80',
+        'theme_color_warning'       => 'fbbf24',
+        'theme_color_danger'        => 'f87171',
+        // Light
+        'theme_color_bg_body_light'       => 'f5f6f8',
+        'theme_color_bg_surface_light'    => 'ffffff',
+        'theme_color_bg_surface2_light'   => 'eef0f4',
+        'theme_color_text_base_light'     => '1a1d23',
+        'theme_color_text_muted_light'    => '585e6b',
+        'theme_color_text_faint_light'    => '8b91a0',
+        'theme_color_border_light'        => 'e3e6ec',
+        'theme_color_border_strong_light' => 'ccd1da',
+        // Schrift
+        // Wie im Entwurf: die Schrift des Geraets. Inter liegt weiter bei
+        // und ist einen Klick entfernt, falls ueberall dasselbe Bild
+        // wichtiger ist als die vertraute Schrift.
+        'theme_font_family'    => 'system',
+        'theme_font_custom'    => '',
+        'theme_font_size_base' => '14',
+        // Form
+        'theme_radius_preset'  => 'medium',
+        'theme_density'        => 'normal',
+        'theme_max_width'      => '1200',
+        'theme_header_style'   => 'inline',
+    ];
 }
 
 /**

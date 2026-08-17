@@ -2,21 +2,21 @@
 <?php /** @var bool $invalid; @var bool $done; @var string $error; @var string $token */ ?>
 
 <div style="max-width:460px;margin:0 auto">
-  <div class="section-heading">🔑 Passwort zurücksetzen</div>
+  <div class="section-heading">Passwort zurücksetzen</div>
   <div class="form-card">
     <?php if ($invalid): ?>
-      <div class="flash flash-error">❌ Dieser Link ist ungültig oder abgelaufen. Bitte fordere einen neuen an.</div>
+      <div class="flash flash-error">Dieser Link ist ungültig oder abgelaufen. Bitte fordere einen neuen an.</div>
       <p style="margin-top:14px;text-align:center">
         <a href="<?= e(FORUM_URL) ?>/forgot.php" class="btn btn-primary btn-sm">Neuen Link anfordern</a>
       </p>
     <?php elseif ($done): ?>
-      <div class="flash flash-success">✅ Passwort erfolgreich gesetzt! Du kannst dich jetzt anmelden.</div>
+      <div class="flash flash-success">Passwort erfolgreich gesetzt! Du kannst dich jetzt anmelden.</div>
       <p style="margin-top:14px;text-align:center">
         <a href="<?= e(FORUM_URL) ?>/login.php" class="btn btn-primary">→ Zum Login</a>
       </p>
     <?php else: ?>
       <?php if ($error): ?>
-        <div class="flash flash-error">❌ <?= e($error) ?></div>
+        <div class="flash flash-error"><?= e($error) ?></div>
       <?php endif; ?>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
         Hallo <strong><?= e($username) ?></strong>, wähle ein neues Passwort:
@@ -57,7 +57,7 @@
           </div>
           <div class="password-match-hint" id="reset_pw_match" hidden></div>
         </div>
-        <button type="submit" class="btn btn-primary">💾 Passwort speichern</button>
+        <button type="submit" class="btn btn-primary">Passwort speichern</button>
       </form>
       <script>
       (function() {
@@ -95,10 +95,10 @@
           if (!v2) { matchHint.hidden = true; return; }
           matchHint.hidden = false;
           if (v1 === v2) {
-            matchHint.textContent = '✓ Passwörter stimmen überein';
+            matchHint.textContent = 'Passwörter stimmen überein';
             matchHint.className = 'password-match-hint match-ok';
           } else {
-            matchHint.textContent = '✗ Passwörter stimmen nicht überein';
+            matchHint.textContent = 'Passwörter stimmen nicht überein';
             matchHint.className = 'password-match-hint match-fail';
           }
         }

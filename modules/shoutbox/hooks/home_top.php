@@ -8,7 +8,7 @@ if (!isset($csrfToken))   $csrfToken   = $_SESSION['csrf_token'] ?? '';
 ?>
 <div class="shoutbox-card card" id="shoutbox-card">
   <div class="shoutbox-header">
-    <span class="shoutbox-title">💬 Shoutbox</span>
+    <span class="shoutbox-title">Shoutbox</span>
     <button type="button" class="shoutbox-toggle" id="shoutbox-toggle" title="Ein-/Ausklappen">▾</button>
   </div>
   <div class="shoutbox-body" id="shoutbox-body">

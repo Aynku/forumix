@@ -1,5 +1,5 @@
 <div class="section-heading">
-  🏆 Achievements von <a href="{{ url('/profile.php?id=') }}{{ profile.user_id }}">{{ profile.username }}</a>
+  Achievements von <a href="{{ url('/profile.php?id=') }}{{ profile.user_id }}">{{ profile.username }}</a>
 </div>
 
 <div class="stat-grid" style="margin-bottom:18px">
@@ -30,9 +30,9 @@
       <div class="achievement-meta">
         <span class="achievement-points">+{{ a.points }} Pkt</span>
         {% if isEarned %}
-          <span class="achievement-earned">✓ {{ format_date(a.earned_at) }}</span>
+          <span class="achievement-earned">{{ format_date(a.earned_at) }}</span>
         {% else %}
-          <span class="achievement-locked">🔒 Noch nicht</span>
+          <span class="achievement-locked">Noch nicht</span>
         {% endif %}
       </div>
     </div>

@@ -39,7 +39,7 @@
     <h1>
       <?= e($u['username'] ?? '–') ?>
       <?php if (!empty($u['is_owner'])): ?>
-        <span class="post-owner-badge">👑 OWNER</span>
+        <span class="post-owner-badge">OWNER</span>
       <?php elseif (!empty($u['is_admin'])): ?>
         <span class="post-admin-badge">A</span>
       <?php elseif (!empty($u['is_mod'])): ?>
@@ -58,13 +58,13 @@
       }
     ?>
     <?php if (!$hideRank && $rangText !== ''): ?>
-      <div class="dashboard-hero-rank">🏅 <?= e($rangText) ?></div>
+      <div class="dashboard-hero-rank"><?= e($rangText) ?></div>
     <?php endif; ?>
 
     <div class="dashboard-hero-meta">
-      <span>💬 <strong><?= (int) ($u['post_count'] ?? 0) ?></strong> Beiträge</span>
+      <span><strong><?= (int) ($u['post_count'] ?? 0) ?></strong> Beiträge</span>
       <span class="dashboard-hero-sep">·</span>
-      <span>📅 Dabei seit <?= e(format_date($u['registered_at'] ?? '')) ?></span>
+      <span>Dabei seit <?= e(format_date($u['registered_at'] ?? '')) ?></span>
     </div>
   </div>
   <div class="dashboard-hero-streak">
@@ -85,41 +85,41 @@
 <div class="dashboard-stats">
   <div class="dash-stat">
     <div class="dash-stat-num"><?= (int) ($ov['posts_total'] ?? 0) ?></div>
-    <div class="dash-stat-label">💬 Beiträge gesamt</div>
+    <div class="dash-stat-label">Beiträge gesamt</div>
   </div>
   <div class="dash-stat dash-stat-accent">
     <div class="dash-stat-num"><?= (int) ($ov['posts_week'] ?? 0) ?></div>
-    <div class="dash-stat-label">📈 Diese Woche</div>
+    <div class="dash-stat-label">Diese Woche</div>
   </div>
   <div class="dash-stat">
     <div class="dash-stat-num"><?= (int) ($ov['posts_month'] ?? 0) ?></div>
-    <div class="dash-stat-label">📅 Letzte 30 Tage</div>
+    <div class="dash-stat-label">Letzte 30 Tage</div>
   </div>
   <div class="dash-stat">
     <div class="dash-stat-num"><?= (int) ($ov['threads_started'] ?? 0) ?></div>
-    <div class="dash-stat-label">🧵 Themen gestartet</div>
+    <div class="dash-stat-label">Themen gestartet</div>
   </div>
   <div class="dash-stat">
     <div class="dash-stat-num"><?= (int) ($ov['reactions_received'] ?? 0) ?></div>
-    <div class="dash-stat-label">⭐ Reaktionen erhalten</div>
+    <div class="dash-stat-label">Reaktionen erhalten</div>
   </div>
   <div class="dash-stat">
     <div class="dash-stat-num"><?= (int) ($ov['reactions_given'] ?? 0) ?></div>
-    <div class="dash-stat-label">👍 Reaktionen gegeben</div>
+    <div class="dash-stat-label">Reaktionen gegeben</div>
   </div>
   <div class="dash-stat">
     <div class="dash-stat-num"><?= (int) ($ov['bookmarks'] ?? 0) ?></div>
-    <div class="dash-stat-label">🔖 Lesezeichen</div>
+    <div class="dash-stat-label">Lesezeichen</div>
   </div>
   <div class="dash-stat">
     <div class="dash-stat-num"><?= (int) $ach['unlocked'] ?>/<?= (int) $ach['total'] ?></div>
-    <div class="dash-stat-label">🏆 Achievements</div>
+    <div class="dash-stat-label">Achievements</div>
   </div>
 </div>
 
 <?php /* ── Heatmap ── */ ?>
 <div class="card" style="margin-bottom:18px;padding:20px">
-  <h2 style="font-size:15px;margin-bottom:14px">📊 Deine Aktivität – letzte 12 Wochen</h2>
+  <h2 style="font-size:15px;margin-bottom:14px">Deine Aktivität – letzte 12 Wochen</h2>
   <div class="heatmap-wrap">
     <div class="heatmap-grid">
       <?php
@@ -159,7 +159,7 @@
 <div class="dashboard-cols">
   <?php /* ── Top Posts ── */ ?>
   <div class="card" style="padding:18px">
-    <h2 style="font-size:15px;margin-bottom:12px">⭐ Deine Top-Beiträge</h2>
+    <h2 style="font-size:15px;margin-bottom:12px">Deine Top-Beiträge</h2>
     <?php if (empty($topPosts)): ?>
       <div style="color:var(--text-faint);font-size:13px;font-style:italic">Noch keine Reaktionen erhalten.</div>
     <?php else: ?>
@@ -179,7 +179,7 @@
 
   <?php /* ── Top Threads ── */ ?>
   <div class="card" style="padding:18px">
-    <h2 style="font-size:15px;margin-bottom:12px">🧵 Deine erfolgreichsten Themen</h2>
+    <h2 style="font-size:15px;margin-bottom:12px">Deine erfolgreichsten Themen</h2>
     <?php if (empty($topThr)): ?>
       <div style="color:var(--text-faint);font-size:13px;font-style:italic">Noch keine Themen gestartet.</div>
     <?php else: ?>
@@ -190,7 +190,7 @@
               <div class="dash-list-title"><?= e(mb_substr($t['title'], 0, 60)) ?></div>
               <div class="dash-list-snippet">vor <?= e(format_date($t['created_at'])) ?></div>
             </div>
-            <div class="dash-list-count">💬 <?= (int) $t['reply_count'] ?></div>
+            <div class="dash-list-count"><?= (int) $t['reply_count'] ?></div>
           </a>
         <?php endforeach; ?>
       </div>
@@ -199,7 +199,7 @@
 
   <?php /* ── Top Interaktionen ── */ ?>
   <div class="card" style="padding:18px">
-    <h2 style="font-size:15px;margin-bottom:12px">👥 Mit wem interagierst du am meisten?</h2>
+    <h2 style="font-size:15px;margin-bottom:12px">Mit wem interagierst du am meisten?</h2>
     <?php if (empty($topInt)): ?>
       <div style="color:var(--text-faint);font-size:13px;font-style:italic">
         Noch keine Interaktionen.
@@ -223,7 +223,7 @@
   <?php /* ── Achievements ── */ ?>
   <div class="card" style="padding:18px">
     <h2 style="font-size:15px;margin-bottom:12px">
-      🏆 Achievements
+      Achievements
       <a href="<?= e(FORUM_URL) ?>/achievements.php" style="font-size:12px;font-weight:400;margin-left:6px;color:var(--text-muted)">alle anzeigen →</a>
     </h2>
     <div class="dash-ach-progress">
@@ -251,7 +251,7 @@
 
 <?php /* ── Recent Activity ── */ ?>
 <div class="card" style="padding:18px;margin-top:18px">
-  <h2 style="font-size:15px;margin-bottom:12px">📝 Deine letzte Aktivität</h2>
+  <h2 style="font-size:15px;margin-bottom:12px">Deine letzte Aktivität</h2>
   <?php if (empty($recent)): ?>
     <div style="color:var(--text-faint);font-size:13px;font-style:italic">Noch keine Aktivität.</div>
   <?php else: ?>
@@ -263,7 +263,7 @@
             <div class="dash-list-title">
               <?= e($r['thread_title']) ?>
               <?php if (empty($r['is_approved'])): ?>
-                <span style="color:var(--color-warning);font-size:11px;margin-left:6px">⏳ wartet auf Freigabe</span>
+                <span style="color:var(--color-warning);font-size:11px;margin-left:6px">wartet auf Freigabe</span>
               <?php endif; ?>
             </div>
             <div class="dash-list-snippet">vor <?= e(format_date($r['created_at'])) ?></div>

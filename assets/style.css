@@ -15,20 +15,20 @@
   --color-success:      #16a34a;
   --color-warning:      #d97706;
 
-  --bg-body:     #f7f7f8;
+  --bg-body:     #f5f6f8;
   --bg-surface:  #ffffff;
-  --bg-surface2: #f3f3f5;
-  --bg-surface3: #e8e8eb;
+  --bg-surface2: #eef0f4;
+  --bg-surface3: #e3e6ec;
   --bg-header:   #ffffff;
-  --bg-header-border: #e8e8eb;
-  --bg-thead:    #f3f3f5;
+  --bg-header-border: #e3e6ec;
+  --bg-thead:    #eef0f4;
 
-  --border:        #e6e6e9;
-  --border-strong: #d4d4d8;
+  --border:        #e3e6ec;
+  --border-strong: #ccd1da;
 
-  --text-base:    #18181b;
-  --text-muted:   #71717a;
-  --text-faint:   #a1a1aa;
+  --text-base:    #1a1d23;
+  --text-muted:   #585e6b;
+  --text-faint:   #8b91a0;
   --text-on-dark: #ffffff;
   --text-link:    #18181b;
   --text-link-hover: #4f46e5;
@@ -37,13 +37,24 @@
   --shadow-md: 0 4px 6px -1px rgba(0,0,0,.06), 0 2px 4px -2px rgba(0,0,0,.04);
   --shadow-lg: 0 10px 25px -5px rgba(0,0,0,.10), 0 8px 10px -6px rgba(0,0,0,.05);
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
+  /* Kleinere Radien: bei 12px wirkt jede Tabelle wie eine Sammlung von
+     Kacheln. Eine Forenuebersicht ist aber eine Liste, keine Galerie. */
+  --radius-sm: 5px;
+  --radius-md: 7px;
+  --radius-lg: 10px;
 
   --font: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
   --transition: 200ms cubic-bezier(.4,0,.2,1);
+}
+
+/* Der Akzent kommt als Rohwert aus der Einstellung. Auf hellem Grund wird
+   er unveraendert benutzt; auf dunklem Grund waere ein sattes Indigo kaum vom
+   Hintergrund zu unterscheiden, deshalb wird er dort aufgehellt. So bleibt es
+   EINE Einstellung, und sie funktioniert in beiden Erscheinungsbildern. */
+:root { --color-accent: var(--color-accent-roh, #4f46e5); }
+:root[data-theme="dark"] {
+  --color-accent: color-mix(in srgb, var(--color-accent-roh, #4f46e5) 62%, #ffffff);
 }
 
 /* ── DARK MODE (Discord/GitHub-Stil) ── */
@@ -56,20 +67,23 @@
   --color-success:      #4ade80;
   --color-warning:      #fbbf24;
 
-  --bg-body:     #0a0a0b;
-  --bg-surface:  #131316;
-  --bg-surface2: #1a1a1f;
-  --bg-surface3: #24242b;
-  --bg-header:   #0f0f12;
-  --bg-header-border: #1f1f24;
-  --bg-thead:    #18181d;
+  /* Rueckfallwerte. Im Betrieb kommen diese Farben aus der settings-Tabelle
+     und werden vom Layout inline gesetzt — hier stehen sie fuer den Fall,
+     dass es die Zeilen noch nicht gibt. Beide Listen muessen dasselbe sagen. */
+  --bg-body:     #0d0f13;
+  --bg-surface:  #15181e;
+  --bg-surface2: #1b1f26;
+  --bg-surface3: #252a33;
+  --bg-header:   #111419;
+  --bg-header-border: #1f242c;
+  --bg-thead:    #191d24;
 
-  --border:        #24242b;
-  --border-strong: #34343d;
+  --border:        #252a33;
+  --border-strong: #333a45;
 
-  --text-base:    #e7e7ea;
-  --text-muted:   #9b9ba3;
-  --text-faint:   #5e5e68;
+  --text-base:    #e4e6ea;
+  --text-muted:   #9aa0ab;
+  --text-faint:   #6b7280;
   --text-on-dark: #ffffff;
   --text-link:    #e7e7ea;
   --text-link-hover: #a5b4fc;
@@ -129,7 +143,9 @@ code {
 .header-banner {
   padding: 0 20px;
   border-bottom: 1px solid var(--bg-header-border);
-  background: linear-gradient(180deg, var(--bg-surface2) 0%, var(--bg-header) 100%);
+  /* Flach statt Verlauf: der Schimmer hinter dem Logo war das Einzige auf
+     der Seite, das nach Politur aussah. */
+  background: var(--bg-header);
 }
 .header-banner .header-inner {
   max-width: 1320px;
@@ -408,11 +424,17 @@ code {
   background: var(--bg-surface2);
   text-decoration: none;
 }
+/* Der aktive Punkt war eine gefuellte Pille — im Kopfband sieht das aus wie
+   ein Knopf, der sich nicht druecken laesst. Ein Strich darunter sagt
+   dasselbe und nimmt keinen Platz. */
 .header-nav-main a.active {
-  color: var(--color-accent);
-  background: var(--color-accent-soft);
+  color: var(--text-base);
+  background: none;
   font-weight: 600;
+  box-shadow: inset 0 -2px 0 var(--color-accent);
+  border-radius: 0;
 }
+.header-nav-main a.active:hover { background: none; }
 
 /* Mobile-Anpassungen */
 @media (max-width: 700px) {
@@ -458,10 +480,12 @@ code {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
   margin-bottom: 16px;
   overflow: hidden;
 }
+/* Karten liegen nicht auf der Seite, sie sind die Seite. Ein Schatten unter
+   jedem Block ergibt Relief, wo nur eine Kante gemeint ist — die Schatten
+   bleiben den Dingen vorbehalten, die wirklich darueber schweben (Menues). */
 /* Cards die Action-Dropdowns enthalten dürfen nicht clippen,
    sonst werden die Menüs unten/seitlich abgeschnitten. */
 .card:has(.action-dropdown),
@@ -487,11 +511,13 @@ code {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: var(--text-muted);
-  padding: 18px 4px 8px;
+  letter-spacing: 1.1px;
+  color: var(--text-faint);
+  padding: 0 0 8px 2px;
+  margin-top: 20px;
 }
-.category-label:first-child { padding-top: 8px; }
+.category-label:first-of-type { margin-top: 4px; }
+
 
 /* ── FORUM TABLE ── */
 .forum-table {
@@ -510,7 +536,7 @@ code {
   border-bottom: 1px solid var(--border);
 }
 .forum-table td {
-  padding: 12px 16px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
   font-size: 13px;
@@ -518,20 +544,71 @@ code {
 .forum-table tr:last-child td { border-bottom: none; }
 .forum-table tr:hover td { background: var(--bg-surface2); }
 
+/* Monogramm statt Symbol: ein Klemmbrett-Emoji vor jedem Forum sagt nichts,
+   weil es vor jedem steht. Zwei Buchstaben aus dem Namen unterscheiden. */
 .board-icon-wrap {
-  width: 40px; height: 40px;
+  width: 34px; height: 34px;
   border-radius: var(--radius-sm);
-  background: var(--bg-surface3);
+  background: var(--bg-surface2);
+  border: 1px solid var(--border-strong);
+  color: var(--color-accent);
   display: flex; align-items: center; justify-content: center;
-  font-size: 18px; flex-shrink: 0;
-  filter: grayscale(.3);
+  font-size: 11.5px; font-weight: 650; letter-spacing: .02em;
+  flex-shrink: 0;
 }
-.board-title-link { font-weight: 600; color: var(--text-base); font-size: 14px; }
+[data-theme="dark"] .board-icon-wrap {
+  color: color-mix(in srgb, var(--color-accent) 55%, #ffffff);
+}
+.board-icon-wrap.is-locked { font-size: 15px; color: var(--text-muted); font-weight: 400; }
+.board-title-link { font-weight: 600; color: var(--text-base); font-size: 14.5px; line-height: 1.3; }
 .board-title-link:hover { color: var(--text-link-hover); }
-.board-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-.stat-cell { text-align: center; font-size: 13px; color: var(--text-muted); }
-.last-post-cell { font-size: 12px; color: var(--text-muted); }
-.last-post-cell a { color: var(--text-base); }
+.board-desc { font-size: 12.5px; color: var(--text-muted); margin-top: 1px; line-height: 1.4; }
+
+/* Zahlen rechtsbuendig und mit gleicher Ziffernbreite: sonst tanzen die
+   Spalten, sobald eine Zahl vierstellig wird. */
+/* Die Spaltenbreiten standen frueher im thead. Den gibt es nicht mehr, also
+   stehen sie hier. */
+.forum-table .stat-cell {
+  width: 118px;
+  text-align: right;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.forum-table .last-post-cell { width: 240px; }
+.forum-table .mod-cell { width: 150px; font-size: 12.5px; }
+.stat-cell b { color: var(--text-base); font-weight: 600; }
+.stat-cell .stat-label { color: var(--text-faint); }
+
+/* Der letzte Beitrag braucht seine eigene Zeile — vorher lief der Titel mit
+   Name und Zeit in einer Zeile und wurde bei jedem laengeren Betreff
+   abgeschnitten. */
+.last-post-cell {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  border-left: 1px solid var(--border);
+  padding-left: 14px;
+  min-width: 0;
+}
+/* Nur der Betreff bekommt die eigene Zeile — der Name in der Meta-Zeile
+   bleibt ein Link im Fliesstext. */
+.last-post-cell > a {
+  color: var(--text-base);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.last-post-cell a:hover { color: var(--text-link-hover); }
+.last-post-cell .last-post-meta {
+  display: block;
+  color: var(--text-faint);
+  font-size: 11.5px;
+  margin-top: 1px;
+}
+.last-post-cell .last-post-meta a { color: var(--text-muted); }
 
 /* ── THREAD TABLE ── */
 .thread-icon-wrap {
@@ -680,28 +757,63 @@ code {
   border-radius: var(--radius-md);
   margin-bottom: 12px;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
 }
+/* Aufbau der Beitragskarte (ab 700px):
+     +----------+-------------------+
+     | Benutzer | Zeit und Nummer   |
+     |          | Text              |
+     |          | Aktionen          |
+     +----------+-------------------+
+   Vorher lief die Kopfzeile als Balken ueber die ganze Karte, also auch
+   ueber die Benutzerspalte. Gelesen wird aber rechts — Zeit und Nummer
+   gehoeren dorthin, wo der Text steht. Moeglich macht das `display: contents`
+   an .post-body: dessen beide Spalten klinken sich in das Raster der Karte
+   ein, ohne dass die Vorlage sich aendert. */
+@media (min-width: 700px) {
+  .post-card {
+    display: grid;
+    grid-template-columns: 136px minmax(0, 1fr);
+    grid-template-areas:
+      "benutzer kopf"
+      "benutzer text"
+      "benutzer fuss";
+    align-items: start;
+  }
+  /* Muss .post-body { display: flex } weiter unten schlagen — deshalb ueber
+     die Karte ausgewaehlt und nicht ueber die Klasse allein. */
+  .post-card > .post-body { display: contents; }
+  .post-user-col    { grid-area: benutzer; align-self: stretch; }
+  .post-header      { grid-area: kopf; }
+  .post-content-col { grid-area: text; }
+  .post-footer      { grid-area: fuss; }
+  .post-pending-bar { grid-column: 1 / -1; }
+}
+
+/* Uhrzeit links, Nummer rechts — man liest den Beitrag von links, und die
+   Nummer braucht man nur zum Verweisen. */
+.post-header .post-nr { color: var(--text-faint); font-variant-numeric: tabular-nums; }
 .post-header {
-  background: var(--bg-surface2);
-  border-bottom: 1px solid var(--border);
-  padding: 8px 16px;
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 12px; color: var(--text-muted);
+  padding: 11px 18px 0;
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 11.5px; color: var(--text-faint);
 }
 .post-header a { color: var(--text-muted); font-weight: 600; }
 .post-header a:hover { color: var(--text-base); }
 .post-body { display: flex; }
 .post-user-col {
-  width: 160px; min-width: 160px;
+  /* 160px waren mehr Platz, als Name und Zaehler brauchen — der Lesetext
+     rechts hat dafuer gefehlt. */
+  width: 136px; min-width: 136px;
   border-right: 1px solid var(--border);
-  padding: 16px 12px;
+  padding: 14px 10px;
   text-align: center;
   background: var(--bg-surface2);
 }
 .post-avatar {
-  width: 72px; height: 72px;
-  border-radius: 50%;
+  /* 72px machten die Benutzerspalte hoeher als die meisten Beitraege — der
+     Rest der Karte war dann Leerraum. */
+  width: 46px; height: 46px;
+  border-radius: 10px;
   border: 2px solid var(--border-strong);
   object-fit: cover;
   margin: 0 auto 8px;
@@ -768,19 +880,33 @@ code {
   color: #fff !important;
 }
 
-.post-content-col { padding: 16px; flex: 1; min-width: 0; }
-.post-text { font-size: 13px; line-height: 1.75; word-wrap: break-word; }
+.post-content-col { padding: 15px 18px; flex: 1; min-width: 0; }
+/* 13px auf 1.75 ist eine Zeitungsspalte im Kleinformat: viel Durchschuss,
+   wenig Schrift. Etwas groesser und enger liest sich ruhiger. */
+.post-text { font-size: 14px; line-height: 1.65; word-wrap: break-word; }
 .post-signature {
   border-top: 1px dashed var(--border);
   margin-top: 14px; padding-top: 10px;
   font-size: 12px; color: var(--text-muted);
 }
 .post-footer {
-  border-top: 1px solid var(--border);
-  padding: 6px 16px;
-  display: flex; align-items: center; gap: 10px;
-  background: var(--bg-surface2);
+  padding: 0 18px 14px;
+  display: flex; align-items: center; gap: 8px;
+  background: none;
 }
+.post-footer .post-action {
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  padding: 2px 11px;
+  font-size: 11.5px;
+}
+.post-footer .post-action:hover {
+  border-color: var(--color-accent);
+  color: var(--text-base);
+}
+/* Fuer Gaeste ist jede Aktion darin ausgeblendet — uebrig blieb eine leere
+   graue Leiste unter jedem Beitrag. Ohne Aktion keine Leiste. */
+.post-footer:not(:has(.post-action)) { display: none; }
 .post-action { font-size: 12px; color: var(--text-muted); cursor: pointer; }
 .post-action:hover { color: var(--text-base); text-decoration: none; }
 .post-ip code { background: transparent; padding: 0; color: var(--text-muted); font-size: 12px; }
@@ -1363,11 +1489,21 @@ input[type="file"]::file-selector-button {
   flex-wrap: wrap;
   gap: 4px;
   align-items: center;
-  margin-top: 14px;
-  padding-top: 10px;
+  margin-top: 10px;
+  padding-top: 8px;
   border-top: 1px dashed var(--border);
   position: relative;
 }
+/* Ohne Reaktion steht dort nur der Hinzufuegen-Knopf. Der braucht keine
+   eigene Linie ueber sich und keinen Absatz darunter — sonst sieht jeder
+   kurze Beitrag aus, als fehle etwas. */
+.reactions-bar:not(:has(.reaction-count)) {
+  border-top: 0;
+  margin-top: 6px;
+  padding-top: 0;
+  opacity: .55;
+}
+.reactions-bar:not(:has(.reaction-count)):hover { opacity: 1; }
 
 .reaction-pill,
 .reaction-add {
@@ -1822,9 +1958,11 @@ input[type="file"]::file-selector-button {
   color: var(--color-accent) !important;
   text-decoration: none;
 }
+/* ACHTUNG: .board-title-link steht weiter oben schon einmal. Diese Regel
+   gewinnt, weil sie spaeter kommt — Aenderungen also HIER machen. */
 .board-title-link {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 14.5px;
   color: var(--text-base) !important;
   transition: color var(--transition);
 }
@@ -2834,10 +2972,10 @@ a.dash-list-item:hover {
     display: grid;
     grid-template-columns: 44px 1fr 1fr;
     grid-template-areas:
-      "icon main    main"
-      "icon threads beitraege"
-      ".    last    last"
-      ".    mods    mods";
+      "icon main   main"
+      "icon zahlen zahlen"
+      ".    last   last"
+      ".    mods   mods";
     gap: 4px 12px;
     align-items: start;
   }
@@ -2865,23 +3003,17 @@ a.dash-list-item:hover {
     margin-top: 2px;
   }
 
-  /* Stat-Zellen: Threads links, Beiträge rechts daneben */
+  /* Eine Zelle statt zwei, und die Zahlen tragen ihre Bezeichnung selbst.
+     Deshalb hier kein ::before wie bei den anderen Zellen. */
   .forum-table-responsive .stat-cell {
+    grid-area: zahlen;
     padding: 0;
     font-size: 12px;
     text-align: left;
     color: var(--text-muted);
   }
-  .forum-table-responsive .stat-cell::before {
-    content: attr(data-label) ": ";
-    color: var(--text-faint);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: .3px;
-    margin-right: 4px;
-  }
-  .forum-table-responsive .stat-cell:nth-of-type(3) { grid-area: threads; }
-  .forum-table-responsive .stat-cell:nth-of-type(4) { grid-area: beitraege; }
+  .forum-table-responsive .stat-cell br { display: none; }
+  .forum-table-responsive .stat-cell .stat-label { margin-right: 8px; }
 
   /* Letzter Beitrag */
   .forum-table-responsive .last-post-cell {
@@ -3847,6 +3979,15 @@ body .form-card,
 body .post-card {
   padding: calc(16px * var(--density-factor, 1));
 }
+/* ...ausser bei Karten, die ihren Aufbau selbst mitbringen. Die Forentabelle
+   und die Beitragskarte haben eigene Innenabstaende in Kopf, Zeile und Fuss;
+   der Rahmen aussenherum ergab einen zweiten Rand und liess die Trennlinien
+   in der Luft enden, statt bis an die Kante zu laufen. */
+body .card:has(> .forum-table),
+body .card:has(> .card-header),
+body .post-card {
+  padding: 0;
+}
 body .post-card-inner {
   padding: calc(14px * var(--density-factor, 1));
 }
@@ -3872,6 +4013,74 @@ body.header-centered #forum-logo-banner {
 }
 body.header-centered .header-slogan {
   text-align: center;
+}
+
+/* Eine Zeile: Logo, Menue und Suche nebeneinander statt uebereinander.
+   Die drei Zeilen des Standardkopfes werden zu Spalten. Unterhalb von 900px
+   gilt das nicht — dort ist fuer drei Dinge nebeneinander kein Platz, und der
+   Kopf faellt in den gewohnten Aufbau zurueck. */
+body.header-inline #site-header {
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--bg-header-border);
+}
+/* Schriftzug statt Bildlogo. Ein 130px hohes Banner laesst sich nicht in eine
+   54px hohe Zeile falten — der Name des Forums schon. */
+.forum-wortmarke {
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -.015em;
+  color: var(--text-base);
+  white-space: nowrap;
+}
+body.header-inline #forum-logo-banner { display: inline-flex; align-items: center; }
+@media (min-width: 900px) {
+  body.header-inline #site-header {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    padding: 0 20px;
+    min-height: 54px;
+  }
+  body.header-inline .header-banner,
+  body.header-inline .header-top,
+  body.header-inline .header-nav-main {
+    border: 0;
+    background: none;
+    padding: 0;
+  }
+  body.header-inline .header-banner .header-inner,
+  body.header-inline .header-top .header-inner,
+  body.header-inline .header-nav-main .header-inner {
+    max-width: none;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+  }
+  /* Reihenfolge im Markup ist Logo, Suche, Menue. Nebeneinander gelesen
+     gehoert das Menue aber neben das Logo und die Bedienung ans Ende —
+     sonst steht die Navigation ganz aussen rechts. */
+  body.header-inline .header-banner   { order: 1; }
+  body.header-inline .header-nav-main { order: 2; flex: 1; min-width: 0; }
+  body.header-inline .header-top      { order: 3; }
+  /* Das Menue steht mittig in der Zeile, nicht am Schriftzug geklebt. Es
+     bekommt den ganzen Platz zwischen Name und Bedienung und zentriert sich
+     darin. */
+  /* Zentriert werden muss die innere Liste: .header-nav-items hat flex:1 und
+     fuellt die Breite, ein justify-content eine Ebene darueber bleibt
+     wirkungslos. */
+  body.header-inline .header-nav-items { justify-content: center; }
+  /* Der Tag-Nacht-Schalter ist ein Nebenschalter, kein Knopf: gleiche Groesse
+     wie die Menuepunkte, aber ohne Rahmen und ohne Fuellung. */
+  body.header-inline #header-user .user-icon {
+    background: none;
+    border: 0;
+    opacity: .65;
+  }
+  body.header-inline #header-user .user-icon:hover { opacity: 1; }
+
+  body.header-inline .header-slogan { display: none; }
+  body.header-inline .header-top .header-inner { gap: 10px; }
+  body.header-inline .header-nav-main .header-inner { gap: 2px; }
 }
 
 /* Kompakt: Banner kleiner, weniger Padding */

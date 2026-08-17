@@ -467,14 +467,12 @@ document.addEventListener('click', function (e) {
       .then(r => r.json())
       .then(data => {
         if (data.error) { alert(data.error); return; }
-        const icon  = document.getElementById('bookmark-icon');
+        // Kein Zeichen mehr daneben — die Beschriftung sagt den Zustand.
         const label = document.getElementById('bookmark-label');
         if (data.action === 'added') {
-          icon.textContent = '🔖';
           label.textContent = 'Gespeichert';
           btn.dataset.bookmarked = '1';
         } else {
-          icon.textContent = '📑';
           label.textContent = 'Lesezeichen';
           btn.dataset.bookmarked = '0';
         }

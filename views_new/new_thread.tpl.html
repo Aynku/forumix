@@ -1,6 +1,6 @@
 <div class="section-heading">+ Neues Thema in „{{ board.title }}"</div>
 <div class="form-card">
-    {% if error %}<div class="flash flash-error">❌ {{ error }}</div>{% endif %}
+    {% if error %}<div class="flash flash-error">{{ error }}</div>{% endif %}
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf" value="{{ csrfToken }}">
       <div class="form-row">
@@ -12,13 +12,13 @@
         {{ render_editor('content', 'content', formContent ?? '', 'Schreibe etwas zum Thema… (BBCode unterstützt)', true, false)|raw }}
       </div>
       <div class="form-row">
-        <label>📎 {{ t('attach_file') }} (optional, max. 5 MB pro Datei)</label>
+        <label>{{ t('attach_file') }} (optional, max. 5 MB pro Datei)</label>
         <input type="file" name="attachments[]" multiple accept="image/*,application/pdf,text/plain,.zip,.rar">
       </div>
 
       {% if availableTags %}
       <div class="form-row">
-        <label>🏷️ Tags (max. 5)</label>
+        <label>Tags (max. 5)</label>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           {% for tg in availableTags %}
             <label class="tag-checkbox" style="border-color:{{ tg.color }}">
@@ -31,7 +31,7 @@
       {% endif %}
 
       <details style="margin:14px 0;padding:12px;background:var(--bg-surface2);border:1px solid var(--border);border-radius:6px">
-        <summary style="cursor:pointer;font-weight:600">📊 {{ t('add_poll') }}</summary>
+        <summary style="cursor:pointer;font-weight:600">{{ t('add_poll') }}</summary>
         <div style="margin-top:12px">
           <div class="form-row">
             <label>{{ t('poll_question') }}</label>

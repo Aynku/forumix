@@ -3,7 +3,7 @@
 <div style="max-width:480px;margin:40px auto">
   <div class="form-card">
     <?php if ($status === 'success'): ?>
-      <h2 style="margin-top:0">✅ Abmeldung erfolgreich</h2>
+      <h2 style="margin-top:0">Abmeldung erfolgreich</h2>
       <p style="line-height:1.6">
         Du wirst keine Benachrichtigungen mehr für
         <?php if ($threadTitle): ?>
@@ -19,7 +19,7 @@
       </p>
 
     <?php elseif ($status === 'error'): ?>
-      <h2 style="margin-top:0;color:var(--color-danger)">⚠️ Etwas ist schiefgegangen</h2>
+      <h2 style="margin-top:0;color:var(--color-danger)">Etwas ist schiefgegangen</h2>
       <p style="line-height:1.6">
         Wir konnten dein Abo gerade nicht entfernen. Bitte versuche es später nochmal oder
         melde dich in deinen <a href="<?= e(FORUM_URL) ?>/settings.php?tab=notifications">Einstellungen</a>
@@ -27,7 +27,7 @@
       </p>
 
     <?php else: ?>
-      <h2 style="margin-top:0;color:var(--color-danger)">❌ Ungültiger Link</h2>
+      <h2 style="margin-top:0;color:var(--color-danger)">Ungültiger Link</h2>
       <p style="line-height:1.6">
         Dieser Abmelde-Link ist nicht gültig oder bereits abgelaufen (Links sind 30 Tage gültig).
       </p>

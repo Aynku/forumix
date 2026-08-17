@@ -2,7 +2,7 @@
 <?php /** @var array $tag; @var array $threads */ ?>
 
 <div class="section-heading">
-  🏷️ Tag: <span style="color:<?= e($tag['color']) ?>"><?= e($tag['name']) ?></span>
+  Tag: <span style="color:<?= e($tag['color']) ?>"><?= e($tag['name']) ?></span>
   <span style="font-size:12px;color:var(--text-muted);font-weight:400;text-transform:none">
     <?= count($threads) ?> Threads
   </span>

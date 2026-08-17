@@ -11,7 +11,7 @@ $stats = online_stats();
 $showIps = is_mod() && (string) get_setting('show_ips_to_mods', '1') === '1';
 
 render('online', [
-    'title'   => '🟢 Wer ist online',
+    'title'   => 'Wer ist online',
     'users'   => $users,
     'stats'   => $stats,
     'showIps' => $showIps,

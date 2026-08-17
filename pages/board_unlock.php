@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (board_check_password($boardId, $pw)) {
             board_unlock_in_session($boardId);
             rate_limit_reset($rateKey);
-            flash('🔓 Forum entsperrt – willkommen!', 'success');
+            flash('Forum entsperrt – willkommen!', 'success');
             redirect(FORUM_URL . '/board.php?id=' . $boardId);
         } else {
             $error = 'Falsches Passwort.';
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 render('board_unlock', [
-    'title' => '🔒 ' . $board['title'],
+    'title' => '' . $board['title'],
     'board' => $board,
     'error' => $error,
 ]);

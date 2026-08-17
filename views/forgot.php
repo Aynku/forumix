@@ -2,27 +2,27 @@
 <?php /** @var bool $sent; @var string $error; @var string $method */ ?>
 
 <div style="max-width:520px;margin:0 auto">
-  <div class="section-heading">🔑 Passwort vergessen</div>
+  <div class="section-heading">Passwort vergessen</div>
 
   <div class="form-card">
     <?php if ($sent): ?>
-      <div class="flash flash-success">✅ Falls die E-Mail-Adresse bei uns hinterlegt ist, wurde dir ein Link geschickt. Schau auch im Spam-Ordner nach.</div>
+      <div class="flash flash-success">Falls die E-Mail-Adresse bei uns hinterlegt ist, wurde dir ein Link geschickt. Schau auch im Spam-Ordner nach.</div>
       <p style="margin-top:14px;text-align:center">
         <a href="<?= e(FORUM_URL) ?>/login.php" class="btn btn-ghost btn-sm">← Zum Login</a>
       </p>
     <?php else: ?>
 
       <?php if ($error): ?>
-        <div class="flash flash-error">❌ <?= e($error) ?></div>
+        <div class="flash flash-error"><?= e($error) ?></div>
       <?php endif; ?>
 
       <div class="recovery-tabs">
         <a href="<?= e(FORUM_URL) ?>/forgot.php?method=email"
-           class="recovery-tab <?= $method === 'email' ? 'active' : '' ?>">✉️ E-Mail</a>
+           class="recovery-tab <?= $method === 'email' ? 'active' : '' ?>">E-Mail</a>
         <a href="<?= e(FORUM_URL) ?>/forgot.php?method=2fa"
-           class="recovery-tab <?= $method === '2fa' ? 'active' : '' ?>">🔐 2FA-Code</a>
+           class="recovery-tab <?= $method === '2fa' ? 'active' : '' ?>">2FA-Code</a>
         <a href="<?= e(FORUM_URL) ?>/forgot.php?method=backup"
-           class="recovery-tab <?= $method === 'backup' ? 'active' : '' ?>">🔑 Backup-Code</a>
+           class="recovery-tab <?= $method === 'backup' ? 'active' : '' ?>">Backup-Code</a>
       </div>
 
       <form method="post" autocomplete="off">
@@ -78,7 +78,7 @@
         <?php if (!empty($showCaptcha) && !empty($captcha)): ?>
           <div class="form-row captcha-row">
             <label>
-              🤖 Sicherheitsfrage:
+              Sicherheitsfrage:
               <strong style="font-size:18px;font-family:var(--font-mono)"><?= e($captcha['question']) ?> = ?</strong>
             </label>
             <input type="number" name="_captcha_answer" required autocomplete="off"

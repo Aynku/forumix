@@ -8,6 +8,6 @@ return [
     'description' => 'Dateiablage mit eigener Seite. Admins laden Dateien hoch und gruppieren sie in Kategorien, alle anderen laden herunter. Zählt die Abrufe.',
     'icon'        => '📥',
     'version'     => '1.0',
-    'menu'        => ['label' => '📥 Downloads', 'url' => 'modules/downloads/downloads.php'],
+    'menu'        => ['label' => 'Downloads', 'url' => 'modules/downloads/downloads.php'],
     'author'      => 'Forumix',
 ];

@@ -1,6 +1,6 @@
 <?php if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); } ?>
 <?php $page = get_page('terms'); ?>
-<div class="section-heading">📜 <?= e($page['title'] ?? 'Nutzungsbedingungen') ?></div>
+<div class="section-heading"><?= e($page['title'] ?? 'Nutzungsbedingungen') ?></div>
 
 <div class="card" style="padding:28px 32px;line-height:1.7">
 

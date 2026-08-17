@@ -27,7 +27,7 @@
       </h2>
       <div class="profile-badge-row">
         <?php if (!empty($profile['is_owner'])): ?>
-          <span class="post-admin-badge" style="background:#7c3aed !important">👑 Owner</span>
+          <span class="post-admin-badge" style="background:#7c3aed !important">Owner</span>
         <?php elseif (!empty($profile['is_banned'])): ?>
           <span class="post-banned-badge">Gesperrt</span>
         <?php elseif ($profile['is_admin']): ?>
@@ -74,9 +74,9 @@
 
     <!-- Meta-Infos (kleiner Text) -->
     <div class="profile-meta">
-      📅 Dabei seit <strong><?= e(date('d.m.Y', strtotime($profile['registered_at']))) ?></strong>
+      Dabei seit <strong><?= e(date('d.m.Y', strtotime($profile['registered_at']))) ?></strong>
       <?php if (!empty($profile['last_login'])): ?>
-        · 🕐 Zuletzt aktiv <strong><?= e(format_date($profile['last_login'])) ?></strong>
+        · Zuletzt aktiv <strong><?= e(format_date($profile['last_login'])) ?></strong>
       <?php endif; ?>
     </div>
 
@@ -84,12 +84,12 @@
     <div class="profile-actions">
       <?php if ($currentUser && $currentUser['user_id'] != $profile['user_id']): ?>
         <a href="<?= e(FORUM_URL) ?>/pm.php?new=1&to=<?= (int) $profile['user_id'] ?>" class="btn btn-primary btn-sm">
-          📬 PN senden
+          PN senden
         </a>
       <?php endif; ?>
       <?php if ($currentUser && $currentUser['user_id'] == $profile['user_id']): ?>
         <a href="<?= e(FORUM_URL) ?>/settings.php" class="btn btn-primary btn-sm">
-          ⚙️ Profil bearbeiten
+          Profil bearbeiten
         </a>
       <?php endif; ?>
     </div>
@@ -101,7 +101,7 @@
   $visibleFields = profile_visible_fields($profile, $currentUser);
   if (!empty($visibleFields)):
 ?>
-<div class="section-heading">👤 Über <?= e($profile['username']) ?></div>
+<div class="section-heading">Über <?= e($profile['username']) ?></div>
 <div class="card" style="margin-bottom:16px;padding:14px 16px">
   <div class="profile-fields-grid">
     <?php foreach ($visibleFields as $key => $field): ?>
@@ -130,7 +130,7 @@
 <!-- ── Signatur ─────────────────────────────────────────────── -->
 <?php if (!empty($profile['signature'])): ?>
 <div class="card" style="margin-bottom:16px">
-  <div class="card-header"><div class="card-title">✍️ Signatur</div></div>
+  <div class="card-header"><div class="card-title">Signatur</div></div>
   <div class="card-body" style="padding:14px 16px;font-size:13px">
     <?= bbcode($profile['signature']) ?>
   </div>
@@ -138,7 +138,7 @@
 <?php endif; ?>
 
 <!-- ── Letzte Beiträge ──────────────────────────────────────── -->
-<div class="section-heading">📰 Letzte Beiträge</div>
+<div class="section-heading">Letzte Beiträge</div>
 <div class="card" style="margin-bottom:16px">
   <table class="forum-table">
     <thead><tr><th>Thread</th><th style="width:180px">Datum</th></tr></thead>
@@ -174,7 +174,7 @@
 ?>
 <details class="mod-ip-history" <?= !$hasMore ? 'open' : '' ?>>
   <summary class="mod-ip-summary">
-    <span>🔍 IP-Verlauf <span style="color:var(--text-faint);font-weight:normal">(nur für Moderatoren · <?= $ipCount ?> Einträge)</span></span>
+    <span>IP-Verlauf <span style="color:var(--text-faint);font-weight:normal">(nur für Moderatoren · <?= $ipCount ?> Einträge)</span></span>
     <span class="mod-ip-summary-chevron">▼</span>
   </summary>
 
@@ -193,7 +193,7 @@
         <tr class="ip-row <?= $hidden ? 'ip-row-hidden' : '' ?>" <?= $hidden ? 'style="display:none"' : '' ?>>
           <td><code><?= e($h['ip']) ?></code></td>
           <td><?php
-            $icons = ['register' => '📝 Registriert', 'login' => '🔑 Login', 'post' => '📨 Post'];
+            $icons = ['register' => 'Registriert', 'login' => 'Login', 'post' => 'Post'];
             echo $icons[$h['action']] ?? e($h['action']);
           ?></td>
           <td style="font-size:12px;color:var(--text-muted)"><?= e(format_date($h['last_seen'])) ?></td>
@@ -202,7 +202,7 @@
             <?php if ($isAdmin): ?>
               <a href="<?= e(FORUM_URL) ?>/admin/?action=ban_ip&ip=<?= e(urlencode($h['ip'])) ?>&csrf=<?= e($csrfToken) ?>"
                  class="btn btn-danger btn-xs"
-                 onclick="return confirm('IP <?= e($h['ip']) ?> sperren?')">🚫 IP sperren</a>
+                 onclick="return confirm('IP <?= e($h['ip']) ?> sperren?')">IP sperren</a>
             <?php endif; ?>
           </td>
         </tr>

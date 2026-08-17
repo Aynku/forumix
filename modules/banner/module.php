@@ -10,6 +10,6 @@ return [
     'version'     => '1.0',
     // Nur fuer die Verwaltung sichtbar: fuer alle anderen waere es ein Link
     // auf eine Seite, die sie ohnehin nicht bedienen duerfen.
-    'menu'        => ['label' => '📣 Band', 'url' => 'modules/banner/banner.php', 'admin' => true],
+    'menu'        => ['label' => 'Band', 'url' => 'modules/banner/banner.php', 'admin' => true, 'ort' => 'menue'],
     'author'      => 'Forumix',
 ];

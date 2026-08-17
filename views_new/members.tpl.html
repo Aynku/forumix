@@ -1,5 +1,5 @@
 <div class="section-heading">
-  👥 Mitglieder
+  Mitglieder
   <span style="font-size:12px;color:var(--text-muted);font-weight:400;text-transform:none">
     {{ number_format(totalUsers, 0, ',', '.') }} registriert
   </span>
@@ -8,13 +8,13 @@
 {% if team.owners or team.admins or team.mods or team.board_mods %}
 <div class="card" style="margin-bottom:18px">
   <div class="card-header">
-    <span class="card-title">🛡️ Das Team</span>
+    <span class="card-title">Das Team</span>
   </div>
 
   {% if team.owners %}
     <div class="team-section">
       <div class="team-section-label" style="color:#7c3aed">
-        👑 {{ count(team.owners) > 1 ? 'Inhaber:innen' : 'Inhaber' }}
+        {{ count(team.owners) > 1 ? 'Inhaber:innen' : 'Inhaber' }}
       </div>
       <div class="team-grid">
         {% for u in team.owners %}
@@ -28,8 +28,8 @@
                 <strong style="color:#7c3aed">{{ u.username }}</strong>
               </div>
               <div class="team-meta">
-                📝 {{ u.post_count }} &middot;
-                📅 seit {{ date('m/Y', strtotime(u.registered_at)) }}
+                {{ u.post_count }} &middot;
+                seit {{ date('m/Y', strtotime(u.registered_at)) }}
               </div>
             </div>
           </a>
@@ -40,7 +40,7 @@
 
   {% if team.admins %}
     <div class="team-section">
-      <div class="team-section-label" style="color:#dc2626">🔴 Administratoren</div>
+      <div class="team-section-label" style="color:#dc2626">Administratoren</div>
       <div class="team-grid">
         {% for u in team.admins %}
           <a href="{{ url('/profile.php?id=') }}{{ u.user_id }}" class="team-card">
@@ -51,8 +51,8 @@
                 <strong style="color:#dc2626">{{ u.username }}</strong>
               </div>
               <div class="team-meta">
-                📝 {{ u.post_count }} &middot;
-                📅 seit {{ date('m/Y', strtotime(u.registered_at)) }}
+                {{ u.post_count }} &middot;
+                seit {{ date('m/Y', strtotime(u.registered_at)) }}
               </div>
             </div>
           </a>
@@ -63,7 +63,7 @@
 
   {% if team.mods %}
     <div class="team-section">
-      <div class="team-section-label" style="color:#f59e0b">🟠 Globale Moderatoren</div>
+      <div class="team-section-label" style="color:#f59e0b">Globale Moderatoren</div>
       <div class="team-grid">
         {% for u in team.mods %}
           <a href="{{ url('/profile.php?id=') }}{{ u.user_id }}" class="team-card">
@@ -74,8 +74,8 @@
                 <strong style="color:#f59e0b">{{ u.username }}</strong>
               </div>
               <div class="team-meta">
-                📝 {{ u.post_count }} &middot;
-                📅 seit {{ date('m/Y', strtotime(u.registered_at)) }}
+                {{ u.post_count }} &middot;
+                seit {{ date('m/Y', strtotime(u.registered_at)) }}
               </div>
             </div>
           </a>
@@ -86,7 +86,7 @@
 
   {% if team.board_mods %}
     <div class="team-section">
-      <div class="team-section-label" style="color:#f59e0b">🟡 Forum-Moderatoren</div>
+      <div class="team-section-label" style="color:#f59e0b">Forum-Moderatoren</div>
       <div class="team-grid">
         {% for u in team.board_mods %}
           <a href="{{ url('/profile.php?id=') }}{{ u.user_id }}" class="team-card">
@@ -97,7 +97,7 @@
                 <strong style="color:#f59e0b">{{ u.username }}</strong>
               </div>
               <div class="team-meta">
-                🛡️ {% for b in u.boards %}{% if not loop.first %}, {% endif %}{{ b.title }}{% endfor %}
+                {% for b in u.boards %}{% if not loop.first %}, {% endif %}{{ b.title }}{% endfor %}
               </div>
             </div>
           </a>
@@ -111,11 +111,11 @@
 <div class="section-heading">
   Alle Mitglieder
   <span>
-    <a href="?sort=posts" class="btn btn-ghost btn-xs {{ sort == 'posts' ? 'btn-primary' : '' }}">📝 Aktivste</a>
-    <a href="?sort=newest" class="btn btn-ghost btn-xs {{ sort == 'newest' ? 'btn-primary' : '' }}">🆕 Neueste</a>
-    <a href="?sort=oldest" class="btn btn-ghost btn-xs {{ sort == 'oldest' ? 'btn-primary' : '' }}">📅 Älteste</a>
-    <a href="?sort=name" class="btn btn-ghost btn-xs {{ sort == 'name' ? 'btn-primary' : '' }}">🔤 Name</a>
-    <a href="?sort=active" class="btn btn-ghost btn-xs {{ sort == 'active' ? 'btn-primary' : '' }}">⏰ Zuletzt aktiv</a>
+    <a href="?sort=posts" class="btn btn-ghost btn-xs {{ sort == 'posts' ? 'btn-primary' : '' }}">Aktivste</a>
+    <a href="?sort=newest" class="btn btn-ghost btn-xs {{ sort == 'newest' ? 'btn-primary' : '' }}">Neueste</a>
+    <a href="?sort=oldest" class="btn btn-ghost btn-xs {{ sort == 'oldest' ? 'btn-primary' : '' }}">Älteste</a>
+    <a href="?sort=name" class="btn btn-ghost btn-xs {{ sort == 'name' ? 'btn-primary' : '' }}">Name</a>
+    <a href="?sort=active" class="btn btn-ghost btn-xs {{ sort == 'active' ? 'btn-primary' : '' }}">Zuletzt aktiv</a>
   </span>
 </div>
 

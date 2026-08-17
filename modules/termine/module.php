@@ -8,6 +8,6 @@ return [
     'description' => 'Terminliste mit eigener Seite. Die nächsten Termine erscheinen zusätzlich oben auf der Startseite. Anlegen und pflegen dürfen Admins.',
     'icon'        => '📅',
     'version'     => '1.0',
-    'menu'        => ['label' => '📅 Termine', 'url' => 'modules/termine/termine.php'],
+    'menu'        => ['label' => 'Termine', 'url' => 'modules/termine/termine.php'],
     'author'      => 'Forumix',
 ];

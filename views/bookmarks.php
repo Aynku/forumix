@@ -1,7 +1,7 @@
 <?php if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); } ?>
 <?php /** @var array $bookmarks */ ?>
 
-<div class="section-heading">🔖 Meine Lesezeichen (<?= count($bookmarks) ?>)</div>
+<div class="section-heading">Meine Lesezeichen (<?= count($bookmarks) ?>)</div>
 
 <div class="card">
   <?php if (empty($bookmarks)): ?>

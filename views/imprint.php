@@ -3,13 +3,13 @@
   $imp  = imprint_data();
   $page = get_page('imprint');
 ?>
-<div class="section-heading">📄 <?= e($page['title'] ?? 'Impressum') ?></div>
+<div class="section-heading"><?= e($page['title'] ?? 'Impressum') ?></div>
 
 <div class="card" style="padding:28px 32px">
 
   <?php if (($imp['is_default'] ?? false) && is_admin(current_user())): ?>
     <div class="flash flash-warning" style="margin-bottom:20px">
-      ⚠️ <strong>Hinweis für Administratoren:</strong> Die Impressums-Daten sind noch nicht ausgefüllt.
+      <strong>Hinweis für Administratoren:</strong> Die Impressums-Daten sind noch nicht ausgefüllt.
       Bitte unter <a href="<?= e(FORUM_URL) ?>/admin/?action=legal">Admin → Rechtliches</a> die Daten eintragen.
     </div>
   <?php endif; ?>

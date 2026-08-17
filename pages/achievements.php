@@ -17,7 +17,7 @@ $total    = count($overview);
 $points   = user_total_points((int) $profile['user_id']);
 
 render('achievements', [
-    'title'    => '🏆 Achievements',
+    'title'    => 'Achievements',
     'profile'  => $profile,
     'overview' => $overview,
     'earned'   => $earned,

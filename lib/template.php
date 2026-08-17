@@ -160,8 +160,15 @@ function tpl_compile(string $source): string {
         function ($m) {
             $item = $m[1];
             $list = tpl_compile_expression($m[2]);
-            // loop-Variable mit metadaten füllen
-            return '<?php $__loop_list = ' . $list . ' ?? []; '
+            // loop-Variable mit metadaten füllen.
+            //
+            // Sie wird auf einen Stapel gelegt und am Ende zurueckgeholt: es
+            // gibt nur EIN $loop, und eine innere Schleife hat die aeussere
+            // sonst ueberschrieben. Sichtbar wurde das in der Themenansicht —
+            // dort trugen alle Beitraege die Nummer #1, weil die (leere)
+            // Reaktionsschleife $loop bei jedem Durchgang neu anlegte.
+            return '<?php $__loop_stapel[] = $loop ?? null; '
+                 . '$__loop_list = ' . $list . ' ?? []; '
                  . '$loop = (object)["index" => 0, "index0" => -1, "first" => true, "last" => false, "length" => is_countable($__loop_list) ? count($__loop_list) : 0]; '
                  . 'foreach ($__loop_list as $' . $item . '): '
                  . '$loop->index0++; $loop->index = $loop->index0 + 1; '
@@ -170,7 +177,8 @@ function tpl_compile(string $source): string {
         },
         $source
     );
-    $source = preg_replace('/\{%\s*endfor\s*%\}/', '<?php endforeach; ?>', $source);
+    $source = preg_replace('/\{%\s*endfor\s*%\}/',
+        '<?php endforeach; $loop = array_pop($__loop_stapel); ?>', $source);
 
     // 6. {{ expr|filter|filter }} – Ausgabe mit Filter-Kette
     $source = preg_replace_callback(

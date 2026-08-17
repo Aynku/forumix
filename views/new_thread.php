@@ -2,7 +2,7 @@
 <?php /** @var array $board; @var string $error */ ?>
 <div class="section-heading">+ Neues Thema in „<?= e($board['title']) ?>"</div>
 <div class="form-card">
-    <?php if (!empty($error)): ?><div class="flash flash-error">❌ <?= e($error) ?></div><?php endif; ?>
+    <?php if (!empty($error)): ?><div class="flash flash-error"><?= e($error) ?></div><?php endif; ?>
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
       <div class="form-row">
@@ -18,13 +18,13 @@
         ?>
       </div>
       <div class="form-row">
-        <label>📎 <?= e(t('attach_file')) ?> (optional, max. 5 MB pro Datei)</label>
+        <label><?= e(t('attach_file')) ?> (optional, max. 5 MB pro Datei)</label>
         <input type="file" name="attachments[]" multiple accept="image/*,application/pdf,text/plain,.zip,.rar">
       </div>
 
       <?php if (!empty($availableTags)): ?>
       <div class="form-row">
-        <label>🏷️ Tags (max. 5)</label>
+        <label>Tags (max. 5)</label>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           <?php foreach ($availableTags as $tg): ?>
             <label class="tag-checkbox" style="border-color:<?= e($tg['color']) ?>">
@@ -37,7 +37,7 @@
       <?php endif; ?>
 
       <details style="margin:14px 0;padding:12px;background:var(--bg-surface2);border:1px solid var(--border);border-radius:6px">
-        <summary style="cursor:pointer;font-weight:600">📊 <?= e(t('add_poll')) ?></summary>
+        <summary style="cursor:pointer;font-weight:600"><?= e(t('add_poll')) ?></summary>
         <div style="margin-top:12px">
           <div class="form-row">
             <label><?= e(t('poll_question')) ?></label>

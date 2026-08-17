@@ -2,44 +2,44 @@
    Wichtig: Filter (|raw, |length etc) nur in {{ }}, NIE in {% %}
    Funktionsaufrufe wie profile_field_schema() laufen direkt #}
 
-<div class="section-heading">⚙️ Einstellungen</div>
+<div class="section-heading">Einstellungen</div>
 
 {# ──── Tab-Navigation ──── #}
 <div class="settings-tabs">
   <a href="{{ url('/settings.php?tab=profile') }}"
      class="settings-tab {% if activeTab == 'profile' %}active{% endif %}">
-    👤 Profil
+    Profil
   </a>
   <a href="{{ url('/settings.php?tab=security') }}"
      class="settings-tab {% if activeTab == 'security' %}active{% endif %}">
-    🔐 Sicherheit
+    Sicherheit
   </a>
   <a href="{{ url('/settings.php?tab=sessions') }}"
      class="settings-tab {% if activeTab == 'sessions' %}active{% endif %}">
-    💻 Sitzungen
+    Sitzungen
     {% if count(sessions) > 0 %}
       <span class="settings-tab-badge">{{ count(sessions) }}</span>
     {% endif %}
   </a>
   <a href="{{ url('/settings.php?tab=notifications') }}"
      class="settings-tab {% if activeTab == 'notifications' %}active{% endif %}">
-    🔔 Benachrichtigungen
+    Benachrichtigungen
   </a>
   <a href="{{ url('/settings.php?tab=preferences') }}"
      class="settings-tab {% if activeTab == 'preferences' %}active{% endif %}">
-    🎨 Darstellung
+    Darstellung
   </a>
   <a href="{{ url('/settings.php?tab=danger') }}"
      class="settings-tab {% if activeTab == 'danger' %}active{% endif %}">
-    ⚠️ Konto
+    Konto
   </a>
 </div>
 
 {% if error %}
-  <div class="flash flash-error" style="margin-bottom:14px">❌ {{ error }}</div>
+  <div class="flash flash-error" style="margin-bottom:14px">{{ error }}</div>
 {% endif %}
 
-{# ══════════ TAB: Profil ══════════ #}
+{# TAB: Profil #}
 {% if activeTab == 'profile' %}
 <div class="form-card">
   <p style="font-size:13px;color:var(--text-muted);margin-bottom:18px">
@@ -55,7 +55,7 @@
     <input type="hidden" name="action" value="save_profile">
 
     <div class="form-row">
-      <label>🖼️ Avatar</label>
+      <label>Avatar</label>
       <div class="media-edit-row">
         <img src="{{ avatar_url(profile) }}" alt="Aktuelles Avatar"
              class="media-edit-preview avatar-preview zoomable-avatar"
@@ -66,7 +66,7 @@
           {% if profile.avatar %}
             <label class="checkbox-line" style="margin-top:6px">
               <input type="checkbox" name="delete_avatar" value="1">
-              <span>🗑️ Aktuelles Avatar entfernen (zurück zum Standard-Bild)</span>
+              <span>Aktuelles Avatar entfernen (zurück zum Standard-Bild)</span>
             </label>
           {% endif %}
         </div>
@@ -74,7 +74,7 @@
     </div>
 
     <div class="form-row">
-      <label>🎨 Profilbanner</label>
+      <label>Profilbanner</label>
       <div class="media-edit-row">
         {% if profile.profile_banner %}
           <img src="{{ url('/uploads/avatars/') }}{{ profile.profile_banner | escape }}"
@@ -88,7 +88,7 @@
           {% if profile.profile_banner %}
             <label class="checkbox-line" style="margin-top:6px">
               <input type="checkbox" name="delete_banner" value="1">
-              <span>🗑️ Aktuellen Banner entfernen</span>
+              <span>Aktuellen Banner entfernen</span>
             </label>
           {% endif %}
         </div>
@@ -107,9 +107,9 @@
     </h3>
     <p style="font-size:12px;color:var(--text-muted);margin:0 0 18px;line-height:1.6">
       Alle Felder sind optional. Pro Feld kannst du wählen wer es sehen darf:
-      <span style="white-space:nowrap">🌐 Öffentlich</span> ·
-      <span style="white-space:nowrap">🔒 Nur Mitglieder</span> ·
-      <span style="white-space:nowrap">🔐 Nur ich</span>
+      <span style="white-space:nowrap">Öffentlich</span> ·
+      <span style="white-space:nowrap">Nur Mitglieder</span> ·
+      <span style="white-space:nowrap">Nur ich</span>
     </p>
 
     {# Da Engine kein loop.key hat, rendern wir die Felder mit einem Helper-Aufruf
@@ -117,27 +117,27 @@
     {% set privacy = profile_privacy_settings(profile) %}
     {{ render_profile_field_inputs(profile, privacy) | raw }}
 
-    <button type="submit" class="btn btn-primary">💾 Profil speichern</button>
+    <button type="submit" class="btn btn-primary">Profil speichern</button>
   </form>
 </div>
 {% endif %}
 
-{# ══════════ TAB: Sicherheit ══════════ #}
+{# TAB: Sicherheit #}
 {% if activeTab == 'security' %}
 
 {# ─── E-Mail-Adresse ─── #}
 <div class="form-card">
-  <h3 style="margin-top:0">✉️ E-Mail-Adresse</h3>
+  <h3 style="margin-top:0">E-Mail-Adresse</h3>
 
   {% if profile.pending_email %}
     {# Aktive Änderungs-Anfrage → Status anzeigen #}
     <div style="padding:14px;background:var(--bg-surface2);border-radius:6px;margin-bottom:14px">
       <div style="margin-bottom:8px">
         <span style="color:var(--text-muted)">Aktuelle Adresse (noch aktiv):</span><br>
-        <strong>🔒 {{ profile.email }}</strong>
+        <strong>{{ profile.email }}</strong>
       </div>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-        <span style="color:var(--text-muted)">⏳ Ausstehende Änderung auf:</span><br>
+        <span style="color:var(--text-muted)">Ausstehende Änderung auf:</span><br>
         <strong>{{ profile.pending_email }}</strong>
         <div style="margin-top:8px;font-size:13px;color:var(--text-muted)">
           Bitte den Bestätigungs-Link in der Mail an die neue Adresse klicken.
@@ -149,7 +149,7 @@
     <form method="post" onsubmit="return confirm('E-Mail-Änderungs-Anfrage wirklich abbrechen?')">
       <input type="hidden" name="csrf" value="{{ csrfToken }}">
       <input type="hidden" name="action" value="cancel_email_change">
-      <button type="submit" class="btn btn-ghost btn-sm">✕ Änderung abbrechen</button>
+      <button type="submit" class="btn btn-ghost btn-sm">Änderung abbrechen</button>
     </form>
 
   {% else %}
@@ -167,7 +167,7 @@
 
     <details style="margin-top:8px">
       <summary style="cursor:pointer;color:var(--color-accent);font-weight:500;padding:8px 0">
-        📧 E-Mail-Adresse ändern
+        E-Mail-Adresse ändern
       </summary>
 
       <form method="post" style="margin-top:14px;padding:14px;background:var(--bg-surface2);border-radius:6px">
@@ -187,12 +187,12 @@
         </div>
 
         <div style="padding:10px 12px;background:rgba(245,158,11,0.1);border-left:3px solid #f59e0b;border-radius:4px;margin:14px 0;font-size:13px;line-height:1.6">
-          ℹ️ Wir senden einen Bestätigungs-Link an die neue Adresse. Erst nach
+          Wir senden einen Bestätigungs-Link an die neue Adresse. Erst nach
           Klick auf den Link wird sie aktiv. Deine bisherige Adresse bleibt
           bis dahin gültig.
         </div>
 
-        <button type="submit" class="btn btn-primary">📧 Bestätigungs-Mail senden</button>
+        <button type="submit" class="btn btn-primary">Bestätigungs-Mail senden</button>
       </form>
     </details>
   {% endif %}
@@ -200,7 +200,7 @@
 
 {# ─── Passwort ändern ─── #}
 <div class="form-card" style="margin-top:16px">
-  <h3 style="margin-top:0">🔑 Passwort ändern</h3>
+  <h3 style="margin-top:0">Passwort ändern</h3>
 
   <form method="post">
     <input type="hidden" name="csrf" value="{{ csrfToken }}">
@@ -230,10 +230,10 @@
     </div>
 
     <div style="padding:10px 12px;background:rgba(245,158,11,0.1);border-left:3px solid #f59e0b;border-radius:4px;margin:14px 0;font-size:13px;line-height:1.6">
-      ⚠️ Bei Passwort-Änderung werden alle anderen Geräte abgemeldet.
+      Bei Passwort-Änderung werden alle anderen Geräte abgemeldet.
     </div>
 
-    <button type="submit" class="btn btn-primary">🔑 Passwort ändern</button>
+    <button type="submit" class="btn btn-primary">Passwort ändern</button>
   </form>
 </div>
 
@@ -246,8 +246,8 @@
   if (!p1 || !p2 || !msg) return;
   function check() {
     if (p2.value === '') { msg.textContent = ''; msg.style.color = ''; return; }
-    if (p1.value === p2.value) { msg.textContent = '✓ Passwörter stimmen überein'; msg.style.color = '#4a9d4a'; }
-    else { msg.textContent = '✗ Passwörter stimmen nicht überein'; msg.style.color = '#dc2626'; }
+    if (p1.value === p2.value) { msg.textContent = 'Passwörter stimmen überein'; msg.style.color = '#4a9d4a'; }
+    else { msg.textContent = 'Passwörter stimmen nicht überein'; msg.style.color = '#dc2626'; }
   }
   p1.addEventListener('input', check);
   p2.addEventListener('input', check);
@@ -255,12 +255,12 @@
 </script>
 
 <div class="form-card" style="margin-top:16px">
-  <h3 style="margin-top:0">🔐 Zwei-Faktor-Authentifizierung</h3>
+  <h3 style="margin-top:0">Zwei-Faktor-Authentifizierung</h3>
 
   {% if newBackupCodes %}
     {# Frisch aktiviert: Backup-Codes EINMALIG zeigen #}
     <div class="card" style="margin-bottom:16px;padding:16px;border:2px solid #4a9d4a;background:rgba(74,157,74,0.06)">
-      <h4 style="font-size:14px;margin:0 0 10px;color:#4a9d4a">📋 Deine Backup-Codes — JETZT speichern!</h4>
+      <h4 style="font-size:14px;margin:0 0 10px;color:#4a9d4a">Deine Backup-Codes — JETZT speichern!</h4>
       <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6">
         Bewahre diese Codes <strong>sicher</strong> auf (Passwort-Manager, ausdrucken).
         Wenn du deine Authenticator-App verlierst, kannst du dich damit einloggen.
@@ -273,8 +273,8 @@
       </div>
       <p style="margin-top:12px;font-size:12px">
         <button type="button" data-backup-codes="{{ join_codes(newBackupCodes) }}" onclick="
-          navigator.clipboard.writeText(this.dataset.backupCodes).then(() => this.textContent='✓ Kopiert!');
-        " class="btn btn-ghost btn-sm">📋 Alle Codes kopieren</button>
+          navigator.clipboard.writeText(this.dataset.backupCodes).then(() => this.textContent='Kopiert!');
+        " class="btn btn-ghost btn-sm">Alle Codes kopieren</button>
       </p>
     </div>
   {% endif %}
@@ -282,12 +282,12 @@
   {% if has2fa %}
     {# 2FA ist aktiv → Deaktivieren-Form #}
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-      ✅ 2FA ist <strong>aktiv</strong>. Du wirst bei jedem Login nach einem 6-stelligen Code gefragt.
+      2FA ist <strong>aktiv</strong>. Du wirst bei jedem Login nach einem 6-stelligen Code gefragt.
       Falls du die Authenticator-App verlierst, kannst du dich mit einem Backup-Code einloggen.
     </p>
     <details>
       <summary style="cursor:pointer;font-size:13px;color:var(--text-muted);padding:8px 0">
-        🔓 2FA deaktivieren (mit Passwort-Bestätigung)
+        2FA deaktivieren (mit Passwort-Bestätigung)
       </summary>
       <form method="post" style="margin-top:12px"
             onsubmit="return confirm('2FA wirklich deaktivieren? Dein Konto ist danach nur noch durch das Passwort geschützt.')">
@@ -297,7 +297,7 @@
           <label>Dein aktuelles Passwort zur Bestätigung</label>
           <input type="password" name="password_confirm" required autocomplete="current-password">
         </div>
-        <button type="submit" class="btn btn-danger btn-sm">🔓 2FA deaktivieren</button>
+        <button type="submit" class="btn btn-danger btn-sm">2FA deaktivieren</button>
       </form>
     </details>
 
@@ -310,7 +310,7 @@
 
     <details>
       <summary style="cursor:pointer;font-size:14px;color:var(--color-accent);font-weight:600;padding:8px 0">
-        📲 2FA jetzt einrichten
+        2FA jetzt einrichten
       </summary>
 
       <div style="padding:14px 0">
@@ -347,7 +347,7 @@
                    style="font-family:var(--font-mono);font-size:18px;letter-spacing:3px;text-align:center;max-width:180px"
                    placeholder="000000">
           </div>
-          <button type="submit" class="btn btn-primary">✓ 2FA aktivieren</button>
+          <button type="submit" class="btn btn-primary">2FA aktivieren</button>
         </form>
       </div>
     </details>
@@ -355,10 +355,10 @@
 </div>
 {% endif %}
 
-{# ══════════ TAB: Sessions ══════════ #}
+{# TAB: Sessions #}
 {% if activeTab == 'sessions' %}
 <div class="form-card" id="sessions">
-  <h3 style="margin-top:0">💻 Aktive Sitzungen ({{ count(sessions) }})</h3>
+  <h3 style="margin-top:0">Aktive Sitzungen ({{ count(sessions) }})</h3>
   {% if not sessions %}
     <p style="font-size:13px;color:var(--text-muted);text-align:center;padding:30px">
       Keine aktiven „Angemeldet bleiben"-Sitzungen.<br>
@@ -377,10 +377,10 @@
           <div class="session-info">
             <strong>{{ remember_format_user_agent(s.user_agent) }}</strong>
             {% if isCurrent %}
-              <span class="session-badge">📍 Diese Sitzung</span>
+              <span class="session-badge">Diese Sitzung</span>
             {% endif %}
             <div class="session-meta">
-              🌐 IP: <code>{{ s.ip_address | default('–') }}</code>
+              IP: <code>{{ s.ip_address | default('–') }}</code>
               · Erstellt: {{ s.created_at | date('d.m.Y') }}
               · Zuletzt: {{ s.last_used | date('d.m.Y H:i') }}
               · Läuft ab: {{ s.expires_at | date('d.m.Y') }}
@@ -391,7 +391,7 @@
               <input type="hidden" name="csrf" value="{{ csrfToken }}">
               <input type="hidden" name="session_action" value="revoke_one">
               <input type="hidden" name="token_id" value="{{ s.token_id }}">
-              <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--color-danger)">🚪 Abmelden</button>
+              <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--color-danger)">Abmelden</button>
             </form>
           {% endif %}
         </div>
@@ -404,7 +404,7 @@
           <input type="hidden" name="csrf" value="{{ csrfToken }}">
           <input type="hidden" name="session_action" value="revoke_others">
           <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--color-warning)">
-            🚪 Alle anderen Geräte abmelden
+            Alle anderen Geräte abmelden
           </button>
         </form>
       </div>
@@ -413,10 +413,10 @@
 </div>
 {% endif %}
 
-{# ══════════ TAB: Benachrichtigungen ══════════ #}
+{# TAB: Benachrichtigungen #}
 {% if activeTab == 'notifications' %}
 <div class="form-card">
-  <h3 style="margin-top:0">🔔 Benachrichtigungen</h3>
+  <h3 style="margin-top:0">Benachrichtigungen</h3>
   <form method="post">
     <input type="hidden" name="csrf" value="{{ csrfToken }}">
     <input type="hidden" name="action" value="save_profile">
@@ -429,26 +429,26 @@
       </label>
       <div class="form-hint">
         Wenn aktiviert, bekommst du zusätzlich zur In-App-Benachrichtigung
-        (🔔 Glocke) auch eine E-Mail bei Antworten in abonnierten Threads.
+        (Glocke) auch eine E-Mail bei Antworten in abonnierten Threads.
         Jede E-Mail enthält einen 1-Klick-Abmelde-Link für den jeweiligen Thread.
       </div>
     </div>
 
     <div class="form-hint" style="margin:14px 0;padding:10px 12px;background:var(--bg-surface2);border-radius:6px">
-      ℹ️ Voraussetzung: Eine gültige E-Mail-Adresse ist im
+      Voraussetzung: Eine gültige E-Mail-Adresse ist im
       <a href="{{ url('/settings.php?tab=security') }}">Sicherheit-Tab</a> hinterlegt.
       Aktuell: <strong>{{ profile.email | default('—') }}</strong>
     </div>
 
-    <button type="submit" class="btn btn-primary">💾 Benachrichtigungen speichern</button>
+    <button type="submit" class="btn btn-primary">Benachrichtigungen speichern</button>
   </form>
 </div>
 {% endif %}
 
-{# ══════════ TAB: Darstellung ══════════ #}
+{# TAB: Darstellung #}
 {% if activeTab == 'preferences' %}
 <div class="form-card">
-  <h3 style="margin-top:0">🎨 Darstellung</h3>
+  <h3 style="margin-top:0">Darstellung</h3>
   <form method="post">
     <input type="hidden" name="csrf" value="{{ csrfToken }}">
     <input type="hidden" name="action" value="save_profile">
@@ -458,22 +458,22 @@
       {% set currentTheme = profile.theme %}
       {% if not currentTheme %}{% set currentTheme = 'auto' %}{% endif %}
       <select name="theme">
-        <option value="auto"  {% if currentTheme == 'auto' %}selected{% endif %}>🌓 Automatisch</option>
-        <option value="dark"  {% if currentTheme == 'dark' %}selected{% endif %}>🌙 Dark</option>
-        <option value="light" {% if currentTheme == 'light' %}selected{% endif %}>☀️ Light</option>
+        <option value="auto"  {% if currentTheme == 'auto' %}selected{% endif %}>Automatisch</option>
+        <option value="dark"  {% if currentTheme == 'dark' %}selected{% endif %}>Dark</option>
+        <option value="light" {% if currentTheme == 'light' %}selected{% endif %}>Light</option>
       </select>
       <div class="form-hint">"Automatisch" folgt deiner System-Einstellung (Hell/Dunkel).</div>
     </div>
 
-    <button type="submit" class="btn btn-primary">💾 Darstellung speichern</button>
+    <button type="submit" class="btn btn-primary">Darstellung speichern</button>
   </form>
 </div>
 {% endif %}
 
-{# ══════════ TAB: Konto / Danger ══════════ #}
+{# TAB: Konto / Danger #}
 {% if activeTab == 'danger' %}
 <div class="form-card" style="border:1px solid #dc262640" id="danger-zone">
-  <h3 style="margin-top:0;color:#dc2626">💀 Account löschen</h3>
+  <h3 style="margin-top:0;color:#dc2626">Account löschen</h3>
   {% if can_user_delete_self_ok(profile.user_id) %}
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6">
       Wenn du dein Konto nicht mehr nutzen möchtest, kannst du es endgültig löschen. Deine Beiträge
@@ -482,7 +482,7 @@
       <strong>Diese Aktion ist unwiderruflich.</strong>
     </p>
     <a href="{{ url('/delete_account.php') }}" class="btn btn-danger btn-sm">
-      💀 Meinen Account löschen…
+      Meinen Account löschen…
     </a>
   {% else %}
     <p style="font-size:13px;color:var(--text-muted);line-height:1.6">

@@ -412,6 +412,6 @@ render('settings', [
     'otpSvg'           => $otpSvg,
     'newBackupCodes'   => $newBackupCodes,
     'breadcrumb'       => [
-        ['title' => '⚙️ Einstellungen', 'url' => FORUM_URL . '/settings.php'],
+        ['title' => 'Einstellungen', 'url' => FORUM_URL . '/settings.php'],
     ],
 ]);

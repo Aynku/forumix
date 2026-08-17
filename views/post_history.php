@@ -1,7 +1,7 @@
 <?php if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); } ?>
 <?php /** @var array $post; @var array $history */ ?>
 
-<div class="section-heading">📜 Edit-Verlauf von Beitrag #<?= (int) $post['post_id'] ?></div>
+<div class="section-heading">Edit-Verlauf von Beitrag #<?= (int) $post['post_id'] ?></div>
 
 <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
   Beitrag von <strong><?= e($post['author_name']) ?></strong> in
@@ -9,7 +9,7 @@
 </p>
 
 <div class="card" style="margin-bottom:14px">
-  <div class="card-header"><span class="card-title">✏️ Aktuelle Version</span></div>
+  <div class="card-header"><span class="card-title">Aktuelle Version</span></div>
   <div style="padding:16px;font-size:13px">
     <?= bbcode($post['content']) ?>
   </div>
@@ -39,7 +39,7 @@
       </div>
       <?php if (!empty($h['reason'])): ?>
         <div style="padding:8px 16px;background:var(--bg-surface2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text-muted);font-style:italic">
-          💬 <?= e($h['reason']) ?>
+          <?= e($h['reason']) ?>
         </div>
       <?php endif; ?>
       <div style="padding:14px 16px;font-size:13px;background:var(--bg-surface2);border-left:3px solid var(--border-strong);font-family:var(--font-mono);white-space:pre-wrap;color:var(--text-muted)"><?= e($h['old_content']) ?></div>

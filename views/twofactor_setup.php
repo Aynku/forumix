@@ -2,14 +2,14 @@
 <?php /** @var bool $has2fa; @var string $newSecret; @var string $otpUrl; @var string $error; @var string $success; @var array $backupCodes */ ?>
 
 <div style="max-width:560px;margin:0 auto">
-  <div class="section-heading">🔐 Zwei-Faktor-Authentifizierung</div>
+  <div class="section-heading">Zwei-Faktor-Authentifizierung</div>
 
-  <?php if ($error): ?><div class="flash flash-error">❌ <?= e($error) ?></div><?php endif; ?>
-  <?php if ($success): ?><div class="flash flash-success">✅ <?= e($success) ?></div><?php endif; ?>
+  <?php if ($error): ?><div class="flash flash-error"><?= e($error) ?></div><?php endif; ?>
+  <?php if ($success): ?><div class="flash flash-success"><?= e($success) ?></div><?php endif; ?>
 
   <?php if (!empty($backupCodes)): ?>
     <div class="card" style="margin-bottom:16px;padding:18px">
-      <h3 style="font-size:14px;margin-bottom:10px">📋 Deine Backup-Codes</h3>
+      <h3 style="font-size:14px;margin-bottom:10px">Deine Backup-Codes</h3>
       <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">
         Bewahre diese Codes sicher auf! Wenn du deine Authenticator-App verlierst, kannst du dich damit einloggen. Jeder Code ist nur einmal verwendbar.
       </p>
@@ -23,7 +23,7 @@
 
   <div class="form-card">
     <?php if ($has2fa): ?>
-      <h2>✅ 2FA ist aktiv</h2>
+      <h2>2FA ist aktiv</h2>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
         Dein Konto ist durch 2-Faktor-Authentifizierung geschützt.
       </p>
@@ -35,11 +35,11 @@
           <label>Passwort zur Bestätigung</label>
           <input type="password" name="password" required>
         </div>
-        <button type="submit" class="btn btn-danger" onclick="return confirm('2FA wirklich deaktivieren?')">🔓 2FA deaktivieren</button>
+        <button type="submit" class="btn btn-danger" onclick="return confirm('2FA wirklich deaktivieren?')">2FA deaktivieren</button>
       </form>
 
     <?php else: ?>
-      <h2>📲 2FA einrichten</h2>
+      <h2>2FA einrichten</h2>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
         Scanne den QR-Code mit einer Authenticator-App (Google Authenticator, Authy, 1Password, …) oder gib den Secret-Code manuell ein.
       </p>
@@ -68,7 +68,7 @@
                  style="font-family:var(--font-mono);font-size:18px;letter-spacing:3px;text-align:center"
                  placeholder="000000">
         </div>
-        <button type="submit" class="btn btn-primary">✓ 2FA aktivieren</button>
+        <button type="submit" class="btn btn-primary">2FA aktivieren</button>
         <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $currentUser['user_id'] ?>" class="btn btn-ghost">Abbrechen</a>
       </form>
     <?php endif; ?>

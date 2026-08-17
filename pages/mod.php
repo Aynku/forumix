@@ -123,4 +123,4 @@ switch ($action) {
         break;
 }
 
-render('mod/index', array_merge(['title' => '🛡️ Moderator-Bereich'], $vars));
+render('mod/index', array_merge(['title' => 'Moderator-Bereich'], $vars));

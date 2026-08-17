@@ -8,6 +8,6 @@ $cu = current_user();
 $bookmarks = user_bookmarks((int) $cu['user_id']);
 
 render('bookmarks', [
-    'title'     => '🔖 Lesezeichen',
+    'title'     => 'Lesezeichen',
     'bookmarks' => $bookmarks,
 ]);

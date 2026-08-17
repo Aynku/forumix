@@ -2,10 +2,10 @@
   {{ board.title }}
   <span style="display:inline-flex;gap:6px">
     <a href="{{ url('/rss.php?type=board&id=') }}{{ board.board_id }}"
-       class="btn btn-ghost btn-sm" title="RSS-Feed">📰</a>
+       class="btn btn-ghost btn-sm" title="Neue Beiträge als RSS abonnieren">RSS</a>
     {% if currentUser %}
       <a href="{{ url('/mark_all_read.php?csrf=') }}{{ csrfToken }}"
-         class="btn btn-ghost btn-sm" title="Alle als gelesen">✓</a>
+         class="btn btn-ghost btn-sm" title="Alle Themen dieses Forums als gelesen markieren">Alles gelesen</a>
       <a href="{{ url('/new_thread.php?board=') }}{{ board.board_id }}"
          class="btn btn-primary btn-sm">+ Neues Thema</a>
     {% endif %}
@@ -56,10 +56,8 @@
         <td class="stat-cell" data-label="Aufrufe">{{ number_format(t.view_count, 0, ',', '.') }}</td>
         <td class="last-post-cell" data-label="Letzter Beitrag">
           {% if t.last_post_date %}
-            {{ format_date(t.last_post_date) }}<br>
-            von <a href="{{ url('/profile.php?id=') }}{{ t.last_poster_id }}">
-              {{ t.last_poster }}
-            </a>
+            <a href="{{ url('/profile.php?id=') }}{{ t.last_poster_id }}">{{ t.last_poster }}</a>
+            <span class="last-post-meta">{{ format_date(t.last_post_date) }}</span>
           {% else %}
             <span style="color:var(--text-faint)">–</span>
           {% endif %}

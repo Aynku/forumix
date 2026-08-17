@@ -2,8 +2,8 @@
 <?php /** @var string $error; @var array $formData; @var bool $termsRequired; @var bool $acceptTerms */ ?>
 <div style="max-width:460px;margin:0 auto">
   <div class="form-card">
-    <h2>📝 Registrieren</h2>
-    <?php if (!empty($error)): ?><div class="flash flash-error">❌ <?= e($error) ?></div><?php endif; ?>
+    <h2>Registrieren</h2>
+    <?php if (!empty($error)): ?><div class="flash flash-error"><?= e($error) ?></div><?php endif; ?>
     <form method="post" id="registerForm">
       <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
       <input type="hidden" name="_bt" value="<?= e($behaviorToken ?? '') ?>">
@@ -58,7 +58,7 @@
 
       <?php if (!empty($approvalRequired)): ?>
         <div class="form-row" style="background:rgba(74,157,74,0.08);padding:12px;border-radius:6px;border-left:3px solid #4a9d4a">
-          <label>✉️ Einladungs-Code <span style="color:var(--text-faint);font-weight:normal">(optional)</span></label>
+          <label>Einladungs-Code <span style="color:var(--text-faint);font-weight:normal">(optional)</span></label>
           <input type="text" name="invite_code" value="<?= e($inviteCode ?? '') ?>"
                  maxlength="20"
                  style="font-family:var(--font-mono);font-size:16px;letter-spacing:2px;text-transform:uppercase"
@@ -73,7 +73,7 @@
       <?php if (!empty($showCaptcha)): ?>
         <div class="form-row captcha-row">
           <label>
-            🤖 Sicherheitsfrage:
+            Sicherheitsfrage:
             <strong style="font-size:18px;font-family:var(--font-mono)"><?= e($captcha['question']) ?> = ?</strong>
           </label>
           <input type="number" name="_captcha_answer" required autocomplete="off"
@@ -146,10 +146,10 @@
     if (!v2) { matchHint.hidden = true; return; }
     matchHint.hidden = false;
     if (v1 === v2) {
-      matchHint.textContent = '✓ Passwörter stimmen überein';
+      matchHint.textContent = 'Passwörter stimmen überein';
       matchHint.className = 'password-match-hint match-ok';
     } else {
-      matchHint.textContent = '✗ Passwörter stimmen nicht überein';
+      matchHint.textContent = 'Passwörter stimmen nicht überein';
       matchHint.className = 'password-match-hint match-fail';
     }
   }
