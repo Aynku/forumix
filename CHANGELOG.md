@@ -8,6 +8,26 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.0.1 (2026-08-19)
+
+**Themen lassen sich verschieben.** Ein Thema landet nicht immer im richtigen
+Forum, und bisher gab es keinen Weg, das zu korrigieren — ausser von Hand in
+der Datenbank.
+
+Die Mod-Tools der Themenansicht zeigen jetzt eine Auswahl der uebrigen Foren
+und einen Knopf. Passwortgeschuetzte Foren ohne Zugang stehen nicht darin.
+
+- Moderatorenrecht wird auf **beiden** Seiten verlangt. Sonst waere das
+  Verschieben ein Weg, ein Thema in ein fremdes Forum zu heben, in dem man
+  selbst nichts zu sagen hat.
+- Die Zaehler beider Foren werden nachgerechnet statt hoch- und
+  runtergezaehlt: Letzteres schreibt jede vorhandene Abweichung dauerhaft
+  fest. `board_zaehler_neu()` liegt dafuer in `lib/board_mods.php` und ist
+  damit auch pruefbar.
+- Der Vorgang steht im Moderationsprotokoll.
+
+Keine Migration noetig, die Datenbankstruktur bleibt unveraendert.
+
 ## v1.0.0 (2026-08-17)
 
 **Die erste stabile Freigabe.** Ab hier ist die Versionsnummer ein Versprechen:
