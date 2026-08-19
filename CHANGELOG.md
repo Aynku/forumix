@@ -8,6 +8,29 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.1.3 (2026-08-19)
+
+**Ein geloeschtes Konto verlaesst jetzt seine Gruppen.** Bisher blieb die
+Mitgliedschaft stehen: in der Mitgliederliste einer Gruppe stand dann
+"Geloeschter Benutzer #2", die Zahl daneben zaehlte ihn mit — und weil Rechte
+an der Kennung haengen, haette ein Nachfolger sie geerbt. Die Kontoloeschung
+raeumt `group_members` jetzt mit ab, so wie sie es mit Forum-Moderator-,
+Abo- und Lesezeichen-Eintraegen schon immer getan hat.
+
+Ergaenzend halten Mitgliederliste und Zaehlung geloeschte Konten heraus — fuer
+Zeilen, die aus der Zeit davor stammen.
+
+**"Geloeschter Benutzer" ohne laufende Nummer.** Die Loeschung haengt eine
+Nummer an, weil der Benutzername eindeutig sein muss. Zu sehen bekam man sie
+bisher auch — obwohl der Text vor dem Loeschen ausdruecklich "Geloeschter
+Benutzer" verspricht. Beitrag, Profil und Startseite zeigen die Nummer nicht
+mehr. Nachahmen laesst sich der Name nicht: `#` ist in Benutzernamen nicht
+erlaubt, und "geloeschter benutzer" ist bei der Anmeldung reserviert.
+
+Keine Migration noetig.
+
+---
+
 ## v1.1.2 (2026-08-19)
 
 **Kein Knopf, wo er nur zur Absage fuehrt.** "+ Neues Thema" stand in jedem

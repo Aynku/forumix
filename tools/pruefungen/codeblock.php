@@ -94,4 +94,21 @@ return [
         if (str_contains($aus, 'bb-quote-kopf')) throw new RuntimeException('Leere Kopfzeile erzeugt');
         if (!str_contains($aus, 'Nur Inhalt')) throw new RuntimeException('Inhalt verloren');
     },
+
+    'Geloeschte Konten erscheinen ohne laufende Nummer' => function () {
+        // Die Loeschung braucht die Nummer, weil username eindeutig ist. Zu
+        // sehen ist sie nicht: delete_account.tpl.html verspricht "Geloeschter
+        // Benutzer" ohne Zusatz.
+        if (zeigename('Gelöschter Benutzer #2') !== 'Gelöschter Benutzer') {
+            throw new RuntimeException('Die Nummer steht noch da');
+        }
+        if (zeigename('Aynku') !== 'Aynku') {
+            throw new RuntimeException('Ein normaler Name wurde veraendert');
+        }
+        // Kein Nachahmen: nur die genaue Form wird gekuerzt. (Registrieren
+        // kann man solche Namen ohnehin nicht, siehe register.php.)
+        if (zeigename('Gelöschter Benutzer #2 aber nicht wirklich') === 'Gelöschter Benutzer') {
+            throw new RuntimeException('Ein aehnlicher Name wurde mitgekuerzt');
+        }
+    },
 ];

@@ -29,7 +29,13 @@ function group_by_id(int $id): ?array {
 function group_member_counts(): array {
     try {
         $karte = [];
-        foreach (db_fetchAll('SELECT group_id, COUNT(*) AS n FROM group_members GROUP BY group_id') as $r) {
+        // Geloeschte Konten zaehlen nicht mit. Seit 1.1.3 raeumt die Loeschung
+        // die Mitgliedschaft zwar selbst ab, aber Zeilen aus der Zeit davor
+        // sollen die Zahl nicht verfaelschen.
+        foreach (db_fetchAll('SELECT m.group_id, COUNT(*) AS n
+                              FROM group_members m JOIN users u ON u.user_id = m.user_id
+                              WHERE u.is_deleted = 0
+                              GROUP BY m.group_id') as $r) {
             $karte[(int) $r['group_id']] = (int) $r['n'];
         }
         return $karte;
@@ -41,7 +47,7 @@ function group_members(int $groupId): array {
         return db_fetchAll('
             SELECT u.user_id, u.username, u.is_admin, u.is_mod, m.added_at
             FROM group_members m JOIN users u ON u.user_id = m.user_id
-            WHERE m.group_id = ? ORDER BY u.username
+            WHERE m.group_id = ? AND u.is_deleted = 0 ORDER BY u.username
         ', [$groupId]);
     } catch (Exception $e) { return []; }
 }

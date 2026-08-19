@@ -64,6 +64,7 @@ if (!function_exists('current_user')) {
 }
 
 require_once $wurzel . '/lib/board_access.php';
+require_once $wurzel . '/lib/groups.php';
 
 /* Die Zugangsschicht merkt sich Gruppen und Stufen pro Aufruf. Hier wechselt
    der Benutzer mehrfach im selben Vorgang, also vor jeder Messung leeren. */
@@ -232,6 +233,43 @@ return [
             $pdo->exec("DELETE FROM users WHERE user_id IN ($drin, $draussen)");
             $pdo->exec("DELETE FROM boards WHERE board_id = $brett");
             $pdo->exec("DELETE FROM categories WHERE cat_id = $cat");
+        }
+    },
+
+    'Ein geloeschtes Konto verlaesst seine Gruppen' => function () use ($pdo, $frisch) {
+        // Der Fund vom 19.08.2026: nach dem Loeschen eines Kontos blieb die
+        // Mitgliedschaft stehen. In der Mitgliederliste stand dann
+        // "Geloeschter Benutzer #2" — und die Rechte haetten an einer neu
+        // vergebenen Kennung geklebt.
+        $quelle = file_get_contents(dirname(__DIR__, 2) . '/lib/user_deletion.php');
+        if (!str_contains($quelle, 'DELETE FROM group_members WHERE user_id')) {
+            throw new RuntimeException('Die Kontoloeschung raeumt group_members nicht ab');
+        }
+    },
+
+    'Geloeschte Konten zaehlen in der Gruppe nicht mit' => function () use ($pdo, $frisch) {
+        $pdo->exec("INSERT INTO user_groups (name, slug, position) VALUES ('Pruefzaehlung', 'pruef_zaehlung', 70)");
+        $gruppe = (int) $pdo->lastInsertId();
+        $pdo->exec("INSERT INTO users (username, password, email, is_deleted)
+                    VALUES ('pruef_weg', 'x', 'weg@example.invalid', 1)");
+        $weg = (int) $pdo->lastInsertId();
+        $pdo->exec("INSERT INTO users (username, password, email) VALUES ('pruef_da', 'x', 'da@example.invalid')");
+        $da = (int) $pdo->lastInsertId();
+        $pdo->exec("INSERT INTO group_members (group_id, user_id) VALUES ($gruppe, $weg), ($gruppe, $da)");
+
+        try {
+            $zahlen = group_member_counts();
+            $liste  = group_members($gruppe);
+            if (($zahlen[$gruppe] ?? 0) !== 1) {
+                throw new RuntimeException('Gezaehlt: ' . ($zahlen[$gruppe] ?? 0) . ' statt 1');
+            }
+            if (count($liste) !== 1 || $liste[0]['username'] !== 'pruef_da') {
+                throw new RuntimeException('Die Mitgliederliste zeigt ein geloeschtes Konto');
+            }
+        } finally {
+            $pdo->exec("DELETE FROM group_members WHERE group_id = $gruppe");
+            $pdo->exec("DELETE FROM users WHERE user_id IN ($weg, $da)");
+            $pdo->exec("DELETE FROM user_groups WHERE group_id = $gruppe");
         }
     },
 ];

@@ -97,6 +97,20 @@ function code_block_html(string $sprache, string $inhalt): string {
          . '<pre>' . $rumpf . '</pre></div>';
 }
 
+/**
+ * Anzeigename eines Kontos.
+ *
+ * Die Loeschung ersetzt den Benutzernamen durch "Geloeschter Benutzer #<id>".
+ * Die Nummer muss sein — die Spalte ist eindeutig, und zwei geloeschte Konten
+ * duerfen sich nicht ins Gehege kommen. Zu sehen braucht sie aber niemand:
+ * delete_account.tpl.html verspricht ausdruecklich "Geloeschter Benutzer", ohne
+ * Nummer. Genau das liefert diese Funktion.
+ */
+function zeigename(?string $name): string {
+    $name = (string) $name;
+    return preg_match('/^Gelöschter Benutzer #\d+$/u', $name) ? 'Gelöschter Benutzer' : $name;
+}
+
 function bbcode(string $text): string {
     $text = e($text);
 

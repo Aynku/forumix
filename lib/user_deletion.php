@@ -143,6 +143,14 @@ function delete_user_account(int $userId): array {
             db_execute('DELETE FROM board_moderators WHERE user_id = ?', [$userId]);
         } catch (Exception $e) {}
 
+        // Gruppenmitgliedschaften löschen. Ohne das bliebe ein geloeschtes
+        // Konto in "Kunden" oder "Team" stehen, taucht in der Mitgliederliste
+        // als "Geloeschter Benutzer #2" auf und zaehlt dort mit — und wenn die
+        // Kennung je neu vergeben wuerde, erbte der Nachfolger die Rechte.
+        try {
+            db_execute('DELETE FROM group_members WHERE user_id = ?', [$userId]);
+        } catch (Exception $e) {}
+
         // 2FA-Daten löschen
         try {
             db_execute('DELETE FROM user_2fa WHERE user_id = ?', [$userId]);

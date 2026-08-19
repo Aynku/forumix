@@ -47,7 +47,7 @@
             {% if b.last_post_date %}
               <a href="{{ url('/thread.php?id=') }}{{ b.last_thread_id }}">{{ truncate(b.last_thread_title ?? '...', 44) }}</a>
               <span class="last-post-meta">
-                von <a href="{{ url('/profile.php?id=') }}{{ b.last_user_id }}">{{ b.last_username }}</a>
+                von <a href="{{ url('/profile.php?id=') }}{{ b.last_user_id }}">{{ zeigename(b.last_username) }}</a>
                 · {{ format_date(b.last_post_date) }}
               </span>
             {% else %}

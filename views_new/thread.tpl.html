@@ -130,7 +130,7 @@
            data-profile-url="{{ url('/profile.php?id=') }}{{ post.user_id }}">
       <div class="post-username">
         {{ online_dot(post)|raw }}
-        <a href="{{ url('/profile.php?id=') }}{{ post.user_id }}">{{ post.username }}</a>
+        <a href="{{ url('/profile.php?id=') }}{{ post.user_id }}">{{ zeigename(post.username) }}</a>
       </div>
       {% if post.is_owner %}
         <div class="post-admin-badge" style="background:#7c3aed !important">Owner</div>

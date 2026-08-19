@@ -13,7 +13,7 @@
     <div class="profile-username-row">
       <h2 class="profile-username">
         {{ online_dot(profile) | raw }}
-        {{ profile.username }}
+        {{ zeigename(profile.username) }}
       </h2>
       <div class="profile-badge-row">
         {% if profile.is_owner %}
@@ -153,7 +153,7 @@
 
 {% set visibleFields = profile_visible_fields(profile, currentUser) %}
 {% if visibleFields %}
-<div class="section-heading">Über {{ profile.username }}</div>
+<div class="section-heading">Über {{ zeigename(profile.username) }}</div>
 <div class="card" style="margin-bottom:16px;padding:14px 16px">
   <div class="profile-fields-grid">
     {% for field in visibleFields %}
