@@ -8,6 +8,24 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.1.2 (2026-08-19)
+
+**Kein Knopf, wo er nur zur Absage fuehrt.** "+ Neues Thema" stand in jedem
+Forum, auch in denen, in denen man nur lesen darf — Klick, Absage, zurueck.
+Dasselbe beim Antwortfeld in der Themenansicht.
+
+Beide erscheinen jetzt nur mit Schreibrecht. Statt des Antwortfeldes steht eine
+Zeile, die sagt, woran es liegt: mitlesen ja, schreiben nein. Die Pruefung beim
+Abschicken bleibt unveraendert — wer das Formular von Hand nachbaut, kommt
+weiterhin nicht durch.
+
+Gefunden beim Durchprobieren mit einem gewoehnlichen Konto auf einer laufenden
+Instanz: die Sperre griff, aber der Weg dorthin sah aus wie eine Einladung.
+
+Keine Migration noetig.
+
+---
+
 ## v1.1.1 (2026-08-19)
 
 **Zwei Luecken beim Verstecken geschlossen.** Sie fielen auf, als das erste
