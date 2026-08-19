@@ -8,6 +8,28 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.1.1 (2026-08-19)
+
+**Zwei Luecken beim Verstecken geschlossen.** Sie fielen auf, als das erste
+Forum wirklich auf eine Gruppe eingeschraenkt wurde: der direkte Aufruf gab
+schon 404, auf der Startseite stand es aber weiter.
+
+- **Die Startseite** benutzte den zentralen Filter nicht. Sie listete alle
+  Foren einer Kategorie und maskierte bei passwortgeschuetzten nur den Titel
+  des letzten Beitrags — bei einem Passwortforum ist das Absicht, bei einem
+  Gruppenbrett falsch. Eine Kategorie, in der nichts mehr sichtbar ist, wird
+  jetzt ausserdem gar nicht mehr gezeichnet: die Ueberschrift allein verriete
+  sonst genau das, was das Verstecken verhindern soll.
+- **Abo-Mails** hielten den Beitragstext nur bei passwortgeschuetzten Foren
+  zurueck. Ein Abo ueberlebt aber auch, dass jemand aus einer Gruppe genommen
+  wird — dann trug die Mail den Inhalt weiter ins Postfach. Dafuer gibt es
+  jetzt `board_level_for_user()`: dieselbe Rechnung fuer einen bestimmten
+  Benutzer statt fuer den angemeldeten Besucher.
+
+Keine Migration noetig.
+
+---
+
 ## v1.1.0 (2026-08-19)
 
 **Gruppen und Rechte pro Forum.** Bis hierher gab es drei Stufen — Inhaber,
