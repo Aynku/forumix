@@ -30,6 +30,11 @@ if (isset($thread['is_approved']) && (int) $thread['is_approved'] === 0) {
 // Passwort-Schutz: wenn das Board geschützt ist und User keinen Zugang hat → zur Unlock-Seite
 $threadBoard = db_fetch('SELECT board_id, password_hash FROM boards WHERE board_id = ?', [$thread['board_id']]);
 if ($threadBoard && !board_user_can_access($threadBoard)) {
+    // Wie im Forum selbst: fehlende Gruppe sieht aus wie "gibt es nicht".
+    if (board_zugangsgrund($threadBoard) === 'gruppe') {
+        http_response_code(404);
+        error_page(404, 'Thread nicht gefunden', 'Dieses Thema gibt es nicht oder es wurde entfernt.');
+    }
     redirect(FORUM_URL . '/board_unlock.php?id=' . $thread['board_id']);
 }
 
@@ -64,6 +69,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
     if ($thread['is_closed'] && !is_mod()) {
         flash('Dieser Thread ist geschlossen.', 'error');
         redirect(FORUM_URL . '/thread.php?id=' . $threadId);
+    }
+
+    // Lesen reicht nicht zum Antworten. Der Knopf wird zwar gar nicht erst
+    // angezeigt, aber wer die Anfrage von Hand schickt, kommt hier an.
+    if (!board_can_write((int) $thread['board_id'])) {
+        http_response_code(403);
+        error_page(403, 'Nur zum Lesen', 'In diesem Forum darfst du nicht antworten.');
     }
 
     $content = post_str('content');

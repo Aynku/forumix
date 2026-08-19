@@ -20,6 +20,14 @@ if (board_user_can_access($board)) {
     redirect(FORUM_URL . '/board.php?id=' . $boardId);
 }
 
+// Fehlt die Gruppe, gibt es hier nichts zu entsperren. Das Formular ueberhaupt
+// zu zeigen waere eine Einladung zum Raten — und die Seite selbst schon eine
+// Auskunft darueber, dass es dieses Forum gibt.
+if (board_zugangsgrund($board) === 'gruppe') {
+    http_response_code(404);
+    error_page(404, 'Forum nicht gefunden', 'Dieses Forum gibt es nicht.');
+}
+
 // Login erforderlich (Gäste können nicht entsperren)
 if (!is_logged_in()) {
     flash('Bitte melde dich an, um auf passwort-geschützte Foren zuzugreifen.', 'info');

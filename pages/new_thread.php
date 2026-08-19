@@ -10,7 +10,17 @@ if (!$board) error_page(404, 'Forum nicht gefunden', 'Dieses Forum gibt es nicht
 
 // Passwort-Schutz: kein neuer Thread ohne Zugang
 if (!board_user_can_access($board)) {
+    if (board_zugangsgrund($board) === 'gruppe') {
+        http_response_code(404);
+        error_page(404, 'Forum nicht gefunden', 'Dieses Forum gibt es nicht.');
+    }
     redirect(FORUM_URL . '/board_unlock.php?id=' . $boardId);
+}
+
+// Lesen reicht zum Mitlesen, nicht zum Schreiben.
+if (!board_can_write($boardId)) {
+    http_response_code(403);
+    error_page(403, 'Nur zum Lesen', 'In diesem Forum darfst du keine neuen Themen anlegen.');
 }
 
 $error = '';

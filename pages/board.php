@@ -15,8 +15,15 @@ if (!$board) {
     error_page(404, 'Forum nicht gefunden', 'Dieses Forum gibt es nicht.');
 }
 
-// Passwort-Schutz: wenn kein Zugang → zur Entsperr-Seite umleiten
+// Kein Zugang? Dann haengt es am Passwort oder an der Gruppe.
 if (!board_user_can_access($board)) {
+    // Fehlt die Gruppe, verhaelt sich das Forum wie nicht vorhanden. Eine
+    // Weiterleitung zur Passwortseite wuerde verraten, dass es existiert, und
+    // ein Eingabefeld anbieten, das hier nichts oeffnen kann.
+    if (board_zugangsgrund($board) === 'gruppe') {
+        http_response_code(404);
+        error_page(404, 'Forum nicht gefunden', 'Dieses Forum gibt es nicht.');
+    }
     redirect(FORUM_URL . '/board_unlock.php?id=' . $boardId);
 }
 
