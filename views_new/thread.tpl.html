@@ -21,6 +21,21 @@
           {% else %}
             <a href="{{ url('/mod_action.php?action=open&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">Öffnen</a>
           {% endif %}
+          {% if moveBoards %}
+            <div class="action-dropdown-divider"></div>
+            <form method="get" action="{{ url('/mod_action.php') }}"
+                  style="display:flex;gap:6px;align-items:center;padding:6px 10px">
+              <input type="hidden" name="action" value="move">
+              <input type="hidden" name="thread" value="{{ thread.thread_id }}">
+              <input type="hidden" name="csrf" value="{{ csrfToken }}">
+              <select name="board" aria-label="Zielforum" style="flex:1;min-width:0">
+                {% for b in moveBoards %}
+                  <option value="{{ b.board_id }}">{{ b.cat }} &rsaquo; {{ b.title }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="btn btn-ghost btn-sm">Verschieben</button>
+            </form>
+          {% endif %}
           <div class="action-dropdown-divider"></div>
           <a href="{{ url('/mod_action.php?action=delete_thread&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}"
              class="action-danger"

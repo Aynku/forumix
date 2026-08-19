@@ -197,3 +197,23 @@ function team_members(): array {
         'board_mods' => $boardMods,
     ];
 }
+
+/**
+ * Zaehlt Themen, Beitraege und letzten Beitrag eines Forums neu. Beim
+ * Verschieben wechselt ein Thema samt allen Beitraegen das Forum — dann
+ * stimmen die mitgefuehrten Zaehler auf beiden Seiten nicht mehr. Hoch- und
+ * Runterzaehlen wuerde jede Abweichung dauerhaft festschreiben, deshalb hier
+ * einmal sauber nachzaehlen.
+ */
+function board_zaehler_neu(int $boardId): void {
+    db_execute('UPDATE boards SET
+            thread_count = (SELECT COUNT(*) FROM threads t
+                            WHERE t.board_id = ? AND t.is_approved = 1),
+            post_count   = (SELECT COUNT(*) FROM posts p
+                            JOIN threads t ON t.thread_id = p.thread_id
+                            WHERE t.board_id = ? AND p.is_approved = 1),
+            last_post_id = (SELECT MAX(p.post_id) FROM posts p
+                            JOIN threads t ON t.thread_id = p.thread_id
+                            WHERE t.board_id = ? AND p.is_approved = 1)
+        WHERE board_id = ?', [$boardId, $boardId, $boardId, $boardId]);
+}

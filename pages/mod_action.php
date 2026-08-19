@@ -85,6 +85,32 @@ switch ($action) {
         flash('Thread geöffnet.', 'success');
         redirect(FORUM_URL . '/thread.php?id=' . $threadId);
 
+    case 'move':
+        ensure_board_permission($threadId);
+        $zielId = get_int('board');
+        $t      = db_fetch('SELECT board_id FROM threads WHERE thread_id = ?', [$threadId]);
+        $ziel   = $zielId > 0 ? db_fetch('SELECT board_id FROM boards WHERE board_id = ?', [$zielId]) : null;
+        if (!$t || !$ziel) {
+            error_page(404, 'Forum nicht gefunden', 'Dieses Zielforum gibt es nicht.');
+        }
+        // Auch im Ziel muss moderiert werden duerfen. Sonst waere das
+        // Verschieben ein Weg, ein Thema in ein fremdes Forum zu heben, in dem
+        // man selbst nichts zu sagen hat.
+        if (!is_mod_for_board((int) $cu['user_id'], $zielId)) {
+            http_response_code(403);
+            error_page(403, 'Keine Berechtigung', 'Im Zielforum bist du kein Moderator.');
+        }
+        if ((int) $t['board_id'] === $zielId) {
+            flash('Das Thema liegt bereits in diesem Forum.', 'info');
+            redirect(FORUM_URL . '/thread.php?id=' . $threadId);
+        }
+        db_execute('UPDATE threads SET board_id = ? WHERE thread_id = ?', [$zielId, $threadId]);
+        board_zaehler_neu((int) $t['board_id']);
+        board_zaehler_neu($zielId);
+        mod_log_entry('move', 'thread', $threadId, 'nach Forum ' . $zielId);
+        flash('Thema verschoben.', 'success');
+        redirect(FORUM_URL . '/thread.php?id=' . $threadId);
+
     case 'delete_thread':
         ensure_board_permission($threadId);
         $t = db_fetch('SELECT board_id FROM threads WHERE thread_id = ?', [$threadId]);

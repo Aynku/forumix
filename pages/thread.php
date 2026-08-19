@@ -242,11 +242,29 @@ ob_start();
 render_module_hook('thread_top', ['thread' => $thread]);
 $threadTopHtml = ob_get_clean();
 
+// Zielforen fuers Verschieben. Nur fuer Moderatoren des aktuellen Forums
+// geladen — sonst waere es eine Liste, die niemand sieht. Das eigene Forum
+// faellt raus, dorthin verschiebt man nicht.
+$moveBoards = [];
+$cuThread   = current_user();
+if ($cuThread && (is_admin() || is_mod_for_board((int) $cuThread['user_id'], (int) $thread['board_id']))) {
+    $moveBoards = db_fetchAll('
+        SELECT b.board_id, b.title, b.password_hash, c.title AS cat
+        FROM boards b JOIN categories c ON c.cat_id = b.cat_id
+        ORDER BY c.position, b.position
+    ');
+    $moveBoards = array_values(array_filter(
+        $moveBoards,
+        fn($b) => (int) $b['board_id'] !== (int) $thread['board_id'] && board_user_can_access($b)
+    ));
+}
+
 render('thread', [
     'title'         => $thread['title'],
     'threadTopHtml' => $threadTopHtml,
     'thread'        => $thread,
     'threadTags'    => $threadTags,
+    'moveBoards'    => $moveBoards,
     'posts'        => $posts,
     'pag'          => $pag,
     'pagination'   => pagination_html($pag, FORUM_URL . '/thread.php?id=' . $threadId),
