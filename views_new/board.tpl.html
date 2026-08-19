@@ -6,8 +6,10 @@
     {% if currentUser %}
       <a href="{{ url('/mark_all_read.php?csrf=') }}{{ csrfToken }}"
          class="btn btn-ghost btn-sm" title="Alle Themen dieses Forums als gelesen markieren">Alles gelesen</a>
-      <a href="{{ url('/new_thread.php?board=') }}{{ board.board_id }}"
-         class="btn btn-primary btn-sm">+ Neues Thema</a>
+      {% if darfSchreiben %}
+        <a href="{{ url('/new_thread.php?board=') }}{{ board.board_id }}"
+           class="btn btn-primary btn-sm">+ Neues Thema</a>
+      {% endif %}
     {% endif %}
   </span>
 </div>

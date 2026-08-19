@@ -292,7 +292,10 @@ if ($cuThread && (is_admin() || is_mod_for_board((int) $cuThread['user_id'], (in
     ));
 }
 
+$darfSchreiben = board_can_write((int) $thread['board_id']);
+
 render('thread', [
+    'darfSchreiben' => $darfSchreiben,
     'title'         => $thread['title'],
     'threadTopHtml' => $threadTopHtml,
     'thread'        => $thread,

@@ -70,7 +70,12 @@ if (current_user() && !empty($threads)) {
     $unreadStatus = unread_status_for_threads((int) current_user()['user_id'], $threadIds);
 }
 
+// Ohne Schreibrecht wird der Knopf gar nicht erst gezeichnet — er fuehrte
+// sonst auf eine Absage.
+$darfSchreiben = board_can_write($boardId);
+
 render('board', [
+    'darfSchreiben' => $darfSchreiben,
     'title'      => $board['title'],
     'board'      => $board,
     'threads'    => $threads,

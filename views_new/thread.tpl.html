@@ -257,7 +257,7 @@
 
 {{ pagination|raw }}
 
-{% if currentUser and not thread.is_closed %}
+{% if currentUser and not thread.is_closed and darfSchreiben %}
 <div id="reply" class="form-card" style="margin-top:20px">
   <h2>{{ t('reply') }}</h2>
   <form method="post" enctype="multipart/form-data">
@@ -274,6 +274,10 @@
 </div>
 {% elseif thread.is_closed %}
   <p style="margin-top:16px;color:var(--text-muted);font-style:italic">Dieser Thread ist geschlossen.</p>
+{% elseif currentUser and not darfSchreiben %}
+<div class="form-card" style="margin-top:20px;text-align:center;color:var(--text-muted)">
+  In diesem Forum darfst du mitlesen, aber nicht schreiben.
+</div>
 {% elseif not currentUser %}
   <p style="margin-top:16px">
     <a href="{{ url('/login.php') }}" class="btn btn-primary">Anmelden, um zu antworten</a>
