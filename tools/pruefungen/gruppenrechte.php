@@ -186,4 +186,52 @@ return [
             $pdo->exec("DELETE FROM categories WHERE cat_id = $cat");
         }
     },
+
+    'Die Startseite listet ein verstecktes Forum nicht' => function () use ($pdo, $frisch) {
+        // Der Fund vom 19.08.2026: home.php benutzte den zentralen Filter NICHT,
+        // sondern maskierte nur den letzten Beitrag passwortgeschuetzter Foren.
+        // Fuer Gruppenbretter war das falsch — sie standen weiter auf der
+        // Startseite, obwohl der Direktaufruf schon 404 gab.
+        $quelle = file_get_contents(dirname(__DIR__, 2) . '/pages/home.php');
+        if (!str_contains($quelle, "board_filter_sql('b')")) {
+            throw new RuntimeException('home.php filtert die Bretterliste nicht');
+        }
+        if (!str_contains($quelle, 'if (empty($boards)) continue;')) {
+            throw new RuntimeException('Leere Kategorien werden weiter gezeichnet');
+        }
+    },
+
+    'Wer nichts lesen darf, bekommt auch keine Abo-Mail' => function () use ($pdo, $frisch) {
+        $pdo->exec("INSERT INTO categories (title, position) VALUES ('Pruef-Abo', 94)");
+        $cat = (int) $pdo->lastInsertId();
+        $pdo->exec("INSERT INTO boards (cat_id, title, position) VALUES ($cat, 'Nur Kunden', 1)");
+        $brett = (int) $pdo->lastInsertId();
+        $pdo->exec("INSERT INTO user_groups (name, slug, position) VALUES ('Pruefkunden', 'pruef_abo', 60)");
+        $gruppe = (int) $pdo->lastInsertId();
+        $mit = (int) $pdo->query("SELECT group_id FROM user_groups WHERE slug='members'")->fetchColumn();
+        $pdo->exec("INSERT INTO users (username, password, email) VALUES ('pruef_abo_drin', 'x', 'a1@example.invalid')");
+        $drin = (int) $pdo->lastInsertId();
+        $pdo->exec("INSERT INTO users (username, password, email) VALUES ('pruef_abo_draussen', 'x', 'a2@example.invalid')");
+        $draussen = (int) $pdo->lastInsertId();
+        $pdo->exec("INSERT INTO group_members (group_id, user_id) VALUES ($gruppe, $drin)");
+        $pdo->exec("INSERT INTO board_permissions (board_id, group_id, level)
+                    VALUES ($brett, $mit, 'none'), ($brett, $gruppe, 'write')");
+
+        try {
+            $frisch();
+            $a = board_level_for_user($brett, $drin);
+            $b = board_level_for_user($brett, $draussen);
+            $c = board_level_for_user($brett, 0);
+            if ($a !== 'write') throw new RuntimeException("Mitglied der Gruppe bekommt '$a'");
+            if ($b !== 'none')  throw new RuntimeException("Aussenstehender bekommt '$b' statt none");
+            if ($c !== 'none')  throw new RuntimeException("Gast bekommt '$c' statt none");
+        } finally {
+            $pdo->exec("DELETE FROM board_permissions WHERE board_id = $brett");
+            $pdo->exec("DELETE FROM group_members WHERE group_id = $gruppe");
+            $pdo->exec("DELETE FROM user_groups WHERE group_id = $gruppe");
+            $pdo->exec("DELETE FROM users WHERE user_id IN ($drin, $draussen)");
+            $pdo->exec("DELETE FROM boards WHERE board_id = $brett");
+            $pdo->exec("DELETE FROM categories WHERE cat_id = $cat");
+        }
+    },
 ];

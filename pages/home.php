@@ -44,7 +44,7 @@ foreach ($rawCats as $cat) {
                   AND COALESCE(t2.is_approved, 1) = 1
                 ORDER BY p2.created_at DESC LIMIT 1) AS last_thread_title
         FROM boards b
-        WHERE b.cat_id = ?
+        WHERE b.cat_id = ? ' . board_filter_sql('b') . '
         ORDER BY b.position
     ', [$cat['cat_id']]);
 
@@ -58,6 +58,11 @@ foreach ($rawCats as $cat) {
         }
     }
     unset($b);
+
+    // Eine Kategorie, in der nichts mehr sichtbar ist, wird nicht gezeichnet.
+    // Sonst bliebe die Ueberschrift "Hosting" ueber einer leeren Flaeche stehen
+    // und verriete genau das, was das Verstecken verhindern soll.
+    if (empty($boards)) continue;
 
     $cat['boards'] = $boards;
     $categories[]  = $cat;

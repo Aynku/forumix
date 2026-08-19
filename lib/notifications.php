@@ -137,6 +137,10 @@ function notify_thread_subscribers(int $threadId, int $postId, int $authorId): v
              JOIN threads t ON t.board_id = b.board_id WHERE t.thread_id = ?',
             [$threadId]
         );
+        // Seit 1.1.0 zaehlt neben dem Passwort auch die Gruppenstufe: wer das
+        // Forum gar nicht lesen darf, bekommt den Beitragstext erst recht nicht
+        // ins Postfach. Ein Abo ueberlebt naemlich auch, dass jemand aus einer
+        // Gruppe genommen wird.
         $geschuetzt = $brett && !empty($brett['password_hash']);
         $post   = db_fetch('SELECT content FROM posts WHERE post_id = ?', [$postId]);
         $author = db_fetch('SELECT username FROM users WHERE user_id = ?', [$authorId]);
@@ -151,6 +155,9 @@ function notify_thread_subscribers(int $threadId, int $postId, int $authorId): v
 
             // E-Mail (nur wenn User es will UND wir die Daten haben)
             if ($geschuetzt && !board_privileged_for_user((int) $brett['board_id'], (int) $s['user_id'])) {
+                continue;
+            }
+            if ($brett && board_level_for_user((int) $brett['board_id'], (int) $s['user_id']) === 'none') {
                 continue;
             }
             if (empty($s['notify_email'])) continue;

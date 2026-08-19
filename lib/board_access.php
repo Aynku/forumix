@@ -300,6 +300,42 @@ function board_can_write(int $boardId): bool {
 }
 
 /**
+ * Stufe eines BESTIMMTEN Benutzers fuer ein Forum — im Gegensatz zu
+ * board_level(), das den gerade angemeldeten Besucher meint.
+ *
+ * Gebraucht wird das ueberall dort, wo etwas fuer jemand anderen entschieden
+ * wird: Abo-Mails, Benachrichtigungen, spaeter Berichte. $userId = 0 steht
+ * fuer einen Gast.
+ */
+function board_level_for_user(int $boardId, int $userId): string {
+    if ($userId > 0 && board_privileged_for_user($boardId, $userId)) return 'write';
+
+    try {
+        $slug = $userId > 0 ? 'members' : 'guests';
+        $eingebaut = db_fetch('SELECT group_id FROM user_groups WHERE slug = ?', [$slug]);
+        $gruppen = $eingebaut ? [(int) $eingebaut['group_id']] : [];
+        if ($userId > 0) {
+            foreach (db_fetchAll('SELECT group_id FROM group_members WHERE user_id = ?', [$userId]) as $g) {
+                $gruppen[] = (int) $g['group_id'];
+            }
+        }
+
+        $zeilen = db_fetchAll('SELECT group_id, level FROM board_permissions WHERE board_id = ?', [$boardId]);
+        if (!$zeilen) return 'write';   // ohne Eintrag: offen wie bisher
+
+        $beste = 'none';
+        foreach ($zeilen as $r) {
+            if (!in_array((int) $r['group_id'], $gruppen, true)) continue;
+            if (BRETT_STUFEN[$r['level']] > BRETT_STUFEN[$beste]) $beste = $r['level'];
+        }
+        return $beste;
+    } catch (Exception $e) {
+        // Tabellen fehlen (Migration nicht gefahren): wie bisher.
+        return 'write';
+    }
+}
+
+/**
  * Warum kommt jemand nicht hinein? 'frei', 'passwort' oder 'gruppe'.
  *
  * Der Unterschied ist wichtig: ein Passwort kann der Besucher selbst eingeben,
