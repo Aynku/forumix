@@ -131,4 +131,24 @@ return [
             }
         } finally { $abraeumen($w); }
     },
+
+    'Zaehler auf 0 laufen beim Verringern nicht ueber' => function () use ($aufbauen, $abraeumen, $pdo) {
+        // Der Fund vom 19.08.2026: GREATEST(0, spalte - 1) schuetzt bei einer
+        // UNSIGNED-Spalte nicht — die Subtraktion laeuft vorher ueber, und
+        // MariaDB bricht mit 1690 ab. Getroffen hat es das Loeschen des
+        // einzigen Beitrags eines Themas.
+        $w = $aufbauen();
+        try {
+            $pdo->prepare('UPDATE threads SET reply_count = 0 WHERE thread_id = ?')->execute([$w['thread']]);
+            $pdo->prepare('UPDATE boards  SET post_count = 0, thread_count = 0 WHERE board_id = ?')->execute([$w['quelle']]);
+
+            $pdo->prepare('UPDATE threads SET reply_count = GREATEST(CAST(reply_count AS SIGNED) - 1, 0)
+                           WHERE thread_id = ?')->execute([$w['thread']]);
+            $pdo->prepare('UPDATE boards SET post_count = GREATEST(CAST(post_count AS SIGNED) - 1, 0)
+                           WHERE board_id = ?')->execute([$w['quelle']]);
+
+            $rc = (int) $pdo->query("SELECT reply_count FROM threads WHERE thread_id = {$w['thread']}")->fetchColumn();
+            if ($rc !== 0) throw new RuntimeException("reply_count steht auf $rc statt 0");
+        } finally { $abraeumen($w); }
+    },
 ];

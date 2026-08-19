@@ -874,6 +874,19 @@ code {
 .post-mod-badge    { background: #f59e0b !important; }
 .post-banned-badge { background: #6b7280 !important; }
 
+/* Gruppen-Abzeichen: bewusst zurueckhaltender als Admin und Mod. Die sagen,
+   wer etwas darf; eine Gruppe sagt nur, wozu jemand gehoert. */
+.post-group-badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 1px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
 [data-theme="dark"] .post-admin-badge,
 [data-theme="dark"] .post-mod-badge,
 [data-theme="dark"] .post-banned-badge {

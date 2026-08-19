@@ -102,6 +102,7 @@ require_once __DIR__ . '/lib/email_verify.php';
 require_once __DIR__ . '/lib/twofactor.php';
 require_once __DIR__ . '/lib/qrcode.php';
 require_once __DIR__ . '/lib/board_mods.php';
+require_once __DIR__ . '/lib/groups.php';
 require_once __DIR__ . '/lib/board_access.php';
 require_once __DIR__ . '/lib/migrations.php';
 require_once __DIR__ . '/lib/update_package.php';

@@ -198,9 +198,30 @@ $posts = db_fetchAll(
     array_merge([$threadId], $approvalParams, [$pag['per_page'], $pag['offset']])
 );
 
+// Gruppen-Abzeichen der Verfasser. Eine Abfrage fuer alle Beitraege der Seite
+// statt einer je Beitrag — sonst waeren es bei zwanzig Beitraegen zwanzig.
+$abzeichen = [];
+$verfasser = array_values(array_unique(array_map(fn($p) => (int) $p['user_id'], $posts)));
+if ($verfasser) {
+    $platzhalter = implode(',', array_fill(0, count($verfasser), '?'));
+    try {
+        foreach (db_fetchAll('
+            SELECT m.user_id, g.name FROM group_members m
+            JOIN user_groups g ON g.group_id = m.group_id
+            WHERE g.show_badge = 1 AND m.user_id IN (' . $platzhalter . ')
+            ORDER BY g.position, g.name
+        ', $verfasser) as $r) {
+            $abzeichen[(int) $r['user_id']][] = $r['name'];
+        }
+    } catch (Exception $e) {
+        // Migration noch nicht gefahren: dann eben keine Abzeichen.
+    }
+}
+
 // Anhänge + Reaktionen pro Post laden
 $reactionTypes = reaction_types();
 foreach ($posts as &$p) {
+    $p['gruppen']     = $abzeichen[(int) $p['user_id']] ?? [];
     $p['attachments'] = post_attachments((int) $p['post_id']);
     $p['reactions']   = post_reactions((int) $p['post_id'], current_user() ? (int) current_user()['user_id'] : null);
 

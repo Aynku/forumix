@@ -22,6 +22,7 @@
               'label' => '👥 Benutzer',
               'items' => [
                   'users'           => '👥 Benutzerliste',
+                  'groups'          => '👪 Gruppen',
                   'approvals_users' => '🆕 Reg.-Freigaben' . ($pendingUserApproval > 0 ? ' <span class="nav-badge">' . $pendingUserApproval . '</span>' : ''),
                   'invitations'     => '✉️ Einladungen' . ($activeInvitations > 0 ? ' <span class="nav-badge">' . $activeInvitations . '</span>' : ''),
                   'warnings'        => '⚠️ Warnungen',
@@ -453,6 +454,70 @@
               <div class="form-hint">Niedrigere Zahl = weiter oben in der Kategorie.</div>
             </div>
 
+            <?php /* ── GRUPPENRECHTE ── */ ?>
+            <?php $rechte = $brettRechte ?? []; ?>
+            <div class="form-row" style="border-top:1px dashed var(--border);padding-top:14px;margin-top:14px">
+              <label>👪 Gruppenrechte</label>
+              <div style="overflow-x:auto">
+                <table style="width:100%;border-collapse:collapse">
+                  <tr>
+                    <th style="text-align:left;padding:8px 10px;font-size:11px;text-transform:uppercase;
+                               letter-spacing:.05em;color:var(--text-muted);border-bottom:1px solid var(--border)">Gruppe</th>
+                    <?php foreach (['none' => 'nichts', 'read' => 'lesen', 'write' => 'schreiben'] as $stufe => $beschriftung): ?>
+                      <th style="width:100px;padding:8px 10px;font-size:11px;text-transform:uppercase;
+                                 letter-spacing:.05em;color:var(--text-muted);border-bottom:1px solid var(--border)">
+                        <?= e($beschriftung) ?></th>
+                    <?php endforeach; ?>
+                  </tr>
+                  <?php foreach (($gruppen ?? []) as $g): ?>
+                    <?php
+                      $gid = (int) $g['group_id'];
+                      // Ohne Eintrag gilt das Forum als offen — dann steht hier
+                      // vorbelegt, was tatsaechlich passiert: Gaeste lesen,
+                      // Angemeldete schreiben.
+                      $vorgabe = $rechte[$gid] ?? ($g['slug'] === 'guests' ? 'read'
+                                                : ($g['slug'] === 'members' ? 'write' : 'none'));
+                    ?>
+                    <tr>
+                      <td style="padding:8px 10px;border-bottom:1px solid var(--border)">
+                        <?= e($g['name']) ?>
+                        <?php if (!empty($g['is_builtin'])): ?>
+                          <span style="color:var(--text-faint);font-size:12px;margin-left:6px">eingebaut</span>
+                        <?php endif; ?>
+                      </td>
+                      <?php foreach (['none', 'read', 'write'] as $stufe): ?>
+                        <td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border)">
+                          <input type="radio" name="rechte[<?= $gid ?>]" value="<?= $stufe ?>"
+                                 <?= $vorgabe === $stufe ? 'checked' : '' ?>>
+                        </td>
+                      <?php endforeach; ?>
+                    </tr>
+                  <?php endforeach; ?>
+                </table>
+              </div>
+              <div class="form-hint">
+                Inhaber, Admins und Moderatoren sind ausgenommen — sie dürfen immer.
+                Wer in mehreren Gruppen ist, bekommt das höhere Recht.
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>Wenn jemand kein Recht hat</label>
+              <?php $sicht = $selectedBoard['visibility'] ?? 'hidden'; ?>
+              <label class="checkbox-line" style="margin-bottom:6px">
+                <input type="radio" name="visibility" value="hidden" <?= $sicht !== 'locked' ? 'checked' : '' ?>>
+                <span><strong>Verstecken</strong> — das Forum taucht nirgends auf, direkter Aufruf endet auf 404</span>
+              </label>
+              <label class="checkbox-line">
+                <input type="radio" name="visibility" value="locked" <?= $sicht === 'locked' ? 'checked' : '' ?>>
+                <span><strong>Zeigen, aber gesperrt</strong> — sichtbar mit Schloss, der Inhalt bleibt zu</span>
+              </label>
+              <div class="form-hint">
+                Verstecken heißt wirklich weg: nicht in der Suche, nicht im RSS, nicht über Schlagworte,
+                nicht im Profil eines Mitglieds.
+              </div>
+            </div>
+
             <?php /* ── PASSWORT-SCHUTZ ── */ ?>
             <div class="form-row" style="border-top:1px dashed var(--border);padding-top:14px;margin-top:14px">
               <label>🔒 Passwort-Schutz</label>
@@ -634,6 +699,150 @@
       </div>
 
     <?php /* ════════════ RÄNGE ════════════ */ ?>
+    <?php elseif ($action === 'groups'): ?>
+      <?php /* ── GRUPPEN ────────────────────────────────────────────────── */ ?>
+      <h2>👪 Gruppen</h2>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
+        Gruppen entscheiden, wer welches Forum sehen, lesen und beschreiben darf.
+        Eingestellt wird das je Forum unter <a href="?action=boards">Foren</a>.
+      </p>
+
+      <div class="card" style="margin-bottom:16px">
+        <div style="overflow-x:auto">
+          <table class="forum-table">
+            <thead>
+              <tr><th>Gruppe</th><th>Mitglieder</th><th>Abzeichen</th><th>In Rechten</th><th></th></tr>
+            </thead>
+            <tbody>
+              <?php foreach (($gruppen ?? []) as $g): ?>
+                <?php $gid = (int) $g['group_id']; $eingebaut = !empty($g['is_builtin']); ?>
+                <tr>
+                  <td>
+                    <strong><?= e($g['name']) ?></strong>
+                    <?php if ($eingebaut): ?>
+                      <span style="color:var(--text-faint);font-size:12px;margin-left:6px">eingebaut</span>
+                    <?php endif; ?>
+                  </td>
+                  <td>
+                    <?php if ($g['slug'] === 'guests'): ?>
+                      <span style="color:var(--text-muted)">alle nicht Angemeldeten</span>
+                    <?php elseif ($g['slug'] === 'members'): ?>
+                      <span style="color:var(--text-muted)">automatisch</span>
+                    <?php else: ?>
+                      <?= (int) ($mitgliederZahl[$gid] ?? 0) ?>
+                    <?php endif; ?>
+                  </td>
+                  <td>
+                    <?= !empty($g['show_badge']) ? 'wird gezeigt' : '<span style="color:var(--text-faint)">aus</span>' ?>
+                  </td>
+                  <?php $nForen = (int) ($rechteJeGruppe[$gid] ?? 0); ?>
+                  <td><?= $nForen ?> <?= $nForen === 1 ? 'Forum' : 'Foren' ?></td>
+                  <td style="white-space:nowrap">
+                    <a href="?action=groups&group=<?= $gid ?>" class="btn btn-ghost btn-xs">Bearbeiten</a>
+                    <?php if (!$eingebaut): ?>
+                      <a href="?action=delete_group&id=<?= $gid ?>&csrf=<?= e($csrfToken) ?>"
+                         class="btn btn-ghost btn-xs"
+                         onclick="return confirm('Gruppe „<?= e($g['name']) ?>“ löschen? Die Rechte, die daran hängen, verschwinden mit.')">Löschen</a>
+                    <?php endif; ?>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px">
+        <h3 style="margin-bottom:12px">Neue Gruppe</h3>
+        <form method="post" action="?action=create_group">
+          <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
+          <div class="form-row">
+            <label>Name</label>
+            <input type="text" name="name" required maxlength="60" placeholder="z. B. Kunden">
+          </div>
+          <label class="checkbox-line">
+            <input type="checkbox" name="show_badge" value="1">
+            <span>Als Abzeichen neben dem Namen zeigen</span>
+          </label>
+          <div class="form-hint">
+            Ohne Häkchen bleibt die Gruppe unsichtbar — für eine interne Gruppe ist das der Sinn der Sache.
+          </div>
+          <div style="margin-top:14px"><button class="btn btn-primary">Anlegen</button></div>
+        </form>
+      </div>
+
+      <?php if (!empty($gruppe)): ?>
+        <div class="card" style="margin-bottom:16px">
+          <h3 style="margin-bottom:12px"><?= e($gruppe['name']) ?></h3>
+
+          <form method="post" action="?action=update_group">
+            <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
+            <input type="hidden" name="group_id" value="<?= (int) $gruppe['group_id'] ?>">
+            <div class="form-row">
+              <label>Name</label>
+              <input type="text" name="name" value="<?= e($gruppe['name']) ?>" required maxlength="60">
+              <?php if (!empty($gruppe['is_builtin'])): ?>
+                <div class="form-hint">
+                  Der Anzeigename lässt sich ändern, der interne Kurzname
+                  (<code><?= e($gruppe['slug']) ?></code>) nicht — daran hängt der Code.
+                </div>
+              <?php endif; ?>
+            </div>
+            <label class="checkbox-line">
+              <input type="checkbox" name="show_badge" value="1" <?= !empty($gruppe['show_badge']) ? 'checked' : '' ?>>
+              <span>Als Abzeichen neben dem Namen zeigen</span>
+            </label>
+            <div style="margin-top:14px"><button class="btn btn-primary">Speichern</button></div>
+          </form>
+
+          <?php if (empty($gruppe['is_builtin'])): ?>
+            <div style="border-top:1px dashed var(--border);margin-top:18px;padding-top:16px">
+              <h3 style="font-size:14px;margin-bottom:10px">Mitglieder (<?= count($mitglieder ?? []) ?>)</h3>
+
+              <?php if (empty($mitglieder)): ?>
+                <p style="color:var(--text-muted);font-size:14px">Noch niemand eingetragen.</p>
+              <?php else: ?>
+                <div style="overflow-x:auto">
+                  <table class="forum-table">
+                    <tbody>
+                      <?php foreach ($mitglieder as $m): ?>
+                        <tr>
+                          <td><?= e($m['username']) ?></td>
+                          <td style="color:var(--text-muted)"><?= e((string) $m['added_at']) ?></td>
+                          <td style="text-align:right">
+                            <a class="btn btn-ghost btn-xs"
+                               href="?action=group_member_remove&group=<?= (int) $gruppe['group_id'] ?>&user=<?= (int) $m['user_id'] ?>&csrf=<?= e($csrfToken) ?>">Entfernen</a>
+                          </td>
+                        </tr>
+                      <?php endforeach; ?>
+                    </tbody>
+                  </table>
+                </div>
+              <?php endif; ?>
+
+              <form method="post" action="?action=group_member_add" style="margin-top:14px">
+                <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
+                <input type="hidden" name="group_id" value="<?= (int) $gruppe['group_id'] ?>">
+                <div class="form-row">
+                  <label>Mitglied hinzufügen</label>
+                  <select name="user_id" required>
+                    <?php foreach (($waehlbar ?? []) as $u): ?>
+                      <option value="<?= (int) $u['user_id'] ?>"><?= e($u['username']) ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+                <button class="btn btn-primary">Eintragen</button>
+              </form>
+            </div>
+          <?php else: ?>
+            <div class="form-hint" style="margin-top:14px">
+              In diese Gruppe wird niemand eingetragen: wer angemeldet ist, gehört zu
+              „Angemeldete", alle anderen zu „Gäste". Eine gepflegte Liste wäre sofort veraltet.
+            </div>
+          <?php endif; ?>
+        </div>
+      <?php endif; ?>
+
     <?php elseif ($action === 'ranks'): ?>
       <h2>🏅 Rangsystem</h2>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">

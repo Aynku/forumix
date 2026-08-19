@@ -55,6 +55,63 @@ if ($action === 'delete_board') {
     redirect(FORUM_URL . '/admin/?action=boards');
 }
 
+/* ── GRUPPEN ─────────────────────────────────────────────────────────
+   Anlegen, umbenennen, loeschen, Mitglieder pflegen. Alles nur mit Token und
+   nur fuer Admins — die Rechtepruefung des Adminbereichs gilt fuer die ganze
+   Datei. */
+if ($action === 'create_group' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    try {
+        group_create(post_str('name'), !empty($_POST['show_badge']));
+        flash('Gruppe angelegt.', 'success');
+    } catch (Exception $e) {
+        flash($e->getMessage(), 'error');
+    }
+    redirect(FORUM_URL . '/admin/?action=groups');
+}
+
+if ($action === 'update_group' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    try {
+        group_rename(post_int('group_id'), post_str('name'), !empty($_POST['show_badge']));
+        flash('Gruppe gespeichert.', 'success');
+    } catch (Exception $e) {
+        flash($e->getMessage(), 'error');
+    }
+    redirect(FORUM_URL . '/admin/?action=groups&group=' . post_int('group_id'));
+}
+
+if ($action === 'delete_group') {
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    try {
+        group_delete(get_int('id'));
+        flash('Gruppe gelöscht. Die Rechte, die daran hingen, sind mit weg.', 'success');
+    } catch (Exception $e) {
+        flash($e->getMessage(), 'error');
+    }
+    redirect(FORUM_URL . '/admin/?action=groups');
+}
+
+if ($action === 'group_member_add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    $gid = post_int('group_id');
+    try {
+        group_member_add($gid, post_int('user_id'));
+        flash('Mitglied eingetragen.', 'success');
+    } catch (Exception $e) {
+        flash($e->getMessage(), 'error');
+    }
+    redirect(FORUM_URL . '/admin/?action=groups&group=' . $gid);
+}
+
+if ($action === 'group_member_remove') {
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    $gid = get_int('group');
+    group_member_remove($gid, get_int('user'));
+    flash('Mitglied entfernt.', 'success');
+    redirect(FORUM_URL . '/admin/?action=groups&group=' . $gid);
+}
+
 if ($action === 'update_board' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $bid = post_int('board_id');
@@ -63,6 +120,21 @@ if ($action === 'update_board' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             'UPDATE boards SET cat_id = ?, title = ?, description = ?, position = ? WHERE board_id = ?',
             [post_int('cat_id'), post_str('title'), post_str('description'), post_int('position'), $bid]
         );
+
+        // Sichtbarkeit und Gruppenrechte. Beides steht im selben Formular, also
+        // wird es hier mitgeschrieben — und zwar nur, wenn die Matrix wirklich
+        // mitgeschickt wurde: sonst wuerde ein anderes Formular, das nur Titel
+        // und Position kennt, versehentlich alle Rechte auf "nichts" setzen.
+        if (isset($_POST['rechte']) && is_array($_POST['rechte'])) {
+            $sicht = post_str('visibility') === 'locked' ? 'locked' : 'hidden';
+            db_execute('UPDATE boards SET visibility = ? WHERE board_id = ?', [$sicht, $bid]);
+
+            $stufen = [];
+            foreach ($_POST['rechte'] as $gid => $stufe) {
+                $stufen[(int) $gid] = (string) $stufe;
+            }
+            board_permissions_set($bid, $stufen);
+        }
 
         // Passwort-Behandlung:
         //   - "remove_password" = explizit entfernen
@@ -1367,6 +1439,29 @@ switch ($action) {
         $vars['categories'] = db_fetchAll('SELECT * FROM categories ORDER BY position');
         break;
 
+    case 'groups':
+        $vars['gruppen']      = groups_all();
+        $vars['mitgliederZahl'] = group_member_counts();
+        $gid = get_int('group');
+        if ($gid > 0) {
+            $vars['gruppe']      = group_by_id($gid);
+            $vars['mitglieder']  = group_members($gid);
+            $vars['waehlbar']    = db_fetchAll('
+                SELECT user_id, username FROM users
+                WHERE is_banned = 0 AND is_deleted = 0
+                  AND user_id NOT IN (SELECT user_id FROM group_members WHERE group_id = ?)
+                ORDER BY username
+            ', [$gid]);
+        }
+        // Wo taucht die Gruppe ueberall in Rechten auf? Zeigt beim Loeschen,
+        // was daran haengt.
+        $vars['rechteJeGruppe'] = [];
+        foreach (db_fetchAll('SELECT group_id, COUNT(*) AS n FROM board_permissions
+                              WHERE level <> \'none\' GROUP BY group_id') as $r) {
+            $vars['rechteJeGruppe'][(int) $r['group_id']] = (int) $r['n'];
+        }
+        break;
+
     case 'boards':
         $vars['boards'] = db_fetchAll('
             SELECT b.*, c.title AS cat FROM boards b
@@ -1378,9 +1473,11 @@ switch ($action) {
         $allIds = array_map(fn($b) => (int) $b['board_id'], $vars['boards']);
         $vars['boardMods'] = board_moderators_map($allIds);
         // Selektiertes Board für Mod-Verwaltung
+        $vars['gruppen'] = groups_all();
         $selBoard = get_int('board');
         if ($selBoard > 0) {
             $vars['selectedBoard']  = db_fetch('SELECT * FROM boards WHERE board_id = ?', [$selBoard]);
+            $vars['brettRechte']    = board_permissions_map($selBoard);
             $vars['selectedMods']   = board_moderators($selBoard);
             $vars['availableUsers'] = db_fetchAll('
                 SELECT user_id, username, is_admin, is_mod FROM users

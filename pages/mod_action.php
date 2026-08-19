@@ -111,6 +111,13 @@ switch ($action) {
         flash('Thema verschoben.', 'success');
         redirect(FORUM_URL . '/thread.php?id=' . $threadId);
 
+    /* Zu den GREATEST(CAST(... AS SIGNED) - 1, 0) weiter unten:
+       Die Zaehlerspalten sind UNSIGNED. GREATEST(0, spalte - 1) schuetzt NICHT,
+       weil die Subtraktion schon ueberlaeuft, bevor GREATEST drankommt —
+       MariaDB bricht dann mit "BIGINT UNSIGNED value is out of range" ab. Beim
+       Loeschen des einzigen Beitrags eines Themas (reply_count = 0) ist das
+       jedes Mal passiert. Das CAST rechnet vorzeichenbehaftet, dann greift die
+       Untergrenze wie gedacht. */
     case 'delete_thread':
         ensure_board_permission($threadId);
         $t = db_fetch('SELECT board_id FROM threads WHERE thread_id = ?', [$threadId]);
@@ -124,12 +131,12 @@ switch ($action) {
             // Profil dauerhaft zu viele Beitraege an.
             foreach (db_fetchAll('SELECT user_id, COUNT(*) AS n FROM posts WHERE thread_id = ? GROUP BY user_id',
                                  [$threadId]) as $v) {
-                db_execute('UPDATE users SET post_count = GREATEST(0, post_count - ?) WHERE user_id = ?',
+                db_execute('UPDATE users SET post_count = GREATEST(CAST(post_count AS SIGNED) - ?, 0) WHERE user_id = ?',
                            [(int) $v['n'], (int) $v['user_id']]);
             }
             db_execute('DELETE FROM threads WHERE thread_id = ?', [$threadId]);
-            db_execute('UPDATE boards SET thread_count = GREATEST(0, thread_count - 1),
-                                          post_count   = GREATEST(0, post_count - ?)
+            db_execute('UPDATE boards SET thread_count = GREATEST(CAST(thread_count AS SIGNED) - 1, 0),
+                                          post_count   = GREATEST(CAST(post_count AS SIGNED) - ?, 0)
                         WHERE board_id = ?', [$rc, $t['board_id']]);
             mod_log_entry('delete_thread', 'thread', $threadId);
             flash('Thread gelöscht.', 'success');
@@ -143,9 +150,9 @@ switch ($action) {
         if ($p) {
             delete_attachments_for_posts([$postId]);
             db_execute('DELETE FROM posts WHERE post_id = ?', [$postId]);
-            db_execute('UPDATE threads SET reply_count = GREATEST(0, reply_count - 1) WHERE thread_id = ?', [$p['thread_id']]);
-            db_execute('UPDATE boards SET post_count = GREATEST(0, post_count - 1) WHERE board_id = ?', [$p['board_id']]);
-            db_execute('UPDATE users SET post_count = GREATEST(0, post_count - 1) WHERE user_id = ?', [$p['user_id']]);
+            db_execute('UPDATE threads SET reply_count = GREATEST(CAST(reply_count AS SIGNED) - 1, 0) WHERE thread_id = ?', [$p['thread_id']]);
+            db_execute('UPDATE boards SET post_count = GREATEST(CAST(post_count AS SIGNED) - 1, 0) WHERE board_id = ?', [$p['board_id']]);
+            db_execute('UPDATE users SET post_count = GREATEST(CAST(post_count AS SIGNED) - 1, 0) WHERE user_id = ?', [$p['user_id']]);
             mod_log_entry('delete_post', 'post', $postId);
             flash('Beitrag gelöscht.', 'success');
             redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);

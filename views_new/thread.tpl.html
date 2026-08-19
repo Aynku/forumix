@@ -143,6 +143,9 @@
       {% else %}
         {{ rank_badge(post.rank, post.post_count)|raw }}
       {% endif %}
+      {% for gruppe in post.gruppen %}
+        <div class="post-group-badge">{{ gruppe }}</div>
+      {% endfor %}
       <div class="post-count-label">Beiträge: {{ post.post_count }}</div>
     </div>
     <div class="post-content-col">
