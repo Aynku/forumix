@@ -8,6 +8,58 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.1.0 (2026-08-19)
+
+**Gruppen und Rechte pro Forum.** Bis hierher gab es drei Stufen — Inhaber,
+Moderator, alle anderen — und den Passwortschutz. Wer ein Forum nur einem Teil
+der Mitglieder zeigen wollte, hatte nichts Passendes: ein Passwort kann jeder
+weitergeben, und es verraet, dass es das Forum gibt.
+
+Jetzt gibt es Gruppen, und je Forum und Gruppe eine Stufe: **nichts, lesen,
+schreiben**. Wer in mehreren Gruppen ist, bekommt die hoechste davon. Inhaber,
+Admins und Moderatoren sind wie bisher ausgenommen.
+
+- Zwei eingebaute Gruppen, **Gäste** und **Angemeldete**: jeder Besucher faellt
+  in genau eine davon. In sie wird niemand eingetragen, das ergibt sich.
+- Pro Forum waehlbar: **verstecken** oder **sichtbar mit Schloss**. Verstecken
+  heisst wirklich weg — nicht auf der Startseite, nicht in der Suche, nicht im
+  RSS, nicht ueber Schlagworte, nicht im Profil eines Mitglieds. Direkter
+  Aufruf ergibt dieselbe 404-Seite wie ein Forum, das es nicht gibt.
+- Der Grund fuer die Abweisung ist unterscheidbar: ein **Passwort** kann der
+  Besucher selbst eingeben, eine fehlende **Gruppe** nicht. Deshalb fuehrt der
+  eine Weg zur Entsperrseite und der andere auf 404 — auch von der
+  Entsperrseite selbst aus, die sonst allein durch ihr Dasein Auskunft gaebe.
+- Gruppen koennen als **Abzeichen** unter dem Rang erscheinen. Ohne Haken
+  bleiben sie unsichtbar, was fuer eine interne Gruppe der Sinn der Sache ist.
+- Verwaltet wird das unter **Benutzer → Gruppen** und im Forum-Formular.
+
+**Migration noetig** (`v26`). Sie traegt fuer jedes vorhandene Forum
+ausdruecklich ein, was heute gilt: Gäste lesen, Angemeldete schreiben. Nach dem
+Update verschwindet also nichts, was vorher offen war.
+
+**Code-Bloecke und Zitate neu gebaut.** Der Code-Block hatte weder Kopfzeile
+noch Sprachangabe noch Kopieren-Knopf. Jetzt mit alldem, dazu Zeilennummern und
+ein Deckel bei 460 Pixel Hoehe.
+
+- **Syntax-Faerbung** ueber CodeMirror, das fuer den Vorlagen-Editor ohnehin
+  beiliegt — kein zweites Paket. Geladen wird nur `runmode-standalone` plus die
+  gebrauchten Modi, und auch das nur auf Seiten mit einem Code-Block. Die
+  Farben kommen aus den vorhandenen Tokens, damit es im hellen Thema genauso
+  stimmt wie im dunklen. Sprachangabe per `[code=php]`; ohne Angabe wird nicht
+  geraten.
+- Behoben: die BBCode-Kette lief auch durch den Code. `[b]` machte fett,
+  `@name` wurde zum Verweis, `nl2br()` haengte an jede Zeile ein `<br>`, und
+  aus `:)` im Quelltext wurde ein Smiley.
+- Behoben: verschachtelte Zitate nahmen den falschen Schluss-Tag — aus
+  `[quote=Name;post=41]` wurde die Zeile "Name;post=41 schrieb".
+
+**Themen verschieben** (aus 1.0.1) und ein Fund aus dem laufenden Betrieb:
+Beitraege liessen sich nicht loeschen, wenn ein Zaehler auf 0 stand.
+`GREATEST(0, spalte - 1)` schuetzt bei einer UNSIGNED-Spalte nicht — die
+Subtraktion laeuft ueber, bevor GREATEST drankommt.
+
+---
+
 ## v1.0.1 (2026-08-19)
 
 **Themen lassen sich verschieben.** Ein Thema landet nicht immer im richtigen
