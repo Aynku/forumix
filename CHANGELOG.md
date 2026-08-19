@@ -8,6 +8,28 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.1.4 (2026-08-19)
+
+**Geloeschte Konten treten nicht mehr als Mitglieder auf.** Ein anonymisiertes
+Konto als "Neuestes Mitglied" zu fuehren ist eine Auskunft ueber niemanden.
+Startseite und Fusszeile zaehlen geloeschte Konten nicht mehr mit, und als
+neuestes Mitglied werden ausserdem gesperrte uebersprungen. Die Beitraege
+bleiben unveraendert stehen — sonst bekaemen Gespraeche Loecher.
+
+Im Adminbereich stehen geloeschte Konten nicht mehr in der Benutzerliste. Ein
+Hinweis darueber nennt ihre Zahl und blendet sie auf Klick wieder ein, falls
+jemand einer alten Kennung nachgehen will.
+
+Die laufende Nummer hinter "Geloeschter Benutzer" ist jetzt auch in
+Mitgliederliste, Wer-ist-online, Dashboard, Auszeichnungen und auf den
+Team-Zeilen verschwunden — in 1.1.3 war sie nur an drei Stellen weg.
+
+Und "1 Mitglieder" heisst jetzt "1 Mitglied".
+
+Keine Migration noetig.
+
+---
+
 ## v1.1.3 (2026-08-19)
 
 **Ein geloeschtes Konto verlaesst jetzt seine Gruppen.** Bisher blieb die

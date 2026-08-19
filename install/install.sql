@@ -564,7 +564,7 @@ CREATE TABLE IF NOT EXISTS `invitations` (
 
 -- ─── Forum-Grundeinstellungen ──────────────────────────────────────────
 INSERT IGNORE INTO `settings` (`setting_key`, `setting_value`) VALUES
-  ('forum_version',          '1.1.3'),
+  ('forum_version',          '1.1.4'),
   ('forum_footer_text',      ''),
   ('forum_footer_links',     ''),
   -- Muss zum Rueckfall in bootstrap.php (forum_accent_color) passen. Der wird
