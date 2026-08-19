@@ -1422,17 +1422,29 @@ switch ($action) {
 
     case 'users':
         $q = trim($_GET['q'] ?? '');
+        // Geloeschte Konten stehen standardmaessig NICHT in der Liste. Sie sind
+        // anonymisiert, es gibt nichts mehr an ihnen zu verwalten, und sie
+        // schieben die lebenden Konten nach unten. Wer sie doch sehen will —
+        // etwa um eine alte Kennung nachzuvollziehen — haengt &geloescht=1 an
+        // oder klickt den Verweis unter der Liste.
+        $mitGeloeschten = !empty($_GET['geloescht']);
+        $wo = $mitGeloeschten ? '' : ' AND COALESCE(is_deleted, 0) = 0';
+
         if ($q !== '') {
             $like = '%' . $q . '%';
             $vars['allUsers'] = db_fetchAll(
-                'SELECT * FROM users WHERE username LIKE ? OR email LIKE ? OR last_ip LIKE ? OR registration_ip LIKE ?
-                 ORDER BY registered_at DESC LIMIT 200',
+                'SELECT * FROM users WHERE (username LIKE ? OR email LIKE ? OR last_ip LIKE ? OR registration_ip LIKE ?)'
+                . $wo . ' ORDER BY registered_at DESC LIMIT 200',
                 [$like, $like, $like, $like]
             );
         } else {
-            $vars['allUsers'] = db_fetchAll('SELECT * FROM users ORDER BY registered_at DESC LIMIT 200');
+            $vars['allUsers'] = db_fetchAll(
+                'SELECT * FROM users WHERE 1 = 1' . $wo . ' ORDER BY registered_at DESC LIMIT 200'
+            );
         }
-        $vars['searchQuery'] = $q;
+        $vars['searchQuery']    = $q;
+        $vars['mitGeloeschten'] = $mitGeloeschten;
+        $vars['zahlGeloescht']  = db_count('SELECT COUNT(*) FROM users WHERE COALESCE(is_deleted, 0) = 1');
         break;
 
     case 'categories':

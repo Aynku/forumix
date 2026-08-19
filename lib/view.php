@@ -26,7 +26,7 @@ function render(string $view, array $data = []): void {
         $globals['unreadNotifications'] = unread_notifications_count((int)$globals['currentUser']['user_id']);
     }
 
-    if ($globals['totalUsers'] === null) $globals['totalUsers'] = db_count('SELECT COUNT(*) FROM users');
+    if ($globals['totalUsers'] === null) $globals['totalUsers'] = db_count('SELECT COUNT(*) FROM users WHERE COALESCE(is_deleted, 0) = 0');
     if ($globals['totalPosts']  === null) $globals['totalPosts']  = db_count('SELECT COUNT(*) FROM posts');
 
     $data = array_merge($globals, $data);

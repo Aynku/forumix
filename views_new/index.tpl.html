@@ -128,7 +128,7 @@
         <strong>{{ number_format(forumStats.posts, 0, ',', '.') }}</strong> Beiträge
       </div>
       <div>
-        <strong>{{ number_format(forumStats.members, 0, ',', '.') }}</strong> Mitglieder
+        <strong>{{ number_format(forumStats.members, 0, ',', '.') }}</strong> {{ forumStats.members == 1 ? 'Mitglied' : 'Mitglieder' }}
       </div>
       {% if forumStats.newest %}
         <div>

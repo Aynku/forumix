@@ -93,9 +93,14 @@ render('index', [
     'namedOnline'   => $namedOnline,
     'onlineStats'   => online_stats(),
     'forumStats'    => [
-        'members' => db_count('SELECT COUNT(*) FROM users'),
+        // Geloeschte Konten zaehlen nicht mit und werden erst recht nicht als
+        // "Neuestes Mitglied" beworben. Fuer den Leser ist ein anonymisiertes
+        // Konto kein Mitglied mehr — die Beitraege bleiben ja trotzdem stehen.
+        'members' => db_count('SELECT COUNT(*) FROM users WHERE COALESCE(is_deleted, 0) = 0'),
         'threads' => db_count('SELECT COUNT(*) FROM threads'),
         'posts'   => db_count('SELECT COUNT(*) FROM posts'),
-        'newest'  => db_fetch('SELECT user_id, username, registered_at FROM users ORDER BY registered_at DESC LIMIT 1'),
+        'newest'  => db_fetch('SELECT user_id, username, registered_at FROM users
+                               WHERE COALESCE(is_deleted, 0) = 0 AND COALESCE(is_banned, 0) = 0
+                               ORDER BY registered_at DESC LIMIT 1'),
     ],
 ]);
