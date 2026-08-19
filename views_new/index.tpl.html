@@ -65,7 +65,7 @@
                   {% set role = user_role_style(m) %}
                   <a href="{{ url('/profile.php?id=') }}{{ m.user_id }}"
                      style="color:{{ role.color }};font-weight:600"
-                     title="{{ role.title|default('Moderator') }}">{{ m.username }}</a>
+                     title="{{ role.title|default('Moderator') }}">{{ zeigename(m.username) }}</a>
                 {% endfor %}
               </div>
             {% endif %}
@@ -104,7 +104,7 @@
             {% set role = user_role_style(u) %}
             {% if not loop.first %}, {% endif %}<a href="{{ url('/profile.php?id=') }}{{ u.user_id }}"
                style="color:{{ role.color }};font-weight:{{ role.weight }}"
-               title="{{ role.title }}">{{ u.username }}</a>
+               title="{{ role.title }}">{{ zeigename(u.username) }}</a>
           {% endfor %}
         </div>
         <p style="font-size:11px;color:var(--text-faint);margin-top:10px;border-top:1px dashed var(--border);padding-top:8px">
@@ -134,7 +134,7 @@
         <div>
           Neuestes Mitglied:
           <a href="{{ url('/profile.php?id=') }}{{ forumStats.newest.user_id }}">
-            <strong>{{ forumStats.newest.username }}</strong>
+            <strong>{{ zeigename(forumStats.newest.username) }}</strong>
           </a>
         </div>
       {% endif %}

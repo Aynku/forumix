@@ -151,7 +151,7 @@
           <a href="{{ url('/profile.php?id=') }}{{ u2.user_id }}" class="dash-list-item">
             <img src="{{ u2avatar }}" alt="" class="dash-list-avatar">
             <div class="dash-list-main">
-              <div class="dash-list-title">{{ u2.username }}</div>
+              <div class="dash-list-title">{{ zeigename(u2.username) }}</div>
               <div class="dash-list-snippet">{{ u2.interactions }} Beiträge in deinen Themen</div>
             </div>
           </a>

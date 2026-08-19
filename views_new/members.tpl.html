@@ -25,7 +25,7 @@
             <div class="team-info">
               <div class="team-name">
                 {{ online_dot(u)|raw }}
-                <strong style="color:#7c3aed">{{ u.username }}</strong>
+                <strong style="color:#7c3aed">{{ zeigename(u.username) }}</strong>
               </div>
               <div class="team-meta">
                 {{ u.post_count }} &middot;
@@ -48,7 +48,7 @@
             <div class="team-info">
               <div class="team-name">
                 {{ online_dot(u)|raw }}
-                <strong style="color:#dc2626">{{ u.username }}</strong>
+                <strong style="color:#dc2626">{{ zeigename(u.username) }}</strong>
               </div>
               <div class="team-meta">
                 {{ u.post_count }} &middot;
@@ -71,7 +71,7 @@
             <div class="team-info">
               <div class="team-name">
                 {{ online_dot(u)|raw }}
-                <strong style="color:#f59e0b">{{ u.username }}</strong>
+                <strong style="color:#f59e0b">{{ zeigename(u.username) }}</strong>
               </div>
               <div class="team-meta">
                 {{ u.post_count }} &middot;
@@ -94,7 +94,7 @@
             <div class="team-info">
               <div class="team-name">
                 {{ online_dot(u)|raw }}
-                <strong style="color:#f59e0b">{{ u.username }}</strong>
+                <strong style="color:#f59e0b">{{ zeigename(u.username) }}</strong>
               </div>
               <div class="team-meta">
                 {% for b in u.boards %}{% if not loop.first %}, {% endif %}{{ b.title }}{% endfor %}
@@ -139,7 +139,7 @@
               <div>
                 <a href="{{ url('/profile.php?id=') }}{{ u.user_id }}" style="font-weight:600">
                   {{ online_dot(u)|raw }}
-                  {{ u.username }}
+                  {{ zeigename(u.username) }}
                 </a>
                 {% if u.is_owner %}
                   <span class="member-role-tag" style="background:#7c3aed">Owner</span>

@@ -40,7 +40,7 @@
           <td>
             {% if u.user_id %}
               <a href="{{ url('/profile.php?id=') }}{{ u.user_id }}">
-                {{ u.username }}
+                {{ zeigename(u.username) }}
               </a>
               {% if u.is_banned %}
                 <span class="post-banned-badge" style="margin-left:4px">🚫</span>
