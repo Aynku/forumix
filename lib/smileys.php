@@ -77,11 +77,16 @@ function parse_smileys(string $html): string {
     $list = smileys_list();
     if (empty($list)) return $html; // Bei leerer Liste nichts ersetzen
 
-    // Nur Code-Blöcke vor Ersetzung schützen (Zitate sollen Smileys haben)
+    // Nur Code-Blöcke vor Ersetzung schützen (Zitate sollen Smileys haben).
+    //
+    // Seit 1.1.0 nimmt bbcode() den Code ohnehin vorher heraus, hier kommt also
+    // normalerweise keiner mehr an. Der Schutz bleibt trotzdem stehen und passt
+    // auf das aktuelle Markup: wer parse_smileys() irgendwann an anderer Stelle
+    // aufruft, soll nicht plötzlich Smileys im Quelltext stehen haben.
     $placeholders = [];
     $i = 0;
     $html = preg_replace_callback(
-        '/<pre class="bb-code">.*?<\/pre>/is',
+        '/<div class="bb-code"[^>]*>.*?<\/pre><\/div>|<pre class="bb-code">.*?<\/pre>/is',
         function ($m) use (&$placeholders, &$i) {
             $key = "\x01SMILEY_PROTECT_{$i}\x01";
             $placeholders[$key] = $m[0];

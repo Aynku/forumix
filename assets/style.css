@@ -998,57 +998,102 @@ mark {
 }
 
 /* ── BB-CODE STYLES ── */
-pre.bb-code {
-  background: var(--bg-surface3);
+/* ── CODE ───────────────────────────────────────────────────────────
+   Kopfzeile mit Sprache und Kopieren-Knopf, Zeilennummern per CSS-Zaehler,
+   lange Bloecke scrollen in sich statt die Seite zu strecken. */
+.bb-code {
+  margin: 12px 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 12px 16px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  white-space: pre-wrap;
-  margin: 8px 0;
-  overflow-x: auto;
+  overflow: hidden;
+  background: var(--bg-surface3);
 }
-blockquote.bb-quote {
+.bb-code-kopf {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 7px 12px;
   background: var(--bg-surface2);
-  border-left: 3px solid var(--color-accent);
-  padding: 12px 16px;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  margin: 10px 0;
-  color: var(--text-base);
-  font-size: 13px;
-  position: relative;
-}
-blockquote.bb-quote::before {
-  content: "💬";
-  position: absolute;
-  top: 10px;
-  right: 14px;
-  font-size: 14px;
-  opacity: .4;
-}
-blockquote.bb-quote cite {
-  display: block;
-  font-style: normal;
-  font-weight: 700;
-  font-size: 11px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .06em;
   color: var(--text-muted);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: .4px;
 }
-blockquote.bb-quote cite .quote-link {
-  color: var(--color-accent);
-  text-decoration: none;
+.bb-code-sprache { color: var(--text-base); }
+.bb-code-kopieren {
+  border: 1px solid var(--border); background: transparent; color: var(--text-muted);
+  cursor: pointer; font: inherit; text-transform: none; letter-spacing: 0;
+  padding: 2px 9px; border-radius: var(--radius-sm);
 }
-blockquote.bb-quote cite .quote-link:hover {
-  text-decoration: underline;
+.bb-code-kopieren:hover { color: var(--color-accent); border-color: var(--color-accent); }
+.bb-code-kopieren:focus-visible { outline: 2px solid var(--color-accent-ring); outline-offset: 2px; }
+.bb-code pre {
+  margin: 0; padding: 12px 14px 12px 0;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.65;
+  white-space: pre; overflow-x: auto; max-height: 460px;
+  tab-size: 4;
+  counter-reset: bbzeile;
 }
-/* Verschachtelte Quotes etwas einrücken */
-blockquote.bb-quote blockquote.bb-quote {
-  margin-top: 8px;
-  background: var(--bg-surface);
+/* Zeilennummern stehen im ::before, nicht im Text — sonst wandern sie beim
+   Kopieren mit in die Zwischenablage. */
+.bb-code .bb-zeile {
+  display: block; position: relative;
+  counter-increment: bbzeile;
+  padding-left: 56px;
+  min-height: 1.65em;
 }
+.bb-code .bb-zeile::before {
+  content: counter(bbzeile);
+  position: absolute; left: 0; width: 40px; text-align: right;
+  color: var(--text-faint);
+  user-select: none; -webkit-user-select: none;
+}
+
+/* Syntax: die Klassen von CodeMirror auf die eigenen Farbtokens gelegt.
+   Kein fremdes Farbschema — so stimmt es im hellen wie im dunklen Thema. */
+.bb-code .cm-keyword     { color: var(--color-accent); font-weight: 600; }
+.bb-code .cm-def         { color: var(--text-base); font-weight: 600; }
+.bb-code .cm-variable,
+.bb-code .cm-variable-2,
+.bb-code .cm-variable-3  { color: var(--text-base); }
+.bb-code .cm-string,
+.bb-code .cm-string-2    { color: var(--color-success); }
+.bb-code .cm-number,
+.bb-code .cm-atom        { color: var(--color-warning); }
+.bb-code .cm-comment     { color: var(--text-faint); font-style: italic; }
+.bb-code .cm-operator,
+.bb-code .cm-punctuation,
+.bb-code .cm-bracket     { color: var(--text-muted); }
+.bb-code .cm-type,
+.bb-code .cm-builtin,
+.bb-code .cm-meta        { color: var(--color-accent-hover); }
+.bb-code .cm-tag         { color: var(--color-accent); }
+.bb-code .cm-attribute   { color: var(--color-accent-hover); }
+.bb-code .cm-error       { color: var(--color-danger); }
+
+/* ── ZITAT ──────────────────────────────────────────────────────────
+   Eigene Kopfzeile mit Verfasser und Sprung zum Original. */
+blockquote.bb-quote {
+  margin: 12px 0;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--bg-surface2);
+  overflow: hidden;
+  color: var(--text-base);
+}
+.bb-quote-kopf {
+  padding: 7px 14px;
+  background: var(--bg-surface3);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px; color: var(--text-muted);
+}
+.bb-quote-autor { color: var(--color-accent); font-weight: 600; text-decoration: none; }
+.bb-quote-sprung { float: right; color: var(--text-faint); text-decoration: none; }
+.bb-quote-sprung:hover { color: var(--color-accent); }
+.bb-quote-inhalt { padding: 11px 14px; font-size: 14px; }
+/* Verschachtelte Zitate heben sich durch einen anderen Grund ab. */
+blockquote.bb-quote blockquote.bb-quote { margin: 10px 0 2px; background: var(--bg-surface); }
+blockquote.bb-quote blockquote.bb-quote .bb-quote-kopf { background: var(--bg-surface2); }
+
 
 /* ── SECTION HEADING ── */
 .section-heading {

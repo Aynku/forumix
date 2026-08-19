@@ -1718,3 +1718,139 @@ document.addEventListener('click', function (e) {
 
   document.querySelectorAll('.editor-textarea').forEach(beobachten);
 })();
+
+/* ══════════════════════════════════════════════════════════════════════
+   CODE-BLOECKE: Kopieren-Knopf und Syntax-Faerbung
+   ══════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  /* ── Kopieren ──
+     Ueber die Zwischenablage, mit Rueckfall auf die alte Auswahl-Methode:
+     navigator.clipboard gibt es nur auf verschluesselten Verbindungen, und
+     wer sein Forum ohne TLS betreibt, soll trotzdem kopieren koennen. */
+  document.addEventListener('click', function (e) {
+    var knopf = e.target.closest && e.target.closest('.bb-code-kopieren');
+    if (!knopf) return;
+
+    var block = knopf.closest('.bb-code');
+    var pre   = block && block.querySelector('pre');
+    if (!pre) return;
+
+    var text = pre.innerText;
+    var fertig = function () {
+      var alt = knopf.textContent;
+      knopf.textContent = 'Kopiert';
+      setTimeout(function () { knopf.textContent = alt; }, 1500);
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(fertig, function () {});
+      return;
+    }
+    var hilf = document.createElement('textarea');
+    hilf.value = text;
+    hilf.style.position = 'fixed';
+    hilf.style.opacity = '0';
+    document.body.appendChild(hilf);
+    hilf.select();
+    try { document.execCommand('copy'); fertig(); } catch (err) {}
+    document.body.removeChild(hilf);
+  });
+
+  /* ── Faerben ──
+     CodeMirror liegt fuers Schreibfeld ohnehin bei; runMode faerbt Text, ohne
+     einen Editor zu bauen. Fehlt die Bibliothek oder der Modus, bleibt der
+     Block schlicht — grauer Code ist besser als falsch gefaerbter. */
+  /* Welche Dateien ein Modus braucht. PHP zieht HTML mit, weil der Modus
+     eingebetteten Auszeichnungscode mitfaerbt — das ist in CodeMirror so
+     gebaut und nicht abzuschalten. */
+  var BASIS = 'codemirror/';
+  var TEILE = {
+    'application/x-httpd-php-open': ['mode/clike/clike.js', 'mode/xml/xml.min.js',
+                                'mode/javascript/javascript.min.js', 'mode/css/css.min.js',
+                                'mode/htmlmixed/htmlmixed.min.js', 'mode/php/php.js'],
+    'text/x-sql':              ['mode/sql/sql.js'],
+    'text/javascript':         ['mode/javascript/javascript.min.js'],
+    'application/json':        ['mode/javascript/javascript.min.js'],
+    'text/css':                ['mode/css/css.min.js'],
+    'application/xml':         ['mode/xml/xml.min.js'],
+    'text/html':               ['mode/xml/xml.min.js', 'mode/javascript/javascript.min.js',
+                                'mode/css/css.min.js', 'mode/htmlmixed/htmlmixed.min.js']
+  };
+
+  var wurzel = (document.querySelector('script[src*="forum.js"]') || {}).src || '';
+  wurzel = wurzel.replace(/forum\.js.*$/, '');
+
+  var geladen = {};
+  /* Nacheinander laden, nicht parallel: die Modi bauen aufeinander auf
+     (php braucht clike und htmlmixed), und wer sie gleichzeitig anfordert,
+     bekommt je nach Netzlaufzeit mal einen fehlenden Modus. */
+  function laden(liste, fertig) {
+    if (!liste.length) return fertig();
+    var datei = liste[0], rest = liste.slice(1);
+    if (geladen[datei]) return laden(rest, fertig);
+    var s = document.createElement('script');
+    s.src = wurzel + BASIS + datei;
+    s.onload = function () { geladen[datei] = true; laden(rest, fertig); };
+    s.onerror = function () { geladen[datei] = true; laden(rest, fertig); };
+    document.head.appendChild(s);
+  }
+
+  function faerben(block) {
+    var modus = block.getAttribute('data-modus');
+    var pre   = block.querySelector('pre');
+    if (!modus || !pre) return;
+    if (typeof CodeMirror === 'undefined' || !CodeMirror.runMode) return;
+    if (CodeMirror.mimeModes && !CodeMirror.mimeModes[modus]) return;
+
+    var text = pre.innerText;
+    var zeile = document.createElement('span');
+    zeile.className = 'bb-zeile';
+    var neu = document.createDocumentFragment();
+    neu.appendChild(zeile);
+
+    CodeMirror.runMode(text, modus, function (stueck, stil) {
+      // Ein Stueck kann Zeilenumbrueche enthalten (Blockkommentar, langer
+      // String). Dann wird es aufgeteilt, damit jede Zeile ihr eigenes <span>
+      // behaelt — sonst rutscht die Nummerierung.
+      var teile = stueck.split('\n');
+      for (var i = 0; i < teile.length; i++) {
+        if (i > 0) {
+          zeile = document.createElement('span');
+          zeile.className = 'bb-zeile';
+          neu.appendChild(zeile);
+        }
+        if (teile[i] === '') continue;
+        if (stil) {
+          var s = document.createElement('span');
+          s.className = 'cm-' + stil.replace(/ +/g, ' cm-');
+          s.appendChild(document.createTextNode(teile[i]));
+          zeile.appendChild(s);
+        } else {
+          zeile.appendChild(document.createTextNode(teile[i]));
+        }
+      }
+    });
+
+    pre.textContent = '';
+    pre.appendChild(neu);
+  }
+
+  /* Nur wenn auf dieser Seite ueberhaupt gefaerbt werden soll, wird geladen.
+     Eine Themenseite ohne Code-Block holt sich also kein Kilobyte davon. */
+  var bloecke = document.querySelectorAll('.bb-code[data-modus]');
+  if (bloecke.length) {
+    var noetig = [];
+    bloecke.forEach(function (b) {
+      (TEILE[b.getAttribute('data-modus')] || []).forEach(function (d) {
+        if (noetig.indexOf(d) === -1) noetig.push(d);
+      });
+    });
+    if (noetig.length) {
+      laden(['addon/runmode/runmode-standalone.js'].concat(noetig), function () {
+        bloecke.forEach(faerben);
+      });
+    }
+  }
+})();

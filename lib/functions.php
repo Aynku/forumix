@@ -46,36 +46,119 @@ function error_page(int $code, string $title, string $message = ''): void {
     exit;
 }
 
+/**
+ * Sprachen, die im Code-Block beschriftet und eingefaerbt werden.
+ * Wert: [Beschriftung, CodeMirror-Modus]. Ohne Modus wird nur beschriftet —
+ * lieber grauer Code als falsch eingefaerbter.
+ */
+const BB_CODE_SPRACHEN = [
+    'php'        => ['PHP',        'application/x-httpd-php-open'],  // -open: faengt IM PHP an. Die normale Kennung startet in HTML und laesst
+    //                                                    Ausschnitte ohne <?php voellig ungefaerbt.
+    'sql'        => ['SQL',        'text/x-sql'],
+    'js'         => ['JavaScript', 'text/javascript'],
+    'javascript' => ['JavaScript', 'text/javascript'],
+    'json'       => ['JSON',       'application/json'],
+    'html'       => ['HTML',       'text/html'],
+    'css'        => ['CSS',        'text/css'],
+    'xml'        => ['XML',        'application/xml'],
+    'bash'       => ['Shell',      ''],
+    'shell'      => ['Shell',      ''],
+    'text'       => ['Text',       ''],
+];
+
+/**
+ * Baut den Code-Block. $inhalt ist bereits durch e() gegangen und wird hier
+ * NICHT erneut maskiert.
+ *
+ * Jede Zeile bekommt ein eigenes <span>, damit die Nummerierung ohne
+ * JavaScript funktioniert. Leere Zeilen bleiben leer statt ein Leerzeichen zu
+ * bekommen — sonst schleppt jedes Kopieren unsichtbare Zeichen mit; die Hoehe
+ * macht das Stylesheet.
+ */
+function code_block_html(string $sprache, string $inhalt): string {
+    $sprache = strtolower(trim($sprache));
+    $bekannt = BB_CODE_SPRACHEN[$sprache] ?? null;
+
+    // Erste und letzte Leerzeile weg: [code] steht meist auf eigener Zeile.
+    $inhalt = preg_replace('/\A\R|\R\z/', '', $inhalt);
+
+    $zeilen = preg_split('/\R/', $inhalt);
+    $rumpf  = '';
+    foreach ($zeilen as $z) {
+        $rumpf .= '<span class="bb-zeile">' . $z . '</span>';
+    }
+
+    $modus = ($bekannt && $bekannt[1] !== '') ? ' data-modus="' . e($bekannt[1]) . '"' : '';
+    return '<div class="bb-code"' . $modus . '>'
+         . '<div class="bb-code-kopf">'
+         . '<span class="bb-code-sprache">' . e($bekannt[0] ?? 'Code') . '</span>'
+         . '<button type="button" class="bb-code-kopieren">Kopieren</button>'
+         . '</div>'
+         . '<pre>' . $rumpf . '</pre></div>';
+}
+
 function bbcode(string $text): string {
     $text = e($text);
 
-    // ── QUOTES zuerst (mit Post-ID-Link, dann mit Author, dann simpel) ──
-    // [quote=username;post=42]Inhalt[/quote]  → mit Sprung zum Original
+    // ── CODE ZUERST HERAUSNEHMEN ──
+    // Alles Weitere in dieser Funktion greift sonst auch im Code zu: [b] macht
+    // fett, @name wird zum Verweis, nl2br() haengt an jede Zeile ein <br>, und
+    // parse_smileys() macht aus :) ein Bild. Deshalb wandert der Block als
+    // Platzhalter durch die ganze Kette und kommt erst ganz am Ende zurueck.
+    $codeBloecke = [];
     $text = preg_replace_callback(
-        '/\[quote=([^;\]]+);post=(\d+)\](.*?)\[\/quote\]/is',
-        function ($m) {
-            $author = $m[1];
-            $postId = (int) $m[2];
-            $body   = $m[3];
-            return '<blockquote class="bb-quote">'
-                 . '<cite><a href="#post' . $postId . '" class="quote-link">' . $author . ' schrieb:</a></cite>'
-                 . $body
-                 . '</blockquote>';
+        '/\[code(?:=([a-zA-Z0-9+#_-]{1,16}))?\](.*?)\[\/code\]/is',
+        function ($m) use (&$codeBloecke) {
+            $schluessel = "\x02CODE" . count($codeBloecke) . "\x02";
+            $codeBloecke[$schluessel] = code_block_html($m[1] ?? '', $m[2]);
+            return $schluessel;
         },
         $text
     );
-    // [quote=username]Inhalt[/quote]  → mit Autor
-    $text = preg_replace(
-        '/\[quote=([^\]]+)\](.*?)\[\/quote\]/is',
-        '<blockquote class="bb-quote"><cite>$1 schrieb:</cite>$2</blockquote>',
-        $text
-    );
-    // [quote]Inhalt[/quote]  → ohne Autor
-    $text = preg_replace(
-        '/\[quote\](.*?)\[\/quote\]/is',
-        '<blockquote class="bb-quote">$1</blockquote>',
-        $text
-    );
+
+    // ── ZITATE ──
+    // Von innen nach aussen: der Ausdruck trifft nur Zitate, deren Inhalt kein
+    // weiteres [quote] enthaelt, und wird so lange wiederholt, bis keines mehr
+    // uebrig ist.
+    //
+    // Vorher gab es drei Muster nacheinander, jedes mit einem faulen .*? — bei
+    // verschachtelten Zitaten nahm das erste den Schluss-Tag des INNEREN und
+    // liess den aeusseren stehen. Sichtbar wurde das am Namen: aus
+    // [quote=Aynku;post=41] wurde die Zeile "Aynku;post=41 schrieb".
+    $runden = 0;
+    while ($runden++ < 20) {
+        $vorher = $text;
+        $text = preg_replace_callback(
+            '/\[quote(?:=([^\]]*))?\]((?:(?!\[quote(?:=[^\]]*)?\]).)*?)\[\/quote\]/is',
+            function ($m) {
+                $attribut = trim($m[1] ?? '');
+                $inhalt   = $m[2];
+
+                $autor  = $attribut;
+                $postId = 0;
+                if ($attribut !== '' && preg_match('/^(.*?);post=(\d+)$/', $attribut, $t)) {
+                    $autor  = trim($t[1]);
+                    $postId = (int) $t[2];
+                }
+
+                $kopf = '';
+                if ($autor !== '' && $postId > 0) {
+                    $kopf = '<div class="bb-quote-kopf">'
+                          . '<a href="#post' . $postId . '" class="bb-quote-autor">' . $autor . '</a> schrieb'
+                          . '<a href="#post' . $postId . '" class="bb-quote-sprung">zum Beitrag &rarr;</a>'
+                          . '</div>';
+                } elseif ($autor !== '') {
+                    $kopf = '<div class="bb-quote-kopf">'
+                          . '<span class="bb-quote-autor">' . $autor . '</span> schrieb</div>';
+                }
+
+                return '<blockquote class="bb-quote">' . $kopf
+                     . '<div class="bb-quote-inhalt">' . $inhalt . '</div></blockquote>';
+            },
+            $text
+        );
+        if ($text === null || $text === $vorher) { $text = $text ?? $vorher; break; }
+    }
 
     $patterns = [
         '/\[b\](.*?)\[\/b\]/is'   => '<strong>$1</strong>',
@@ -85,7 +168,6 @@ function bbcode(string $text): string {
         '/\[h2\](.*?)\[\/h2\]/is' => '<h2 class="bb-h2">$1</h2>',
         '/\[h3\](.*?)\[\/h3\]/is' => '<h3 class="bb-h3">$1</h3>',
         '/\[hr\]/is' => '<hr class="bb-hr">',
-        '/\[code\](.*?)\[\/code\]/is' => '<pre class="bb-code">$1</pre>',
         '/\[spoiler\](.*?)\[\/spoiler\]/is' => '<details class="bb-spoiler"><summary>Spoiler anzeigen</summary>$1</details>',
         '/\[url\](https?:\/\/[^\[]+)\[\/url\]/is' => '<a href="$1" rel="nofollow noopener" target="_blank">$1</a>',
         '/\[url=(https?:\/\/[^\]]+)\](.*?)\[\/url\]/is' => '<a href="$1" rel="nofollow noopener" target="_blank">$2</a>',
@@ -146,6 +228,11 @@ function bbcode(string $text): string {
     // Smileys ersetzen (geschützt vor [code]/[quote])
     if (function_exists('parse_smileys')) {
         $text = parse_smileys($text);
+    }
+
+    // Code zurueck an seinen Platz — nach allem anderen, unberuehrt.
+    if ($codeBloecke) {
+        $text = strtr($text, $codeBloecke);
     }
 
     return $text;
