@@ -18,7 +18,17 @@ etwas enthält. Das Update räumt beides wieder weg.
 
 Wer die Migration schon ausgeführt hat, behält die Spalte — sie stört nicht und
 wird von nichts mehr gelesen. Gruppen, Rechte und die Verwaltung im
-Adminbereich sind unverändert; das Inline-Tag aus 1.2.0 bleibt ebenfalls.
+Adminbereich sind unverändert.
+
+**Was aus 1.2.0 bleibt: Wortwörtliches mitten im Satz.** Neben dem Code-Block
+gibt es jetzt ein Inline-Tag für einzelne Wörter — einen Dateinamen, einen
+Schalter, ein Tag. Es setzt sie in Schreibmaschinenschrift und nimmt sie aus
+der Auszeichnung heraus: was dazwischen steht, wird nicht mehr als BBCode
+gelesen. Damit lässt sich endlich über BBCode schreiben, ohne dass es wirkt.
+
+```
+Der Schalter [c]--probe[/c] rechnet nur vor.
+```
 
 Keine Migration nötig.
 
