@@ -8,6 +8,43 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.3.2 (2026-08-20)
+
+### Ungelesen-Anzeige stimmt wieder
+
+Seit 1.3.0 galt jedes Thema dauerhaft als ungelesen: der blaue Punkt blieb
+stehen, auch nach „Alles gelesen". Ursache war ein Ausdruck, der in der
+Abfrage selbst gelandet ist statt davor — die Abfrage scheiterte, und ein
+leeres `catch` schluckte den Fehler.
+
+- Die Abfrage ist berichtigt, die Anzeige verhält sich wieder wie vor 1.3.0.
+- Der Fehler wird jetzt protokolliert, statt verschluckt zu werden. Ein
+  Fehler, den niemand sehen kann, kostet mehr als eine Zeile im Protokoll.
+- Eine Prüfung im Repo geht den Quelltext mit dem PHP-Zerteiler durch und
+  meldet, wenn ein Abfrage-Helfer in einer Zeichenkette steht statt daneben.
+
+### Kleinigkeiten
+
+- Im Papierkorb steht „1 Beitrag" statt „1 Beiträge".
+
+**Hinweis zu älteren Installationen:** Wurde vor 1.3.0 ein Beitrag gelöscht,
+der zufällig der letzte eines Themas war, zeigt die Themenliste bei diesem
+Thema dauerhaft keinen letzten Beitrag an — das alte Löschen hat den Verweis
+stehen lassen. Ab 1.3.0 passiert das nicht mehr. Vorhandene Fälle lassen sich
+einmalig geradeziehen:
+
+```sql
+UPDATE threads t
+   SET t.last_post_id = (SELECT MAX(p.post_id) FROM posts p
+                          WHERE p.thread_id = t.thread_id AND p.deleted_at IS NULL)
+ WHERE t.last_post_id IS NOT NULL
+   AND NOT EXISTS (SELECT 1 FROM posts p2 WHERE p2.post_id = t.last_post_id);
+```
+
+Keine Migration nötig.
+
+---
+
 ## v1.3.1 (2026-08-20)
 
 ### Ohne Migration fällt nichts mehr aus

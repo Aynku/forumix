@@ -33,7 +33,7 @@ function unread_status_for_threads(int $userId, array $threadIds): array {
         $rows = db_fetchAll("
             SELECT t.thread_id, p.created_at AS last_post_at, tr.read_at
             FROM threads t
-            LEFT JOIN posts p ON p.post_id = t.last_post_id' . sichtbar_sql('p') . '
+            LEFT JOIN posts p ON p.post_id = t.last_post_id " . sichtbar_sql('p') . "
             LEFT JOIN thread_reads tr ON tr.thread_id = t.thread_id AND tr.user_id = ?
             WHERE t.thread_id IN ($placeholders)
         ", $params);
@@ -49,7 +49,13 @@ function unread_status_for_threads(int $userId, array $threadIds): array {
                 $result[$tid] = false;
             }
         }
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+        // Frueher stand hier nichts. Am 20.08.2026 hat das eine kaputte
+        // Abfrage verdeckt: jedes Thema galt als ungelesen, der blaue Punkt
+        // ging nie weg, und niemand konnte sehen warum. Ein verschluckter
+        // Fehler kostet mehr als eine Zeile im Protokoll.
+        error_log('unread_status_for_threads: ' . $e->getMessage());
+    }
 
     return $result;
 }
