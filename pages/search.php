@@ -64,7 +64,9 @@ $authorId = get_int('author');
 $author   = trim($_GET['author_name'] ?? '');
 $dateFrom = trim($_GET['date_from'] ?? '');
 $dateTo   = trim($_GET['date_to'] ?? '');
-$sortBy   = $_GET['sort'] ?? 'date_desc';
+// Ohne ausdrueckliche Wahl: mit Suchbegriff nach Treffergüte, sonst nach
+// Datum. Wer "Neueste zuerst" auswaehlt, bekommt auch Neueste zuerst.
+$sortBy   = $_GET['sort'] ?? (trim((string) ($_GET['q'] ?? '')) !== '' ? 'relevanz' : 'date_desc');
 $hasReactions   = !empty($_GET['has_reactions']);
 $hasAttachments = !empty($_GET['has_attachments']);
 $page     = max(1, get_int('page', 1));
@@ -83,10 +85,14 @@ if ($hasQuery) {
     $where  = [];
     $params = [];
 
+    // Volltext, wenn der Index steht und der Begriff dazu taugt — sonst wie
+    // bisher mit LIKE. Was gilt, entscheidet lib/suche.php.
+    $volltext = false;
     if (mb_strlen($query) >= 3) {
-        $where[]  = '(t.title LIKE ? OR p.content LIKE ?)';
-        $params[] = '%' . $query . '%';
-        $params[] = '%' . $query . '%';
+        $bed      = such_bedingung($query);
+        $where[]  = $bed['sql'];
+        $params   = array_merge($params, $bed['params']);
+        $volltext = $bed['volltext'];
     }
     if ($boardId > 0)  { $where[] = 't.board_id = ?'; $params[] = $boardId; }
     if ($authorId > 0) { $where[] = 'p.user_id = ?'; $params[] = $authorId; }
@@ -118,7 +124,12 @@ if ($hasQuery) {
         $whereSql .= $boardFilter;
     }
 
+    // Nach Treffergüte sortieren geht nur, wenn auch danach gesucht wurde.
+    // Steht der Index nicht bereit oder war der Begriff zu kurz, faellt die
+    // Auswahl still auf "Neueste zuerst" zurueck — eine Sortierung, die keine
+    // Zahlen hat, waere eine leere Behauptung.
     $order = match ($sortBy) {
+        'relevanz'  => $volltext ? 'relevanz DESC, p.created_at DESC' : 'p.created_at DESC',
         'date_asc'  => 'p.created_at ASC',
         'replies'   => 't.reply_count DESC',
         'views'     => 't.view_count DESC',
@@ -136,7 +147,17 @@ if ($hasQuery) {
     ", $params);
 
     $pag = paginate($total, SEARCH_PER_PAGE, $page);
-    $sp  = array_merge($params, [$pag['per_page'], $pag['offset']]);
+
+    // Die Guete steht nur in der Ergebnisabfrage, nicht in der Zaehlung — dort
+    // waere sie Arbeit ohne Zweck. Ihre Parameter gehoeren deshalb VOR die
+    // uebrigen: sie stehen in der Abfrage weiter vorn.
+    $relevanzSpalte = '';
+    $sp = array_merge($params, [$pag['per_page'], $pag['offset']]);
+    if ($volltext) {
+        $rel = such_relevanz($query);
+        $relevanzSpalte = ', ' . $rel['sql'] . ' AS relevanz';
+        $sp = array_merge($rel['params'], $sp);
+    }
 
     $raw = db_fetchAll("
         SELECT t.thread_id, t.title AS thread_title, t.reply_count, t.view_count,
@@ -146,6 +167,7 @@ if ($hasQuery) {
                p.post_id, p.content AS post_content, p.created_at AS post_date,
                (SELECT COUNT(*) FROM reactions   WHERE post_id = p.post_id) AS reaction_count,
                (SELECT COUNT(*) FROM attachments WHERE post_id = p.post_id) AS attachment_count
+               $relevanzSpalte
         FROM threads t
         JOIN boards b     ON b.board_id = t.board_id
         JOIN categories c ON c.cat_id   = b.cat_id

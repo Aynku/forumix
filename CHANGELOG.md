@@ -8,6 +8,35 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.4.0 (2026-08-20)
+
+### Suche über einen Volltext-Index
+
+Die Suche verglich bisher mit `LIKE '%wort%'`. Das kann kein Index bedienen:
+Die Datenbank liest bei jeder Suche jeden Beitrag, und eine Reihenfolge nach
+Treffergüte gibt es dabei nicht — `LIKE` kennt nur „kommt vor“ und „kommt nicht
+vor“. Ab dieser Fassung fragt die Suche einen Volltext-Index.
+
+- **Beste Treffer** ist die neue Vorgabe, sobald ein Suchbegriff eingegeben
+  wurde. Der Titel zählt dabei doppelt: wonach ein Thema heißt, ist meist
+  näher dran als ein Wort irgendwo im Text. Die übrigen Sortierungen bleiben.
+- **Jedes Wort muss vorkommen** — im Titel oder im Beitrag, nicht zwingend
+  beides an derselben Stelle. Wer nach zwei Wörtern sucht, meint beide.
+- **Wortanfänge zählen:** „Hefe" findet auch „Hefeteig".
+- **In Anführungszeichen** wird die Wendung genau so gesucht, in dieser
+  Reihenfolge.
+- Wörter unter drei Zeichen kennt der Index nicht; die Suche nimmt dafür
+  weiterhin den alten Weg.
+
+**Migration nötig** (v29). Sie legt zwei Volltext-Indizes an und liest dafür
+die Beiträge einmal ganz durch — bei einem großen Forum dauert das spürbar, und
+die Tabellen sind währenddessen gesperrt. **Eine ruhige Minute wählen.**
+
+Solange die Migration nicht gelaufen ist, sucht das Forum wie bisher: ohne
+Index, ohne Treffergüte, aber vollständig.
+
+---
+
 ## v1.3.2 (2026-08-20)
 
 ### Ungelesen-Anzeige stimmt wieder

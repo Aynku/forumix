@@ -1,4 +1,4 @@
-{% set isFiltered = boardId or author or dateFrom or dateTo or hasReactions or hasAttachments or sortBy != 'date_desc' %}
+{% set isFiltered = boardId or author or dateFrom or dateTo or hasReactions or hasAttachments or (sortBy != 'date_desc' and sortBy != 'relevanz') %}
 <div class="section-heading">{{ t('search') }}</div>
 
 {% if currentUser and savedSearches %}
@@ -59,6 +59,7 @@
       <div class="form-row">
         <label>Sortierung</label>
         <select name="sort">
+          <option value="relevanz"  {{ sortBy == 'relevanz'  ? 'selected' : '' }}>Beste Treffer</option>
           <option value="date_desc" {{ sortBy == 'date_desc' ? 'selected' : '' }}>Neueste zuerst</option>
           <option value="date_asc"  {{ sortBy == 'date_asc'  ? 'selected' : '' }}>Älteste zuerst</option>
           <option value="reactions" {{ sortBy == 'reactions' ? 'selected' : '' }}>Meiste Reaktionen</option>
