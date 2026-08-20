@@ -3,7 +3,7 @@
 Ein vollständiges Community-Forum in nativem PHP. **Keine externen Abhängigkeiten, kein Composer, kein Framework, kein Build-Schritt.**
 
 ```
-Aktuelle Version: 1.2.0
+Aktuelle Version: 1.2.1
 Projektseite:     https://forumix.de
 Zum Ausprobieren: https://forum.forumix.de   ← läuft selbst mit Forumix
 Download:         https://forumix.de/#download
@@ -153,30 +153,6 @@ Ist die Konstante gesetzt, gewinnt sie immer und das Feld im Adminbereich ist
 gesperrt. Ohne sie bleibt alles wie gehabt. Gedacht für Installationen, die
 jemand anderes betreibt als der Forum-Admin: dort hängt der Versand an fremder
 Reputation.
-
----
-
-## 👥 Gruppe aus einer Adressliste pflegen
-
-Steht anderswo schon fest, wer dazugehört — eine Mitgliederverwaltung, eine
-Kundendatei, ein anderes System —, muss die Gruppe im Forum nicht zusätzlich
-von Hand geführt werden:
-
-```bash
-php bin/gruppenabgleich.php --gruppe=kunde --liste=/pfad/adressen.txt
-irgendein-werkzeug | php bin/gruppenabgleich.php --gruppe=kunde --probe
-```
-
-Eine Adresse je Zeile; ohne `--liste` kommt die Liste von der Standardeingabe.
-Aufrufen als der Benutzer, dem das Forum gehört, nicht als root.
-
-Zwei Grenzen sind fest eingebaut: übernommen werden nur **bestätigte** Adressen
-(sonst genügt eine fremde Adresse bei der Anmeldung, um in eine Gruppe zu
-kommen), und ausgetragen wird nur, was ein früherer Abgleich selbst eingetragen
-hat. Von Hand Eingetragene bleiben unangetastet; im Adminbereich ist beides
-unterscheidbar.
-
-Ausgegeben wird nur, was sich ändert — gedacht für cron. Braucht Migration v27.
 
 ---
 

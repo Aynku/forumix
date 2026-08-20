@@ -8,6 +8,22 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.2.1 (2026-08-20)
+
+**Der Gruppenabgleich aus 1.2.0 ist wieder aus dem Paket genommen.**
+`bin/gruppenabgleich.php` und die Migration v27 gehören zum Betrieb von
+forumix.de, nicht ins Produkt: eine Installation, der niemand eine Adressliste
+hinlegt, bekäme davon nur eine Datei, die nie läuft, und eine Spalte, die nie
+etwas enthält. Das Update räumt beides wieder weg.
+
+Wer die Migration schon ausgeführt hat, behält die Spalte — sie stört nicht und
+wird von nichts mehr gelesen. Gruppen, Rechte und die Verwaltung im
+Adminbereich sind unverändert; das Inline-Tag aus 1.2.0 bleibt ebenfalls.
+
+Keine Migration nötig.
+
+---
+
 ## v1.2.0 (2026-08-20)
 
 **Eine Gruppe lässt sich aus einer Adressliste pflegen.** Wenn woanders schon
