@@ -8,6 +8,26 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.2.2 (2026-08-20)
+
+**Ein Knopf für Wortwörtliches.** Das Inline-Tag aus 1.2.0 musste man bisher
+von Hand tippen und kannte es deshalb nicht. Jetzt sitzt es in der
+Werkzeugleiste des Editors, gleich neben dem Code-Block, beschriftet mit `‹›`.
+Die Vorschau im Editor konnte es ohnehin schon.
+
+**Weniger Luft um Blöcke.** Eine Leerzeile zwischen zwei Absätzen wird zu einem
+Umbruch. Steht daneben ein Code-Block, ein Zitat, eine Linie oder eine Liste,
+bringt der seinen Abstand schon selbst mit — und beides zusammen ergab um jeden
+Kasten zwei Zeilen zu viel. Umbrüche direkt an einem Block fallen jetzt weg,
+mitten im Absatz bleibt alles wie es war.
+
+Das betrifft auch bestehende Beiträge: gesetzt wird bei jedem Aufruf neu, am
+gespeicherten Text ändert sich nichts.
+
+Keine Migration nötig.
+
+---
+
 ## v1.2.1 (2026-08-20)
 
 **Der Gruppenabgleich aus 1.2.0 ist wieder aus dem Paket genommen.**

@@ -36,6 +36,39 @@ return [
         if (str_contains($aus, "\x02CODE")) throw new RuntimeException('Ein Platzhalter blieb stehen');
     },
 
+    'Kein Umbruch klebt am Code-Kasten' => function () use ($satz) {
+        $aus = $satz("Davor.\n\n[code]\neins\n[/code]\n\nDanach.");
+        if (preg_match('#<br\s*/?>\s*<div class="bb-code"#i', $aus)) {
+            throw new RuntimeException('Umbruch vor dem Kasten');
+        }
+        if (preg_match('#</div>\s*<br\s*/?>#i', $aus)) {
+            throw new RuntimeException('Umbruch hinter dem Kasten');
+        }
+    },
+
+    'Auch an Linie, Zitat und Liste bleibt keine Luft' => function () use ($satz) {
+        foreach ([
+            'Linie' => "Davor.\n\n[hr]\n\nDanach.",
+            'Zitat' => "Davor.\n\n[quote]etwas[/quote]\n\nDanach.",
+            'Liste' => "Davor.\n\n[list][*]eins[/list]\n\nDanach.",
+        ] as $was => $roh) {
+            $aus = $satz($roh);
+            if (preg_match('#<br\s*/?>\s*(<hr|<blockquote|<ul)#i', $aus)) {
+                throw new RuntimeException("Umbruch vor $was");
+            }
+            if (preg_match('#(bb-hr">|</blockquote>|</ul>)\s*<br\s*/?>#i', $aus)) {
+                throw new RuntimeException("Umbruch hinter $was");
+            }
+        }
+    },
+
+    'Inline-Code laesst die Umbrueche im Satz in Ruhe' => function () use ($satz) {
+        // Der Kasten schluckt die Umbrueche neben sich — ein Wort mitten im
+        // Satz darf das nicht, sonst rutschen zwei Zeilen zusammen.
+        $aus = $satz("Erste Zeile mit [c]wort[/c]\nZweite Zeile");
+        if (!preg_match('#<br\s*/?>#i', $aus)) throw new RuntimeException('Der Zeilenumbruch ist verschwunden');
+    },
+
     'Fettschrift bleibt im Code stehen' => function () use ($satz) {
         $aus = $satz("[code]\n[b]nicht fett[/b]\n[/code]");
         if (str_contains($aus, '<strong>')) throw new RuntimeException('[b] wurde im Code ausgefuehrt');

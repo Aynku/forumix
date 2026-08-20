@@ -20,7 +20,7 @@ if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
 $_eId   = $editorId          ?? 'content';
 $_eName = $editorName        ?? 'content';
 $_eVal  = $editorValue       ?? '';
-$_eHint = $editorPlaceholder ?? 'Schreibe etwas… (BBCode unterstützt: [b], [i], [quote], [code], [spoiler] …)';
+$_eHint = $editorPlaceholder ?? 'Schreibe etwas… (BBCode unterstützt: [b], [i], [quote], [code], [c], [spoiler] …)';
 $_eReq  = ($editorRequired ?? true) ? 'required' : '';
 $editorAllowHeadings = $editorAllowHeadings ?? false;
 ?>
@@ -44,6 +44,7 @@ $editorAllowHeadings = $editorAllowHeadings ?? false;
     <div class="editor-toolbar-group">
       <button type="button" class="editor-btn" data-action="bb" data-tag="quote" title="Zitat">❝</button>
       <button type="button" class="editor-btn" data-action="bb" data-tag="code" title="Code">{ }</button>
+      <button type="button" class="editor-btn" data-action="bb" data-tag="c" title="Wortwörtliches mitten im Satz">&lsaquo;&rsaquo;</button>
       <button type="button" class="editor-btn" data-action="bb" data-tag="spoiler" title="Spoiler">👁️</button>
     </div>
     <div class="editor-toolbar-sep"></div>

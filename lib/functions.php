@@ -162,7 +162,10 @@ function bbcode(string $text, ?int $postId = null): string {
     $text = preg_replace_callback(
         '/\[c\](.*?)\[\/c\]/is',
         function ($m) use (&$codeBloecke) {
-            $schluessel = "\x02CODE" . count($codeBloecke) . "\x02";
+            // Eigener Platzhalter, nicht \x02CODE: der Kasten ist ein Block und
+            // schluckt unten die Umbrueche neben sich. Ein Wort mitten im Satz
+            // darf das nicht — sonst verschwindet der Zeilenumbruch daneben.
+            $schluessel = "\x02INLINE" . count($codeBloecke) . "\x02";
             $codeBloecke[$schluessel] = '<code class="bb-inline">' . $m[1] . '</code>';
             return $schluessel;
         },
@@ -277,6 +280,7 @@ function bbcode(string $text, ?int $postId = null): string {
     );
 
     $text = nl2br($text);
+    $text = bb_umbrueche_an_bloecken_kuerzen($text);
 
     // Smileys ersetzen (geschützt vor [code]/[quote])
     if (function_exists('parse_smileys')) {
@@ -289,6 +293,27 @@ function bbcode(string $text, ?int $postId = null): string {
     }
 
     return $text;
+}
+
+/**
+ * Nimmt die Umbrueche weg, die direkt an einem Block kleben.
+ *
+ * Eine Leerzeile zwischen zwei Absaetzen wird zu <br><br>. Steht daneben ein
+ * Code-Kasten, ein Zitat, eine Linie oder eine Liste, bringt der schon eigenen
+ * Abstand mit — und beides zusammen ergibt zwei Zeilen Luft zu viel. Sichtbar
+ * war das an jedem Beitrag mit Code, nur hat es niemand benannt.
+ *
+ * Der Umbruch wird nur DIREKT daneben entfernt, nicht mitten im Absatz. Und
+ * Inline-Code faellt nicht darunter: der traegt \x02INLINE, nicht \x02CODE.
+ */
+function bb_umbrueche_an_bloecken_kuerzen(string $html): string {
+    $br  = '(?:<br\s*/?>\s*)+';
+    $auf = '(?:\x02CODE\d+\x02|<blockquote\b|<hr\b|<ul\b|<ol\b|<details\b|<h2\b|<h3\b)';
+    $zu  = '(?:\x02CODE\d+\x02|</blockquote>|<hr class="bb-hr">|</ul>|</ol>|</details>|</h2>|</h3>)';
+
+    $html = preg_replace('#' . $br . '(?=' . $auf . ')#i', '', $html) ?? $html;
+    $html = preg_replace('#(' . $zu . ')\s*' . $br . '#i', '$1', $html) ?? $html;
+    return $html;
 }
 
 function paginate(int $total, int $perPage, int $currentPage): array {
