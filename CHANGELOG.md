@@ -10,19 +10,28 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ## v1.2.2 (2026-08-20)
 
-**Ein Knopf für Wortwörtliches.** Das Inline-Tag aus 1.2.0 musste man bisher
-von Hand tippen und kannte es deshalb nicht. Jetzt sitzt es in der
-Werkzeugleiste des Editors, gleich neben dem Code-Block, beschriftet mit `‹›`.
-Die Vorschau im Editor konnte es ohnehin schon.
+### Auszeichnung für wortwörtlichen Text im Editor
 
-**Weniger Luft um Blöcke.** Eine Leerzeile zwischen zwei Absätzen wird zu einem
-Umbruch. Steht daneben ein Code-Block, ein Zitat, eine Linie oder eine Liste,
-bringt der seinen Abstand schon selbst mit — und beides zusammen ergab um jeden
-Kasten zwei Zeilen zu viel. Umbrüche direkt an einem Block fallen jetzt weg,
-mitten im Absatz bleibt alles wie es war.
+Das Tag steht seit 1.2.0 zur Verfügung, war über die Oberfläche aber nicht
+erreichbar. Es hat jetzt einen eigenen Knopf.
 
-Das betrifft auch bestehende Beiträge: gesetzt wird bei jedem Aufruf neu, am
-gespeicherten Text ändert sich nichts.
+- In der Werkzeugleiste neben dem Code-Block, beschriftet mit `‹›`.
+- Wirkt auf die Auswahl, wie die übrigen Auszeichnungen.
+- Die Vorschau im Editor stellt das Ergebnis bereits dar.
+
+### Abstände um Blöcke
+
+Eine Leerzeile zwischen zwei Absätzen erzeugt einen Zeilenumbruch. Grenzt sie
+an einen Code-Block, ein Zitat, eine Linie oder eine Liste, kommt dieser
+Umbruch zum Abstand des Blocks hinzu — sichtbar als zwei überzählige Leerzeilen
+um jeden Kasten.
+
+- Umbrüche unmittelbar an einem Block werden nicht mehr gesetzt.
+- Innerhalb eines Absatzes bleibt die Darstellung unverändert.
+- Wortwörtlicher Text im Fließtext ist ausgenommen; Zeilenumbrüche daneben
+  bleiben erhalten.
+- Betrifft auch vorhandene Beiträge: die Darstellung entsteht bei jedem Aufruf
+  neu, der gespeicherte Text bleibt unberührt.
 
 Keine Migration nötig.
 
@@ -30,21 +39,27 @@ Keine Migration nötig.
 
 ## v1.2.1 (2026-08-20)
 
-**Der Gruppenabgleich aus 1.2.0 ist wieder aus dem Paket genommen.**
-`bin/gruppenabgleich.php` und die Migration v27 gehören zum Betrieb von
-forumix.de, nicht ins Produkt: eine Installation, der niemand eine Adressliste
-hinlegt, bekäme davon nur eine Datei, die nie läuft, und eine Spalte, die nie
-etwas enthält. Das Update räumt beides wieder weg.
+### Gruppenabgleich wieder aus dem Paket genommen
 
-Wer die Migration schon ausgeführt hat, behält die Spalte — sie stört nicht und
-wird von nichts mehr gelesen. Gruppen, Rechte und die Verwaltung im
-Adminbereich sind unverändert.
+Mit 1.2.0 kamen ein Werkzeug zum Abgleich einer Benutzergruppe mit einer
+Adressliste sowie die Migration v27 hinzu. Beides gehört zum Betrieb von
+forumix.de und nicht in die ausgelieferte Software: einer Installation ohne
+eine solche Liste bleiben davon eine Datei ohne Funktion und eine Spalte ohne
+Inhalt. Das Update entfernt beides.
 
-**Was aus 1.2.0 bleibt: Wortwörtliches mitten im Satz.** Neben dem Code-Block
-gibt es jetzt ein Inline-Tag für einzelne Wörter — einen Dateinamen, einen
-Schalter, ein Tag. Es setzt sie in Schreibmaschinenschrift und nimmt sie aus
-der Auszeichnung heraus: was dazwischen steht, wird nicht mehr als BBCode
-gelesen. Damit lässt sich endlich über BBCode schreiben, ohne dass es wirkt.
+- `bin/gruppenabgleich.php` wird beim Update entfernt.
+- Die Migration v27 entfällt. Wurde sie bereits ausgeführt, bleibt die Spalte
+  `group_members.woher` bestehen. Sie wird von keiner Funktion mehr gelesen und
+  kann entfernt werden.
+- Die Nummer v27 wird nicht erneut vergeben; die nächste Migration ist v28.
+- Gruppen, Rechte und die Gruppenverwaltung im Adminbereich sind unverändert.
+
+### Aus 1.2.0 unverändert übernommen: wortwörtlicher Text im Fließtext
+
+Neben dem Code-Block steht eine Auszeichnung für einzelne Wörter zur Verfügung
+— einen Dateinamen, einen Schalter, ein Tag. Der Inhalt erscheint in
+Schreibmaschinenschrift und wird nicht als BBCode ausgewertet; damit lässt sich
+über BBCode schreiben, ohne dass er wirkt.
 
 ```
 Der Schalter [c]--probe[/c] rechnet nur vor.
