@@ -49,3 +49,13 @@ Die Dateien sind idempotent zu schreiben: bei einer frischen Installation gibt
 es keine Einträge in der Tabelle `migrations`, also gilt dort jede vorhandene
 Datei als ausstehend und läuft einmal durch. Sie muss dann feststellen, dass
 nichts zu tun ist, statt zu scheitern.
+
+## Verbrannte Nummern
+
+**v27 ist vergeben und darf nicht wiederverwendet werden.** Sie kam mit 1.2.0
+(eine Spalte `group_members.woher`) und wurde mit 1.2.1 wieder zurückgezogen,
+weil das zugehörige Werkzeug nicht ins Produkt gehört. Die Datei ist weg, die
+Spalte in den betroffenen Installationen entfernt — aber im Protokoll dieser
+Installationen steht `v27` weiterhin als gelaufen, und das ist auch richtig so:
+sie IST dort gelaufen. Eine neue `migrate_v27.php` würde deshalb genau dort
+übersprungen, wo sie am nötigsten wäre. Die nächste Migration ist v28.
