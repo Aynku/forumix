@@ -8,6 +8,27 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.2.4 (2026-08-20)
+
+### Keine erfundene Adresse im IP-Protokoll
+
+Ein Beitrag, der nicht aus einem Browser kommt, hat keine Absenderadresse.
+`client_ip()` liefert in diesem Fall die Ersatzadresse `0.0.0.0` — und die
+stand anschließend im Protokoll, als wäre jemand von dort gekommen.
+
+- Ohne gültige Adresse wird kein Protokolleintrag mehr geschrieben.
+- Betrifft Beiträge, die über die Kommandozeile entstehen; am Beitrag selbst
+  stand ohnehin keine Adresse.
+- Vorhandene Einträge bleiben liegen. Wer sie entfernen will:
+
+```sql
+DELETE FROM user_ip_log WHERE ip = '0.0.0.0';
+```
+
+Keine Migration nötig.
+
+---
+
 ## v1.2.3 (2026-08-20)
 
 ### Gelöschte Konten hinterlassen keine Spuren mehr

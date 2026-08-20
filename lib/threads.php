@@ -24,7 +24,8 @@ if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
  *                          Vorgabe: sichtbar. Die Entscheidung faellt beim
  *                          Aufrufer, weil sie an dessen Rechten haengt.
  *   'ip'            string Fuer das Beitrags-Protokoll. Vorgabe: die des
- *                          Aufrufers, auf der Kommandozeile leer.
+ *                          Aufrufers. Leer oder ungueltig heisst: kein
+ *                          Eintrag im IP-Protokoll.
  *   'abo'           bool   Autor das Thema abonnieren. Vorgabe: ja.
  *   'nachbereitung' callable(int $themaId, int $beitragId)
  *                          Laeuft NACH dem Commit und VOR den Erwaehnungen.
@@ -69,7 +70,13 @@ function thread_erstellen(int $boardId, int $userId, string $titel, string $inha
             );
         }
 
-        try { log_user_ip($userId, 'post'); } catch (Exception $e) {}
+        // Nur mit echter Adresse protokollieren. Auf der Kommandozeile gibt es
+        // keine, und client_ip() liefert dort die Ersatzadresse 0.0.0.0 — die
+        // stuende danach im IP-Protokoll, als waere jemand von dort gekommen.
+        // Kein Eintrag ist richtiger als ein erfundener.
+        if ($ip !== '' && filter_var($ip, FILTER_VALIDATE_IP)) {
+            try { log_user_ip($userId, 'post', $ip); } catch (Exception $e) {}
+        }
 
         db_execute('UPDATE threads SET last_post_id = ? WHERE thread_id = ?', [$postId, $threadId]);
 

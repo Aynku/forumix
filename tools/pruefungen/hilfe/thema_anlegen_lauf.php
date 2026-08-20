@@ -59,14 +59,24 @@ try {
                    WHERE user_id = $user AND thread_id = {$neu['thread_id']}") !== 1) {
         $fehler[] = 'Auto-Abo';
     }
+    if (db_count("SELECT COUNT(*) FROM user_ip_log WHERE user_id = $user AND ip = '127.0.0.1'") !== 1) {
+        $fehler[] = 'IP nicht protokolliert';
+    }
 
     // Ein Thema, das auf Freigabe wartet, darf nirgends mitzaehlen — sonst
     // meldet das Forum Beitraege, die niemand sehen kann.
     $vor2 = db_fetch("SELECT thread_count, post_count FROM boards WHERE board_id = $brett");
+    $vorLog = db_count("SELECT COUNT(*) FROM user_ip_log WHERE user_id = $user");
     $neu2 = thread_erstellen($brett, $user, 'Prueflauf Wartend', 'Wartet.', [
         'freigegeben' => false,
         'abo'         => false,
+        'ip'          => '',
     ]);
+    // Ohne Adresse kein Eintrag: client_ip() liefert auf der Kommandozeile
+    // 0.0.0.0, und das ist keine Herkunft, sondern eine Erfindung.
+    if (db_count("SELECT COUNT(*) FROM user_ip_log WHERE user_id = $user") !== $vorLog) {
+        $fehler[] = 'ohne IP wurde trotzdem protokolliert';
+    }
     $b2 = db_fetch("SELECT thread_count, post_count FROM boards WHERE board_id = $brett");
     if ((int) $b2['thread_count'] !== (int) $vor2['thread_count']) $fehler[] = 'wartendes Thema mitgezaehlt';
     if ((int) $b2['post_count']   !== (int) $vor2['post_count'])   $fehler[] = 'wartender Beitrag mitgezaehlt';
@@ -78,6 +88,7 @@ try {
     $pdo->exec("DELETE FROM posts WHERE thread_id IN ($themen)");
     $pdo->exec("DELETE FROM threads WHERE thread_id IN ($themen)");
 } finally {
+    $pdo->exec("DELETE FROM user_ip_log WHERE user_id = $user");
     $pdo->exec("DELETE FROM thread_subscriptions WHERE user_id = $user");
     $pdo->exec("DELETE FROM users WHERE user_id = $user");
     $pdo->exec("DELETE FROM boards WHERE board_id = $brett");
