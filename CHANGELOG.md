@@ -8,6 +8,37 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.2.3 (2026-08-20)
+
+### Gelöschte Konten hinterlassen keine Spuren mehr
+
+Beim Löschen wird ein Konto anonymisiert; die Zeile selbst bleibt als Anker
+unter den Beiträgen bestehen, die stehen bleiben. Sichtbar war davon bisher
+mehr als nötig.
+
+- Das Anmelde-Protokoll wird jetzt mitgelöscht. Bisher blieben die
+  IP-Adressen stehen — der Name war ersetzt, die Person darüber weiterhin
+  erkennbar. Bei einer abgelehnten Registrierung geschah das längst.
+- Im Adminbereich stehen gelöschte Konten nicht mehr in der Benutzerliste.
+  Das Einblenden auf Wunsch entfällt; an einem anonymisierten Konto ist nichts
+  zu verwalten.
+- Das Dashboard zählt sie nicht mehr als Mitglieder und führt sie weder unter
+  „Neueste Mitglieder“ noch unter „Letzte Logins“.
+- Die Kurve der Registrierungen der letzten 30 Tage lässt sie ebenfalls weg,
+  im Dashboard wie in der Statistik.
+
+Protokollzeilen aus früheren Löschungen bleiben liegen; das Update räumt keine
+vorhandenen Daten ab. Wer sie entfernen will:
+
+```sql
+DELETE l FROM user_ip_log l JOIN users u ON u.user_id = l.user_id
+WHERE u.is_deleted = 1;
+```
+
+Keine Migration nötig.
+
+---
+
 ## v1.2.2 (2026-08-20)
 
 ### Auszeichnung für wortwörtlichen Text im Editor

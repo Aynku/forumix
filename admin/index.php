@@ -1319,18 +1319,24 @@ switch ($action) {
 
     case 'dashboard':
         $vars['stats'] = [
-            ['icon' => '👥', 'label' => 'Mitglieder', 'value' => db_count('SELECT COUNT(*) FROM users')],
+            // Geloeschte Konten sind keine Mitglieder mehr — sie stehen nur noch
+            // als Anker unter ihren Beitraegen. Mitgezaehlt waere die Zahl hier
+            // groesser als die auf der Startseite.
+            ['icon' => '👥', 'label' => 'Mitglieder', 'value' => db_count('SELECT COUNT(*) FROM users WHERE COALESCE(is_deleted, 0) = 0')],
             ['icon' => '💬', 'label' => 'Threads',    'value' => db_count('SELECT COUNT(*) FROM threads')],
             ['icon' => '📝', 'label' => 'Beiträge',   'value' => db_count('SELECT COUNT(*) FROM posts')],
             ['icon' => '🚨', 'label' => 'Offene Meldungen', 'value' => open_reports_count()],
             ['icon' => '🚫', 'label' => 'IP-Banns',   'value' => db_count('SELECT COUNT(*) FROM ip_bans WHERE expires_at IS NULL OR expires_at > NOW()')],
             ['icon' => '🟢', 'label' => 'Online jetzt', 'value' => online_stats()['total']],
         ];
-        $vars['newestUsers']  = db_fetchAll('SELECT * FROM users ORDER BY registered_at DESC LIMIT 10');
+        $vars['newestUsers']  = db_fetchAll('
+            SELECT * FROM users WHERE COALESCE(is_deleted, 0) = 0
+            ORDER BY registered_at DESC LIMIT 10
+        ');
         $vars['recentLogins'] = db_fetchAll('
             SELECT u.username, u.user_id, l.ip, l.created_at
             FROM user_ip_log l JOIN users u ON u.user_id = l.user_id
-            WHERE l.action = "login"
+            WHERE l.action = "login" AND COALESCE(u.is_deleted, 0) = 0
             ORDER BY l.created_at DESC LIMIT 10
         ');
 
@@ -1339,6 +1345,7 @@ switch ($action) {
             SELECT DATE(registered_at) AS d, COUNT(*) AS n
             FROM users
             WHERE registered_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+              AND COALESCE(is_deleted, 0) = 0
             GROUP BY DATE(registered_at)
             ORDER BY d ASC
         ');
@@ -1422,13 +1429,13 @@ switch ($action) {
 
     case 'users':
         $q = trim($_GET['q'] ?? '');
-        // Geloeschte Konten stehen standardmaessig NICHT in der Liste. Sie sind
-        // anonymisiert, es gibt nichts mehr an ihnen zu verwalten, und sie
-        // schieben die lebenden Konten nach unten. Wer sie doch sehen will —
-        // etwa um eine alte Kennung nachzuvollziehen — haengt &geloescht=1 an
-        // oder klickt den Verweis unter der Liste.
-        $mitGeloeschten = !empty($_GET['geloescht']);
-        $wo = $mitGeloeschten ? '' : ' AND COALESCE(is_deleted, 0) = 0';
+        // Geloeschte Konten stehen hier nicht mehr — auch nicht auf Wunsch.
+        // Bis 1.2.2 liess sich das umschalten; das war eine halbe Loeschung.
+        // An einem anonymisierten Konto ist nichts zu verwalten. Die Zeile
+        // selbst bleibt in der Datenbank, weil posts.user_id und
+        // threads.user_id NOT NULL sind: sie ist der Anker unter den
+        // Beitraegen, die bewusst stehen bleiben.
+        $wo = ' AND COALESCE(is_deleted, 0) = 0';
 
         if ($q !== '') {
             $like = '%' . $q . '%';
@@ -1442,9 +1449,7 @@ switch ($action) {
                 'SELECT * FROM users WHERE 1 = 1' . $wo . ' ORDER BY registered_at DESC LIMIT 200'
             );
         }
-        $vars['searchQuery']    = $q;
-        $vars['mitGeloeschten'] = $mitGeloeschten;
-        $vars['zahlGeloescht']  = db_count('SELECT COUNT(*) FROM users WHERE COALESCE(is_deleted, 0) = 1');
+        $vars['searchQuery'] = $q;
         break;
 
     case 'categories':
@@ -1609,6 +1614,7 @@ switch ($action) {
             SELECT DATE(registered_at) AS d, COUNT(*) AS n
             FROM users
             WHERE registered_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+              AND COALESCE(is_deleted, 0) = 0
             GROUP BY DATE(registered_at)
             ORDER BY d ASC
         ');

@@ -172,6 +172,15 @@ function delete_user_account(int $userId): array {
             db_execute('DELETE FROM thread_reads WHERE user_id = ?', [$userId]);
         } catch (Exception $e) {}
 
+        // IP-Protokoll mit weg. Ein anonymisiertes Konto, unter dem weiter die
+        // Anmelde-IPs stehen, ist nicht geloescht — der Name ist ersetzt, die
+        // Person bleibt daran erkennbar. Die Ablehnung einer Registrierung
+        // raeumt das laengst mit ab (lib/approval.php); die Selbstloeschung
+        // hat es bis 1.2.2 stehen lassen.
+        try {
+            db_execute('DELETE FROM user_ip_log WHERE user_id = ?', [$userId]);
+        } catch (Exception $e) {}
+
         // Avatar-Datei vom Server löschen (falls vorhanden)
         // Geht erst NACH dem UPDATE damit wir aus dem User noch den alten Avatar lesen können
         // → Daher hier nicht mehr, das machen wir in einem separaten Schritt vor dem Update.

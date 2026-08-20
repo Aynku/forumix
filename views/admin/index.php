@@ -177,19 +177,6 @@
         </div>
       </form>
 
-      <?php if (!empty($zahlGeloescht)): ?>
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px">
-          <?php if (empty($mitGeloeschten)): ?>
-            <?= (int) $zahlGeloescht ?> gelöschte <?= (int) $zahlGeloescht === 1 ? 'Konto ist' : 'Konten sind' ?>
-            ausgeblendet — anonymisiert, nichts mehr zu verwalten.
-            <a href="?action=users<?= !empty($searchQuery) ? '&q=' . urlencode($searchQuery) : '' ?>&geloescht=1">Trotzdem zeigen</a>
-          <?php else: ?>
-            Gelöschte Konten werden mit angezeigt.
-            <a href="?action=users<?= !empty($searchQuery) ? '&q=' . urlencode($searchQuery) : '' ?>">Ausblenden</a>
-          <?php endif; ?>
-        </p>
-      <?php endif; ?>
-
       <div class="card">
         <table class="forum-table">
           <thead>
