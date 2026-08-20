@@ -8,7 +8,7 @@ $postId = get_int('id');
 $post   = db_fetch('
     SELECT p.*, t.board_id
     FROM posts p JOIN threads t ON t.thread_id = p.thread_id
-    WHERE p.post_id = ?
+    WHERE p.post_id = ?' . sichtbar_sql('p') . sichtbar_sql('t') . '
 ', [$postId]);
 
 if (!$post) {

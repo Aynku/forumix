@@ -25,6 +25,7 @@
   <a href="?action=dashboard" class="<?= $action === 'dashboard' ? 'active' : '' ?>">📊 Übersicht</a>
   <a href="?action=approval"  class="<?= $action === 'approval' ? 'active' : '' ?>">🚦 Freigabe</a>
   <a href="?action=reports"   class="<?= $action === 'reports' ? 'active' : '' ?>">🚨 Meldungen</a>
+  <a href="?action=papierkorb" class="<?= $action === 'papierkorb' ? 'active' : '' ?>">🗑️ Papierkorb</a>
   <a href="?action=modlog"    class="<?= $action === 'modlog' ? 'active' : '' ?>">📜 Meine Aktionen</a>
 </div>
 
@@ -222,6 +223,89 @@
   <?php endif; ?>
 
 <?php /* ════════════ MOD-LOG ════════════ */ ?>
+<?php elseif ($action === 'papierkorb'): ?>
+
+  <h2 style="margin-bottom:6px">🗑️ Papierkorb</h2>
+  <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">
+    Gelöschtes bleibt hier stehen, bis es jemand zurückholt oder endgültig entfernt.
+    Für alle außer der Moderation ist es nicht vorhanden.
+  </p>
+
+  <div class="card" style="margin-bottom:22px">
+    <h3 style="font-size:15px;margin-bottom:10px">Themen (<?= count($papierkorbThemen ?? []) ?>)</h3>
+    <?php if (empty($papierkorbThemen)): ?>
+      <p style="color:var(--text-muted);font-size:14px">Keine Themen im Papierkorb.</p>
+    <?php else: ?>
+      <div style="overflow-x:auto">
+        <table class="forum-table">
+          <tbody>
+            <?php foreach ($papierkorbThemen as $t): ?>
+              <tr>
+                <td>
+                  <a href="<?= e(FORUM_URL) ?>/thread.php?id=<?= (int) $t['thread_id'] ?>"><?= e($t['title']) ?></a>
+                  <div style="color:var(--text-muted);font-size:12px">
+                    <?= e($t['brett']) ?> · <?= (int) $t['beitraege'] ?> Beiträge ·
+                    von <?= e(zeigename($t['verfasser'])) ?>
+                  </div>
+                </td>
+                <td style="color:var(--text-muted);font-size:12px;white-space:nowrap">
+                  <?= e((string) $t['deleted_at']) ?>
+                  <?php if ($t['geloescht_von']): ?><br>durch <?= e(zeigename($t['geloescht_von'])) ?><?php endif; ?>
+                </td>
+                <td style="text-align:right;white-space:nowrap">
+                  <a class="btn btn-ghost btn-xs"
+                     href="<?= e(FORUM_URL) ?>/mod_action.php?action=restore_thread&thread=<?= (int) $t['thread_id'] ?>&csrf=<?= e($csrfToken) ?>">Wiederherstellen</a>
+                  <a class="btn btn-ghost btn-xs"
+                     href="<?= e(FORUM_URL) ?>/mod_action.php?action=purge_thread&thread=<?= (int) $t['thread_id'] ?>&csrf=<?= e($csrfToken) ?>"
+                     onclick="return confirm('Endgültig löschen? Das lässt sich nicht rückgängig machen.')">Endgültig</a>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    <?php endif; ?>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:15px;margin-bottom:10px">Einzelne Beiträge (<?= count($papierkorbBeitraege ?? []) ?>)</h3>
+    <p style="color:var(--text-muted);font-size:12px;margin-bottom:10px">
+      Beiträge, die mit ihrem Thema gelöscht wurden, stehen oben beim Thema.
+    </p>
+    <?php if (empty($papierkorbBeitraege)): ?>
+      <p style="color:var(--text-muted);font-size:14px">Keine Beiträge im Papierkorb.</p>
+    <?php else: ?>
+      <div style="overflow-x:auto">
+        <table class="forum-table">
+          <tbody>
+            <?php foreach ($papierkorbBeitraege as $p): ?>
+              <tr>
+                <td>
+                  <a href="<?= e(FORUM_URL) ?>/thread.php?id=<?= (int) $p['thread_id'] ?>#post<?= (int) $p['post_id'] ?>"><?= e($p['thema']) ?></a>
+                  <div style="color:var(--text-muted);font-size:12px">
+                    <?= e($p['brett']) ?> · von <?= e(zeigename($p['verfasser'])) ?> ·
+                    <?= e(truncate(strip_tags((string) $p['content']), 70)) ?>
+                  </div>
+                </td>
+                <td style="color:var(--text-muted);font-size:12px;white-space:nowrap">
+                  <?= e((string) $p['deleted_at']) ?>
+                  <?php if ($p['geloescht_von']): ?><br>durch <?= e(zeigename($p['geloescht_von'])) ?><?php endif; ?>
+                </td>
+                <td style="text-align:right;white-space:nowrap">
+                  <a class="btn btn-ghost btn-xs"
+                     href="<?= e(FORUM_URL) ?>/mod_action.php?action=restore_post&post=<?= (int) $p['post_id'] ?>&csrf=<?= e($csrfToken) ?>">Wiederherstellen</a>
+                  <a class="btn btn-ghost btn-xs"
+                     href="<?= e(FORUM_URL) ?>/mod_action.php?action=purge_post&post=<?= (int) $p['post_id'] ?>&csrf=<?= e($csrfToken) ?>"
+                     onclick="return confirm('Endgültig löschen? Das lässt sich nicht rückgängig machen.')">Endgültig</a>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    <?php endif; ?>
+  </div>
+
 <?php elseif ($action === 'modlog'): ?>
   <div class="card" style="padding:18px">
     <h3 style="font-size:14px;margin-bottom:10px">📜 Deine Moderator-Aktionen</h3>

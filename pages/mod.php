@@ -118,6 +118,11 @@ switch ($action) {
         $vars['reports'] = mod_reports_list($boardIds);
         break;
 
+    case 'papierkorb':
+        $vars['papierkorbThemen']    = papierkorb_themen($boardIds);
+        $vars['papierkorbBeitraege'] = papierkorb_beitraege($boardIds);
+        break;
+
     case 'modlog':
         $vars['logs'] = mod_log_entries((int) $cu['user_id']);
         break;

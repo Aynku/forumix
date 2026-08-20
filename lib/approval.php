@@ -7,8 +7,8 @@ if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
  */
 function pending_approval_count(): int {
     try {
-        $threads = db_count('SELECT COUNT(*) FROM threads WHERE COALESCE(is_approved, 1) = 0');
-        $posts   = db_count('SELECT COUNT(*) FROM posts   WHERE COALESCE(is_approved, 1) = 0');
+        $threads = db_count('SELECT COUNT(*) FROM threads WHERE COALESCE(is_approved, 1) = 0 AND deleted_at IS NULL');
+        $posts   = db_count('SELECT COUNT(*) FROM posts   WHERE COALESCE(is_approved, 1) = 0 AND deleted_at IS NULL');
         return $threads + $posts;
     } catch (Exception $e) { return 0; }
 }
@@ -27,7 +27,7 @@ function pending_threads(): array {
             JOIN users u ON u.user_id = t.user_id
             JOIN boards b ON b.board_id = t.board_id
             LEFT JOIN posts p ON p.thread_id = t.thread_id AND p.user_id = t.user_id
-            WHERE COALESCE(t.is_approved, 1) = 0
+            WHERE COALESCE(t.is_approved, 1) = 0 AND t.deleted_at IS NULL
             ORDER BY t.created_at ASC
         ');
     } catch (Exception $e) { return []; }
@@ -47,7 +47,7 @@ function pending_posts(): array {
             JOIN threads t ON t.thread_id = p.thread_id
             JOIN boards b ON b.board_id = t.board_id
             JOIN users u ON u.user_id = p.user_id
-            WHERE COALESCE(p.is_approved, 1) = 0
+            WHERE COALESCE(p.is_approved, 1) = 0 AND p.deleted_at IS NULL
               AND COALESCE(t.is_approved, 1) = 1
               AND p.post_id != COALESCE((SELECT MIN(post_id) FROM posts WHERE thread_id = t.thread_id), 0)
             ORDER BY p.created_at ASC

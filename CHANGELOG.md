@@ -8,6 +8,48 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.3.0 (2026-08-20)
+
+### Papierkorb statt endgültig löschen
+
+Bisher entfernte jedes Löschen den Beitrag samt Anhängen aus der Datenbank. Ein
+Fehlgriff in den Mod-Werkzeugen war damit nicht zu heilen. Gelöschtes bleibt
+jetzt liegen, bis es jemand zurückholt oder ausdrücklich endgültig entfernt.
+
+- Für Mitglieder und Gäste ist ein gelöschter Beitrag nicht vorhanden — auch
+  nicht für den Verfasser, nicht über die Suche, nicht im RSS-Abruf und nicht
+  über die Kennung in der Adresszeile.
+- Die Moderation sieht ihn weiterhin an seiner Stelle im Thema, ausgegraut und
+  mit dem Vermerk, wer ihn wann gelöscht hat. So bleibt beim Wiederherstellen
+  erkennbar, worauf sich die folgenden Antworten beziehen.
+- Zähler an Forum, Thema und Verfasser gehen beim Löschen herunter und beim
+  Wiederherstellen wieder hoch. Ein Beitrag im Papierkorb zählt nirgends mit.
+- Wird ein Thema gelöscht, gehen seine Beiträge mit. Beim Wiederherstellen
+  kommt genau das zurück, was mit ihm gegangen ist — was vorher einzeln
+  weggelegt wurde, bleibt liegen.
+- Endgültig löschen bleibt möglich, aber als zweiter Schritt: erst Papierkorb,
+  dann entfernen. Dabei verschwinden auch die Anhänge.
+- Der Papierkorb steht unter *Moderator-Bereich → Papierkorb*. Er leert sich
+  nicht von selbst.
+
+### Themen teilen und zusammenführen
+
+- **Ab hier abtrennen**: an einem Beitrag lässt sich das Thema teilen. Dieser
+  und alle folgenden Beiträge wandern in ein neues Thema im selben Forum. Es
+  trägt Verfasser und Datum des ersten abgetrennten Beitrags.
+- **Zusammenführen**: alle Beiträge eines Themas wandern in ein anderes, das
+  leergeräumte verschwindet. Moderationsrecht wird auf beiden Seiten verlangt.
+- Die Zähler beider Themen und Foren werden anschließend neu berechnet, nicht
+  hoch- und heruntergezählt.
+- Am ersten Beitrag lässt sich nichts abtrennen; ein Thema lässt sich nicht mit
+  sich selbst zusammenführen.
+
+**Migration nötig** (v28). Sie ergänzt die Spalten für den Papierkorb. Alles
+Bestehende gilt als sichtbar — nach dem Update ist nichts verschwunden, was
+vorher da war.
+
+---
+
 ## v1.2.4 (2026-08-20)
 
 ### Keine erfundene Adresse im IP-Protokoll

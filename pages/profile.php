@@ -44,7 +44,7 @@ if (is_mod() && (string) get_setting('show_ips_to_mods', '1') === '1') {
 $latestPosts = db_fetchAll('
     SELECT p.post_id, p.created_at, t.title AS thread_title, t.thread_id
     FROM posts p JOIN threads t ON t.thread_id = p.thread_id
-    WHERE p.user_id = ? ' . board_filter_sql('t', 'board_id') . '
+    WHERE p.user_id = ? ' . sichtbar_sql('p') . sichtbar_sql('t') . board_filter_sql('t', 'board_id') . '
     ORDER BY p.created_at DESC
     LIMIT 10
 ', [$userId]);

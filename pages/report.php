@@ -5,7 +5,8 @@ require_once __DIR__ . '/../bootstrap.php';
 require_login();
 
 $postId = get_int('post');
-$post = db_fetch('SELECT p.*, t.thread_id, t.board_id FROM posts p JOIN threads t ON t.thread_id = p.thread_id WHERE p.post_id = ?', [$postId]);
+$post = db_fetch('SELECT p.*, t.thread_id, t.board_id FROM posts p JOIN threads t ON t.thread_id = p.thread_id
+                   WHERE p.post_id = ?' . sichtbar_sql('p') . sichtbar_sql('t'), [$postId]);
 if (!$post) error_page(404, 'Beitrag nicht gefunden', 'Dieser Beitrag gibt es nicht oder er wurde entfernt.');
 
 // Die Seite zeigt eine Vorschau des Beitrags. Ohne Zugangspruefung waere sie

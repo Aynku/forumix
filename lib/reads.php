@@ -33,7 +33,7 @@ function unread_status_for_threads(int $userId, array $threadIds): array {
         $rows = db_fetchAll("
             SELECT t.thread_id, p.created_at AS last_post_at, tr.read_at
             FROM threads t
-            LEFT JOIN posts p ON p.post_id = t.last_post_id
+            LEFT JOIN posts p ON p.post_id = t.last_post_id AND p.deleted_at IS NULL
             LEFT JOIN thread_reads tr ON tr.thread_id = t.thread_id AND tr.user_id = ?
             WHERE t.thread_id IN ($placeholders)
         ", $params);
@@ -60,7 +60,7 @@ function unread_status_for_threads(int $userId, array $threadIds): array {
 function mark_all_threads_read(int $userId): int {
     if ($userId <= 0) return 0;
     try {
-        $threads = db_fetchAll('SELECT thread_id FROM threads');
+        $threads = db_fetchAll('SELECT thread_id FROM threads WHERE deleted_at IS NULL');
         $count = 0;
         foreach ($threads as $t) {
             mark_thread_read($userId, (int) $t['thread_id']);

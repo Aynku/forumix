@@ -1019,6 +1019,31 @@ mark {
 /* ── CODE ───────────────────────────────────────────────────────────
    Kopfzeile mit Sprache und Kopieren-Knopf, Zeilennummern per CSS-Zaehler,
    lange Bloecke scrollen in sich statt die Seite zu strecken. */
+/* Papierkorb: der geloeschte Beitrag bleibt fuer die Moderation an seiner
+   Stelle stehen, damit beim Zurueckholen erkennbar ist, worauf sich die
+   Antworten danach beziehen. Er muss dabei auf den ersten Blick als geloescht
+   zu erkennen sein — sonst moderiert jemand an einem Beitrag weiter, den es
+   fuer alle anderen nicht mehr gibt. */
+.post-card.post-geloescht {
+  opacity: .62;
+  border-left: 3px solid var(--color-danger);
+}
+.post-card.post-geloescht .post-text {
+  text-decoration-line: none;
+}
+.papierkorb-hinweis {
+  margin: 0 0 10px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface2);
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.badge-geloescht {
+  background: var(--color-danger);
+  color: #fff;
+}
+
 /* Inline-Code: [c]...[/c]. Steht mitten im Satz, bekommt deshalb keinen Kasten
    und keine eigene Zeile — nur so viel Absetzung, dass ein BBCode-Tag als Text
    erkennbar bleibt und nicht als Auszeichnung gelesen wird. */

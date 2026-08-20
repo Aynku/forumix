@@ -40,7 +40,7 @@ function pending_threads_filtered(?array $boardIds): array {
             JOIN users u ON u.user_id = t.user_id
             JOIN boards b ON b.board_id = t.board_id
             LEFT JOIN posts p ON p.thread_id = t.thread_id AND p.user_id = t.user_id
-            WHERE COALESCE(t.is_approved, 1) = 0' . $where . '
+            WHERE COALESCE(t.is_approved, 1) = 0 AND t.deleted_at IS NULL' . $where . '
             ORDER BY t.created_at ASC
         ', $params);
     } catch (Exception $e) { return []; }
@@ -68,7 +68,7 @@ function pending_posts_filtered(?array $boardIds): array {
             JOIN threads t ON t.thread_id = p.thread_id
             JOIN boards b ON b.board_id = t.board_id
             JOIN users u ON u.user_id = p.user_id
-            WHERE COALESCE(p.is_approved, 1) = 0
+            WHERE COALESCE(p.is_approved, 1) = 0 AND p.deleted_at IS NULL
               AND COALESCE(t.is_approved, 1) = 1
               AND p.post_id != COALESCE((SELECT MIN(post_id) FROM posts WHERE thread_id = t.thread_id), 0)' . $where . '
             ORDER BY p.created_at ASC

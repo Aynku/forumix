@@ -111,53 +111,157 @@ switch ($action) {
         flash('Thema verschoben.', 'success');
         redirect(FORUM_URL . '/thread.php?id=' . $threadId);
 
-    /* Zu den GREATEST(CAST(... AS SIGNED) - 1, 0) weiter unten:
-       Die Zaehlerspalten sind UNSIGNED. GREATEST(0, spalte - 1) schuetzt NICHT,
-       weil die Subtraktion schon ueberlaeuft, bevor GREATEST drankommt —
-       MariaDB bricht dann mit "BIGINT UNSIGNED value is out of range" ab. Beim
-       Loeschen des einzigen Beitrags eines Themas (reply_count = 0) ist das
-       jedes Mal passiert. Das CAST rechnet vorzeichenbehaftet, dann greift die
-       Untergrenze wie gedacht. */
+    /* Loeschen legt in den Papierkorb, es entfernt nichts.
+       Bis 1.2.x war jedes Loeschen endgueltig — ein Fehlgriff hier war nicht
+       zu heilen. Jetzt bekommt der Beitrag einen Zeitstempel, verschwindet
+       fuer alle ausser der Moderation, und die Zaehler gehen herunter. Was
+       wirklich weg soll, geht den zweiten Weg: 'endgueltig_*'.
+
+       Die Zaehlerarbeit steht in lib/papierkorb.php, weil Loeschen und
+       Zurueckholen sonst zwangslaeufig auseinanderlaufen. Zum dortigen
+       GREATEST(CAST(... AS SIGNED) - 1, 0): die Spalten sind UNSIGNED, und
+       GREATEST(0, spalte - 1) schuetzt NICHT — die Subtraktion laeuft schon
+       ueber, bevor GREATEST drankommt. */
     case 'delete_thread':
         ensure_board_permission($threadId);
         $t = db_fetch('SELECT board_id FROM threads WHERE thread_id = ?', [$threadId]);
         if ($t) {
-            $rc = db_count('SELECT COUNT(*) FROM posts WHERE thread_id = ?', [$threadId]);
-            // Erst die Anhaenge, dann das Thema: nach dem DELETE gibt es die
-            // Beitraege nicht mehr, und die Dateien waeren nicht mehr
-            // zuzuordnen — sie blieben liegen und weiter abrufbar.
-            delete_attachments_for_thread($threadId);
-            // Beitragszaehler der Verfasser mitfuehren, sonst zeigt jedes
-            // Profil dauerhaft zu viele Beitraege an.
-            foreach (db_fetchAll('SELECT user_id, COUNT(*) AS n FROM posts WHERE thread_id = ? GROUP BY user_id',
-                                 [$threadId]) as $v) {
-                db_execute('UPDATE users SET post_count = GREATEST(CAST(post_count AS SIGNED) - ?, 0) WHERE user_id = ?',
-                           [(int) $v['n'], (int) $v['user_id']]);
+            if (thema_in_papierkorb($threadId, (int) $cu['user_id'])) {
+                mod_log_entry('delete_thread', 'thread', $threadId, 'in den Papierkorb');
+                flash('Thema liegt im Papierkorb. Wiederherstellen geht dort.', 'success');
+            } else {
+                flash('Das Thema liegt bereits im Papierkorb.', 'info');
             }
-            db_execute('DELETE FROM threads WHERE thread_id = ?', [$threadId]);
-            db_execute('UPDATE boards SET thread_count = GREATEST(CAST(thread_count AS SIGNED) - 1, 0),
-                                          post_count   = GREATEST(CAST(post_count AS SIGNED) - ?, 0)
-                        WHERE board_id = ?', [$rc, $t['board_id']]);
-            mod_log_entry('delete_thread', 'thread', $threadId);
-            flash('Thread gelöscht.', 'success');
             redirect(FORUM_URL . '/board.php?id=' . $t['board_id']);
         }
         break;
 
+    case 'restore_thread':
+        ensure_board_permission($threadId);
+        if (thema_zurueckholen($threadId)) {
+            mod_log_entry('restore_thread', 'thread', $threadId);
+            flash('Thema wiederhergestellt.', 'success');
+        } else {
+            flash('Dieses Thema liegt nicht im Papierkorb.', 'error');
+        }
+        redirect(FORUM_URL . '/thread.php?id=' . $threadId);
+
+    case 'purge_thread':
+        ensure_board_permission($threadId);
+        $t = db_fetch('SELECT board_id, deleted_at FROM threads WHERE thread_id = ?', [$threadId]);
+        if (!$t) break;
+        if (empty($t['deleted_at'])) {
+            flash('Erst in den Papierkorb, dann endgültig löschen.', 'error');
+            redirect(FORUM_URL . '/thread.php?id=' . $threadId);
+        }
+        thema_endgueltig_loeschen($threadId);
+        mod_log_entry('purge_thread', 'thread', $threadId, 'endgültig');
+        flash('Thema endgültig gelöscht.', 'success');
+        redirect(FORUM_URL . '/board.php?id=' . $t['board_id']);
+
     case 'delete_post':
         ensure_board_permission(null, $postId);
-        $p = db_fetch('SELECT p.*, t.board_id FROM posts p JOIN threads t ON t.thread_id = p.thread_id WHERE p.post_id = ?', [$postId]);
+        $p = db_fetch('SELECT p.thread_id FROM posts p WHERE p.post_id = ?', [$postId]);
         if ($p) {
-            delete_attachments_for_posts([$postId]);
-            db_execute('DELETE FROM posts WHERE post_id = ?', [$postId]);
-            db_execute('UPDATE threads SET reply_count = GREATEST(CAST(reply_count AS SIGNED) - 1, 0) WHERE thread_id = ?', [$p['thread_id']]);
-            db_execute('UPDATE boards SET post_count = GREATEST(CAST(post_count AS SIGNED) - 1, 0) WHERE board_id = ?', [$p['board_id']]);
-            db_execute('UPDATE users SET post_count = GREATEST(CAST(post_count AS SIGNED) - 1, 0) WHERE user_id = ?', [$p['user_id']]);
-            mod_log_entry('delete_post', 'post', $postId);
-            flash('Beitrag gelöscht.', 'success');
+            // Der erste Beitrag traegt das Thema. Ihn allein wegzunehmen
+            // hinterliesse ein Thema ohne Anfang — dafuer gibt es das Loeschen
+            // des Themas.
+            $erster = db_count('SELECT COALESCE(MIN(post_id), 0) FROM posts WHERE thread_id = ?', [$p['thread_id']]);
+            if ($erster === $postId) {
+                flash('Das ist der erste Beitrag — dafür das ganze Thema löschen.', 'error');
+                redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);
+            }
+            if (beitrag_in_papierkorb($postId, (int) $cu['user_id'])) {
+                mod_log_entry('delete_post', 'post', $postId, 'in den Papierkorb');
+                flash('Beitrag liegt im Papierkorb.', 'success');
+            } else {
+                flash('Der Beitrag liegt bereits im Papierkorb.', 'info');
+            }
             redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);
         }
         break;
+
+    case 'restore_post':
+        ensure_board_permission(null, $postId);
+        $p = db_fetch('SELECT thread_id FROM posts WHERE post_id = ?', [$postId]);
+        if ($p && beitrag_zurueckholen($postId)) {
+            mod_log_entry('restore_post', 'post', $postId);
+            flash('Beitrag wiederhergestellt.', 'success');
+        } else {
+            flash('Dieser Beitrag liegt nicht im Papierkorb.', 'error');
+        }
+        redirect(FORUM_URL . '/thread.php?id=' . ($p['thread_id'] ?? 0));
+
+    case 'purge_post':
+        ensure_board_permission(null, $postId);
+        $p = db_fetch('SELECT thread_id, deleted_at FROM posts WHERE post_id = ?', [$postId]);
+        if (!$p) break;
+        if (empty($p['deleted_at'])) {
+            flash('Erst in den Papierkorb, dann endgültig löschen.', 'error');
+            redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);
+        }
+        beitrag_endgueltig_loeschen($postId);
+        mod_log_entry('purge_post', 'post', $postId, 'endgültig');
+        flash('Beitrag endgültig gelöscht.', 'success');
+        redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);
+
+    /* Teilen: ab dem angegebenen Beitrag wandert alles Folgende in ein neues
+       Thema. Der haeufigste Fall im Betrieb — ein Gespraech driftet ab einer
+       Stelle ab. Einzelne Beitraege herauszupicken kann das bewusst nicht:
+       das braucht Kaestchen an jedem Beitrag und mehr Stellen, an denen etwas
+       schiefgehen kann. */
+    case 'split':
+        ensure_board_permission(null, $postId);
+        $p = db_fetch('SELECT p.post_id, p.thread_id, p.user_id, p.created_at, t.board_id, t.title
+                         FROM posts p JOIN threads t ON t.thread_id = p.thread_id
+                        WHERE p.post_id = ?', [$postId]);
+        if (!$p) break;
+
+        $erster = db_count('SELECT COALESCE(MIN(post_id), 0) FROM posts WHERE thread_id = ?', [$p['thread_id']]);
+        if ($erster === $postId) {
+            flash('Am ersten Beitrag lässt sich nichts abtrennen — das wäre das ganze Thema.', 'error');
+            redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);
+        }
+
+        $titel = post_str('title') !== '' ? post_str('title') : 'Abgetrennt aus: ' . $p['title'];
+        if (mb_strlen($titel) < 3) {
+            flash('Der Titel des neuen Themas ist zu kurz.', 'error');
+            redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);
+        }
+
+        $neuesThema = thema_teilen($postId, $titel);
+        if (!$neuesThema) {
+            flash('Hier ließ sich nichts abtrennen.', 'error');
+            redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);
+        }
+        mod_log_entry('split', 'thread', (int) $p['thread_id'], 'ab Beitrag ' . $postId . ' → Thema ' . $neuesThema);
+        flash('Thema geteilt.', 'success');
+        redirect(FORUM_URL . '/thread.php?id=' . $neuesThema);
+
+    /* Zusammenfuehren: alles aus diesem Thema wandert in ein anderes, das
+       leere bleibt nicht stehen. Moderiert werden muss auf beiden Seiten —
+       sonst waere es ein Weg, Beitraege in ein fremdes Forum zu heben. */
+    case 'merge':
+        ensure_board_permission($threadId);
+        $zielThema = post_int('ziel') ?: get_int('ziel');
+        $quelle = db_fetch('SELECT thread_id, board_id FROM threads WHERE thread_id = ?', [$threadId]);
+        $ziel   = $zielThema > 0 ? db_fetch('SELECT thread_id, board_id FROM threads WHERE thread_id = ?', [$zielThema]) : null;
+        if (!$quelle || !$ziel) {
+            error_page(404, 'Thema nicht gefunden', 'Dieses Zielthema gibt es nicht.');
+        }
+        if ((int) $quelle['thread_id'] === (int) $ziel['thread_id']) {
+            flash('Ein Thema lässt sich nicht mit sich selbst zusammenführen.', 'error');
+            redirect(FORUM_URL . '/thread.php?id=' . $threadId);
+        }
+        if (!is_mod_for_board((int) $cu['user_id'], (int) $ziel['board_id'])) {
+            http_response_code(403);
+            error_page(403, 'Keine Berechtigung', 'Im Forum des Zielthemas bist du kein Moderator.');
+        }
+
+        themen_zusammenfuehren($threadId, (int) $ziel['thread_id']);
+        mod_log_entry('merge', 'thread', $threadId, 'in Thema ' . $ziel['thread_id']);
+        flash('Themen zusammengeführt.', 'success');
+        redirect(FORUM_URL . '/thread.php?id=' . $ziel['thread_id']);
 
     case 'ban':
         require_admin();

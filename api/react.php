@@ -39,7 +39,7 @@ $brett = db_fetch(
        FROM posts p
        JOIN threads t ON t.thread_id = p.thread_id
        JOIN boards  b ON b.board_id  = t.board_id
-      WHERE p.post_id = ?',
+      WHERE p.post_id = ?' . sichtbar_sql('p') . sichtbar_sql('t'),
     [$postId]
 );
 if (!$brett) {

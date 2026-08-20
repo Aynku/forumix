@@ -52,7 +52,7 @@ function threads_by_tag(int $tagId, int $limit = 50): array {
             JOIN thread_tags tt ON tt.thread_id = t.thread_id
             JOIN boards b       ON b.board_id = t.board_id
             JOIN users u        ON u.user_id  = t.user_id
-            WHERE tt.tag_id = ? AND COALESCE(t.is_approved, 1) = 1 ' . $boardFilter . '
+            WHERE tt.tag_id = ? AND COALESCE(t.is_approved, 1) = 1 ' . sichtbar_sql('t') . $boardFilter . '
             ORDER BY t.is_sticky DESC, t.thread_id DESC
             LIMIT ?
         ', [$tagId, $limit]);

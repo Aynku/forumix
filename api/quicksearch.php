@@ -29,7 +29,7 @@ try {
         JOIN boards b ON b.board_id = t.board_id
         JOIN users u  ON u.user_id  = t.user_id
         WHERE t.title LIKE ?
-          AND COALESCE(t.is_approved, 1) = 1' . board_filter_sql('t', 'board_id') . '
+          AND COALESCE(t.is_approved, 1) = 1' . sichtbar_sql('t') . board_filter_sql('t', 'board_id') . '
         ORDER BY t.is_sticky DESC, t.thread_id DESC
         LIMIT 5
     ', [$like]);

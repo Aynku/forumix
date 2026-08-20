@@ -115,6 +115,7 @@ require_once __DIR__ . '/lib/modules.php';
 require_once __DIR__ . '/lib/view.php';
 require_once __DIR__ . '/lib/user_deletion.php';
 require_once __DIR__ . '/lib/threads.php';
+require_once __DIR__ . '/lib/papierkorb.php';
 require_once __DIR__ . '/lib/template.php';
 
 // ── Unbehandelte Fehler landen im Forum, nicht im Nichts ────────

@@ -20,7 +20,7 @@ function user_threads_count(int $userId): int {
     try {
         return db_count(
             'SELECT COUNT(*) FROM threads t
-             WHERE t.user_id = ? ' . board_filter_sql('t', 'board_id'),
+             WHERE t.user_id = ? ' . sichtbar_sql('t') . board_filter_sql('t', 'board_id'),
             [$userId]
         );
     } catch (Exception $e) { return 0; }
@@ -47,7 +47,7 @@ function user_posts_in_last_days(int $userId, int $days = 30): int {
             'SELECT COUNT(*) FROM posts p JOIN threads t ON t.thread_id = p.thread_id
              WHERE p.user_id = ?
                AND p.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY) '
-            . board_filter_sql('t', 'board_id'),
+            . sichtbar_sql('p') . sichtbar_sql('t') . board_filter_sql('t', 'board_id'),
             [$userId, $days]
         );
     } catch (Exception $e) { return 0; }
@@ -102,7 +102,7 @@ function user_top_threads(int $userId, int $limit = 3): array {
                      WHERE p2.thread_id = t.thread_id
                        AND p2.user_id = ?) AS reactions_total
              FROM threads t
-             WHERE t.user_id = ? ' . board_filter_sql('t', 'board_id') . '
+             WHERE t.user_id = ? ' . sichtbar_sql('t') . board_filter_sql('t', 'board_id') . '
              ORDER BY reactions_total DESC, t.created_at DESC
              LIMIT ' . (int) $limit,
             [$userId, $userId]

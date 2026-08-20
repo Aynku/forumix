@@ -101,6 +101,10 @@ if ($hasQuery) {
 
     $where[] = 'COALESCE(p.is_approved, 1) = 1';
     $where[] = 'COALESCE(t.is_approved, 1) = 1';
+    // Was im Papierkorb liegt, ist auch ueber die Suche nicht zu finden —
+    // sonst stuende der Text im Auszug, den gerade jemand geloescht hat.
+    $where[] = 'p.deleted_at IS NULL';
+    $where[] = 't.deleted_at IS NULL';
 
     $whereSql = ' WHERE ' . implode(' AND ', $where);
 

@@ -206,14 +206,19 @@ function team_members(): array {
  * einmal sauber nachzaehlen.
  */
 function board_zaehler_neu(int $boardId): void {
+    // Was im Papierkorb liegt, zaehlt nirgends mit — sonst meldet das Forum
+    // Beitraege, die niemand sehen kann.
     db_execute('UPDATE boards SET
             thread_count = (SELECT COUNT(*) FROM threads t
-                            WHERE t.board_id = ? AND t.is_approved = 1),
+                            WHERE t.board_id = ? AND t.is_approved = 1
+                              AND t.deleted_at IS NULL),
             post_count   = (SELECT COUNT(*) FROM posts p
                             JOIN threads t ON t.thread_id = p.thread_id
-                            WHERE t.board_id = ? AND p.is_approved = 1),
+                            WHERE t.board_id = ? AND p.is_approved = 1
+                              AND p.deleted_at IS NULL AND t.deleted_at IS NULL),
             last_post_id = (SELECT MAX(p.post_id) FROM posts p
                             JOIN threads t ON t.thread_id = p.thread_id
-                            WHERE t.board_id = ? AND p.is_approved = 1)
+                            WHERE t.board_id = ? AND p.is_approved = 1
+                              AND p.deleted_at IS NULL AND t.deleted_at IS NULL)
         WHERE board_id = ?', [$boardId, $boardId, $boardId, $boardId]);
 }

@@ -54,7 +54,10 @@ return [
         if (!function_exists('delete_attachments_for_posts')) {
             throw new RuntimeException('delete_attachments_for_posts() fehlt');
         }
-        foreach (['pages/mod_action.php', 'lib/approval.php'] as $datei) {
+        // Seit 1.3.0 loescht nicht mehr die Seite, sondern lib/papierkorb.php —
+        // die Eigenschaft bleibt: wer einen Beitrag entfernt, entfernt seine
+        // Anhaenge mit, sonst liegen die Dateien weiter abrufbar herum.
+        foreach (['lib/papierkorb.php', 'lib/approval.php'] as $datei) {
             if (!str_contains($lies($datei), 'delete_attachments_for_')) {
                 throw new RuntimeException("$datei loescht Beitraege ohne ihre Anhaenge");
             }
@@ -73,8 +76,11 @@ return [
     },
 
     'Beitragszaehler wird beim Loeschen eines Themas mitgefuehrt' => function () use ($lies) {
-        $q = $lies('pages/mod_action.php');
-        $ab = strpos($q, "case 'delete_thread'");
+        // Auch das steht seit 1.3.0 in lib/papierkorb.php. Ohne diese Zeile
+        // zeigt jedes Profil dauerhaft zu viele Beitraege an.
+        $q = $lies('lib/papierkorb.php');
+        $ab = strpos($q, 'function thema_in_papierkorb');
+        if ($ab === false) throw new RuntimeException('thema_in_papierkorb() fehlt');
         $rumpf = substr($q, $ab, 2000);
         if (!str_contains($rumpf, 'users SET post_count')) {
             throw new RuntimeException('Die Zaehler der Verfasser bleiben stehen');

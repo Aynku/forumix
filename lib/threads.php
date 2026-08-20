@@ -116,3 +116,73 @@ function thread_erstellen(int $boardId, int $userId, string $titel, string $inha
 
     return ['thread_id' => (int) $threadId, 'post_id' => (int) $postId, 'freigegeben' => $freigegeben];
 }
+
+/**
+ * Teilt ein Thema ab einem Beitrag: dieser und alle folgenden wandern in ein
+ * neues Thema im selben Forum.
+ *
+ * Das neue Thema gehoert dem Verfasser des ersten abgetrennten Beitrags und
+ * traegt dessen Datum — sonst stuende ein Thema von heute in der Liste, dessen
+ * Inhalt von vorletzter Woche ist.
+ *
+ * @return int Kennung des neuen Themas, 0 wenn nichts zu teilen war.
+ */
+function thema_teilen(int $postId, string $titel): int
+{
+    $p = db_fetch('SELECT p.post_id, p.thread_id, p.user_id, p.created_at, t.board_id
+                     FROM posts p JOIN threads t ON t.thread_id = p.thread_id
+                    WHERE p.post_id = ?', [$postId]);
+    if (!$p) return 0;
+
+    // Am ersten Beitrag laesst sich nichts abtrennen — das waere das ganze
+    // Thema, und zurueck bliebe eines ohne Anfang.
+    $erster = db_count('SELECT COALESCE(MIN(post_id), 0) FROM posts WHERE thread_id = ?', [$p['thread_id']]);
+    if ($erster === $postId) return 0;
+
+    DB::get()->beginTransaction();
+    try {
+        $neu = db_execute(
+            'INSERT INTO threads (board_id, user_id, title, created_at, is_approved) VALUES (?, ?, ?, ?, 1)',
+            [$p['board_id'], $p['user_id'], $titel, $p['created_at']]
+        );
+        db_execute('UPDATE posts SET thread_id = ? WHERE thread_id = ? AND post_id >= ?',
+                   [$neu, $p['thread_id'], $postId]);
+        DB::get()->commit();
+    } catch (Throwable $e) {
+        if (DB::get()->inTransaction()) DB::get()->rollBack();
+        throw $e;
+    }
+
+    thema_zaehler_neu((int) $p['thread_id']);
+    thema_zaehler_neu((int) $neu);
+    board_zaehler_neu((int) $p['board_id']);
+    return (int) $neu;
+}
+
+/**
+ * Fuehrt ein Thema in ein anderes: alle Beitraege wandern, das leere Thema
+ * verschwindet. Was am Thema hing und nicht am Beitrag — Abos, Lesezeichen,
+ * Schlagworte, Gelesen-Stand — geht mit ihm.
+ */
+function themen_zusammenfuehren(int $quelleId, int $zielId): bool
+{
+    if ($quelleId === $zielId) return false;
+    $quelle = db_fetch('SELECT thread_id, board_id FROM threads WHERE thread_id = ?', [$quelleId]);
+    $ziel   = db_fetch('SELECT thread_id, board_id FROM threads WHERE thread_id = ?', [$zielId]);
+    if (!$quelle || !$ziel) return false;
+
+    DB::get()->beginTransaction();
+    try {
+        db_execute('UPDATE posts SET thread_id = ? WHERE thread_id = ?', [$zielId, $quelleId]);
+        db_execute('DELETE FROM threads WHERE thread_id = ?', [$quelleId]);
+        DB::get()->commit();
+    } catch (Throwable $e) {
+        if (DB::get()->inTransaction()) DB::get()->rollBack();
+        throw $e;
+    }
+
+    thema_zaehler_neu($zielId);
+    board_zaehler_neu((int) $quelle['board_id']);
+    board_zaehler_neu((int) $ziel['board_id']);
+    return true;
+}

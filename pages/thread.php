@@ -71,6 +71,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
         redirect(FORUM_URL . '/thread.php?id=' . $threadId);
     }
 
+    // In ein Thema im Papierkorb wird nicht geschrieben — auch nicht von der
+    // Moderation, die es ja noch sieht. Sonst haengt nach dem Zurueckholen
+    // eine Antwort daran, die es waehrend der Loeschung nicht geben konnte.
+    if (!empty($thread['deleted_at'])) {
+        flash('Dieses Thema liegt im Papierkorb.', 'error');
+        redirect(FORUM_URL . '/thread.php?id=' . $threadId);
+    }
+
     // Lesen reicht nicht zum Antworten. Der Knopf wird zwar gar nicht erst
     // angezeigt, aber wer die Anfrage von Hand schickt, kommt hier an.
     if (!board_can_write((int) $thread['board_id'])) {
@@ -171,6 +179,17 @@ if ($canSeeAll) {
     $approvalParams = [$currentUserId];
 }
 
+// Papierkorb: Geloeschtes sieht nur, wer moderieren darf — und zwar an Ort und
+// Stelle, damit beim Zurueckholen erkennbar bleibt, worauf sich die Antworten
+// danach beziehen. Fuer alle anderen ist es weg, auch fuer den Verfasser.
+$approvalFilter .= $canSeeAll ? '' : sichtbar_sql('p');
+
+// Und das Thema selbst: liegt es im Papierkorb, ist es fuer alle uebrigen
+// dasselbe wie ein Thema, das es nicht gibt.
+if (!empty($thread['deleted_at']) && !$canSeeAll) {
+    error_page(404, 'Thread nicht gefunden', 'Dieses Thema gibt es nicht oder es wurde entfernt.');
+}
+
 $page  = get_int('page', 1);
 $total = db_count(
     'SELECT COUNT(*) FROM posts p WHERE p.thread_id = ?' . $approvalFilter,
@@ -188,10 +207,12 @@ $posts = db_fetchAll(
             COALESCE(u.is_owner, 0)   AS is_owner,
             COALESCE(u.is_deleted, 0) AS is_deleted,
             COALESCE(p.is_approved, 1) AS is_approved,
-            mu.username AS mod_editor_name
+            mu.username AS mod_editor_name,
+            du.username AS geloescht_von
      FROM posts p
      JOIN users u ON u.user_id = p.user_id
      LEFT JOIN users mu ON mu.user_id = p.mod_edited_by
+     LEFT JOIN users du ON du.user_id = p.deleted_by
      WHERE p.thread_id = ?' . $approvalFilter . '
      ORDER BY p.created_at ASC
      LIMIT ? OFFSET ?',

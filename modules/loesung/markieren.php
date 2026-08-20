@@ -25,7 +25,7 @@ $postId   = (int) ($_POST['post_id'] ?? 0);
 // Loesung des eigenen Themas eintragen.
 $row = db_fetch(
     'SELECT p.post_id, t.thread_id, t.user_id
-     FROM posts p JOIN threads t ON t.thread_id = p.thread_id
+     FROM posts p JOIN threads t ON t.thread_id = p.thread_id AND t.deleted_at IS NULL
      WHERE p.post_id = ? AND t.thread_id = ?',
     [$postId, $threadId]
 );

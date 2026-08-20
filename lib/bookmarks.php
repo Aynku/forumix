@@ -46,7 +46,7 @@ function user_bookmarks(int $userId, int $limit = 50): array {
             JOIN threads t ON t.thread_id = bm.thread_id
             JOIN boards  b ON b.board_id  = t.board_id
             JOIN users   u ON u.user_id   = t.user_id
-            WHERE bm.user_id = ? ' . board_filter_sql('b') . '
+            WHERE bm.user_id = ? ' . sichtbar_sql('t') . board_filter_sql('b') . '
             ORDER BY bm.created_at DESC
             LIMIT ?
         ', [$userId, $limit]);

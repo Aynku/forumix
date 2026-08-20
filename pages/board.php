@@ -40,6 +40,13 @@ if ($canSeeAllThreads) {
     $approvalParams = [$cuId];
 }
 
+// Themen im Papierkorb stehen in keiner Liste — auch nicht fuer die
+// Moderation. Sie sind ueber die Papierkorb-Ansicht erreichbar und dort
+// zurueckzuholen; ein ausgegrautes Thema zwischen den lebenden waere in einer
+// Liste nur Rauschen. Innerhalb eines Themas ist das anders, dort steht der
+// geloeschte Beitrag im Zusammenhang.
+$approvalFilter .= sichtbar_sql('t');
+
 $page  = max(1, get_int('page', 1));
 $total = db_count(
     'SELECT COUNT(*) FROM threads t WHERE t.board_id = ?' . $approvalFilter,

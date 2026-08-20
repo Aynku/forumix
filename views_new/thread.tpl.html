@@ -4,6 +4,7 @@
   <span>
     {% if thread.is_sticky %}<span class="badge badge-sticky">Angepinnt</span>{% endif %}
     {% if thread.is_closed %}<span class="badge badge-closed">Geschlossen</span>{% endif %}
+    {% if thread.deleted_at %}<span class="badge badge-geloescht">Im Papierkorb</span>{% endif %}
     {{ thread.title }}
   </span>
   <span style="display:inline-flex;gap:6px;align-items:center">
@@ -37,9 +38,25 @@
             </form>
           {% endif %}
           <div class="action-dropdown-divider"></div>
-          <a href="{{ url('/mod_action.php?action=delete_thread&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}"
-             class="action-danger"
-             onclick="return confirm('Thread wirklich löschen?')">Thread löschen</a>
+          <form method="post" action="{{ url('/mod_action.php?action=merge&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}"
+                style="display:flex;gap:6px;align-items:center;padding:6px 10px">
+            <input type="number" name="ziel" min="1" placeholder="Ziel-Thema-Nr."
+                   aria-label="Nummer des Themas, in das zusammengeführt wird"
+                   style="flex:1;min-width:0" required>
+            <button type="submit" class="btn btn-ghost btn-sm"
+                    onclick="return confirm('Alle Beiträge dieses Themas in das andere verschieben? Dieses Thema verschwindet dabei.')">Zusammenführen</button>
+          </form>
+          <div class="action-dropdown-divider"></div>
+          {% if thread.deleted_at %}
+            <a href="{{ url('/mod_action.php?action=restore_thread&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">Thema wiederherstellen</a>
+            <a href="{{ url('/mod_action.php?action=purge_thread&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}"
+               class="action-danger"
+               onclick="return confirm('Endgültig löschen? Das lässt sich nicht rückgängig machen.')">Endgültig löschen</a>
+          {% else %}
+            <a href="{{ url('/mod_action.php?action=delete_thread&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}"
+               class="action-danger"
+               onclick="return confirm('Thema in den Papierkorb legen?')">Thema löschen</a>
+          {% endif %}
         </div>
       </div>
     {% endif %}
@@ -115,7 +132,7 @@
 {{ threadTopHtml|raw }}
 
 {% for post in posts %}
-<div class="post-card{{ post.is_approved ? '' : ' post-pending' }}" id="post{{ post.post_id }}">
+<div class="post-card{{ post.is_approved ? '' : ' post-pending' }}{{ post.deleted_at ? ' post-geloescht' : '' }}" id="post{{ post.post_id }}">
   {% if not post.is_approved %}
     <div class="post-pending-bar">Dieser Beitrag wartet auf Freigabe</div>
   {% endif %}
@@ -149,6 +166,12 @@
       <div class="post-count-label">Beiträge: {{ post.post_count }}</div>
     </div>
     <div class="post-content-col">
+      {% if post.deleted_at %}
+        <p class="papierkorb-hinweis">
+          Im Papierkorb{% if post.geloescht_von %} · gelöscht von {{ post.geloescht_von }}{% endif %} ·
+          {{ post.deleted_at }} — nur für die Moderation sichtbar.
+        </p>
+      {% endif %}
       <div class="post-text">{{ bbcode(post.content, post.post_id)|raw }}</div>
       <script type="text/plain" class="post-raw" data-post-id="{{ post.post_id }}">{{ post.content }}</script>
 
@@ -247,8 +270,21 @@
       <a class="post-action" href="{{ url('/edit_post.php?id=') }}{{ post.post_id }}">{{ t('edit') }}</a>
     {% endif %}
     {% if canModThis %}
-      <a class="post-action" href="{{ url('/mod_action.php?action=delete_post&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}"
-         onclick="return confirm('Beitrag löschen?')">{{ t('delete') }}</a>
+      {% if post.deleted_at %}
+        <a class="post-action" href="{{ url('/mod_action.php?action=restore_post&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}">Wiederherstellen</a>
+        <a class="post-action" href="{{ url('/mod_action.php?action=purge_post&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}"
+           onclick="return confirm('Endgültig löschen? Das lässt sich nicht rückgängig machen.')">Endgültig löschen</a>
+      {% else %}
+        <a class="post-action" href="{{ url('/mod_action.php?action=delete_post&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}"
+           onclick="return confirm('Beitrag in den Papierkorb legen?')">{{ t('delete') }}</a>
+        <form method="post" action="{{ url('/mod_action.php?action=split&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}"
+              style="display:inline-flex;gap:6px;align-items:center;vertical-align:middle">
+          <input type="text" name="title" placeholder="Titel des neuen Themas"
+                 aria-label="Titel des neuen Themas" style="width:190px">
+          <button type="submit" class="post-action" style="border:0;background:none;cursor:pointer"
+                  onclick="return confirm('Diesen und alle folgenden Beiträge in ein neues Thema abtrennen?')">Ab hier abtrennen</button>
+        </form>
+      {% endif %}
     {% endif %}
   </div>
   {{ post.hookFooter|raw }}
