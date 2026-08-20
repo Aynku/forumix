@@ -59,74 +59,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $isApproved = $needsApproval ? 0 : 1;
 
-        DB::get()->beginTransaction();
+        // Anlegen, Zaehlen, Benachrichtigen: lib/threads.php. Der Ablauf wird
+        // auch von tools/versionsbeitrag.php gebraucht, und zweimal gepflegt
+        // laeuft er zwangslaeufig auseinander.
+        $neu = thread_erstellen($boardId, (int) $cu['user_id'], $title, $content, [
+            'freigegeben' => (bool) $isApproved,
+            'ip'          => client_ip(),
+            // Anhaenge, Umfrage und Schlagworte haengen am Formular, nicht am
+            // Thema. Sie laufen zwischen Commit und Erwaehnung, damit die
+            // Benachrichtigung auf ein vollstaendiges Thema zeigt.
+            'nachbereitung' => function (int $threadId, int $postId) use ($cu) {
+                try { process_attachments($postId, (int) $cu['user_id']); } catch (Exception $e) {}
 
-        try {
-            $threadId = db_execute(
-                'INSERT INTO threads (board_id, user_id, title, is_approved) VALUES (?, ?, ?, ?)',
-                [$boardId, $cu['user_id'], $title, $isApproved]
-            );
-        } catch (PDOException $e) {
-            // Fallback falls is_approved Spalte fehlt (alte DB)
-            $threadId = db_execute(
-                'INSERT INTO threads (board_id, user_id, title) VALUES (?, ?, ?)',
-                [$boardId, $cu['user_id'], $title]
-            );
-        }
+                $pollQ    = post_str('poll_question');
+                $pollOpts = $_POST['poll_options'] ?? [];
+                if (mb_strlen($pollQ) >= 3 && is_array($pollOpts) && count(array_filter($pollOpts, fn($o) => trim($o) !== '')) >= 2) {
+                    try { create_poll($threadId, $pollQ, $pollOpts, isset($_POST['poll_multi'])); }
+                    catch (Exception $e) {}
+                }
 
-        try {
-            $postId = db_execute(
-                'INSERT INTO posts (thread_id, user_id, content, author_ip, is_approved) VALUES (?, ?, ?, ?, ?)',
-                [$threadId, $cu['user_id'], $content, client_ip(), $isApproved]
-            );
-        } catch (PDOException $e) {
-            $postId = db_execute(
-                'INSERT INTO posts (thread_id, user_id, content) VALUES (?, ?, ?)',
-                [$threadId, $cu['user_id'], $content]
-            );
-        }
-        try { log_user_ip($cu['user_id'], 'post'); } catch (Exception $e) {}
+                if (!empty($_POST['tags']) && is_array($_POST['tags'])) {
+                    set_thread_tags($threadId, $_POST['tags']);
+                }
+            },
+        ]);
+        $threadId = $neu['thread_id'];
 
-        db_execute('UPDATE threads SET last_post_id = ? WHERE thread_id = ?', [$postId, $threadId]);
-
-        // Counter nur erhöhen wenn approved
-        if ($isApproved) {
-            db_execute('UPDATE boards SET thread_count = thread_count + 1, post_count = post_count + 1, last_post_id = ? WHERE board_id = ?',
-                [$postId, $boardId]);
-            db_execute('UPDATE users SET post_count = post_count + 1, last_post_at = NOW(), last_activity_at = NOW() WHERE user_id = ?', [$cu['user_id']]);
-            update_user_rank($cu['user_id']);
-        }
-
-        DB::get()->commit();
-
-        // Anhänge
-        try { process_attachments((int) $postId, (int) $cu['user_id']); } catch (Exception $e) {}
-
-        // Erwähnungen nur senden wenn approved (sonst Spam-Vektor)
-        if ($isApproved) {
-            process_mentions($content, (int) $threadId, (int) $postId, (int) $cu['user_id']);
-        }
-
-        // Umfrage falls angegeben
-        $pollQ = post_str('poll_question');
-        $pollOpts = $_POST['poll_options'] ?? [];
-        if (mb_strlen($pollQ) >= 3 && is_array($pollOpts) && count(array_filter($pollOpts, fn($o) => trim($o) !== '')) >= 2) {
-            try { create_poll((int) $threadId, $pollQ, $pollOpts, isset($_POST['poll_multi'])); }
-            catch (Exception $e) {}
-        }
-
-        // Tags
-        if (!empty($_POST['tags']) && is_array($_POST['tags'])) {
-            set_thread_tags((int) $threadId, $_POST['tags']);
-        }
-
-        // Auto-Abo
-        try {
-            db_execute('INSERT IGNORE INTO thread_subscriptions (user_id, thread_id) VALUES (?, ?)',
-                [$cu['user_id'], $threadId]);
-        } catch (Exception $e) {}
-
-        try { check_achievements((int) $cu['user_id']); } catch (Exception $e) {}
         if ($isApproved) {
             flash('Thema erfolgreich erstellt!', 'success');
             redirect(FORUM_URL . '/thread.php?id=' . $threadId);

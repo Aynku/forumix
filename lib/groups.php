@@ -45,11 +45,22 @@ function group_member_counts(): array {
 function group_members(int $groupId): array {
     try {
         return db_fetchAll('
-            SELECT u.user_id, u.username, u.is_admin, u.is_mod, m.added_at
+            SELECT u.user_id, u.username, u.is_admin, u.is_mod, m.added_at, m.woher
             FROM group_members m JOIN users u ON u.user_id = m.user_id
             WHERE m.group_id = ? AND u.is_deleted = 0 ORDER BY u.username
         ', [$groupId]);
-    } catch (Exception $e) { return []; }
+    } catch (Exception $e) {
+        // Vor Migration v27 gibt es die Spalte woher nicht. Ohne diesen zweiten
+        // Versuch bliebe die Mitgliederliste im Adminbereich einfach leer —
+        // ein Fehler, der wie "da ist niemand drin" aussieht.
+        try {
+            return db_fetchAll('
+                SELECT u.user_id, u.username, u.is_admin, u.is_mod, m.added_at
+                FROM group_members m JOIN users u ON u.user_id = m.user_id
+                WHERE m.group_id = ? AND u.is_deleted = 0 ORDER BY u.username
+            ', [$groupId]);
+        } catch (Exception $e2) { return []; }
+    }
 }
 
 /**
@@ -101,7 +112,16 @@ function group_delete(int $id): void {
     db_execute('DELETE FROM user_groups WHERE group_id = ?', [$id]);
 }
 
-function group_member_add(int $groupId, int $userId): void {
+/**
+ * @param string $woher 'hand' = jemand hat es eingetragen, 'liste' = aus einer
+ *   Adressliste uebernommen (tools/kundenabgleich.php). Der Abgleich entfernt
+ *   spaeter nur, was er selbst angelegt hat — deshalb muss die Herkunft mit.
+ *
+ * INSERT IGNORE mit Absicht: steht jemand schon von Hand drin, bleibt es dabei.
+ * Ein Abgleich soll eine Mitgliedschaft nicht heimlich in seine eigene
+ * umwidmen und sie beim naechsten Lauf wieder entfernen koennen.
+ */
+function group_member_add(int $groupId, int $userId, string $woher = 'hand'): void {
     $g = group_by_id($groupId);
     if (!$g) throw new RuntimeException('Diese Gruppe gibt es nicht.');
     if (!empty($g['is_builtin'])) {
@@ -109,7 +129,14 @@ function group_member_add(int $groupId, int $userId): void {
         // gepflegt zu werden. Eine Liste dafuer waere sofort veraltet.
         throw new RuntimeException('In eingebaute Gruppen wird niemand eingetragen.');
     }
-    db_execute('INSERT IGNORE INTO group_members (group_id, user_id) VALUES (?, ?)', [$groupId, $userId]);
+    if (!in_array($woher, ['hand', 'liste'], true)) $woher = 'hand';
+    try {
+        db_execute('INSERT IGNORE INTO group_members (group_id, user_id, woher) VALUES (?, ?, ?)',
+            [$groupId, $userId, $woher]);
+    } catch (PDOException $e) {
+        // Vor Migration v27 gibt es die Spalte nicht.
+        db_execute('INSERT IGNORE INTO group_members (group_id, user_id) VALUES (?, ?)', [$groupId, $userId]);
+    }
 }
 
 function group_member_remove(int $groupId, int $userId): void {

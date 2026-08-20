@@ -819,11 +819,18 @@
                   <table class="forum-table">
                     <tbody>
                       <?php foreach ($mitglieder as $m): ?>
+                        <?php $ausListe = ($m['woher'] ?? 'hand') === 'liste'; ?>
                         <tr>
                           <td><?= e($m['username']) ?></td>
-                          <td style="color:var(--text-muted)"><?= e((string) $m['added_at']) ?></td>
+                          <td style="color:var(--text-muted)">
+                            <?= e((string) $m['added_at']) ?>
+                            <?php if ($ausListe): ?>
+                              <span style="color:var(--text-faint)">· aus Liste</span>
+                            <?php endif; ?>
+                          </td>
                           <td style="text-align:right">
                             <a class="btn btn-ghost btn-xs"
+                               <?php if ($ausListe): ?>onclick="return confirm('<?= e($m['username']) ?> steht auf der abgeglichenen Liste und ist beim nächsten Abgleich wieder da. Trotzdem entfernen?')"<?php endif; ?>
                                href="?action=group_member_remove&group=<?= (int) $gruppe['group_id'] ?>&user=<?= (int) $m['user_id'] ?>&csrf=<?= e($csrfToken) ?>">Entfernen</a>
                           </td>
                         </tr>

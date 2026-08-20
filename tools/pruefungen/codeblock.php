@@ -20,6 +20,22 @@ require_once $wurzel . '/lib/functions.php';
 $satz = function (string $roh): string { return bbcode($roh); };
 
 return [
+    'Inline-Code gibt BBCode als Text aus' => function () use ($satz) {
+        // Der Grund, warum es [c] ueberhaupt gibt: ueber BBCode schreiben,
+        // ohne dass es wirkt. Als Kursiv-Inhalt haette das Tag zugeschlagen.
+        $aus = $satz('Ein [c][b]fett[/b][/c] mitten im Satz.');
+        if (str_contains($aus, '<strong>')) throw new RuntimeException('[b] wirkte innerhalb von [c]');
+        if (!str_contains($aus, '<code class="bb-inline">')) throw new RuntimeException('Kein bb-inline erzeugt');
+        if (!str_contains($aus, '[b]fett[/b]')) throw new RuntimeException('Der Text ist unterwegs verlorengegangen');
+    },
+
+    'Inline-Code steht neben Code-Bloecken, ohne sie zu stoeren' => function () use ($satz) {
+        $aus = $satz("Vorher [c]eins[/c].\n[code]\nzwei\n[/code]\nNachher [c]drei[/c].");
+        if (substr_count($aus, 'class="bb-inline"') !== 2) throw new RuntimeException('Erwartet zwei Inline-Stellen');
+        if (!str_contains($aus, 'class="bb-code"')) throw new RuntimeException('Der Block ist abhanden gekommen');
+        if (str_contains($aus, "\x02CODE")) throw new RuntimeException('Ein Platzhalter blieb stehen');
+    },
+
     'Fettschrift bleibt im Code stehen' => function () use ($satz) {
         $aus = $satz("[code]\n[b]nicht fett[/b]\n[/code]");
         if (str_contains($aus, '<strong>')) throw new RuntimeException('[b] wurde im Code ausgefuehrt');

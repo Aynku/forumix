@@ -1019,6 +1019,19 @@ mark {
 /* ── CODE ───────────────────────────────────────────────────────────
    Kopfzeile mit Sprache und Kopieren-Knopf, Zeilennummern per CSS-Zaehler,
    lange Bloecke scrollen in sich statt die Seite zu strecken. */
+/* Inline-Code: [c]...[/c]. Steht mitten im Satz, bekommt deshalb keinen Kasten
+   und keine eigene Zeile — nur so viel Absetzung, dass ein BBCode-Tag als Text
+   erkennbar bleibt und nicht als Auszeichnung gelesen wird. */
+.bb-inline {
+  font-family: var(--font-mono);
+  font-size: .92em;
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface3);
+  color: var(--text-base);
+  overflow-wrap: anywhere;
+}
 .bb-code {
   margin: 12px 0;
   border: 1px solid var(--border);

@@ -8,6 +8,47 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.2.0 (2026-08-20)
+
+**Eine Gruppe lässt sich aus einer Adressliste pflegen.** Wenn woanders schon
+steht, wer dazugehört — eine Mitgliederverwaltung, eine Kundendatei, ein
+anderes System —, muss die Gruppe im Forum nicht zusätzlich von Hand geführt
+werden. `bin/gruppenabgleich.php` nimmt eine Liste von Adressen entgegen und
+bringt die Gruppe damit in Deckung, in beide Richtungen. Gedacht für cron.
+
+- Übernommen werden nur **bestätigte** Adressen. Ohne diese Grenze genügt es,
+  sich mit der Adresse eines Mitglieds anzumelden, um in dessen Gruppe zu
+  landen — und damit womöglich in ein Forum, das nur diese Gruppe sieht. Ob die
+  Anmeldung eine Bestätigung verlangt, hängt an einem Schalter im Adminbereich;
+  hier hängt es an nichts. Gesperrte und gelöschte Konten bleiben ebenfalls
+  draußen.
+- Ausgetragen wird nur, was ein früherer Abgleich selbst eingetragen hat. Wen
+  ein Administrator von Hand in die Gruppe gesetzt hat, fasst der Abgleich
+  nicht an — auch dann nicht, wenn die Adresse auf der Liste steht.
+- Im Adminbereich steht bei diesen Mitgliedschaften „aus Liste“. Wer eine davon
+  entfernt, wird darauf hingewiesen, dass sie beim nächsten Abgleich wieder da
+  ist.
+- `--probe` rechnet vor, ohne zu schreiben. Eine leere Liste an der
+  Standardeingabe räumt die Gruppe nicht leer, sondern bricht ab: eine Quelle,
+  die gerade nichts liefert, ist kein Grund, eine Gruppe zu räumen.
+
+**Wortwörtliches mitten im Satz.** Neben dem Code-Block gibt es jetzt ein
+Inline-Tag für einzelne Wörter — einen Dateinamen, einen Schalter, ein Tag.
+Es setzt sie in Schreibmaschinenschrift und nimmt sie aus der Auszeichnung
+heraus: was dazwischen steht, wird nicht mehr als BBCode gelesen. Damit lässt
+sich endlich über BBCode schreiben, ohne dass es wirkt.
+
+```
+Der Schalter [c]--probe[/c] rechnet nur vor.
+```
+
+**Migration nötig** (v27). Sie ergänzt in `group_members` eine Spalte für die
+Herkunft einer Mitgliedschaft. Alles Bestehende gilt als von Hand eingetragen
+und ist damit vor jedem Abgleich sicher. Ohne die Migration verhält sich das
+Forum wie bisher.
+
+---
+
 ## v1.1.5 (2026-08-20)
 
 **Codezeilen lassen sich einzeln verlinken.** "Schau dir Zeile 14 an" wird zum

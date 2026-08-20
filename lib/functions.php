@@ -154,6 +154,21 @@ function bbcode(string $text, ?int $postId = null): string {
         $text
     );
 
+    // ── INLINE-CODE ──
+    // [c]...[/c] ist der kleine Bruder: mitten im Satz, ohne Kasten. Er wandert
+    // in dieselbe Ablage und aus demselben Grund — was drinsteht, ist Text und
+    // keine Auszeichnung. Genau dafuer wird er gebraucht: um ueber BBCode zu
+    // schreiben, ohne dass es wirkt.
+    $text = preg_replace_callback(
+        '/\[c\](.*?)\[\/c\]/is',
+        function ($m) use (&$codeBloecke) {
+            $schluessel = "\x02CODE" . count($codeBloecke) . "\x02";
+            $codeBloecke[$schluessel] = '<code class="bb-inline">' . $m[1] . '</code>';
+            return $schluessel;
+        },
+        $text
+    );
+
     // ── ZITATE ──
     // Von innen nach aussen: der Ausdruck trifft nur Zitate, deren Inhalt kein
     // weiteres [quote] enthaelt, und wird so lange wiederholt, bis keines mehr
