@@ -244,7 +244,8 @@
                 <td>
                   <a href="<?= e(FORUM_URL) ?>/thread.php?id=<?= (int) $t['thread_id'] ?>"><?= e($t['title']) ?></a>
                   <div style="color:var(--text-muted);font-size:12px">
-                    <?= e($t['brett']) ?> · <?= (int) $t['beitraege'] ?> Beiträge ·
+                    <?= e($t['brett']) ?> · <?= (int) $t['beitraege'] ?>
+                    <?= (int) $t['beitraege'] === 1 ? 'Beitrag' : 'Beiträge' ?> ·
                     von <?= e(zeigename($t['verfasser'])) ?>
                   </div>
                 </td>
