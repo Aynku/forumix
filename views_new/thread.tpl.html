@@ -149,7 +149,7 @@
       <div class="post-count-label">Beiträge: {{ post.post_count }}</div>
     </div>
     <div class="post-content-col">
-      <div class="post-text">{{ bbcode(post.content)|raw }}</div>
+      <div class="post-text">{{ bbcode(post.content, post.post_id)|raw }}</div>
       <script type="text/plain" class="post-raw" data-post-id="{{ post.post_id }}">{{ post.content }}</script>
 
       {% if post.attachments %}

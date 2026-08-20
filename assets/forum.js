@@ -1804,9 +1804,30 @@ document.addEventListener('click', function (e) {
     if (typeof CodeMirror === 'undefined' || !CodeMirror.runMode) return;
     if (CodeMirror.mimeModes && !CodeMirror.mimeModes[modus]) return;
 
-    var text = pre.innerText;
-    var zeile = document.createElement('span');
-    zeile.className = 'bb-zeile';
+    var text  = pre.innerText;
+    var marke = block.getAttribute('data-marke');   // z.B. "p12c1"
+    var nr    = 0;
+
+    // Die Zeilen werden neu gebaut — Sprungmarke und Nummern-Verweis muessen
+    // dabei mitkommen, sonst zeigt ein Verweis auf Zeile 14 nach dem Einfaerben
+    // ins Leere.
+    function neueZeile() {
+      nr++;
+      var z = document.createElement('span');
+      z.className = 'bb-zeile';
+      if (marke) {
+        var id = marke + '-' + nr;
+        z.id = id;
+        var a = document.createElement('a');
+        a.className = 'bb-zeilennr';
+        a.href = '#' + id;
+        a.setAttribute('aria-label', 'Zeile ' + nr);
+        z.appendChild(a);
+      }
+      return z;
+    }
+
+    var zeile = neueZeile();
     var neu = document.createDocumentFragment();
     neu.appendChild(zeile);
 
@@ -1817,8 +1838,7 @@ document.addEventListener('click', function (e) {
       var teile = stueck.split('\n');
       for (var i = 0; i < teile.length; i++) {
         if (i > 0) {
-          zeile = document.createElement('span');
-          zeile.className = 'bb-zeile';
+          zeile = neueZeile();
           neu.appendChild(zeile);
         }
         if (teile[i] === '') continue;
@@ -1837,6 +1857,23 @@ document.addEventListener('click', function (e) {
     pre.appendChild(neu);
   }
 
+  /* Angesprungene Zeile hervorheben.
+     :target allein reicht nicht: der Browser loest es beim Laden auf, und das
+     Faerben baut die Zeilen danach neu — dieselbe Kennung, aber ein anderes
+     Element, und die Hervorhebung ist weg. Deshalb wird sie hier zusaetzlich
+     als Klasse gesetzt, beim Start und bei jedem Sprung. */
+  function zielMarkieren() {
+    document.querySelectorAll('.bb-zeile--ziel').forEach(function (z) {
+      z.classList.remove('bb-zeile--ziel');
+    });
+    var id = location.hash.slice(1);
+    if (!id) return;
+    var z = document.getElementById(id);
+    if (z && z.classList.contains('bb-zeile')) z.classList.add('bb-zeile--ziel');
+  }
+  window.addEventListener('hashchange', zielMarkieren);
+  zielMarkieren();
+
   /* Nur wenn auf dieser Seite ueberhaupt gefaerbt werden soll, wird geladen.
      Eine Themenseite ohne Code-Block holt sich also kein Kilobyte davon. */
   var bloecke = document.querySelectorAll('.bb-code[data-modus]');
@@ -1850,6 +1887,7 @@ document.addEventListener('click', function (e) {
     if (noetig.length) {
       laden(['addon/runmode/runmode-standalone.js'].concat(noetig), function () {
         bloecke.forEach(faerben);
+        zielMarkieren();   // die Zeilen sind neu, die Markierung muss mit
       });
     }
   }

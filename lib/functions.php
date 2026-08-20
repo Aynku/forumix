@@ -75,7 +75,7 @@ const BB_CODE_SPRACHEN = [
  * bekommen — sonst schleppt jedes Kopieren unsichtbare Zeichen mit; die Hoehe
  * macht das Stylesheet.
  */
-function code_block_html(string $sprache, string $inhalt): string {
+function code_block_html(string $sprache, string $inhalt, string $praefix = ''): string {
     $sprache = strtolower(trim($sprache));
     $bekannt = BB_CODE_SPRACHEN[$sprache] ?? null;
 
@@ -84,12 +84,28 @@ function code_block_html(string $sprache, string $inhalt): string {
 
     $zeilen = preg_split('/\R/', $inhalt);
     $rumpf  = '';
+    $nr     = 0;
     foreach ($zeilen as $z) {
-        $rumpf .= '<span class="bb-zeile">' . $z . '</span>';
+        $nr++;
+        if ($praefix !== '') {
+            // Jede Zeile bekommt eine Sprungmarke und die Nummer davor einen
+            // Verweis darauf. Damit laesst sich auf EINE Zeile zeigen —
+            // "schau dir Zeile 14 an" wird zum Klick. Die Nummer selbst steht
+            // im ::before des Verweises, nicht im Text: sonst wanderte sie
+            // beim Kopieren mit.
+            $marke  = $praefix . '-' . $nr;
+            $rumpf .= '<span class="bb-zeile" id="' . e($marke) . '">'
+                    . '<a class="bb-zeilennr" href="#' . e($marke) . '"'
+                    . ' aria-label="Zeile ' . $nr . '"></a>'
+                    . $z . '</span>';
+        } else {
+            $rumpf .= '<span class="bb-zeile">' . $z . '</span>';
+        }
     }
 
     $modus = ($bekannt && $bekannt[1] !== '') ? ' data-modus="' . e($bekannt[1]) . '"' : '';
-    return '<div class="bb-code"' . $modus . '>'
+    $marke = $praefix !== '' ? ' data-marke="' . e($praefix) . '"' : '';
+    return '<div class="bb-code"' . $modus . $marke . '>'
          . '<div class="bb-code-kopf">'
          . '<span class="bb-code-sprache">' . e($bekannt[0] ?? 'Code') . '</span>'
          . '<button type="button" class="bb-code-kopieren">Kopieren</button>'
@@ -111,7 +127,13 @@ function zeigename(?string $name): string {
     return preg_match('/^Gelöschter Benutzer #\d+$/u', $name) ? 'Gelöschter Benutzer' : $name;
 }
 
-function bbcode(string $text): string {
+/**
+ * $postId ist die Beitragskennung, sofern bekannt. Sie geht in die
+ * Sprungmarken der Codezeilen ein, damit ein Verweis auf Zeile 14 auch dann
+ * noch stimmt, wenn der Beitrag auf eine andere Seite des Themas rutscht.
+ * Ohne Kennung — Vorschau, Suchtreffer, Modul — gibt es keine Marken.
+ */
+function bbcode(string $text, ?int $postId = null): string {
     $text = e($text);
 
     // ── CODE ZUERST HERAUSNEHMEN ──
@@ -122,9 +144,11 @@ function bbcode(string $text): string {
     $codeBloecke = [];
     $text = preg_replace_callback(
         '/\[code(?:=([a-zA-Z0-9+#_-]{1,16}))?\](.*?)\[\/code\]/is',
-        function ($m) use (&$codeBloecke) {
-            $schluessel = "\x02CODE" . count($codeBloecke) . "\x02";
-            $codeBloecke[$schluessel] = code_block_html($m[1] ?? '', $m[2]);
+        function ($m) use (&$codeBloecke, $postId) {
+            $nummer     = count($codeBloecke);
+            $schluessel = "\x02CODE" . $nummer . "\x02";
+            $praefix    = $postId !== null ? 'p' . $postId . 'c' . ($nummer + 1) : '';
+            $codeBloecke[$schluessel] = code_block_html($m[1] ?? '', $m[2], $praefix);
             return $schluessel;
         },
         $text

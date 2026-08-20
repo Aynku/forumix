@@ -1059,6 +1059,20 @@ mark {
   color: var(--text-faint);
   user-select: none; -webkit-user-select: none;
 }
+/* Steht eine Sprungmarke zur Verfuegung, liegt ueber der Nummer ein Verweis.
+   Die Nummer selbst bleibt im ::before der Zeile — sie soll beim Kopieren
+   nicht mitwandern, und ein Verweis mit Text drin taete genau das. */
+.bb-code .bb-zeilennr {
+  position: absolute; left: 0; top: 0; width: 46px; height: 1.65em;
+  text-decoration: none;
+}
+.bb-code .bb-zeile:hover::before { color: var(--color-accent); }
+/* Angesprungene Zeile hervorheben — sonst sucht man sie im Block. */
+.bb-code .bb-zeile:target,
+.bb-code .bb-zeile--ziel {
+  background: var(--color-accent-soft);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
 
 /* Syntax: die Klassen von CodeMirror auf die eigenen Farbtokens gelegt.
    Kein fremdes Farbschema — so stimmt es im hellen wie im dunklen Thema. */

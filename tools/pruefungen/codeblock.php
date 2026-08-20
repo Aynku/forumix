@@ -111,4 +111,36 @@ return [
             throw new RuntimeException('Ein aehnlicher Name wurde mitgekuerzt');
         }
     },
+
+    'Mit Beitragskennung bekommt jede Codezeile eine Sprungmarke' => function () {
+        $aus = bbcode("[code=php]\neins\nzwei\ndrei\n[/code]", 12);
+        foreach ([1, 2, 3] as $n) {
+            if (!str_contains($aus, 'id="p12c1-' . $n . '"')) {
+                throw new RuntimeException("Marke fuer Zeile $n fehlt");
+            }
+            if (!str_contains($aus, 'href="#p12c1-' . $n . '"')) {
+                throw new RuntimeException("Verweis auf Zeile $n fehlt");
+            }
+        }
+        // Die Nummer darf NICHT im Text stehen, sonst wandert sie beim
+        // Kopieren mit.
+        if (preg_match('/<a class="bb-zeilennr"[^>]*>[^<]/', $aus)) {
+            throw new RuntimeException('Im Nummern-Verweis steht Text');
+        }
+    },
+
+    'Zwei Codebloecke im selben Beitrag kommen sich nicht ins Gehege' => function () {
+        $aus = bbcode("[code]a[/code]\n\n[code]b[/code]", 7);
+        if (!str_contains($aus, 'id="p7c1-1"')) throw new RuntimeException('Erster Block ohne Marke');
+        if (!str_contains($aus, 'id="p7c2-1"')) throw new RuntimeException('Zweiter Block nutzt dieselbe Marke');
+    },
+
+    'Ohne Beitragskennung gibt es keine Marken' => function () {
+        // Vorschau, Suchtreffer, Modulausgabe: dort gibt es keinen Beitrag, auf
+        // den ein Verweis zeigen koennte. Dann lieber gar keine Marke als eine,
+        // die zweimal auf der Seite steht.
+        $aus = bbcode("[code]eins[/code]");
+        if (str_contains($aus, 'bb-zeilennr')) throw new RuntimeException('Marke ohne Beitragskennung erzeugt');
+        if (!str_contains($aus, 'class="bb-zeile"')) throw new RuntimeException('Zeile fehlt ganz');
+    },
 ];
