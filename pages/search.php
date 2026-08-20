@@ -103,8 +103,12 @@ if ($hasQuery) {
     $where[] = 'COALESCE(t.is_approved, 1) = 1';
     // Was im Papierkorb liegt, ist auch ueber die Suche nicht zu finden —
     // sonst stuende der Text im Auszug, den gerade jemand geloescht hat.
-    $where[] = 'p.deleted_at IS NULL';
-    $where[] = 't.deleted_at IS NULL';
+    // Ueber den Helfer, damit auch hier der Schalter greift, wenn die
+    // Migration noch aussteht. Er liefert " AND x.deleted_at IS NULL" — das
+    // fuehrende AND faellt hier weg, weil die Teile selbst verknuepft werden.
+    foreach ([sichtbar_sql('p'), sichtbar_sql('t')] as $teil) {
+        if ($teil !== '') $where[] = ltrim(substr($teil, 4));
+    }
 
     $whereSql = ' WHERE ' . implode(' AND ', $where);
 

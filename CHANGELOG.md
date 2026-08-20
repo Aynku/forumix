@@ -8,6 +8,33 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.3.1 (2026-08-20)
+
+### Ohne Migration fällt nichts mehr aus
+
+Wird 1.3.0 eingespielt und die Migration erst später ausgeführt, fragte jede
+Seite nach Spalten, die es noch nicht gab — die Installation antwortete in
+dieser Zeit durchgehend mit Fehler 500.
+
+- Fehlen die Spalten, verhält sich das Forum wie vor 1.3.0: kein Papierkorb,
+  aber es läuft. Sobald die Migration durch ist, ist er da.
+- Die Prüfung dafür stellt den Fall nach: Spalten weg, Seitenaufrufe, Spalten
+  wieder anlegen.
+
+### Kleinigkeiten
+
+- Werkzeuge auf der Kommandozeile erscheinen nicht mehr unter „Wer ist online".
+  Bisher hinterließ jeder Aufruf dort einen Gast mit der Adresse `0.0.0.0`.
+- Die Knöpfe unter einem Beitrag stehen immer rechts. Bei Beiträgen ohne
+  Absenderadresse rutschten sie nach links, seit es solche Beiträge regelmäßig
+  gibt, sah die Fußzeile von Beitrag zu Beitrag anders aus.
+- „Ab hier abtrennen" fragt den Titel des neuen Themas nach dem Klick ab,
+  statt ein Eingabefeld zwischen die Knöpfe zu setzen.
+
+Keine Migration nötig.
+
+---
+
 ## v1.3.0 (2026-08-20)
 
 ### Papierkorb statt endgültig löschen

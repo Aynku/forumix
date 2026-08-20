@@ -1912,3 +1912,30 @@ document.addEventListener('click', function (e) {
     }
   }
 })();
+
+
+/* "Ab hier abtrennen": der Titel des neuen Themas wird gefragt, nicht in einem
+   Feld mitten in der Beitragsleiste eingetippt. Ein Eingabefeld zwischen den
+   Knoepfen sah aus wie hineingerutscht.
+
+   Ohne Antwort passiert nichts, bei leerer Eingabe folgt der Verweis wie er
+   ist — dann vergibt der Server den Titel "Abgetrennt aus: …". Ohne
+   JavaScript bleibt genau dieser Weg uebrig, der Knopf funktioniert also
+   trotzdem. */
+function abtrennen(a) {
+    const titel = prompt('Titel des neuen Themas — leer lassen für "Abgetrennt aus …":', '');
+    if (titel === null) return false;
+    if (titel.trim() === '') return true;
+
+    const f = document.createElement('form');
+    f.method = 'post';
+    f.action = a.href;
+    const i = document.createElement('input');
+    i.type  = 'hidden';
+    i.name  = 'title';
+    i.value = titel.trim();
+    f.appendChild(i);
+    document.body.appendChild(f);
+    f.submit();
+    return false;
+}

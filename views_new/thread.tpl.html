@@ -244,11 +244,13 @@
          title="IP-Lookup">
         <code>{{ post.author_ip }}</code>
       </a>
-      {# Der Platzhalter schiebt die Aktionen nach rechts, damit sie nicht an
-         der IP kleben. Ohne IP steht links nichts — dann sollen sie auch
-         links stehen. #}
-      <span style="flex:1"></span>
     {% endif %}
+    {# Der Platzhalter schiebt die Aktionen nach rechts. Er steht IMMER da,
+       auch ohne IP davor: sonst rutschen die Knoepfe bei Beitraegen ohne
+       Adresse nach links und die Fusszeile sieht von Beitrag zu Beitrag anders
+       aus. Beitraege ohne Adresse gibt es seit 1.2.4 regelmaessig — alles, was
+       nicht aus einem Browser kommt. #}
+    <span style="flex:1"></span>
     {% if currentUser %}
       <a class="post-action quote-btn" href="#reply"
          data-post-id="{{ post.post_id }}"
@@ -277,13 +279,9 @@
       {% else %}
         <a class="post-action" href="{{ url('/mod_action.php?action=delete_post&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}"
            onclick="return confirm('Beitrag in den Papierkorb legen?')">{{ t('delete') }}</a>
-        <form method="post" action="{{ url('/mod_action.php?action=split&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}"
-              style="display:inline-flex;gap:6px;align-items:center;vertical-align:middle">
-          <input type="text" name="title" placeholder="Titel des neuen Themas"
-                 aria-label="Titel des neuen Themas" style="width:190px">
-          <button type="submit" class="post-action" style="border:0;background:none;cursor:pointer"
-                  onclick="return confirm('Diesen und alle folgenden Beiträge in ein neues Thema abtrennen?')">Ab hier abtrennen</button>
-        </form>
+        <a class="post-action" href="{{ url('/mod_action.php?action=split&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}"
+           onclick="return abtrennen(this)"
+           title="Diesen und alle folgenden Beiträge in ein neues Thema abtrennen">Ab hier abtrennen</a>
       {% endif %}
     {% endif %}
   </div>

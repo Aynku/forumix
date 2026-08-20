@@ -10,6 +10,12 @@ const ONLINE_TIMEOUT = 300; // 5 Minuten
  */
 function track_online(): void {
     try {
+        // Auf der Kommandozeile ist niemand da. bootstrap.php startet trotzdem
+        // eine Sitzung, und ohne diese Zeile stand nach jedem Lauf eines
+        // Werkzeugs ein Gast mit der Adresse 0.0.0.0 unter "Wer ist online" —
+        // das Forum behauptete Besuch, den es nicht gab.
+        if (PHP_SAPI === 'cli') return;
+
         if (session_status() !== PHP_SESSION_ACTIVE) return;
 
         $sid = session_id();

@@ -38,6 +38,9 @@ if (!function_exists('db_execute')) {
         return $s->execute($p);
     }
 }
+// board_zaehler_neu() haengt seit 1.3.0 an sichtbar_sql() — was im Papierkorb
+// liegt, zaehlt nicht mit.
+require_once $wurzel . '/lib/papierkorb.php';
 require_once $wurzel . '/lib/board_mods.php';
 
 /** Legt Kategorie, zwei Foren, Benutzer und ein Thema mit zwei Beitraegen an. */

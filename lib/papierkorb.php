@@ -27,8 +27,34 @@ if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
  */
 function sichtbar_sql(string $alias = ''): string
 {
+    if (!papierkorb_bereit()) return '';
     $p = $alias !== '' ? $alias . '.' : '';
     return " AND {$p}deleted_at IS NULL";
+}
+
+/**
+ * Gibt es die Papierkorb-Spalten schon?
+ *
+ * Am 20.08.2026 lagen Code und Datenbank zwoelf Minuten auseinander: 1.3.0 war
+ * ausgerollt, Migration v28 noch nicht gelaufen — und weil rund siebzig
+ * Abfragen nach `deleted_at` fragten, antwortete das Forum auf JEDE Seite mit
+ * 500. Ein Update darf eine Installation nicht umlegen, nur weil zwei Schritte
+ * nicht in derselben Sekunde passieren.
+ *
+ * Ohne die Spalten verhaelt sich das Forum wie vor 1.3.0: kein Papierkorb,
+ * aber es laeuft. Die Antwort wird je Aufruf einmal geholt und gemerkt.
+ */
+function papierkorb_bereit(): bool
+{
+    static $bereit = null;
+    if ($bereit === null) {
+        try {
+            $bereit = (bool) db_fetch("SHOW COLUMNS FROM posts LIKE 'deleted_at'");
+        } catch (Throwable $e) {
+            $bereit = false;
+        }
+    }
+    return $bereit;
 }
 
 /** Liegt der Beitrag im Papierkorb? */
@@ -45,6 +71,7 @@ function beitrag_geloescht(array $beitrag): bool
  */
 function beitrag_in_papierkorb(int $postId, int $modId): bool
 {
+    if (!papierkorb_bereit()) return false;
     $p = db_fetch('SELECT p.post_id, p.thread_id, p.user_id, p.deleted_at, t.board_id
                      FROM posts p JOIN threads t ON t.thread_id = p.thread_id
                     WHERE p.post_id = ?', [$postId]);
@@ -60,6 +87,7 @@ function beitrag_in_papierkorb(int $postId, int $modId): bool
 /** Beitrag zurückholen. */
 function beitrag_zurueckholen(int $postId): bool
 {
+    if (!papierkorb_bereit()) return false;
     $p = db_fetch('SELECT p.post_id, p.thread_id, p.user_id, p.deleted_at, t.board_id
                      FROM posts p JOIN threads t ON t.thread_id = p.thread_id
                     WHERE p.post_id = ?', [$postId]);
@@ -80,6 +108,7 @@ function beitrag_zurueckholen(int $postId): bool
  */
 function beitrag_endgueltig_loeschen(int $postId): bool
 {
+    if (!papierkorb_bereit()) return false;
     $p = db_fetch('SELECT post_id, thread_id, deleted_at FROM posts WHERE post_id = ?', [$postId]);
     if (!$p || empty($p['deleted_at'])) return false;
 
@@ -93,6 +122,7 @@ function beitrag_endgueltig_loeschen(int $postId): bool
 /** Thema in den Papierkorb: das Thema selbst und alles, was drinsteht. */
 function thema_in_papierkorb(int $threadId, int $modId): bool
 {
+    if (!papierkorb_bereit()) return false;
     $t = db_fetch('SELECT thread_id, board_id, deleted_at FROM threads WHERE thread_id = ?', [$threadId]);
     if (!$t || !empty($t['deleted_at'])) return false;
 
@@ -119,6 +149,7 @@ function thema_in_papierkorb(int $threadId, int $modId): bool
 /** Thema zurückholen, samt der Beiträge, die mit ihm gegangen sind. */
 function thema_zurueckholen(int $threadId): bool
 {
+    if (!papierkorb_bereit()) return false;
     $t = db_fetch('SELECT thread_id, board_id, deleted_at, deleted_by FROM threads WHERE thread_id = ?', [$threadId]);
     if (!$t || empty($t['deleted_at'])) return false;
 
@@ -143,6 +174,7 @@ function thema_zurueckholen(int $threadId): bool
 /** Thema endgültig löschen — nur aus dem Papierkorb heraus. */
 function thema_endgueltig_loeschen(int $threadId): bool
 {
+    if (!papierkorb_bereit()) return false;
     $t = db_fetch('SELECT thread_id, deleted_at FROM threads WHERE thread_id = ?', [$threadId]);
     if (!$t || empty($t['deleted_at'])) return false;
 
@@ -209,6 +241,7 @@ function thema_zaehler_neu(int $threadId): void
 /** Themen im Papierkorb. Für die Mod-Ansicht. */
 function papierkorb_themen(?array $boardIds = null): array
 {
+    if (!papierkorb_bereit()) return [];
     $wo = ''; $args = [];
     if ($boardIds !== null) {
         if (!$boardIds) return [];
@@ -231,6 +264,7 @@ function papierkorb_themen(?array $boardIds = null): array
 /** Einzeln gelöschte Beiträge — ohne die, die mit ihrem Thema gegangen sind. */
 function papierkorb_beitraege(?array $boardIds = null): array
 {
+    if (!papierkorb_bereit()) return [];
     $wo = ''; $args = [];
     if ($boardIds !== null) {
         if (!$boardIds) return [];

@@ -27,7 +27,7 @@ function render(string $view, array $data = []): void {
     }
 
     if ($globals['totalUsers'] === null) $globals['totalUsers'] = db_count('SELECT COUNT(*) FROM users WHERE COALESCE(is_deleted, 0) = 0');
-    if ($globals['totalPosts']  === null) $globals['totalPosts']  = db_count('SELECT COUNT(*) FROM posts WHERE deleted_at IS NULL');
+    if ($globals['totalPosts']  === null) $globals['totalPosts']  = db_count('SELECT COUNT(*) FROM posts WHERE 1 = 1' . sichtbar_sql());
 
     $data = array_merge($globals, $data);
 

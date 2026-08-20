@@ -28,8 +28,8 @@ if ($type === 'board' && $id > 0) {
             SELECT t.thread_id, t.title, t.created_at, u.username, p.content AS first_post
             FROM threads t
             JOIN users u ON u.user_id = t.user_id
-            LEFT JOIN posts p ON p.thread_id = t.thread_id AND p.deleted_at IS NULL
-            WHERE t.board_id = ? AND t.deleted_at IS NULL
+            LEFT JOIN posts p ON p.thread_id = t.thread_id' . sichtbar_sql('p') . '
+            WHERE t.board_id = ?' . sichtbar_sql('t') . '
             GROUP BY t.thread_id
             ORDER BY t.created_at DESC
             LIMIT 20
@@ -55,7 +55,7 @@ if ($type === 'board' && $id > 0) {
             WHERE p.thread_id = ?
               AND COALESCE(p.is_approved, 1) = 1
               AND COALESCE(t.is_approved, 1) = 1
-              AND p.deleted_at IS NULL AND t.deleted_at IS NULL
+              ' . sichtbar_sql('p') . sichtbar_sql('t') . '
             ORDER BY p.created_at DESC
             LIMIT 20
         ', [$id]);
@@ -69,8 +69,8 @@ if ($type === 'board' && $id > 0) {
         FROM threads t
         JOIN users u   ON u.user_id   = t.user_id
         JOIN boards b  ON b.board_id  = t.board_id
-        LEFT JOIN posts p ON p.thread_id = t.thread_id AND p.deleted_at IS NULL
-        WHERE COALESCE(t.is_approved, 1) = 1 AND t.deleted_at IS NULL ' . $boardFilter . '
+        LEFT JOIN posts p ON p.thread_id = t.thread_id' . sichtbar_sql('p') . '
+        WHERE COALESCE(t.is_approved, 1) = 1' . sichtbar_sql('t') . ' ' . $boardFilter . '
         GROUP BY t.thread_id
         ORDER BY t.created_at DESC
         LIMIT 20

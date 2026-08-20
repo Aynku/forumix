@@ -211,14 +211,14 @@ function board_zaehler_neu(int $boardId): void {
     db_execute('UPDATE boards SET
             thread_count = (SELECT COUNT(*) FROM threads t
                             WHERE t.board_id = ? AND t.is_approved = 1
-                              AND t.deleted_at IS NULL),
+                              ' . sichtbar_sql('t') . '),
             post_count   = (SELECT COUNT(*) FROM posts p
                             JOIN threads t ON t.thread_id = p.thread_id
                             WHERE t.board_id = ? AND p.is_approved = 1
-                              AND p.deleted_at IS NULL AND t.deleted_at IS NULL),
+                              ' . sichtbar_sql('p') . sichtbar_sql('t') . '),
             last_post_id = (SELECT MAX(p.post_id) FROM posts p
                             JOIN threads t ON t.thread_id = p.thread_id
                             WHERE t.board_id = ? AND p.is_approved = 1
-                              AND p.deleted_at IS NULL AND t.deleted_at IS NULL)
+                              ' . sichtbar_sql('p') . sichtbar_sql('t') . ')
         WHERE board_id = ?', [$boardId, $boardId, $boardId, $boardId]);
 }

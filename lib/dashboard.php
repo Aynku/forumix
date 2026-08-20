@@ -59,12 +59,12 @@ function dashboard_user(int $userId): ?array {
 function dashboard_overview(int $userId): array {
     try {
         // Beiträge gesamt + diese Woche + dieser Monat
-        $total   = db_count('SELECT COUNT(*) FROM posts WHERE user_id = ? AND COALESCE(is_approved, 1) = 1 AND deleted_at IS NULL', [$userId]);
-        $week    = db_count('SELECT COUNT(*) FROM posts WHERE user_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND COALESCE(is_approved, 1) = 1 AND deleted_at IS NULL', [$userId]);
-        $month   = db_count('SELECT COUNT(*) FROM posts WHERE user_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) AND COALESCE(is_approved, 1) = 1 AND deleted_at IS NULL', [$userId]);
+        $total   = db_count('SELECT COUNT(*) FROM posts WHERE user_id = ? AND COALESCE(is_approved, 1) = 1' . sichtbar_sql(), [$userId]);
+        $week    = db_count('SELECT COUNT(*) FROM posts WHERE user_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND COALESCE(is_approved, 1) = 1' . sichtbar_sql(), [$userId]);
+        $month   = db_count('SELECT COUNT(*) FROM posts WHERE user_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) AND COALESCE(is_approved, 1) = 1' . sichtbar_sql(), [$userId]);
 
         // Threads gestartet
-        $threads = db_count('SELECT COUNT(*) FROM threads WHERE user_id = ? AND COALESCE(is_approved, 1) = 1 AND deleted_at IS NULL', [$userId]);
+        $threads = db_count('SELECT COUNT(*) FROM threads WHERE user_id = ? AND COALESCE(is_approved, 1) = 1' . sichtbar_sql(), [$userId]);
 
         // Reaktionen erhalten
         $reactionsReceived = 0;
@@ -118,7 +118,7 @@ function dashboard_streak(int $userId): array {
         $days = db_fetchAll('
             SELECT DATE(created_at) AS day
             FROM posts
-            WHERE user_id = ? AND COALESCE(is_approved, 1) = 1 AND deleted_at IS NULL
+            WHERE user_id = ? AND COALESCE(is_approved, 1) = 1' . sichtbar_sql() . '
             GROUP BY DATE(created_at)
             ORDER BY day DESC
             LIMIT 365
@@ -188,7 +188,7 @@ function dashboard_heatmap(int $userId): array {
             WHERE user_id = ?
               AND created_at >= DATE_SUB(NOW(), INTERVAL 84 DAY)
               AND COALESCE(is_approved, 1) = 1
-              AND deleted_at IS NULL
+              ' . sichtbar_sql() . '
             GROUP BY DATE(created_at)
         ', [$userId]);
 
@@ -215,7 +215,7 @@ function dashboard_top_posts(int $userId): array {
             JOIN threads t ON t.thread_id = p.thread_id
             WHERE p.user_id = ?
               AND COALESCE(p.is_approved, 1) = 1
-              AND p.deleted_at IS NULL AND t.deleted_at IS NULL
+              ' . sichtbar_sql('p') . sichtbar_sql('t') . '
             ORDER BY reactions DESC, p.created_at DESC
             LIMIT 5
         ', [$userId]);

@@ -17,14 +17,14 @@ foreach ($rawCats as $cat) {
                 WHERE t2.board_id = b.board_id
                   AND COALESCE(p2.is_approved, 1) = 1
                   AND COALESCE(t2.is_approved, 1) = 1
-                  AND p2.deleted_at IS NULL AND t2.deleted_at IS NULL
+                  ' . sichtbar_sql('p2') . sichtbar_sql('t2') . '
                 ORDER BY p2.created_at DESC LIMIT 1) AS last_post_date,
                (SELECT p2.thread_id FROM posts p2
                 JOIN threads t2 ON t2.thread_id = p2.thread_id
                 WHERE t2.board_id = b.board_id
                   AND COALESCE(p2.is_approved, 1) = 1
                   AND COALESCE(t2.is_approved, 1) = 1
-                  AND p2.deleted_at IS NULL AND t2.deleted_at IS NULL
+                  ' . sichtbar_sql('p2') . sichtbar_sql('t2') . '
                 ORDER BY p2.created_at DESC LIMIT 1) AS last_thread_id,
                (SELECT u2.username FROM posts p2
                 JOIN threads t2 ON t2.thread_id = p2.thread_id
@@ -32,21 +32,21 @@ foreach ($rawCats as $cat) {
                 WHERE t2.board_id = b.board_id
                   AND COALESCE(p2.is_approved, 1) = 1
                   AND COALESCE(t2.is_approved, 1) = 1
-                  AND p2.deleted_at IS NULL AND t2.deleted_at IS NULL
+                  ' . sichtbar_sql('p2') . sichtbar_sql('t2') . '
                 ORDER BY p2.created_at DESC LIMIT 1) AS last_username,
                (SELECT p2.user_id FROM posts p2
                 JOIN threads t2 ON t2.thread_id = p2.thread_id
                 WHERE t2.board_id = b.board_id
                   AND COALESCE(p2.is_approved, 1) = 1
                   AND COALESCE(t2.is_approved, 1) = 1
-                  AND p2.deleted_at IS NULL AND t2.deleted_at IS NULL
+                  ' . sichtbar_sql('p2') . sichtbar_sql('t2') . '
                 ORDER BY p2.created_at DESC LIMIT 1) AS last_user_id,
                (SELECT t2.title FROM posts p2
                 JOIN threads t2 ON t2.thread_id = p2.thread_id
                 WHERE t2.board_id = b.board_id
                   AND COALESCE(p2.is_approved, 1) = 1
                   AND COALESCE(t2.is_approved, 1) = 1
-                  AND p2.deleted_at IS NULL AND t2.deleted_at IS NULL
+                  ' . sichtbar_sql('p2') . sichtbar_sql('t2') . '
                 ORDER BY p2.created_at DESC LIMIT 1) AS last_thread_title
         FROM boards b
         WHERE b.cat_id = ? ' . board_filter_sql('b') . '
@@ -102,8 +102,8 @@ render('index', [
         // "Neuestes Mitglied" beworben. Fuer den Leser ist ein anonymisiertes
         // Konto kein Mitglied mehr — die Beitraege bleiben ja trotzdem stehen.
         'members' => db_count('SELECT COUNT(*) FROM users WHERE COALESCE(is_deleted, 0) = 0'),
-        'threads' => db_count('SELECT COUNT(*) FROM threads WHERE deleted_at IS NULL'),
-        'posts'   => db_count('SELECT COUNT(*) FROM posts WHERE deleted_at IS NULL'),
+        'threads' => db_count('SELECT COUNT(*) FROM threads WHERE 1 = 1' . sichtbar_sql()),
+        'posts'   => db_count('SELECT COUNT(*) FROM posts WHERE 1 = 1' . sichtbar_sql()),
         'newest'  => db_fetch('SELECT user_id, username, registered_at FROM users
                                WHERE COALESCE(is_deleted, 0) = 0 AND COALESCE(is_banned, 0) = 0
                                ORDER BY registered_at DESC LIMIT 1'),
