@@ -1862,6 +1862,17 @@ document.addEventListener('click', function (e) {
      Faerben baut die Zeilen danach neu — dieselbe Kennung, aber ein anderes
      Element, und die Hervorhebung ist weg. Deshalb wird sie hier zusaetzlich
      als Klasse gesetzt, beim Start und bei jedem Sprung. */
+  /* Die Kopfzeile laeuft mit und ist je nach Fensterbreite unterschiedlich
+     hoch. Deshalb wird ihre Hoehe gemessen und als Sprungreserve gesetzt. */
+  function sprungreserveSetzen() {
+    var kopf = document.getElementById('site-header');
+    if (!kopf) return;
+    var h = Math.round(kopf.getBoundingClientRect().height);
+    document.documentElement.style.scrollPaddingTop = (h + 12) + 'px';
+  }
+  sprungreserveSetzen();
+  window.addEventListener('resize', sprungreserveSetzen);
+
   function zielMarkieren() {
     document.querySelectorAll('.bb-zeile--ziel').forEach(function (z) {
       z.classList.remove('bb-zeile--ziel');
@@ -1869,7 +1880,16 @@ document.addEventListener('click', function (e) {
     var id = location.hash.slice(1);
     if (!id) return;
     var z = document.getElementById(id);
-    if (z && z.classList.contains('bb-zeile')) z.classList.add('bb-zeile--ziel');
+    if (z && z.classList.contains('bb-zeile')) {
+      z.classList.add('bb-zeile--ziel');
+      // Nach dem Faerben stehen die Zeilen neu — der Sprung von vorhin zeigt
+      // dann auf eine andere Stelle. Also einmal nachfassen.
+      //
+      // Und zwar mittig statt oben: wer auf Zeile 14 zeigt, meint die Zeile IM
+      // Zusammenhang. Oben angeschlagen sieht man nur noch, was darunter kommt,
+      // und der Kopf des Blocks mit Sprache und Kopieren-Knopf ist weg.
+      z.scrollIntoView({ block: 'center', behavior: 'auto' });
+    }
   }
   window.addEventListener('hashchange', zielMarkieren);
   zielMarkieren();

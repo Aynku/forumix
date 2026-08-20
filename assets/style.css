@@ -94,7 +94,12 @@
 }
 
 /* ── GLOBAL ── */
-html { font-size: 14px; scroll-behavior: smooth; }
+/* scroll-padding-top haelt Sprungziele unter der mitlaufenden Kopfzeile frei —
+   ohne das landet jeder Sprung (Zitat, Codezeile, #post) dahinter. Der Wert
+   hier ist der Rueckfall fuer den Fall ohne JavaScript; forum.js setzt die
+   tatsaechlich gemessene Hoehe, denn die aendert sich mit der Fensterbreite
+   (61 px am Rechner, 175 px am Handy). */
+html { font-size: 14px; scroll-behavior: smooth; scroll-padding-top: 72px; }
 
 body {
   font-family: var(--font);
