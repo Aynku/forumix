@@ -8,6 +8,25 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.1.5 (2026-08-20)
+
+**Codezeilen lassen sich einzeln verlinken.** "Schau dir Zeile 14 an" wird zum
+Klick: jede Zeile eines Code-Blocks hat eine Sprungmarke, die Nummer davor ist
+der Verweis darauf, und die angesprungene Zeile hebt sich ab. Die Marke setzt
+sich aus Beitrag und Blocknummer zusammen (`p12c1-3`) und bleibt damit gueltig,
+wenn der Beitrag auf eine andere Seite des Themas rutscht. Die Nummer selbst
+wandert beim Kopieren weiterhin nicht mit.
+
+**Sprungziele landen nicht mehr hinter der Kopfzeile.** Die laeuft mit, und
+damit verschwand jedes Ziel dahinter — das galt auch fuer die
+"zum Beitrag"-Verweise aus Zitaten, nur fiel es dort weniger auf. Die Hoehe
+der Kopfzeile wird jetzt gemessen (61 px am Rechner, 175 px am Handy, weil sie
+sich dort stapelt) und als Sprungreserve gesetzt.
+
+Keine Migration noetig.
+
+---
+
 ## v1.1.4 (2026-08-19)
 
 **Geloeschte Konten treten nicht mehr als Mitglieder auf.** Ein anonymisiertes
