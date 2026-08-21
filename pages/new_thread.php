@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $isApproved = $needsApproval ? 0 : 1;
 
         // Anlegen, Zaehlen, Benachrichtigen: lib/threads.php. Der Ablauf wird
-        // auch von tools/versionsbeitrag.php gebraucht, und zweimal gepflegt
+        // auch von Werkzeugen ausserhalb des Forums gebraucht, und zweimal gepflegt
         // laeuft er zwangslaeufig auseinander.
         $neu = thread_erstellen($boardId, (int) $cu['user_id'], $title, $content, [
             'freigegeben' => (bool) $isApproved,

@@ -3,7 +3,7 @@
  * Ein Thema anlegen — der ganze Weg (1.2.0).
  *
  * Seit 1.2.0 steht das Anlegen in lib/threads.php statt in der Seite, weil
- * tools/versionsbeitrag.php denselben Weg braucht. Daran haengen Zaehler an
+ * Werkzeuge ausserhalb des Forums denselben Weg brauchen. Daran haengen Zaehler an
  * Forum und Benutzer, der letzte Beitrag an beiden Stellen, Rang, Auto-Abo.
  * Ein Fehler faellt hier nicht sofort auf, sondern erst Wochen spaeter an
  * einer Zahl, die nicht mehr stimmt.

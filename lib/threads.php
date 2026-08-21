@@ -8,7 +8,7 @@
  * stehen danach dauerhaft schief, ohne dass es jemandem auffaellt.
  *
  * Deshalb steht der Ablauf hier, und pages/new_thread.php benutzt ihn wie
- * jedes andere Werkzeug auch (tools/versionsbeitrag.php zum Beispiel).
+ * jedes Werkzeug ausserhalb des Forums auch.
  *
  * Was NICHT hier steht, weil es zum Formular gehoert und nicht zum Thema:
  * Rechtepruefung, Laengenpruefung, Wartezeit zwischen Beitraegen, Anhaenge,
