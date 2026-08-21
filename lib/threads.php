@@ -114,6 +114,19 @@ function thread_erstellen(int $boardId, int $userId, string $titel, string $inha
 
     try { check_achievements($userId); } catch (Exception $e) {}
 
+    // Module erfahren, dass ein Beitrag entstanden ist — nach dem Commit, denn
+    // was hier passiert, gehoert nicht in dieselbe Transaktion wie der Beitrag.
+    if (function_exists('module_event')) {
+        module_event('post_saved', [
+            'post_id'     => (int) $postId,
+            'thread_id'   => (int) $threadId,
+            'user_id'     => $userId,
+            'content'     => $inhalt,
+            'freigegeben' => $freigegeben,
+            'neues_thema' => true,
+        ]);
+    }
+
     return ['thread_id' => (int) $threadId, 'post_id' => (int) $postId, 'freigegeben' => $freigegeben];
 }
 

@@ -90,10 +90,8 @@ function enable_module(string $code): array {
             $sqlFile = $modulesDir . '/' . $code . '/install.sql';
             if (file_exists($sqlFile)) {
                 $sql = file_get_contents($sqlFile);
-                // Statements ggf. splitten an ; (best-effort, einfaches Schema)
-                $stmts = array_filter(array_map('trim', explode(';', $sql)));
-                foreach ($stmts as $stmt) {
-                    if ($stmt !== '') DB::get()->exec($stmt);
+                foreach (sql_in_anweisungen($sql) as $stmt) {
+                    DB::get()->exec($stmt);
                 }
             }
             // name gehoert mit in das INSERT: die Spalte ist NOT NULL ohne
@@ -115,6 +113,31 @@ function enable_module(string $code): array {
     } catch (Exception $e) {
         return ['ok' => false, 'error' => $e->getMessage()];
     }
+}
+
+/**
+ * Zerlegt eine .sql-Datei in einzelne Anweisungen.
+ *
+ * Getrennt wird am Semikolon — mit einer Ausnahme, die einen halben Abend
+ * kosten kann: Zeilenkommentare fliegen vorher raus. Ein Semikolon MITTEN IM
+ * KOMMENTAR ("… bleibt erhalten; die Anzeige nicht.") teilt sonst den
+ * Kommentar, und die zweite Haelfte landet als eigene Anweisung bei der
+ * Datenbank. Der Fehler zeigt dann auf deutschen Fliesstext und sagt
+ * "Syntax error" — man sucht ihn ueberall, nur nicht dort.
+ *
+ * Entfernt werden nur Zeilen, die mit -- beginnen. Ein -- mitten in einer
+ * Zeile koennte in einem Text stehen und bleibt deshalb unangetastet.
+ */
+function sql_in_anweisungen(string $sql): array {
+    $zeilen = preg_split('/\R/', $sql) ?: [];
+    $ohne   = [];
+    foreach ($zeilen as $z) {
+        if (str_starts_with(ltrim($z), '--')) continue;
+        $ohne[] = $z;
+    }
+
+    $teile = array_map('trim', explode(';', implode("\n", $ohne)));
+    return array_values(array_filter($teile, static fn ($t) => $t !== ''));
 }
 
 /**
@@ -228,6 +251,45 @@ function module_menu_links_fuer(string $ort): array {
         module_menu_links(),
         fn ($l) => ($l['ort'] ?? 'beides') === 'beides' || ($l['ort'] ?? '') === $ort
     ));
+}
+
+/**
+ * Ereignis-Haken: ein Modul erfaehrt, dass etwas geschehen ist.
+ *
+ * Der Unterschied zu render_module_hook(): der hier zeigt nichts an, er
+ * verarbeitet. Beide Eigenschaften sind Absicht und beide sind wichtig:
+ *
+ *  - Ausgabe wird verworfen. Ein Modul, das hier versehentlich etwas
+ *    ausgibt, wuerde sonst mitten in eine Weiterleitung schreiben und den
+ *    Seitenaufbau zerlegen — an einer Stelle, die niemand mit dem Modul in
+ *    Verbindung bringt.
+ *  - Ausnahmen werden gefangen. Ein Ereignis laeuft NACH der eigentlichen
+ *    Arbeit: der Beitrag steht schon in der Datenbank. Ein Modul, das hier
+ *    stolpert, darf den Benutzer nicht auf eine Fehlerseite schicken und ihn
+ *    glauben lassen, sein Beitrag sei verloren.
+ *
+ * Die Dateien liegen unter modules/<code>/events/<name>.php.
+ */
+function module_event(string $name, array $context = []): void {
+    if (!preg_match('/^[a-z0-9_]+$/', $name)) return;
+
+    $currentUser = current_user();
+    if ($context) extract($context, EXTR_SKIP);
+
+    foreach (available_modules() as $code => $mod) {
+        if (!$mod['enabled']) continue;
+        $datei = __DIR__ . '/../modules/' . $code . '/events/' . $name . '.php';
+        if (!file_exists($datei)) continue;
+
+        ob_start();
+        try {
+            include $datei;
+        } catch (Throwable $e) {
+            error_log('[modul ' . $code . '] Ereignis ' . $name . ': ' . $e->getMessage());
+        } finally {
+            ob_end_clean();
+        }
+    }
 }
 
 /**

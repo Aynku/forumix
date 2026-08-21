@@ -8,6 +8,76 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.7.0 (2026-08-21)
+
+### KI-Schreibhilfe als Modul
+
+Vier Knöpfe im Editor: Rechtschreibung und Grammatik, Kürzen, Zusammenfassen,
+Übersetzen. Der Betreiber hinterlegt einen eigenen API-Schlüssel — ohne ihn
+erscheint der Knopf gar nicht erst. Anthropic und OpenAI stehen zur Wahl.
+
+Der Ablauf ist absichtlich umständlich: **anfordern, ansehen, übernehmen.**
+Kein Knopf schreibt in den Beitrag. Das Ergebnis erscheint als
+Gegenüberstellung — links der bisherige Text mit dem Entfernten durchgestrichen,
+rechts der Vorschlag mit dem Hinzugekommenen hervorgehoben. So sieht man, wenn
+beim Glattbügeln ein „nicht" verschwindet.
+
+- **Zitate und Quelltext werden nicht mitgeschickt.** `[quote]` und `[code]`
+  am Rand des Beitrags werden abgetrennt und danach wieder angesetzt, mitten
+  im Text stehende durch eine Marke ersetzt. Das ist keine Bitte an das Modell,
+  sondern Mechanik: was nicht gesendet wird, kann nicht umformuliert
+  zurückkommen. Wer fremde Zitate glätten lässt, legt jemandem Worte in den
+  Mund, die er nicht gesagt hat.
+- **Prüfung vor dem Senden.** E-Mail-Adressen, Telefonnummern, IBANs,
+  Zugangsschlüssel, Kartennummern und IP-Adressen werden im Browser erkannt,
+  bevor etwas hinausgeht. Der Verfasser entscheidet: abbrechen, schwärzen oder
+  unverändert senden. Geschwärzt bleibt der Text vollständig — an Stelle der
+  Angabe geht eine Marke hinaus, danach steht sie wieder da. Sie verlässt den
+  Browser nicht.
+- **Kennzeichnung.** Beiträge, an denen ein Sprachmodell mitgeschrieben hat,
+  tragen den Hinweis sichtbar. Welcher Befehl das auslöst, bestimmt der
+  Betreiber: eine Rechtschreibkorrektur macht niemanden zum KI-Autor, beim
+  Zusammenfassen entscheidet das Modell mit, was wegfällt.
+- **Modell je Befehl.** Gemessen am selben Beitrag: bei der Rechtschreibung
+  setzen ein kleines und ein großes Modell dieselben Kommas. Beim Kürzen nicht
+  — das kleine schrieb den Beitrag um statt ihn zu straffen. Deshalb lässt
+  sich für jeden Befehl ein eigenes Modell eintragen.
+- **Freigabe je Gruppe**, im Auslieferungszustand nur für die Verwaltung. Dazu
+  zwei Bremsen: Zeichen je Anfrage und Anfragen je Stunde und Person. Was Geld
+  kostet, steht nicht versehentlich für alle offen.
+- Der API-Schlüssel liegt verschlüsselt in der Datenbank (`FORUM_CRYPT_KEY`),
+  nicht im Klartext, und wird nach dem Speichern nicht wieder angezeigt.
+
+Das Modul ist nach der Installation **aus**. Keine Migration nötig; die eigenen
+Tabellen legt es beim Aktivieren selbst an.
+
+### Module können auf Ereignisse reagieren
+
+Bisher konnten Module nur an vorgesehenen Stellen etwas *anzeigen*
+(`render_module_hook`). Für alles, was nach einer Handlung geschehen soll,
+gab es keinen Weg.
+
+`module_event()` schließt die Lücke — Dateien unter `modules/<code>/events/`.
+Der Haken verwirft Ausgabe und fängt Ausnahmen: ein Ereignis läuft **nach**
+der eigentlichen Arbeit, der Beitrag steht schon in der Datenbank. Ein Modul,
+das dort stolpert, darf den Verfasser nicht glauben lassen, sein Beitrag sei
+verloren. Erster Einhängepunkt ist `post_saved`.
+
+Dazu ein Einhängepunkt in der Werkzeugleiste des Editors, über den ein Modul
+eigene Knöpfe anmelden kann.
+
+### Behoben
+
+- **Ein Semikolon im Kommentar zerlegte `install.sql`.** Die Zerlegung in
+  einzelne Anweisungen trennte an jedem Semikolon — auch an einem mitten in
+  einem Kommentar. Die Datenbank meldete daraufhin „Syntax error" auf
+  deutschen Fließtext, und man sucht den Fehler überall, nur nicht dort.
+  Kommentarzeilen fliegen jetzt vorher heraus.
+- `curl_close()` ist seit PHP 8.5 veraltet und schrieb bei jedem Aufruf eine
+  Warnung ins Protokoll.
+
+---
+
 ## v1.6.2 (2026-08-21)
 
 ### Gruppen können den Rang ersetzen und ein Bild tragen

@@ -65,6 +65,14 @@ $editorAllowHeadings = $editorAllowHeadings ?? false;
       <button type="button" class="editor-btn" data-action="smileys" title="Smileys">😊</button>
     </div>
     <div class="editor-toolbar-group editor-toolbar-right">
+      <?php
+        // Platz fuer Module, die eigene Knoepfe mitbringen. Sie bekommen die
+        // Kennung des Textfeldes mit — ohne sie wuesste ein Knopf nicht, an
+        // welchem der Editoren auf der Seite er haengt.
+        if (function_exists('render_module_hook')) {
+            render_module_hook('editor_toolbar', ['editorId' => $_eId]);
+        }
+      ?>
       <button type="button" class="editor-btn editor-btn-preview" data-action="preview" title="Vorschau anzeigen/verbergen">👁️ Vorschau</button>
     </div>
   </div>

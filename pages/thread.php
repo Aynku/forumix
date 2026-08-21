@@ -157,6 +157,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
         } catch (Exception $e) {}
 
         try { check_achievements((int) $cu['user_id']); } catch (Exception $e) {}
+
+        // Module erfahren, dass ein Beitrag entstanden ist. Vor der
+        // Weiterleitung, aber nach allem, was den Beitrag selbst betrifft.
+        if (function_exists('module_event')) {
+            module_event('post_saved', [
+                'post_id'     => (int) $postId,
+                'thread_id'   => $threadId,
+                'user_id'     => (int) $cu['user_id'],
+                'content'     => $content,
+                'freigegeben' => (bool) $isApproved,
+                'neues_thema' => false,
+            ]);
+        }
+
         if ($isApproved) {
             flash('Beitrag erfolgreich erstellt.', 'success');
             redirect(FORUM_URL . '/thread.php?id=' . $threadId . '&page=last#post' . $postId);

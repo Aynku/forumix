@@ -1,0 +1,245 @@
+/**
+ * modules/ki/assets/ki.css – Schreibhilfe
+ *
+ * Nimmt die Variablen des Forums, damit das Modul auch im dunklen Design und
+ * unter einem eigenen Farbschema stimmt. Keine festen Farben ausser den
+ * beiden Markierungen, und die sind absichtlich kraeftig: an ihnen haengt,
+ * ob jemand eine verschwundene Verneinung bemerkt.
+ */
+
+/* ── Knopf und Menue ──────────────────────────────────────────────── */
+
+/* Das Menue haengt am Seitenkoerper, nicht im Editor — der schneidet mit
+   overflow:hidden ab. Position setzt ki.js, bis dahin bleibt es unsichtbar,
+   damit es nicht kurz oben links aufblitzt. */
+.ki-menue {
+  position: absolute;
+  visibility: hidden;
+  z-index: 1000;
+  min-width: 260px;
+  max-width: min(340px, calc(100vw - 16px));
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.ki-menue-kopf,
+.ki-menue-fuss {
+  padding: 8px 12px;
+  font-size: 11px;
+  color: var(--text-faint);
+  background: var(--bg-surface2);
+}
+.ki-menue-kopf { border-bottom: 1px solid var(--border); }
+.ki-menue-fuss { border-top: 1px solid var(--border); }
+
+.ki-menue-punkt {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 12px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  color: var(--text-base);
+}
+.ki-menue-punkt:hover { background: var(--color-accent-soft); }
+
+.ki-menue-name   { display: block; font-size: 13px; font-weight: 600; }
+.ki-menue-hinweis{ display: block; font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+.ki-menue-sprachen .ki-menue-punkt { font-size: 13px; }
+
+/* ── Panel unter der Werkzeugleiste ──────────────────────────────── */
+
+.ki-panel {
+  background: var(--bg-surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px;
+}
+
+.ki-kopf {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+.ki-kopf-hinweis { font-size: 11px; color: var(--color-warning); }
+
+.ki-warten {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.ki-punkte {
+  width: 14px; height: 14px;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: ki-dreh .8s linear infinite;
+}
+@keyframes ki-dreh { to { transform: rotate(360deg); } }
+
+/* Wer keine Bewegung sehen will, bekommt keine. */
+@media (prefers-reduced-motion: reduce) {
+  .ki-punkte { animation: none; border-top-color: var(--border-strong); }
+}
+
+/* ── Gegenueberstellung ──────────────────────────────────────────── */
+
+.ki-raster {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Unter 700 Pixel passen zwei Spalten nicht mehr nebeneinander: dann
+   untereinander, mit der Beschriftung als Trennung. */
+@media (max-width: 700px) {
+  .ki-raster { grid-template-columns: 1fr; }
+}
+
+.ki-spalte {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.ki-spalte-neu { border-color: var(--color-accent-ring); }
+
+.ki-spalte-kopf {
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+  background: var(--bg-surface2);
+  border-bottom: 1px solid var(--border);
+}
+
+.ki-text {
+  padding: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.ki-weg, .ki-neu {
+  border-radius: 3px;
+  padding: 0 1px;
+}
+.ki-weg {
+  background: rgba(220, 38, 38, .16);
+  color: inherit;
+  text-decoration: line-through;
+  text-decoration-color: rgba(220, 38, 38, .7);
+}
+.ki-neu {
+  background: rgba(22, 163, 74, .18);
+  color: inherit;
+}
+
+/* ── Knopfleiste ─────────────────────────────────────────────────── */
+
+.ki-leiste {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ki-marke-hinweis {
+  margin-right: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.ki-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-base);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.ki-btn:hover { background: var(--bg-surface3); }
+
+.ki-btn-haupt {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--text-on-dark);
+  font-weight: 600;
+}
+.ki-btn-haupt:hover { background: var(--color-accent-hover); }
+
+.ki-btn-still { color: var(--text-muted); }
+
+.ki-panel-fehler { background: rgba(220, 38, 38, .07); }
+.ki-fehler {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--color-danger);
+}
+.ki-fehler .ki-btn { margin-left: auto; }
+
+/* ── Kennzeichnung am Beitrag ────────────────────────────────────── */
+
+.ki-marke {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-surface2);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ── Warnung vor dem Senden ──────────────────────────────────────── */
+
+.ki-panel-warnung { background: color-mix(in srgb, var(--color-warning) 10%, var(--bg-surface2)); }
+
+.ki-funde {
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: 13px;
+}
+.ki-funde li {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.ki-fund-art {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-warning);
+}
+.ki-fund-hinweis {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 4px;
+}
+.ki-kopf-still { font-size: 11px; color: var(--text-faint); }
