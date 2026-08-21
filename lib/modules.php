@@ -280,9 +280,12 @@ function module_menu_links_fuer(string $ort): array {
  * steht das Datum ("Stand: 08.2026"), und danach gehoert nichts mehr hin. Mit
  * einem Platzhalter setzt der Betreiber die Stelle selbst.
  *
+ * $kontext ist der Text, in den eingesetzt wird — leer, wenn nur die Liste
+ * gebraucht wird (Adminhilfe).
+ *
  * @return array<string, array{text: string, hilfe: string}>
  */
-function module_platzhalter(): array {
+function module_platzhalter(string $kontext = ''): array {
     $alle = [];
     foreach (available_modules() as $code => $mod) {
         if (!$mod['enabled']) continue;
@@ -290,6 +293,9 @@ function module_platzhalter(): array {
         if (!file_exists($datei)) continue;
 
         try {
+            // Der Text, in den eingesetzt wird, steht der eingebundenen Datei
+            // als $kontext zur Verfuegung — damit ein Absatz sich einpassen
+            // kann, etwa in eine laufende Nummerierung.
             $liste = include $datei;
         } catch (Throwable $e) {
             error_log('[modul ' . $code . '] Platzhalter: ' . $e->getMessage());

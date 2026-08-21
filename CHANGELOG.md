@@ -8,6 +8,29 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.8.3 (2026-08-22)
+
+### Die Überschrift des KI-Absatzes passt sich ein
+
+Der Absatz trug eine fett gesetzte Zeile als Überschrift und stand damit
+zwischen Überschriften wie „9. Datensicherheit" und „10. Änderungen dieser
+Datenschutzerklärung" wie ein Fremdkörper.
+
+Er bekommt jetzt eine echte Überschrift und setzt die Nummerierung des
+Dokuments fort: Endet der Text bei 10, heißt der Absatz „11. Verarbeitung
+durch ein KI-System". Ohne Nummerierung im Dokument bleibt die Überschrift
+ohne Nummer.
+
+Möglich wird das dadurch, dass ein Platzhalter jetzt den Text kennt, in den er
+eingesetzt wird — er steht in `platzhalter.php` als `$kontext` zur Verfügung.
+Damit lässt sich ein Absatz an das anpassen, was ihn umgibt.
+
+**Einschränkung:** Die Nummer ist die höchste im Dokument gefundene plus eins.
+Wer den Platzhalter mitten in den Text setzt, bekommt trotzdem die letzte
+Nummer.
+
+---
+
 ## v1.8.2 (2026-08-22)
 
 ### Der Themen-Titel wird mitgeprüft

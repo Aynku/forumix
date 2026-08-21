@@ -11,12 +11,16 @@
  */
 if (!defined('FORUM_RUNNING')) return;
 
+$ki_seite = function_exists('get_page') ? get_page('privacy') : null;
+
+// Steht der Platzhalter im Text, ist der Absatz schon oben — dann hier nichts.
+if ($ki_seite && str_contains((string) ($ki_seite['content'] ?? ''), '{{ki_hinweis}}')) return;
+
+// Der Seitentext geht als $kontext mit, damit die Ueberschrift dieselbe
+// Nummer bekommt wie ueber den Platzhalter.
+$kontext  = (string) ($ki_seite['content'] ?? '');
 $ki_platz = include __DIR__ . '/../platzhalter.php';
 $ki_text  = (string) ($ki_platz['{{ki_hinweis}}']['text'] ?? '');
 if (trim($ki_text) === '') return;
-
-// Steht der Platzhalter im Text, ist der Absatz schon oben — dann hier nichts.
-$ki_seite = function_exists('get_page') ? get_page('privacy') : null;
-if ($ki_seite && str_contains((string) ($ki_seite['content'] ?? ''), '{{ki_hinweis}}')) return;
 
 echo '<div style="margin-top:24px">' . bbcode($ki_text) . '</div>';

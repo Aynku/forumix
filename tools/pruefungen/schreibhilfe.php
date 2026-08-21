@@ -672,6 +672,24 @@ return [
         }
     },
 
+    'Die Überschrift passt sich in die Nummerierung ein' => function () use ($modul) {
+        // Ein fettes Wort zwischen "9. Datensicherheit" und "10. Änderungen"
+        // faellt auf wie ein Fremdkoerper.
+        $platz = (string) file_get_contents($modul . '/platzhalter.php');
+        if (!str_contains($platz, '[h2]')) {
+            throw new RuntimeException('Die Überschrift ist keine Überschrift');
+        }
+        if (!str_contains($platz, '$kontext')) {
+            throw new RuntimeException('Die Nummerierung wird nicht fortgesetzt');
+        }
+        // Und der Auffang muss denselben Kontext liefern, sonst steht dort
+        // eine Überschrift ohne Nummer.
+        $hook = (string) file_get_contents($modul . '/hooks/privacy_bottom.php');
+        if (!str_contains($hook, '$kontext')) {
+            throw new RuntimeException('Der Auffang liefert keinen Kontext — dort fehlt die Nummer');
+        }
+    },
+
     'Der Absatz steht nicht doppelt da' => function () use ($modul) {
         // Platzhalter gesetzt UND Auffang aktiv waere derselbe Text zweimal.
         $hook = (string) file_get_contents($modul . '/hooks/privacy_bottom.php');

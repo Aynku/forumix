@@ -65,7 +65,7 @@ function replace_page_placeholders(string $content): string {
     // die Datenschutzerklaerung, wenn sie Daten an Dritte geben. Sie stehen
     // hinten: einen der festen Platzhalter kann ein Modul so nicht ersetzen.
     if (function_exists('module_platzhalter')) {
-        foreach (module_platzhalter() as $name => $eintrag) {
+        foreach (module_platzhalter($content) as $name => $eintrag) {
             if (isset($replacements[$name])) continue;
             $replacements[$name] = $eintrag['text'];
         }

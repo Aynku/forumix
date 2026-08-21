@@ -25,7 +25,23 @@ if ((string) ($cfg['schluessel'] ?? '') === '') {
 
 $anbieter = KI_ANBIETER[$cfg['anbieter'] ?? 'anthropic']['name'] ?? 'einem KI-Anbieter';
 
-$text = "[b]Verarbeitung durch ein KI-System[/b]\n\n"
+/**
+ * Die Ueberschrift setzt die Nummerierung des Dokuments fort.
+ *
+ * Ein fettes Wort zwischen nummerierten Ueberschriften faellt auf wie ein
+ * Fremdkoerper — der Absatz soll aussehen, als haette ihn derselbe Mensch
+ * geschrieben wie den Rest. Die naechste Nummer steht im Text: die hoechste
+ * gefundene plus eins. Findet sich keine, bleibt die Ueberschrift ohne Nummer.
+ *
+ * $kontext kommt aus module_platzhalter() und ist der Seitentext.
+ */
+$nummer = '';
+if (isset($kontext) && is_string($kontext)
+    && preg_match_all('/\[h[23]\]\s*(\d+)\./', $kontext, $treffer)) {
+    $nummer = (max(array_map('intval', $treffer[1])) + 1) . '. ';
+}
+
+$text = "[h2]" . $nummer . "Verarbeitung durch ein KI-System[/h2]\n\n"
       . "Dieses Forum setzt für einzelne Funktionen ein Sprachmodell von "
       . $anbieter . " ein. Dabei werden Beitragstexte an diesen Anbieter "
       . "übermittelt und dort verarbeitet. Benutzernamen, E-Mail-Adressen und "
