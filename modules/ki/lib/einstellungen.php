@@ -85,6 +85,36 @@ function ki_darf(?array $u = null): bool {
 }
 
 /**
+ * Holt einen im Klartext abgelegten Schluessel nach.
+ *
+ * Der Fall: Beim Speichern gab es noch keinen FORUM_CRYPT_KEY, der API-Schluessel
+ * ging also unverschluesselt in die Datenbank. Wird der Schluessel spaeter
+ * nachgetragen, aendert das an dem bereits Gespeicherten nichts — es liegt
+ * weiter im Klartext, und niemand sieht es ihm an.
+ *
+ * Hier wird es einmal nachgeholt: derselbe Wert, jetzt verschluesselt. Kein
+ * stiller Vorgang beim Lesen — aufgerufen wird das von der Einstellungsseite,
+ * und sie sagt danach, dass es geschehen ist.
+ *
+ * @return bool true, wenn etwas nachgeholt wurde
+ */
+function ki_schluessel_nachziehen(): bool {
+    if (!forum_crypt_available()) return false;
+
+    // Absichtlich an module_config() vorbei: gebraucht wird der ROHE Wert aus
+    // der Datenbank, nicht der von ki_einstellungen() schon entschluesselte.
+    $roh = module_config('ki');
+    $wert = (string) ($roh['schluessel'] ?? '');
+
+    if ($wert === '' || str_starts_with($wert, CRYPT_PREFIX)) return false;
+
+    $roh['schluessel'] = forum_encrypt($wert);
+    set_module_config('ki', $roh);
+    ki_einstellungen_vergessen();
+    return true;
+}
+
+/**
  * Die Gruppen, die im Adminbereich zur Wahl stehen.
  *
  * Alle ausser den Gaesten: die Schreibhilfe setzt eine Anmeldung voraus —

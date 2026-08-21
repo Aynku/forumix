@@ -271,8 +271,8 @@
     var kopf = document.createElement('div');
     kopf.className = 'ki-menue-kopf';
     kopf.textContent = stueck.teil
-      ? 'Arbeitet am markierten Abschnitt'
-      : 'Arbeitet am ganzen Beitrag';
+      ? 'Nimmt nur das Markierte'
+      : 'Nimmt den ganzen Beitrag';
     menue.appendChild(kopf);
 
     K.befehle.forEach(function (b) {
@@ -292,7 +292,7 @@
 
     var fuss = document.createElement('div');
     fuss.className = 'ki-menue-fuss';
-    fuss.textContent = '* wird im Beitrag als KI-unterstützt gekennzeichnet';
+    fuss.textContent = '* am Beitrag steht danach, dass die KI geholfen hat';
     menue.appendChild(fuss);
 
     anstellen(menue, knopf);
@@ -344,7 +344,7 @@
   function starte(ta, befehl, ziel) {
     var stueck = holeText(ta);
     if (!stueck.text.trim()) {
-      panelFehler(ta, 'Da ist noch kein Text, an dem sich arbeiten ließe.');
+      panelFehler(ta, 'Da ist noch kein Text.');
       return;
     }
 
@@ -371,8 +371,8 @@
     kopf.className = 'ki-kopf';
     var stark = document.createElement('strong');
     stark.textContent = gefunden.length === 1
-      ? 'Im Text steht eine Angabe, die nicht hinausgehen muss'
-      : 'Im Text stehen ' + gefunden.length + ' Angaben, die nicht hinausgehen müssen';
+      ? 'Eine Angabe, die du vielleicht nicht mitschicken willst'
+      : gefunden.length + ' Angaben, die du vielleicht nicht mitschicken willst';
     kopf.appendChild(stark);
     p.appendChild(kopf);
 
@@ -389,27 +389,27 @@
     });
     p.appendChild(liste);
 
+    // Ein Satz, Hauptsatz, kein Fachwort. Er muss zwei Fehlschluesse
+    // ausraeumen: "wird jetzt veroeffentlicht" und "die Angaben fallen aus
+    // dem Text". Beides ist falsch, und beides hat schon jemand gelesen.
     var hinweis = document.createElement('div');
     hinweis.className = 'ki-fund-hinweis';
-    hinweis.textContent = 'Dein Beitrag bleibt unverändert — es geht nichts ins Forum. '
-      + 'Geschwärzt steht an Stelle der Angabe nur eine Marke in der Anfrage, im '
-      + 'Ergebnis steht sie wieder da. Sie verlässt diesen Browser nicht.';
+    hinweis.textContent = 'Sie bleiben in deinem Beitrag stehen. Es geht nur darum, '
+      + 'ob die KI sie zu sehen bekommt.';
     p.appendChild(hinweis);
 
     var leiste = document.createElement('div');
     leiste.className = 'ki-leiste';
 
-    // Kein "senden" in der Beschriftung: der Knopf steht eine Handbreit ueber
-    // "Antworten", und in einem Forum heisst senden "Beitrag veroeffentlichen".
-    // Was hier passiert, ist der gewaehlte Befehl — also steht der da.
-    var tun = befehl.name.toLowerCase();
-
-    leiste.appendChild(knopf('Ohne diese Angaben ' + tun, 'ki-btn ki-btn-haupt', function () {
+    // "Zurückhalten" statt "ohne": ohne klingt nach Verlust, dabei bleibt der
+    // Text vollständig. Und kein "senden" — der Knopf steht eine Handbreit
+    // ueber "Antworten", und in einem Forum heisst senden "veroeffentlichen".
+    leiste.appendChild(knopf('Nicht mitschicken', 'ki-btn ki-btn-haupt', function () {
       var g = schwaerzen(stueck.text, gefunden);
       senden(ta, stueck, g.text, g.werte, befehl, ziel);
     }));
 
-    leiste.appendChild(knopf('Mit diesen Angaben ' + tun, 'ki-btn', function () {
+    leiste.appendChild(knopf('Trotzdem mitschicken', 'ki-btn', function () {
       senden(ta, stueck, stueck.text, [], befehl, ziel);
     }));
 
@@ -501,7 +501,7 @@
     if (!teile) {
       var hinweis = document.createElement('span');
       hinweis.className = 'ki-kopf-hinweis';
-      hinweis.textContent = 'Text zu lang für die Gegenüberstellung — bitte selbst vergleichen.';
+      hinweis.textContent = 'Der Text ist zu lang, um die Unterschiede zu färben. Bitte selbst vergleichen.';
       kopf.appendChild(hinweis);
     }
     if (d.hinweis) {
@@ -514,8 +514,8 @@
       var ok = document.createElement('span');
       ok.className = 'ki-kopf-still';
       ok.textContent = d.geschwaerzt === 1
-        ? 'Eine Angabe blieb hier und wurde wieder eingesetzt.'
-        : d.geschwaerzt + ' Angaben blieben hier und wurden wieder eingesetzt.';
+        ? 'Eine Angabe wurde nicht mitgeschickt.'
+        : d.geschwaerzt + ' Angaben wurden nicht mitgeschickt.';
       kopf.appendChild(ok);
     }
     p.appendChild(kopf);
@@ -543,7 +543,7 @@
     if (d.kennzeichnet) {
       var marke = document.createElement('span');
       marke.className = 'ki-marke-hinweis';
-      marke.textContent = 'Wird als KI-unterstützt gekennzeichnet';
+      marke.textContent = 'Am Beitrag steht danach, dass die KI geholfen hat';
       leiste.appendChild(marke);
     }
 

@@ -51,7 +51,7 @@ if (!ki_befehl_frei($befehl, $cfg)) {
 
 $text = trim($text);
 if ($text === '') {
-    ki_json(['ok' => false, 'fehler' => 'Es ist kein Text da, an dem gearbeitet werden könnte.'], 400);
+    ki_json(['ok' => false, 'fehler' => 'Da ist noch kein Text.'], 400);
 }
 
 // Obergrenze fuer die Eingabe. Sie schuetzt zwei Dinge: die Rechnung des
@@ -93,8 +93,7 @@ if ($proStunde > 0) {
 [$gekuerzt, $bloecke]           = ki_bloecke_heraus($mitte);
 
 if (!ki_hat_eigenen_text($gekuerzt)) {
-    ki_json(['ok' => false, 'fehler' => 'Der Beitrag besteht nur aus Zitaten und Quelltext — '
-        . 'daran wird nichts geändert.'], 400);
+    ki_json(['ok' => false, 'fehler' => 'In dem Beitrag stehen nur Zitate und Quelltext. Daran wird nichts geändert.'], 400);
 }
 
 try {

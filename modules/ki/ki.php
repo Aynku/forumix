@@ -90,7 +90,24 @@ if (array_key_exists('ki_probe', $_SESSION)) {
     unset($_SESSION['ki_probe']);
 }
 
+// Lag der API-Schluessel noch im Klartext, weil beim Speichern kein
+// FORUM_CRYPT_KEY da war: jetzt nachholen und es sagen.
+$nachgezogen = ki_schluessel_nachziehen();
+
 $cfg = ki_einstellungen();
+
+// Fehlt der Schluessel in der config.php, nuetzt der blosse Hinweis darauf
+// wenig — dann steht der Betreiber davor und weiss nicht, was er eintragen
+// soll. Also die fertige Zeile dazu, wie im E-Mail-Bereich. Einmal je Sitzung
+// dieselbe: sonst steht nach jedem Neuladen eine andere da, und wer die alte
+// schon eingetragen hat, glaubt, er habe sich vertippt.
+$crypt_vorschlag = '';
+if (!forum_crypt_available()) {
+    if (empty($_SESSION['crypt_key_vorschlag'])) {
+        $_SESSION['crypt_key_vorschlag'] = forum_crypt_new_key();
+    }
+    $crypt_vorschlag = $_SESSION['crypt_key_vorschlag'];
+}
 
 // Verbrauch der letzten sieben Tage — die Antwort auf "wofuer zahle ich das".
 $verbrauch = [];
@@ -118,5 +135,7 @@ render('@ki/ki', [
     'gesamt'       => $gesamt,
     'probe'        => $probe_ergebnis,
     'crypt_da'     => forum_crypt_available(),
+    'crypt_vorschlag' => $crypt_vorschlag,
+    'nachgezogen'  => $nachgezogen,
     'hat_schluessel' => (string) ($cfg['schluessel'] ?? '') !== '',
 ]);

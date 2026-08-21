@@ -104,7 +104,7 @@ function ki_anfrage(string $system, string $text, array $cfg, int $max = 1500): 
 
     $ergebnis = trim($ergebnis);
     if ($ergebnis === '') {
-        throw new KiFehler('Der Dienst hat nichts zurückgegeben.');
+        throw new KiFehler('Es kam nichts zurück.');
     }
     return $ergebnis;
 }
@@ -146,7 +146,7 @@ function ki_post(string $url, array $kopf, array $rumpf): array {
     $daten = json_decode((string) $roh, true);
     if (!is_array($daten)) {
         error_log('[ki] Antwort war kein JSON (HTTP ' . $code . ')');
-        throw new KiFehler('Der Dienst hat unverständlich geantwortet.');
+        throw new KiFehler('Die Antwort war nicht lesbar.');
     }
 
     if ($code >= 400) {
@@ -157,7 +157,7 @@ function ki_post(string $url, array $kopf, array $rumpf): array {
         throw new KiFehler(match (true) {
             $code === 401 || $code === 403 => 'Der API-Schlüssel wurde abgelehnt.',
             $code === 429                  => 'Zu viele Anfragen — bitte gleich noch einmal versuchen.',
-            $code >= 500                   => 'Beim Anbieter ist gerade etwas gestört.',
+            $code >= 500                   => 'Beim Anbieter ist gerade etwas kaputt.',
             default                        => 'Die Anfrage wurde abgelehnt (HTTP ' . $code . ').',
         });
     }

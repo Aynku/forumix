@@ -8,6 +8,32 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.7.4 (2026-08-21)
+
+### Ein nachgetragener Schlüssel holt den Klartext nach
+
+`FORUM_CRYPT_KEY` legt der Installer erst seit v0.23.0 an. Wer sein Forum
+vorher eingerichtet hat, trägt ihn nachträglich ein — und hat damit zunächst
+nichts gewonnen: Was schon in der Datenbank steht, bleibt dort im Klartext,
+und man sieht es ihm nicht an.
+
+Die Einstellungsseite der Schreibhilfe holt das jetzt einmal nach und sagt es
+auch. Fehlt der Schlüssel noch, steht dort ab sofort die **fertige Zeile zum
+Kopieren** statt nur der Hinweis, dass etwas fehlt. Bisher gab es die nur unter
+E-Mail, und dort auch nur, wenn ein SMTP-Passwort hinterlegt war.
+
+**Wichtig:** Wurde von der Datenbank schon eine Sicherung gezogen, während der
+API-Schlüssel im Klartext darin stand, steht er dort weiter. Dagegen hilft
+keine Software — dann beim Anbieter einen neuen erzeugen.
+
+### Meldungen in Alltagssprache
+
+Der Rest der Texte, den 1.7.3 noch nicht erreicht hat: „Es ist kein Text da, an
+dem gearbeitet werden könnte" heißt jetzt „Da ist noch kein Text", „Der Dienst
+hat unverständlich geantwortet" heißt „Die Antwort war nicht lesbar".
+
+---
+
 ## v1.7.3 (2026-08-21)
 
 ### Kein Knopf der Schreibhilfe sagt mehr „senden"

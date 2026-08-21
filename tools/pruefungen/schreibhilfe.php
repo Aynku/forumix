@@ -431,10 +431,27 @@ return [
     },
 
     'Die Warnung sagt, dass der Beitrag unangetastet bleibt' => function () use ($modul) {
+        // Ohne diesen Satz liest sich die Warnung wie eine Frage vor dem
+        // Veroeffentlichen — und wie die Ankuendigung, dass die Angaben aus
+        // dem Text fliegen. Beides ist falsch, beides ist schon passiert.
         $js = (string) file_get_contents($modul . '/assets/ki.js');
-        if (!str_contains($js, 'Dein Beitrag bleibt unverändert')) {
-            throw new RuntimeException('Der Hinweis fehlt — ohne ihn liest sich die '
-                . 'Warnung wie eine Frage vor dem Veröffentlichen');
+        if (!str_contains($js, 'Sie bleiben in deinem Beitrag stehen')) {
+            throw new RuntimeException('Der Hinweis fehlt, dass die Angaben im Beitrag bleiben');
+        }
+    },
+
+    'Die Warnung kommt ohne Beamtendeutsch aus' => function () use ($modul) {
+        // Juergen am 21.08.2026: "Bedenke die Texte so zu definieren das ein
+        // Mensch sie auch versteht .... Kein Claude Klingonisch". Gemeint war
+        // "Zurückgehalten geht an ihrer Stelle ein Platzhalter hinaus" —
+        // Partizip am Satzanfang, Fachwort in der Mitte, niemand redet so.
+        $js = (string) file_get_contents($modul . '/assets/ki.js');
+        foreach (['Zurückgehalten geht', 'Gegenüberstellung', 'Ohne diese Angaben',
+                  'werden könnte', 'zurückgehalten und steht'] as $wendung) {
+            if (str_contains($js, $wendung)) {
+                throw new RuntimeException('Umständliche Wendung in der Oberfläche: '
+                    . var_export($wendung, true));
+            }
         }
     },
 
@@ -528,6 +545,57 @@ return [
         if (!preg_match('/if\s*\(!\$cu\)/', $quelle)) {
             throw new RuntimeException('Die Anmeldepflicht im Endpunkt fehlt — '
                 . 'dann erzeugt jeder Vorbeikommende Kosten');
+        }
+    },
+
+    'Ohne FORUM_CRYPT_KEY steht die fertige Zeile da' => function () use ($modul) {
+        // Ein Hinweis "der Schluessel fehlt" ohne den Schluessel selbst laesst
+        // den Betreiber davorstehen. Foren von vor v0.25.7 haben keinen, und
+        // die fertige Zeile gab es bisher nur unter E-Mail — und dort auch nur,
+        // wenn ein SMTP-Passwort hinterlegt war.
+        $php  = (string) file_get_contents($modul . '/ki.php');
+        $view = (string) file_get_contents($modul . '/views/ki.php');
+
+        if (!str_contains($php, 'forum_crypt_new_key')) {
+            throw new RuntimeException('Die Seite erzeugt keinen Vorschlag');
+        }
+        if (!str_contains($view, "define('FORUM_CRYPT_KEY'")) {
+            throw new RuntimeException('Die fertige Zeile zum Kopieren fehlt');
+        }
+        // Einmal je Sitzung derselbe Vorschlag: sonst steht nach jedem
+        // Neuladen ein anderer da.
+        if (!str_contains($php, "\$_SESSION['crypt_key_vorschlag']")) {
+            throw new RuntimeException('Der Vorschlag wechselt bei jedem Neuladen');
+        }
+    },
+
+    'Ein nachgetragener FORUM_CRYPT_KEY holt den Klartext nach' => function () use ($modul) {
+        // Wer den Schluessel spaeter in die config.php nimmt, hat damit noch
+        // nichts gewonnen: der API-Schluessel liegt weiter im Klartext in der
+        // Datenbank, und man sieht es ihm nicht an.
+        $quelle = (string) file_get_contents($modul . '/lib/einstellungen.php');
+        if (!str_contains($quelle, 'function ki_schluessel_nachziehen')) {
+            throw new RuntimeException('Das Nachziehen fehlt');
+        }
+        // Es muss am entschluesselnden Leser vorbeigehen, sonst prueft es den
+        // bereits entschluesselten Wert und haelt ihn fuer Klartext.
+        $pos = strpos($quelle, 'function ki_schluessel_nachziehen');
+        $koerper = substr($quelle, $pos, 1200);
+        if (!str_contains($koerper, 'module_config')) {
+            throw new RuntimeException('Es liest nicht den rohen Wert aus der Datenbank');
+        }
+        if (!str_contains($koerper, 'CRYPT_PREFIX')) {
+            throw new RuntimeException('Es erkennt nicht, was schon verschlüsselt ist — '
+                . 'sonst wird bei jedem Aufruf erneut verschlüsselt');
+        }
+        // Und die Seite muss es aufrufen und sagen.
+        $admin = (string) file_get_contents($modul . '/ki.php');
+        if (!str_contains($admin, 'ki_schluessel_nachziehen()')) {
+            throw new RuntimeException('Die Einstellungsseite ruft es nicht auf');
+        }
+        $view = (string) file_get_contents($modul . '/views/ki.php');
+        if (!str_contains($view, 'nachgezogen')) {
+            throw new RuntimeException('Es geschieht still — der Betreiber erfährt nichts davon');
         }
     },
 

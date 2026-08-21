@@ -19,11 +19,32 @@
   ohne Schlüssel bleibt der Knopf im Editor unsichtbar.
 </div>
 
+<?php if (!empty($nachgezogen)): ?>
+  <div class="flash flash-success" style="margin-bottom:16px">
+    Dein API-Schlüssel lag noch im Klartext in der Datenbank und ist jetzt
+    verschlüsselt. Falls davon schon eine Sicherung gemacht wurde, steht er dort
+    weiter im Klartext — dann erzeuge beim Anbieter besser einen neuen.
+  </div>
+<?php endif; ?>
+
 <?php if (!$crypt_da): ?>
-  <div class="flash flash-error" style="margin-bottom:16px">
-    In der <code>config.php</code> fehlt <code>FORUM_CRYPT_KEY</code>. Der Schlüssel
-    wird dann <strong>im Klartext</strong> in der Datenbank abgelegt und stünde in
-    jeder Sicherung. Erst den Schlüssel in die Konfiguration eintragen, dann hier speichern.
+  <div class="card" style="margin-bottom:16px;padding:14px 16px;
+       border-left:3px solid var(--color-warning)">
+    <strong>🔐 Erst einen Schlüssel in die config.php</strong>
+    <p style="margin:6px 0;font-size:13px;line-height:1.6">
+      Ohne ihn liegt dein API-Schlüssel im Klartext in der Datenbank — und damit
+      auch in jeder Sicherung. Diese Installation hat noch keinen: Der Installer
+      legt ihn erst seit Version 0.23.0 an. Nimm diese Zeile in deine
+      <code>config.php</code> auf:
+    </p>
+    <pre style="white-space:pre-wrap;word-break:break-all;background:var(--bg-body);
+         padding:10px;border-radius:6px;margin:0"><code>define('FORUM_CRYPT_KEY', '<?= e($crypt_vorschlag) ?>');</code></pre>
+    <p style="margin:8px 0 0;font-size:13px;line-height:1.6">
+      Danach <strong>nicht mehr ändern</strong> und beim Umzug mitnehmen — sonst ist
+      nicht mehr lesbar, was damit gespeichert wurde. Der Schlüssel hilft gegen einen
+      abhandengekommenen Datenbank-Abzug, nicht gegen jemanden, der den Server hat:
+      der liest die <code>config.php</code> mit.
+    </p>
   </div>
 <?php endif; ?>
 
