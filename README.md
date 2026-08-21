@@ -517,6 +517,33 @@ Ab dann pflegt sich's selbst.
 
 ---
 
+## 🧪 Mitentwickeln
+
+Im Repository liegt ein Prüflauf ohne Fremdpakete — über Rechte, Papierkorb,
+Suche, Kontolöschung, Zwei-Faktor und die Datenbank-Anpassungen. Er gehört
+nicht ins Auslieferungspaket, wohl aber ins Repository: wer den Code ändert,
+soll sehen können, ob er etwas kaputt gemacht hat.
+
+```sh
+# Eine eigene Datenbank, nie die des laufenden Forums:
+FORUM_TEST_DB=forumix_test php tools/pruefen.php
+
+# Nur eine Gruppe:
+php tools/pruefen.php suche
+```
+
+Ein Teil der Prüfungen braucht eine zweite, vollständige Installation als
+Prüfstand — etwa um zu sehen, wie sich das Forum verhält, wenn eine
+Datenbank-Anpassung noch nicht gefahren ist. Ohne die Angabe überspringen sie
+sich und sagen es:
+
+```sh
+FORUM_PRUEFSTAND=/pfad/zur/instanz php tools/pruefen.php
+```
+
+Einzelheiten und wie eine neue Prüfung aussieht:
+[`tools/pruefungen/README.md`](tools/pruefungen/README.md).
+
 ## 📝 Lizenz
 
 **GNU Affero General Public License v3.0** — vollständiger Text in [LICENSE](LICENSE).
