@@ -70,6 +70,11 @@ $opt = [
     'host' => 'localhost', 'db' => '', 'user' => '', 'pass' => '',
     'praefix' => 'phpbb_', 'dateien' => '', 'port' => '3306',
 ];
+/* Laeuft die Ausgabe auf einem Terminal oder in eine Datei? Der laufende
+   Zaehler unten arbeitet mit Wagenruecklauf — in einer Logdatei stuende sonst
+   jeder Zwischenstand hintereinander in einer einzigen, unlesbaren Zeile. */
+$terminal = function_exists('stream_isatty') && @stream_isatty(STDOUT);
+
 $probe = false;
 $zurueck = false;
 foreach (array_slice($argv, 1) as $arg) {
@@ -109,17 +114,35 @@ if ($zurueck) {
         exit(1);
     }
 
+    echo "── Zurücknehmen ──\n";
+
+    // Die Dateien zuerst: sie stehen in der Tabelle, die gleich geleert wird.
+    // Geloescht wird ausschliesslich, was der Import selbst kopiert hat —
+    // Anhaenge, die jemand hier hochgeladen hat, tragen keine Zuordnung.
+    $dateien = 0;
+    try {
+        foreach (db_fetchAll(
+            "SELECT a.filename FROM attachments a
+             JOIN import_zuordnung z ON z.art = 'anhang' AND z.neu_id = a.attachment_id") as $d) {
+            $pfad = rtrim(UPLOAD_DIR, '/') . '/attachments/' . basename((string) $d['filename']);
+            if (is_file($pfad) && @unlink($pfad)) $dateien++;
+        }
+    } catch (Throwable $e) {}
+    if ($dateien > 0) printf("  %-20s %d gelöscht\n", 'Dateien', $dateien);
+
     // Reihenfolge von innen nach aussen, sonst haengen Verweise in der Luft.
     $schritte = [
-        ['beitrag',   'posts',            'post_id'],
-        ['thema',     'threads',          'thread_id'],
-        ['board',     'boards',           'board_id'],
-        ['kategorie', 'categories',       'cat_id'],
-        ['pn',        'private_messages', 'pm_id'],
-        ['user',      'users',            'user_id'],
+        ['anhang',         'attachments',      'attachment_id'],
+        ['umfrage_option', 'poll_options',     'option_id'],
+        ['umfrage',        'polls',            'poll_id'],
+        ['beitrag',        'posts',            'post_id'],
+        ['thema',          'threads',          'thread_id'],
+        ['board',          'boards',           'board_id'],
+        ['kategorie',      'categories',       'cat_id'],
+        ['pn',             'private_messages', 'pm_id'],
+        ['user',           'users',            'user_id'],
     ];
 
-    echo "── Zurücknehmen ──\n";
     foreach ($schritte as [$art, $tabelle, $spalte]) {
         try {
             $n = db_affected(
@@ -647,14 +670,14 @@ foreach ($abfrage as $z) {
     import_merken('beitrag', $altId, $neuId);
     $beitraegeAngelegt++;
 
-    if ($beitraegeAngelegt % 500 === 0) {
+    if ($beitraegeAngelegt % 500 === 0 && $terminal) {
         printf("\r  Beiträge             %d …", $beitraegeAngelegt);
     }
 }
 
 $alt->setAttribute($gepuffert, true);
 
-printf("\r  Beiträge             %d angelegt", $beitraegeAngelegt);
+printf("%s  Beiträge             %d angelegt", $terminal ? "\r" : '', $beitraegeAngelegt);
 if ($beitraegeSchon > 0) printf(", %d schon da", $beitraegeSchon);
 if ($beitraegeUeber > 0) printf(", %d übersprungen", $beitraegeUeber);
 echo "\n";
@@ -665,7 +688,7 @@ echo "\n";
 // mitzurechnen waere langsam und bei einem Abbruch falsch; deshalb werden sie
 // am Ende in einem Zug aus dem gesetzt, was tatsaechlich dasteht.
 
-echo "  Zähler               werden neu gesetzt …";
+if ($terminal) echo "  Zähler               werden neu gesetzt …";
 
 $sichtbar = $papierkorb ? ' AND p.deleted_at IS NULL' : '';
 
@@ -686,7 +709,7 @@ db_execute("UPDATE users u SET post_count = (SELECT COUNT(*) FROM posts p
             WHERE p.user_id = u.user_id AND p.is_approved = 1$sichtbar)
             WHERE u.user_id IN (SELECT neu_id FROM import_zuordnung WHERE art = 'user')");
 
-echo "\r  Zähler               neu gesetzt          \n";
+echo ($terminal ? "\r" : '') . "  Zähler               neu gesetzt          \n";
 
 /* ── Anhaenge ─────────────────────────────────────────────────────────── */
 //
