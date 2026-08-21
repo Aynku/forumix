@@ -540,7 +540,7 @@
                 <?php else: ?>
                   <br><strong>Feinere Rechte stehen noch nicht bereit.</strong>
                   Sie kommen mit der Anpassung <em>v1.5.0 – Feinere Rechte je Forum und Gruppe</em>
-                  unter <a href="<?= FORUM_URL ?>/admin/?action=migrations">Datenbank-Anpassungen</a>.
+                  unter <a href="<?= FORUM_URL ?>/admin/?action=updates">Forum-Updates</a>.
                 <?php endif; ?>
               </div>
             </div>
@@ -2045,7 +2045,7 @@
           <strong>⚠️ Hinweis:</strong> Admin-Freigabe für Registrierungen ist aktuell <strong>nicht aktiv</strong>.
           Einladungen funktionieren weiterhin, aber sie sind nur dann nützlich wenn neue User normalerweise
           in die Freigabe-Queue kämen.
-          <a href="?action=settings">→ Setting prüfen</a>
+          <a href="?action=registration">→ Registrierungs-Einstellungen öffnen</a>
         </div>
       <?php endif; ?>
 
@@ -2176,7 +2176,7 @@
               <strong style="color:#4a9d4a">aktiv</strong>.
             <?php else: ?>
               <strong style="color:#aa6644">inaktiv</strong>.
-              <a href="?action=settings">→ Aktivieren</a>
+              <a href="?action=registration">→ Aktivieren</a>
             <?php endif; ?>
           </p>
         </div>

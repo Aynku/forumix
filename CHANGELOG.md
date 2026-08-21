@@ -8,6 +8,38 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.5.1 (2026-08-21)
+
+### Neuinstallationen bekommen wieder das ganze Forum
+
+Eine frische Installation legte nur die Tabellen an, die in `install.sql`
+stehen — und diese Datei war seit 1.1.0 nicht mehr nachgezogen worden. Ein
+frisch aufgesetztes Forum hatte damit weder Gruppenrechte noch Papierkorb noch
+Volltextsuche und wies sich trotzdem als aktuelle Fassung aus. Bemerkbar
+machte es sich nicht: alle drei Funktionen haben einen Rückfall, das Forum
+lief also, es konnte nur weniger.
+
+- Der Installer fährt jetzt dieselben Datenbank-Anpassungen wie ein Update.
+  Beide Wege — Browser und Kommandozeile — nehmen denselben Ordner
+  `install/migrations/`.
+- `install.sql` bleibt bewusst der ältere Stand. Sie ein zweites Mal von Hand
+  zu pflegen war die Ursache; alles Neue kommt jetzt aus einer Quelle.
+- Nach dem Aufsetzen steht im Adminbereich unter *Forum-Updates* nichts mehr
+  offen.
+
+**Bestehende Foren sind nicht betroffen** — dort wurden die Anpassungen beim
+Update gefahren. Betroffen war nur das Fenster zwischen Aufsetzen und erstem
+Update.
+
+### Zwei Verweise im Adminbereich zeigten ins Leere
+
+Bei den Einladungen und in der Freigabe-Übersicht führte der Hinweis auf die
+Admin-Freigabe in die allgemeinen Einstellungen — die Einstellung steht aber
+in einem eigenen Bereich. Ein dritter Verweis, in der Forenverwaltung, zeigte
+auf einen Bereich, den es gar nicht gibt.
+
+---
+
 ## v1.5.0 (2026-08-21)
 
 ### Feinere Rechte je Forum und Gruppe

@@ -161,6 +161,15 @@ try {
 }
 sagen('✓ Schema angelegt (' . $anzahl . ' Anweisungen)');
 
+// install.sql ist der Stand von 1.0; alles danach kommt aus
+// install/migrations/ — derselbe Weg, den auch ein Update geht.
+try {
+    $anpassungen = run_migrations($pdo);
+} catch (Throwable $e) {
+    abbrechen('Anpassungen fehlgeschlagen: ' . $e->getMessage());
+}
+sagen('✓ Anpassungen gefahren (' . count($anpassungen) . ')');
+
 /* ── 4. Inhaber + Grundeinstellungen ──────────────────────────────────── */
 
 try {

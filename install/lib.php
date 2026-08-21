@@ -111,6 +111,108 @@ function run_schema(PDO $pdo): int {
     return $count;
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   ANPASSUNGEN NACH DEM SCHEMA
+
+   `install.sql` beschreibt das Schema ein zweites Mal, von Hand — neben den
+   Anpassungen in `install/migrations/`. Genau daran ist es gescheitert: seit
+   1.1.0 wurde in der Datei nur noch die Versionsnummer hochgezogen, die
+   Tabellen nicht. Eine Neuinstallation bekam damit das Schema von 1.0 und die
+   Aufschrift der neuesten Fassung. Aufgefallen ist es nie, weil jede dieser
+   Funktionen einen sauberen Rueckfall hat: das Forum lief, es konnte nur
+   weniger.
+
+   Die Datei jetzt nachzufuellen wuerde denselben Fehler nur vertagen — beim
+   naechsten Mal denkt wieder niemand daran. Stattdessen faehrt der Installer
+   dieselben Anpassungen, die auch ein Update faehrt. `install.sql` bleibt
+   damit bewusst der alte Stand, und alles Neue kommt fuer beide Wege aus
+   demselben Verzeichnis.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Die Anpassungen erwarten die Umgebung des laufenden Forums: das Kennwort
+   FORUM_RUNNING und drei Abfrage-Helfer. Der Installer laedt bootstrap.php
+   absichtlich nicht (er hat noch keine config.php), also stellt er sie selbst
+   bereit — auf seiner eigenen Verbindung. */
+if (!function_exists('db_execute')) {
+    function db_execute(string $sql, array $p = []) {
+        $s = $GLOBALS['__installer_pdo']->prepare($sql);
+        $s->execute($p);
+        return $GLOBALS['__installer_pdo']->lastInsertId();
+    }
+}
+if (!function_exists('db_fetch')) {
+    function db_fetch(string $sql, array $p = []) {
+        $s = $GLOBALS['__installer_pdo']->prepare($sql); $s->execute($p);
+        return $s->fetch(PDO::FETCH_ASSOC);
+    }
+}
+if (!function_exists('db_fetchAll')) {
+    function db_fetchAll(string $sql, array $p = []): array {
+        $s = $GLOBALS['__installer_pdo']->prepare($sql); $s->execute($p);
+        return $s->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
+if (!function_exists('db_count')) {
+    function db_count(string $sql, array $p = []): int {
+        $s = $GLOBALS['__installer_pdo']->prepare($sql); $s->execute($p);
+        return (int) $s->fetchColumn();
+    }
+}
+
+/**
+ * Faehrt alle Anpassungen aus install/migrations/ und traegt sie als erledigt
+ * ein. Gibt die Liste der gefahrenen Versionen zurueck.
+ *
+ * Die Reihenfolge kommt aus available_migrations() — derselben Funktion, die
+ * auch der Adminbereich und `install/migrate.php` benutzen. Eine zweite
+ * Sortierung hier waere wieder eine zweite Wahrheit.
+ *
+ * Eine Anpassung, die auf halbem Weg scheitert, bricht die Installation ab:
+ * ein Forum mit halbem Schema ist schlimmer als eines, das gar nicht erst
+ * fertig wird — das eine faellt sofort auf, das andere erst Wochen spaeter.
+ */
+function run_migrations(PDO $pdo): array
+{
+    $GLOBALS['__installer_pdo'] = $pdo;
+    if (!defined('FORUM_RUNNING')) define('FORUM_RUNNING', true);
+
+    require_once FORUM_ROOT . '/lib/migrations.php';
+
+    // Die Tabelle legt lib/migrations.php an — nicht der Installer. Eine
+    // zweite Definition hier waere genau die doppelte Wahrheit, die dieser
+    // Umbau abschafft: der erste Probelauf hatte prompt zwei Spalten anders
+    // als ein gewachsenes Forum.
+    ensure_migrations_table();
+
+    $eintrag = $pdo->prepare(
+        'INSERT INTO migrations (version, name, executed_by, output) VALUES (?, ?, 0, ?)
+         ON DUPLICATE KEY UPDATE executed_at = NOW(), output = VALUES(output)'
+    );
+
+    $gefahren = [];
+    foreach (available_migrations() as $m) {
+        if (!is_file($m['file'])) continue;
+
+        // Die Anpassungen schreiben ihren Verlauf als HTML — im Installer
+        // faengt das der Puffer ab, damit die Seite nicht zerfaellt.
+        ob_start();
+        try {
+            require $m['file'];
+        } catch (Throwable $e) {
+            ob_end_clean();
+            throw new RuntimeException(
+                'Anpassung ' . $m['version'] . ' ist gescheitert: ' . $e->getMessage()
+            );
+        }
+        $roh = (string) ob_get_clean();
+
+        $text = trim(preg_replace('/\s+/', ' ', strip_tags($roh)));
+        $eintrag->execute([$m['version'], $m['name'], mb_substr($text, 0, 2000)]);
+        $gefahren[] = $m['version'];
+    }
+    return $gefahren;
+}
+
 function setting_set(PDO $pdo, string $key, string $value): void {
     // Die settings-Tabelle hat KEINE updated_at-Spalte (siehe install.sql).
     // Statement identisch zum Laufzeit-Code in lib/settings.php::set_setting().

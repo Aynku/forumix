@@ -100,6 +100,9 @@ if ($step === 3) {
             try {
                 $pdo = pdo_connect($_SESSION['install_db']);
                 $schemaStmts = run_schema($pdo);
+                // install.sql ist der Stand von 1.0; alles danach kommt aus
+                // install/migrations/ — derselbe Weg, den ein Update geht.
+                $_SESSION['install_migrations'] = count(run_migrations($pdo));
                 $_SESSION['install_schema_done'] = true;
                 header('Location: ?step=4');
                 exit;
@@ -328,9 +331,13 @@ if ($step === 4) {
 }
 
 if ($step === 5) {
+    $anz = (int) ($_SESSION['install_migrations'] ?? 0);
     echo '<div class="card"><h2 class="ok-big">✓ Installation abgeschlossen</h2>
     <p>Das Forum ist eingerichtet. <code>config.php</code> wurde geschrieben und der
-       Installer ist ab jetzt gesperrt.</p>
+       Installer ist ab jetzt gesperrt.'
+       . ($anz > 0 ? ' Dabei wurden ' . $anz . ' Datenbank-Anpassungen mitgefahren —
+       im Adminbereich unter <em>Forum-Updates</em> steht die Liste.' : '')
+       . '</p>
     <div class="warn">🔒 <strong>Letzter Schritt:</strong> Bitte im Ordner
        <code>install/</code> die Dateien <code>index.php</code>, <code>cli.php</code>,
        <code>lib.php</code> und <code>install.sql</code> löschen.<br>
