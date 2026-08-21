@@ -21,10 +21,14 @@
  *   "forum": {"name":"Mein Forum","url":"https://forum.example.com"},
  *   "owner": {"user":"Chef","email":"chef@example.com","pass":"…"},
  *   "extra": {"FORUM_MAIL_FROM":"noreply@example.com"},
+ *   "demo": false,
  *   "cleanup": true
  * }
  *
  * "extra"   schreibt zusätzliche Konstanten in die config.php (optional).
+ * "demo"    legt vier Beispiel-Foren an (optional, Vorgabe aus). Ohne sie faengt
+ *           das Forum mit einer leeren Uebersicht an — richtig fuer jeden, der
+ *           eigene Foren anlegt oder ein bestehendes uebernimmt.
  * "cleanup" räumt den Installer nach Erfolg selbst weg (optional, Vorgabe aus).
  *
  * Rückgabe: 0 = fertig, 1 = abgebrochen. Fehler gehen nach STDERR.
@@ -159,7 +163,17 @@ try {
 } catch (Throwable $e) {
     abbrechen('Schema-Import fehlgeschlagen: ' . $e->getMessage());
 }
-sagen('✓ Schema angelegt (' . $anzahl . ' Anweisungen)');
+// Vorgabe: keine Beispiel-Foren. Etwas, das man aktiv wegraeumen muss, ist
+// aufgezwungen; wer sie will, traegt "demo": true ein.
+if (empty($eingabe['demo'])) {
+    try {
+        drop_demo_content($pdo);
+    } catch (Throwable $e) {
+        abbrechen('Beispiel-Foren entfernen fehlgeschlagen: ' . $e->getMessage());
+    }
+}
+sagen('✓ Schema angelegt (' . $anzahl . ' Anweisungen'
+    . (empty($eingabe['demo']) ? ', ohne Beispiel-Foren' : ', mit Beispiel-Foren') . ')');
 
 // install.sql ist der Stand von 1.0; alles danach kommt aus
 // install/migrations/ — derselbe Weg, den auch ein Update geht.

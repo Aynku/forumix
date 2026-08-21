@@ -67,6 +67,7 @@
               'items' => [
                   'backups'           => '💾 Backups',
                   'updates'           => '🚀 Updates',
+                  'import'            => '📦 Import aus phpBB',
                   'maintenance_mode'  => '🛠️ Wartungsmodus',
                   'maintenance'       => '🧹 Tools',
               ],
@@ -2776,6 +2777,344 @@
       <?php endif; ?>
 
     <?php /* ════════════ UPDATES (DB-MIGRATIONEN) ════════════ */ ?>
+    <?php elseif ($action === 'import'): ?>
+      <h2>📦 Aus phpBB übernehmen</h2>
+
+      <?php $b = $importBericht ?? null; $o = $importOpt ?? null; ?>
+
+      <?php if (!empty($importLaeuft)): ?>
+        <?php /* ── Ein Import steht bereits ── */ ?>
+        <div class="card" style="padding:18px 22px;margin-bottom:18px;border-left:3px solid var(--color-success)">
+          <h3 style="margin:0 0 10px">✅ Ein Import ist eingespielt</h3>
+          <div class="stat-grid" style="margin-bottom:14px">
+            <?php foreach (['user' => ['👤','Konten'], 'board' => ['📁','Foren'],
+                            'thema' => ['💬','Themen'], 'beitrag' => ['✉️','Beiträge'],
+                            'anhang' => ['📎','Anhänge']] as $art => [$icon, $label]): ?>
+              <?php if (($importStand[$art] ?? 0) > 0): ?>
+              <div class="stat-box">
+                <div class="stat-icon"><?= $icon ?></div>
+                <div class="stat-num"><?= number_format((int) $importStand[$art], 0, ',', '.') ?></div>
+                <div class="stat-label"><?= e($label) ?></div>
+              </div>
+              <?php endif; ?>
+            <?php endforeach; ?>
+          </div>
+          <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin:0 0 14px">
+            Alles Übernommene ist als solches vermerkt. Ein zweiter Lauf ergänzt nur, was fehlt —
+            und das Zurücknehmen entfernt ausschließlich, was der Import angelegt hat.
+            Was du seither von Hand angelegt hast, bleibt.
+          </p>
+          <form method="post" action="?action=import_zurueck"
+                onsubmit="return confirm('Alles zurücknehmen, was der Import angelegt hat?')">
+            <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
+            <button type="submit" class="btn btn-danger btn-sm">Import zurücknehmen</button>
+          </form>
+        </div>
+      <?php endif; ?>
+
+      <?php if ($b === null): ?>
+        <?php /* ── Schritt 1: Zugangsdaten ── */ ?>
+        <div class="card" style="padding:18px 22px;margin-bottom:18px">
+          <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin:0">
+            Übernimmt Konten, Foren, Themen, Beiträge, Anhänge, Umfragen und private Nachrichten
+            aus einem phpBB der Fassungen 3.2 und 3.3. <strong>Die Passwörter kommen mit</strong> —
+            die Mitglieder melden sich hinterher mit ihrem gewohnten an.
+            Es wird nur gelesen; das alte Forum bleibt unverändert.
+          </p>
+        </div>
+
+        <form method="post" action="?action=import_pruefen">
+          <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
+
+          <div class="form-card" style="margin-bottom:16px">
+            <h3 style="margin-top:0">Datenbank des alten Forums</h3>
+
+            <div class="form-row">
+              <label>Datenbank <span style="color:var(--color-danger)">*</span></label>
+              <input type="text" name="db_name" placeholder="phpbb" required autofocus>
+              <div class="form-hint">Der Name der Datenbank, in der phpBB liegt.</div>
+            </div>
+
+            <div class="form-row">
+              <label>Benutzer <span style="color:var(--color-danger)">*</span></label>
+              <input type="text" name="db_user" placeholder="phpbb_user" required>
+            </div>
+
+            <div class="form-row">
+              <label>Passwort</label>
+              <input type="password" name="db_pass" autocomplete="new-password">
+            </div>
+
+            <div class="form-row">
+              <label>Server</label>
+              <input type="text" name="db_host" value="localhost">
+              <div class="form-hint">
+                Liegt das alte Forum auf demselben Server, bleibt es bei <code>localhost</code>.
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>Tabellen-Präfix</label>
+              <input type="text" name="db_praefix" value="phpbb_">
+              <div class="form-hint">
+                Steht in der <code>config.php</code> des alten Forums unter <code>$table_prefix</code>.
+              </div>
+            </div>
+          </div>
+
+          <div class="form-card" style="margin-bottom:16px">
+            <h3 style="margin-top:0">Anhänge</h3>
+            <div class="form-row">
+              <label>Ordner mit den Dateien</label>
+              <input type="text" name="dateien" placeholder="/pfad/zu/phpBB3/files">
+              <div class="form-hint">
+                Der Ordner, den phpBB unter <em>Anhänge → Einstellungen</em> als Upload-Pfad führt —
+                meist <code>files</code> im phpBB-Verzeichnis. Bleibt das Feld leer, kommen die
+                Beiträge ohne ihre Dateien.
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Nachsehen, was da ist</button>
+          <span style="font-size:12px;color:var(--text-faint);margin-left:10px">
+            Liest nur — schreibt noch nichts.
+          </span>
+        </form>
+
+      <?php else: ?>
+        <?php /* ── Schritt 2: Was gefunden wurde ── */ ?>
+        <?php
+          $bs   = $b['bestand'];
+          $pw   = $b['passwoerter'];
+          $dat  = $b['dateien'];
+          $alt32 = $bs['fassung'] !== '' && version_compare($bs['fassung'], '3.2.0', '<');
+        ?>
+
+        <div class="card" style="padding:18px 22px;margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
+            <h3 style="margin:0">Gefunden in <code><?= e($o['db'] ?? '') ?></code></h3>
+            <span style="font-size:13px;color:var(--text-muted)">
+              phpBB <?= $bs['fassung'] !== '' ? e($bs['fassung']) : 'unbekannter Fassung' ?>
+            </span>
+          </div>
+        </div>
+
+        <?php if ($alt32): ?>
+          <div class="card" style="padding:16px 20px;margin-bottom:16px;background:rgba(170,102,68,0.1);border-left:3px solid #aa6644">
+            <strong>⚠️ Diese Fassung ist älter als 3.2.</strong>
+            Beiträge werden dort anders abgelegt. Der Import versucht es, aber die Formatierung
+            kann darunter leiden. Ein Blick in ein paar Beiträge lohnt sich hinterher.
+          </div>
+        <?php endif; ?>
+
+        <div class="stat-grid" style="margin-bottom:18px">
+          <?php foreach ([
+            ['👤', $bs['konten'],     'Konten'],
+            ['📂', $bs['kategorien'], 'Kategorien'],
+            ['📁', $bs['foren'],      'Foren'],
+            ['💬', $bs['themen'],     'Themen'],
+            ['✉️', $bs['beitraege'],  'Beiträge'],
+            ['📎', $bs['anhaenge'],   'Anhänge'],
+            ['📊', $bs['umfragen'],   'Umfragen'],
+            ['🔒', $bs['pn'],         'Nachrichten'],
+          ] as [$icon, $zahl, $label]): ?>
+            <div class="stat-box"<?= $zahl === 0 ? ' style="opacity:.45"' : '' ?>>
+              <div class="stat-icon"><?= $icon ?></div>
+              <div class="stat-num"><?= number_format((int) $zahl, 0, ',', '.') ?></div>
+              <div class="stat-label"><?= e($label) ?></div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+
+        <?php if ($bs['bots'] > 0): ?>
+          <p style="font-size:12px;color:var(--text-faint);margin:-8px 0 18px">
+            Dazu <?= number_format((int) $bs['bots'], 0, ',', '.') ?> Bot-Konten, die phpBB für seine
+            Wer-ist-online-Liste führt — die bleiben draußen.
+          </p>
+        <?php endif; ?>
+
+        <?php /* ── Passwörter: die Zahl, nach der man den Umzug plant ── */ ?>
+        <div class="card" style="padding:18px 22px;margin-bottom:16px">
+          <h3 style="margin:0 0 12px">🔑 Passwörter</h3>
+          <?php
+            $gesamt = max(1, $pw['uebernehmbar'] + $pw['neu_noetig']);
+            $anteil = round($pw['uebernehmbar'] / $gesamt * 100);
+          ?>
+          <div style="display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--bg-surface2);margin-bottom:12px">
+            <div style="width:<?= $anteil ?>%;background:var(--color-success)"></div>
+            <div style="width:<?= 100 - $anteil ?>%;background:#aa6644"></div>
+          </div>
+          <div style="display:flex;gap:24px;flex-wrap:wrap;font-size:13px">
+            <div>
+              <strong style="color:var(--color-success);font-size:18px">
+                <?= number_format((int) $pw['uebernehmbar'], 0, ',', '.') ?></strong>
+              melden sich normal an
+            </div>
+            <?php if ($pw['neu_noetig'] > 0): ?>
+            <div>
+              <strong style="color:#aa6644;font-size:18px">
+                <?= number_format((int) $pw['neu_noetig'], 0, ',', '.') ?></strong>
+              brauchen ein neues Passwort
+            </div>
+            <?php endif; ?>
+          </div>
+          <div class="form-hint" style="margin-top:10px">
+            <?php if ($pw['neu_noetig'] > 0): ?>
+              Ältere phpBB-Fassungen haben Passwörter anders verschlüsselt; diese lassen sich hier
+              nicht prüfen. Die Konten kommen mit — ihre Inhaber benutzen einmal
+              „Passwort vergessen“.
+            <?php else: ?>
+              Alle Passwörter lassen sich übernehmen. Niemand muss sein Passwort neu setzen.
+            <?php endif; ?>
+          </div>
+        </div>
+
+        <?php if ($bs['anhaenge'] > 0): ?>
+          <div class="card" style="padding:16px 20px;margin-bottom:16px<?= $dat['fehlen'] > 0 || !$dat['ordner'] ? ';border-left:3px solid #aa6644' : '' ?>">
+            <h3 style="margin:0 0 8px">📎 Anhänge</h3>
+            <?php if (!$dat['ordner']): ?>
+              <p style="margin:0;font-size:13px;color:var(--text-muted)">
+                Kein Ordner angegeben — die <?= number_format((int) $bs['anhaenge'], 0, ',', '.') ?>
+                Anhänge bleiben draußen. <a href="?action=import_vergessen">Nochmal eingeben</a>.
+              </p>
+            <?php elseif ($dat['fehlen'] > 0): ?>
+              <p style="margin:0;font-size:13px">
+                <strong><?= number_format((int) $dat['fehlen'], 0, ',', '.') ?></strong> von
+                <?= number_format((int) $bs['anhaenge'], 0, ',', '.') ?> Dateien liegen nicht in
+                <code><?= e($o['dateien'] ?? '') ?></code>.
+                <a href="?action=import_vergessen">Pfad ändern</a>
+              </p>
+            <?php else: ?>
+              <p style="margin:0;font-size:13px;color:var(--text-muted)">
+                Alle <?= number_format((int) $dat['gefunden'], 0, ',', '.') ?> Dateien sind da.
+              </p>
+            <?php endif; ?>
+          </div>
+        <?php endif; ?>
+
+        <?php /* ── Schritt 3: Der Lauf ── */ ?>
+        <div class="card" style="padding:18px 22px" id="import-lauf">
+          <h3 style="margin:0 0 12px">Übernehmen</h3>
+
+          <div id="import-fortschritt" hidden>
+            <div style="height:10px;border-radius:5px;background:var(--bg-surface2);overflow:hidden;margin-bottom:12px">
+              <div id="import-balken" style="height:100%;width:0;background:var(--color-accent);transition:width .3s"></div>
+            </div>
+            <table style="width:100%;border-collapse:collapse;font-size:13px">
+              <?php foreach (IMPORT_SCHRITTE as $sch => $label): ?>
+                <tr data-schritt="<?= e($sch) ?>">
+                  <td style="padding:5px 0;width:26px" class="import-zeichen">·</td>
+                  <td style="padding:5px 0"><?= e($label) ?></td>
+                  <td style="padding:5px 0;text-align:right;color:var(--text-muted)" class="import-zahl"></td>
+                </tr>
+              <?php endforeach; ?>
+            </table>
+            <p id="import-fehler" style="display:none;margin:12px 0 0;color:var(--color-danger);font-size:13px"></p>
+          </div>
+
+          <div id="import-start">
+            <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin:0 0 14px">
+              Der Import läuft in Runden und meldet, wie weit er ist. Das Fenster darf dabei nicht
+              geschlossen werden. Bricht er ab, setzt ein neuer Lauf dort an, wo er stehengeblieben
+              ist — und zurücknehmen lässt sich alles.
+            </p>
+            <button type="button" class="btn btn-primary" id="import-knopf">Import starten</button>
+            <a href="?action=import_vergessen" class="btn btn-ghost btn-sm" style="margin-left:8px">Abbrechen</a>
+          </div>
+
+          <div id="import-fertig" hidden>
+            <p style="margin:14px 0 0;font-size:14px">
+              <strong style="color:var(--color-success)">✅ Fertig.</strong>
+              <a href="<?= e(FORUM_URL) ?>/index.php">Zum Forum</a> ·
+              <a href="?action=boards">Rechte je Forum einrichten</a>
+            </p>
+          </div>
+        </div>
+
+        <script>
+        (function () {
+          var knopf   = document.getElementById('import-knopf');
+          if (!knopf) return;
+          var schritte = <?= json_encode(array_keys(IMPORT_SCHRITTE)) ?>;
+          // Wie viel jeder Schritt zu tun hat — sonst stuende der Balken
+          // waehrend der Beitraege minutenlang still.
+          var gesamt = <?= json_encode([
+              'user'     => (int) $bs['konten'],
+              'struktur' => (int) $bs['kategorien'] + (int) $bs['foren'],
+              'thema'    => (int) $bs['themen'],
+              'beitrag'  => (int) $bs['beitraege'],
+              'anhang'   => (int) $bs['anhaenge'],
+              'umfrage'  => (int) $bs['umfragen'],
+              'pn'       => (int) $bs['pn'],
+              'zaehler'  => 1,
+          ]) ?>;
+          var alle = Object.values(gesamt).reduce(function (a, b) { return a + b; }, 0) || 1;
+          var csrf     = <?= json_encode($csrfToken) ?>;
+          var balken   = document.getElementById('import-balken');
+          var fehlerP  = document.getElementById('import-fehler');
+          var i = 0, summe = {}, neu = {};
+
+          function zeile(s) { return document.querySelector('tr[data-schritt="' + s + '"]'); }
+
+          function malen() {
+            // Anteilig an der Gesamtmenge, nicht an der Zahl der Schritte:
+            // die Beitraege sind hundertmal mehr Arbeit als die Umfragen.
+            var fertig = 0;
+            for (var k = 0; k < schritte.length; k++) {
+              var s = schritte[k];
+              fertig += (k < i) ? (gesamt[s] || 0) : Math.min(summe[s] || 0, gesamt[s] || 0);
+            }
+            balken.style.width = Math.min(100, Math.round(fertig / alle * 100)) + '%';
+          }
+
+          function fehler(text) {
+            fehlerP.textContent = text;
+            fehlerP.style.display = '';
+            var z = zeile(schritte[i]);
+            if (z) z.querySelector('.import-zeichen').textContent = '✕';
+          }
+
+          function runde() {
+            if (i >= schritte.length) {
+              balken.style.width = '100%';
+              document.getElementById('import-fertig').hidden = false;
+              return;
+            }
+            var s = schritte[i], z = zeile(s);
+            z.querySelector('.import-zeichen').textContent = '⟳';
+
+            var daten = new FormData();
+            daten.append('csrf', csrf);
+            daten.append('schritt', s);
+
+            fetch('?action=import_runde', { method: 'POST', body: daten })
+              .then(function (a) { return a.json(); })
+              .then(function (e) {
+                if (e.fehler) { fehler(e.fehler); return; }
+                summe[s] = (summe[s] || 0) + (e.getan || 0);
+                neu[s]   = (neu[s]   || 0) + (e.neu   || 0);
+                z.querySelector('.import-zahl').textContent =
+                  neu[s] > 0 ? neu[s].toLocaleString('de-DE') : '';
+                if (e.fertig) {
+                  z.querySelector('.import-zeichen').textContent = '✓';
+                  i++;
+                }
+                malen();
+                runde();
+              })
+              .catch(function (ex) { fehler('Abgebrochen: ' + ex.message); });
+          }
+
+          knopf.addEventListener('click', function () {
+            document.getElementById('import-start').hidden = true;
+            document.getElementById('import-fortschritt').hidden = false;
+            malen();
+            runde();
+          });
+        })();
+        </script>
+      <?php endif; ?>
+
     <?php elseif ($action === 'updates'): ?>
       <h2>🚀 Forum-Updates</h2>
 

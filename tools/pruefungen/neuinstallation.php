@@ -119,6 +119,62 @@ return [
             if ((int) $offen !== $dateien) {
                 throw new RuntimeException("Es liegen $dateien Anpassungen bereit, eingetragen sind $offen");
             }
+
+            // Ohne "demo" faengt das Forum mit einer leeren Uebersicht an.
+            // Etwas, das man erst wegraeumen muss, ist aufgezwungen.
+            $foren = (int) $pdo->query("SELECT COUNT(*) FROM `$probeDb`.boards")->fetchColumn();
+            $kat   = (int) $pdo->query("SELECT COUNT(*) FROM `$probeDb`.categories")->fetchColumn();
+            if ($foren !== 0 || $kat !== 0) {
+                throw new RuntimeException("Ohne \"demo\" stehen $kat Kategorien und $foren Foren da");
+            }
+        } finally {
+            $aufraeumen();
+        }
+    },
+
+    'Mit "demo" kommen die vier Beispiel-Foren' => function () use ($wurzel, $db, $hole) {
+        $probeDb = $db . '_demo';
+        $ordner  = sys_get_temp_dir() . '/forumix-demo';
+        $pdo = new PDO("mysql:host={$hole('DB_HOST')};charset=utf8mb4",
+                       $hole('DB_USER'), $hole('DB_PASS'),
+                       [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+
+        $aufraeumen = function () use ($pdo, $probeDb, $ordner) {
+            try { $pdo->exec("DROP DATABASE IF EXISTS `$probeDb`"); } catch (Throwable $e) {}
+            if (is_dir($ordner)) exec('rm -rf ' . escapeshellarg($ordner));
+        };
+        $aufraeumen();
+
+        try {
+            $pdo->exec("CREATE DATABASE `$probeDb` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            exec(sprintf('rsync -a --exclude .git --exclude "cache/*" --exclude "uploads/*" '
+                       . '--exclude config.php %s/ %s/ 2>&1',
+                         escapeshellarg($wurzel), escapeshellarg($ordner)), $aus, $rc);
+            if ($rc !== 0) throw new RuntimeException('Kopie nicht anlegbar');
+            @unlink($ordner . '/install/.installed');
+
+            $datei = $ordner . '/setup.json';
+            file_put_contents($datei, json_encode([
+                'db'    => ['host' => $hole('DB_HOST'), 'name' => $probeDb,
+                            'user' => $hole('DB_USER'), 'pass' => $hole('DB_PASS'),
+                            'charset' => 'utf8mb4'],
+                'forum' => ['name' => 'Demo', 'url' => 'https://demo.example.invalid'],
+                'owner' => ['user' => 'demopruef', 'email' => 'demo@example.invalid',
+                            'pass' => bin2hex(random_bytes(12))],
+                'demo'  => true,
+                'cleanup' => false,
+            ], JSON_UNESCAPED_SLASHES));
+            chmod($datei, 0600);
+
+            exec(sprintf('cd %s && %s install/cli.php --config=setup.json --quiet 2>&1',
+                escapeshellarg($ordner), escapeshellarg(PHP_BINARY)), $zeilen, $rc2);
+            if ($rc2 !== 0) throw new RuntimeException('Installer: ' . implode(' ', $zeilen));
+
+            $foren = (int) $pdo->query("SELECT COUNT(*) FROM `$probeDb`.boards")->fetchColumn();
+            $kat   = (int) $pdo->query("SELECT COUNT(*) FROM `$probeDb`.categories")->fetchColumn();
+            if ($foren !== 4 || $kat !== 2) {
+                throw new RuntimeException("Erwartet 2 Kategorien und 4 Foren, bekommen $kat und $foren");
+            }
         } finally {
             $aufraeumen();
         }

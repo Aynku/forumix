@@ -98,6 +98,24 @@ function split_sql(string $sql): array {
     return $clean;
 }
 
+/**
+ * Entfernt die Beispiel-Foren wieder.
+ *
+ * Sie stehen in `install.sql` und werden mit eingespielt; wer sie nicht will,
+ * bekommt sie hier wieder weggeraeumt. Der umgekehrte Weg — sie erst gar nicht
+ * anzulegen — hiesse, die Datei in zwei Teile zu zerlegen und den zweiten je
+ * nach Antwort einzuspielen. Das waere eine zweite Stelle, an die man denken
+ * muss, sobald sich an den Startdaten etwas aendert.
+ *
+ * Angefasst wird nur, was die Datei selbst anlegt: die vier Foren und die
+ * zwei Kategorien mit ihren festen Kennungen. Alles, was ein Betreiber
+ * spaeter dazustellt, bekommt hoehere Kennungen und bleibt.
+ */
+function drop_demo_content(PDO $pdo): void {
+    $pdo->exec('DELETE FROM `boards` WHERE `board_id` IN (1, 2, 3, 4)');
+    $pdo->exec('DELETE FROM `categories` WHERE `cat_id` IN (1, 2)');
+}
+
 function run_schema(PDO $pdo): int {
     $sql = file_get_contents(SQL_FILE);
     if ($sql === false) {

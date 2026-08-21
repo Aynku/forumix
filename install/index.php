@@ -100,6 +100,9 @@ if ($step === 3) {
             try {
                 $pdo = pdo_connect($_SESSION['install_db']);
                 $schemaStmts = run_schema($pdo);
+                // Vorgabe: keine Beispiel-Foren. Etwas, das man aktiv
+                // wegklicken muss, ist aufgezwungen — wer sie will, hakt an.
+                if (empty($_POST['demo'])) { drop_demo_content($pdo); }
                 // install.sql ist der Stand von 1.0; alles danach kommt aus
                 // install/migrations/ — derselbe Weg, den ein Update geht.
                 $_SESSION['install_migrations'] = count(run_migrations($pdo));
@@ -224,6 +227,10 @@ function render_page(string $title, string $body, int $cur = 0): void {
   .steps li.done{color:var(--okc)} .steps li.done span{background:var(--okc);color:#0b0d10}
   .steps li.done{border-top-color:var(--okc)}
   label{display:block;margin:14px 0 5px;font-size:13px;color:var(--mut)}
+  /* Beschriftungen stehen sonst ueber dem Feld. Ein Haekchen gehoert daneben. */
+  label.check{display:flex;align-items:center;gap:9px;margin:18px 0 0;
+              font-size:14px;color:var(--fg);cursor:pointer}
+  label.check input{width:16px;height:16px;margin:0;accent-color:var(--acc);cursor:pointer}
   input[type=text],input[type=password],input[type=email],input[type=url]{
         width:100%;padding:10px 12px;background:#0f1114;border:1px solid var(--bd);
         border-radius:8px;color:var(--fg);font-size:14px}
@@ -306,9 +313,19 @@ if ($step === 3) {
       Eine eventuell vorhandene Forum-Datenbank wird dabei <strong>überschrieben</strong>.
       Nur fortfahren, wenn die Datenbank leer ist oder neu aufgesetzt werden soll.</div>
     <p class="hint">Es werden alle Tabellen, Indizes und Fremdschlüssel angelegt sowie
-      die nicht-personenbezogenen Grunddaten (Kategorien, Foren, Tags, Smileys,
-      Achievements, Seiten, FAQ, Einstellungen) eingespielt.</p>
+      die nicht-personenbezogenen Grunddaten (Tags, Smileys, Achievements,
+      Seiten, FAQ, Einstellungen) eingespielt.</p>
     <form method="post" action="?step=3">' . csrf_field() . '
+      <label class="check">
+        <input type="checkbox" name="demo" value="1">
+        Vier Beispiel-Foren anlegen
+      </label>
+      <p class="hint" style="margin-top:6px">
+        <em>Ankündigungen</em>, <em>Off-Topic</em>, <em>Hilfe &amp; Fragen</em> und
+        <em>Fehlerberichte</em> in zwei Kategorien — zum Ausprobieren.
+        Wer eigene Foren anlegen oder ein bestehendes Forum übernehmen will,
+        lässt das Häkchen weg und fängt mit einer leeren Übersicht an.
+      </p>
       <button type="submit">Schema jetzt anlegen →</button>
     </form></div>';
 }

@@ -1004,6 +1004,112 @@ if (in_array($action, ['approve_thread', 'approve_post', 'reject_thread', 'rejec
     redirect(FORUM_URL . '/admin/?action=approval');
 }
 
+// ─── PHPBB-IMPORT ─────────────────────────────────────────────────
+//
+// Der Import laeuft in Runden, weil ein Forum mit hunderttausend Beitraegen
+// im Browser in jedes Zeitlimit liefe. Jede Runde macht ein Stueck und sagt,
+// wie weit sie gekommen ist; die Seite ruft die naechste selbst auf.
+//
+// Die Zugangsdaten stehen in der Sitzung, nicht in versteckten Feldern: sie
+// gehen sonst bei jeder Runde durch den Browser.
+
+if (str_starts_with($action, 'import_')) {
+    require_once __DIR__ . '/../lib/import_phpbb.php';
+}
+
+if ($action === 'import_pruefen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+
+    $opt = [
+        'host'    => post_str('db_host') ?: 'localhost',
+        'port'    => post_str('db_port') ?: '3306',
+        'db'      => post_str('db_name'),
+        'user'    => post_str('db_user'),
+        'pass'    => (string) ($_POST['db_pass'] ?? ''),
+        'praefix' => post_str('db_praefix') ?: 'phpbb_',
+        'dateien' => rtrim(post_str('dateien'), '/'),
+    ];
+
+    if ($opt['db'] === '' || $opt['user'] === '') {
+        flash('Datenbank und Benutzer sind Pflicht.', 'error');
+        redirect(FORUM_URL . '/admin/?action=import');
+    }
+
+    try {
+        $alt = import_verbindung($opt);
+    } catch (Throwable $e) {
+        flash('Keine Verbindung: ' . $e->getMessage(), 'error');
+        redirect(FORUM_URL . '/admin/?action=import');
+    }
+
+    $grund = import_pruefe_quelle($alt, $opt['praefix']);
+    if ($grund !== null) {
+        flash($grund, 'error');
+        redirect(FORUM_URL . '/admin/?action=import');
+    }
+
+    $_SESSION['import_opt']    = $opt;
+    $_SESSION['import_bericht'] = [
+        'bestand'    => import_bestand($alt, $opt['praefix']),
+        'passwoerter'=> import_passwoerter($alt, $opt['praefix']),
+        'dateien'    => import_dateien_pruefen($alt, $opt['praefix'], $opt['dateien']),
+    ];
+    redirect(FORUM_URL . '/admin/?action=import');
+}
+
+if ($action === 'import_runde' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json; charset=utf-8');
+    if (!verify_csrf(post_str('csrf'))) {
+        echo json_encode(['fehler' => 'Sicherheits-Token ungültig. Bitte die Seite neu laden.']);
+        exit;
+    }
+    $opt = $_SESSION['import_opt'] ?? null;
+    if (!$opt) {
+        echo json_encode(['fehler' => 'Die Zugangsdaten sind nicht mehr da. Bitte von vorn beginnen.']);
+        exit;
+    }
+
+    $schritt = post_str('schritt');
+    if (!isset(IMPORT_SCHRITTE[$schritt])) {
+        echo json_encode(['fehler' => 'Unbekannter Schritt.']);
+        exit;
+    }
+
+    // Ein Zeitlimit waehrend einer Runde traefe mitten in die Arbeit. Also so
+    // viel Zeit geben, wie der Server hergibt — die Runde selbst ist kurz.
+    @set_time_limit(300);
+
+    try {
+        $alt = import_verbindung($opt);
+        $e   = import_runde($alt, $opt['praefix'], $schritt, $opt);
+        echo json_encode([
+            'getan'   => (int) ($e['getan'] ?? 0),
+            'neu'     => (int) ($e['neu'] ?? 0),
+            'fertig'  => (bool) ($e['fertig'] ?? true),
+            'stand'   => import_erledigt($schritt),
+        ]);
+    } catch (Throwable $ex) {
+        echo json_encode(['fehler' => $ex->getMessage()]);
+    }
+    exit;
+}
+
+if ($action === 'import_zurueck' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    $bericht = import_zuruecknehmen();
+    unset($_SESSION['import_bericht']);
+    $summe = array_sum($bericht);
+    flash($summe > 0
+        ? 'Der Import wurde zurückgenommen — ' . number_format($summe, 0, ',', '.') . ' Einträge entfernt.'
+        : 'Es gab nichts zurückzunehmen.', 'success');
+    redirect(FORUM_URL . '/admin/?action=import');
+}
+
+if ($action === 'import_vergessen') {
+    unset($_SESSION['import_opt'], $_SESSION['import_bericht']);
+    redirect(FORUM_URL . '/admin/?action=import');
+}
+
 // ─── DATENBANK-MIGRATIONEN ────────────────────────────────────────
 if ($action === 'run_migration' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
@@ -1695,6 +1801,19 @@ switch ($action) {
             'tpl_count' => count($tplFiles),
             'tpl_bytes' => $tplBytes,
         ];
+        break;
+
+    case 'import':
+        require_once __DIR__ . '/../lib/import_phpbb.php';
+        $vars['importBericht'] = $_SESSION['import_bericht'] ?? null;
+        $vars['importOpt']     = $_SESSION['import_opt'] ?? null;
+        $vars['importLaeuft']  = import_zuordnung_da();
+        $vars['importStand']   = [];
+        if ($vars['importLaeuft']) {
+            foreach (array_keys(IMPORT_SCHRITTE) as $sch) {
+                $vars['importStand'][$sch] = import_erledigt($sch);
+            }
+        }
         break;
 
     case 'updates':
