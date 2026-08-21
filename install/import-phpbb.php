@@ -688,5 +688,209 @@ db_execute("UPDATE users u SET post_count = (SELECT COUNT(*) FROM posts p
 
 echo "\r  Zähler               neu gesetzt          \n";
 
-fwrite(STDERR, "\nAnhänge, Umfragen und Nachrichten folgen in der nächsten Stufe.\n");
+/* ── Anhaenge ─────────────────────────────────────────────────────────── */
+//
+// Nicht nur Zeilen, sondern Dateien: ohne den Ordner aus dem alten Forum
+// bleibt hier ein Verweis auf nichts. Der Import legt eine Kopie an und
+// laesst das Original in Ruhe — wer den Umzug abbricht, hat sein altes Forum
+// unveraendert.
+
+if ($anhaenge > 0 && $opt['dateien'] !== '' && is_dir($opt['dateien'])) {
+    $quelle = rtrim($opt['dateien'], '/');
+    $ziel   = rtrim(UPLOAD_DIR, '/') . '/attachments';
+    if (!is_dir($ziel)) @mkdir($ziel, 0755, true);
+
+    // Gehoert der Zielordner jemand anderem als dem, der gerade laeuft?
+    // Dann sollen die neuen Dateien ihm auch gehoeren.
+    $besitzer = null;
+    $stat = @stat($ziel);
+    if ($stat !== false && function_exists('posix_geteuid') && posix_geteuid() === 0
+        && $stat['uid'] !== 0) {
+        $besitzer = ['uid' => $stat['uid'], 'gid' => $stat['gid']];
+    }
+
+    $anAngelegt = $anFehlt = $anSchon = 0;
+    foreach ($alt->query("SELECT attach_id, post_msg_id, poster_id, real_filename,
+                                 physical_filename, mimetype, filesize
+                          FROM {$p}attachments WHERE is_orphan = 0 ORDER BY attach_id") as $z) {
+        $altId = (int) $z['attach_id'];
+        if (import_neu_id('anhang', $altId) !== null) { $anSchon++; continue; }
+
+        $beitrag = import_neu_id('beitrag', (int) $z['post_msg_id']);
+        if ($beitrag === null) { $anFehlt++; continue; }
+
+        $von = $quelle . '/' . basename((string) $z['physical_filename']);
+        if (!is_file($von)) { $anFehlt++; continue; }
+
+        // Endung aus dem Anzeigenamen, nicht aus dem MIME-Typ: phpBB fuehrt
+        // auch Typen, die Forumix nicht anbietet, und eine Datei ohne Endung
+        // laesst sich hinterher nicht ausliefern.
+        $endung = strtolower(pathinfo((string) $z['real_filename'], PATHINFO_EXTENSION));
+        if ($endung === '' || !preg_match('/^[a-z0-9]{1,5}$/', $endung)) $endung = 'dat';
+
+        $name = 'att_' . $beitrag . '_' . bin2hex(random_bytes(6)) . '.' . $endung;
+        if (!@copy($von, $ziel . '/' . $name)) { $anFehlt++; continue; }
+        @chmod($ziel . '/' . $name, 0644);
+
+        // Wer den Import als root faehrt, legt Dateien an, die root gehoeren —
+        // und die kann der Webserver nicht ausliefern. Also den Besitzer des
+        // Ordners uebernehmen, in den geschrieben wird.
+        if ($besitzer !== null) {
+            @chown($ziel . '/' . $name, $besitzer['uid']);
+            @chgrp($ziel . '/' . $name, $besitzer['gid']);
+        }
+
+        $mime  = (string) $z['mimetype'];
+        $neuId = (int) db_execute(
+            'INSERT INTO attachments (post_id, user_id, filename, original_name, mime_type,
+                                      size_bytes, is_image)
+             VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [
+                $beitrag,
+                import_neu_id('user', (int) $z['poster_id']) ?? import_platzhalter(),
+                $name,
+                mb_substr((string) $z['real_filename'], 0, 255),
+                $mime !== '' ? $mime : 'application/octet-stream',
+                (int) $z['filesize'],
+                str_starts_with($mime, 'image/') ? 1 : 0,
+            ]
+        );
+        import_merken('anhang', $altId, $neuId, (string) $z['real_filename']);
+        $anAngelegt++;
+    }
+
+    printf("  Anhänge              %d übernommen", $anAngelegt);
+    if ($anSchon > 0) printf(", %d schon da", $anSchon);
+    if ($anFehlt > 0) printf(", %d ohne Datei", $anFehlt);
+    echo "\n";
+} elseif ($anhaenge > 0) {
+    printf("  Anhänge              %d übersprungen (kein Ordner angegeben)\n", $anhaenge);
+}
+
+/* ── Umfragen ─────────────────────────────────────────────────────────── */
+//
+// phpBB haengt die Frage an das Thema und fuehrt die Antworten daneben;
+// Forumix hat eine eigene Tabelle je Umfrage. Die Stimmen kommen als Zahl
+// mit — wer wofuer gestimmt hat, nur soweit die Konten mitgekommen sind.
+
+if ($umfragen > 0) {
+    $umAngelegt = 0;
+    foreach ($alt->query("SELECT topic_id, poll_title, poll_start, poll_length, poll_max_options
+                          FROM {$p}topics WHERE poll_title <> '' ORDER BY topic_id") as $z) {
+        $thema = import_neu_id('thema', (int) $z['topic_id']);
+        if ($thema === null) continue;
+        if (import_neu_id('umfrage', (int) $z['topic_id']) !== null) continue;
+
+        $laenge = (int) $z['poll_length'];
+        $start  = (int) $z['poll_start'];
+
+        $pollId = (int) db_execute(
+            'INSERT INTO polls (thread_id, question, multi_choice, expires_at, created_at)
+             VALUES (?, ?, ?, ?, ?)',
+            [
+                $thema, mb_substr((string) $z['poll_title'], 0, 255),
+                ((int) $z['poll_max_options']) > 1 ? 1 : 0,
+                $laenge > 0 ? import_zeit($start + $laenge) : null,
+                import_zeit($start),
+            ]
+        );
+        import_merken('umfrage', (int) $z['topic_id'], $pollId,
+                      mb_substr((string) $z['poll_title'], 0, 100));
+
+        $pos = 0;
+        $optionen = $alt->prepare("SELECT poll_option_id, poll_option_text, poll_option_total
+                                   FROM {$p}poll_options WHERE topic_id = ? ORDER BY poll_option_id");
+        $optionen->execute([(int) $z['topic_id']]);
+        foreach ($optionen as $o) {
+            $optId = (int) db_execute(
+                'INSERT INTO poll_options (poll_id, text, vote_count, position) VALUES (?, ?, ?, ?)',
+                [$pollId, mb_substr((string) $o['poll_option_text'], 0, 200),
+                 (int) $o['poll_option_total'], $pos++]
+            );
+            import_merken('umfrage_option', ((int) $z['topic_id']) * 1000 + (int) $o['poll_option_id'],
+                          $optId);
+        }
+        $umAngelegt++;
+    }
+
+    // Einzelne Stimmen, soweit Konto und Antwort mitgekommen sind. Ohne sie
+    // koennte ein Mitglied ein zweites Mal abstimmen.
+    $stimmen = 0;
+    if ($tabelle_da($p . 'poll_votes')) {
+        foreach ($alt->query("SELECT topic_id, poll_option_id, vote_user_id FROM {$p}poll_votes") as $v) {
+            $poll = import_neu_id('umfrage', (int) $v['topic_id']);
+            $opt  = import_neu_id('umfrage_option',
+                                  ((int) $v['topic_id']) * 1000 + (int) $v['poll_option_id']);
+            $user = import_neu_id('user', (int) $v['vote_user_id']);
+            if ($poll === null || $opt === null || $user === null) continue;
+            try {
+                db_execute('INSERT IGNORE INTO poll_votes (poll_id, option_id, user_id) VALUES (?, ?, ?)',
+                           [$poll, $opt, $user]);
+                $stimmen++;
+            } catch (Throwable $e) {}
+        }
+    }
+
+    printf("  Umfragen             %d übernommen", $umAngelegt);
+    if ($stimmen > 0) printf(", %d Stimmen zugeordnet", $stimmen);
+    echo "\n";
+}
+
+/* ── Private Nachrichten ──────────────────────────────────────────────── */
+//
+// phpBB kennt mehrere Empfaenger je Nachricht, Forumix einen. Aus einer
+// Nachricht an drei Leute werden deshalb drei — anders liesse sich nicht
+// abbilden, dass jeder sie einzeln liest, beantwortet und loescht.
+//
+// Die Kopie im Postausgang des Absenders (folder_id = -1) bleibt draussen:
+// Forumix zeigt dem Absender seine gesendeten Nachrichten aus derselben
+// Zeile, ein zweiter Eintrag waere ein Doppelgaenger.
+
+if ($pn > 0 && $tabelle_da($p . 'privmsgs_to')) {
+    $pnAngelegt = $pnUeber = 0;
+    $abfrage = $alt->query("SELECT m.msg_id, t.user_id AS empfaenger, m.author_id, m.message_subject,
+                                   m.message_text, m.message_time, t.pm_unread
+                            FROM {$p}privmsgs m
+                            JOIN {$p}privmsgs_to t ON t.msg_id = m.msg_id
+                            WHERE t.folder_id <> -1
+                            ORDER BY m.msg_id, t.user_id");
+
+    foreach ($abfrage as $z) {
+        $schluessel = ((int) $z['msg_id']) * 100000 + (int) $z['empfaenger'];
+        if (import_neu_id('pn', $schluessel) !== null) continue;
+
+        $von = import_neu_id('user', (int) $z['author_id']);
+        $an  = import_neu_id('user', (int) $z['empfaenger']);
+        if ($von === null || $an === null) { $pnUeber++; continue; }
+
+        $betreff = trim((string) $z['message_subject']);
+        $neuId = (int) db_execute(
+            'INSERT INTO private_messages (sender_id, receiver_id, subject, content, is_read, sent_at)
+             VALUES (?, ?, ?, ?, ?, ?)',
+            [
+                $von, $an,
+                mb_substr($betreff !== '' ? $betreff : '(ohne Betreff)', 0, 200),
+                phpbb_text_zu_bbcode((string) $z['message_text']),
+                ((int) $z['pm_unread']) === 1 ? 0 : 1,
+                import_zeit((int) $z['message_time']),
+            ]
+        );
+        import_merken('pn', $schluessel, $neuId);
+        $pnAngelegt++;
+    }
+
+    printf("  Private Nachrichten  %d übernommen", $pnAngelegt);
+    if ($pnUeber > 0) printf(", %d ohne Absender oder Empfänger", $pnUeber);
+    echo "\n";
+}
+
+echo "\n── Fertig ──\n";
+echo "  Was zu tun bleibt:\n";
+echo "  · Die Rechte je Forum stehen offen — im Adminbereich einrichten.\n";
+if ($manuell > 0) {
+    printf($manuell === 1
+        ? "  · Ein Mitglied muss einmal \"Passwort vergessen\" benutzen.\n"
+        : "  · %d Mitglieder müssen einmal \"Passwort vergessen\" benutzen.\n", $manuell);
+}
+echo "  · Ein zweiter Lauf ergänzt nur, was fehlt. --zuruecknehmen macht alles rückgängig.\n";
 exit(0);
