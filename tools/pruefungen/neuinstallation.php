@@ -22,7 +22,7 @@ if (!defined('FORUM_PRUEFLAUF')) { http_response_code(403); die('Forbidden'); }
 
 $wurzel = dirname(__DIR__, 2);
 $db     = getenv('FORUM_TEST_DB') ?: 'forumix_test';
-$konfig = '/root/forumix-test/instanz/config.php';
+$konfig = (defined('PRUEFSTAND') && PRUEFSTAND !== '') ? PRUEFSTAND . '/config.php' : '';
 if (!is_file($konfig)) return ['Neuinstallation (uebersprungen, kein Pruefstand)' => fn() => null];
 
 $roh  = file_get_contents($konfig);

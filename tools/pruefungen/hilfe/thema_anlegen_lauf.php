@@ -8,7 +8,7 @@
  * Forum, echte Transaktion, echte Zaehler — also laeuft es in einem eigenen
  * Prozess gegen den Pruefstand.
  *
- *   php hilfe/thema_anlegen_lauf.php /root/forumix-test/instanz
+ *   php hilfe/thema_anlegen_lauf.php <pfad-zum-pruefstand>
  *
  * Gibt "ok" aus oder nennt, was nicht stimmt, und geht mit 1 raus.
  */

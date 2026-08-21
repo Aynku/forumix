@@ -7,6 +7,11 @@
  *   php tools/pruefen.php --auch=/pfad/zu/pruefungen
  *                                    zusaetzlich fremde Pruefungen mitfahren
  *
+ * Manche Pruefungen brauchen eine zweite Installation als Pruefstand. Wo die
+ * liegt, sagt FORUM_PRUEFSTAND; ohne die Angabe ueberspringen sie sich:
+ *
+ *   FORUM_PRUEFSTAND=/pfad/zur/instanz php tools/pruefen.php
+ *
  * Jede Datei in tools/pruefungen/ liefert ein Array
  *   'Beschreibung' => fn() => ...   (wirft bei Fehlschlag)
  *
@@ -32,6 +37,11 @@ $wurzel = dirname(__DIR__);
 // Betriebswerkzeuge von forumix.de etwa), und die koennen es nicht mehr aus
 // ihrem eigenen Pfad erschliessen.
 define('FORUM_WURZEL', $wurzel);
+
+// Wo der Pruefstand liegt, weiss nur der Betreiber — der Pfad ist seine Sache,
+// nicht die des Produkts. Ohne Angabe ueberspringen die Pruefungen, die eine
+// zweite Installation brauchen, sich selbst.
+define('PRUEFSTAND', rtrim((string) getenv('FORUM_PRUEFSTAND'), '/'));
 
 $gruppe = '';
 $fremde = [];

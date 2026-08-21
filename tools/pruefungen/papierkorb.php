@@ -15,7 +15,7 @@
 if (!defined('FORUM_PRUEFLAUF')) { http_response_code(403); die('Forbidden'); }
 
 $wurzel  = dirname(__DIR__, 2);
-$instanz = '/root/forumix-test/instanz';
+$instanz = defined('PRUEFSTAND') ? PRUEFSTAND : '';
 if (!is_file($instanz . '/config.php')) {
     return ['Papierkorb (uebersprungen, kein Pruefstand)' => fn() => null];
 }

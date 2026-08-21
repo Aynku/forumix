@@ -17,7 +17,7 @@ $wurzel = dirname(__DIR__, 2);
 $db     = getenv('FORUM_TEST_DB') ?: 'forumix_test';
 
 // Zugang aus der Konfiguration des Pruefstands, nie aus einem Live-Forum.
-$konfig = '/root/forumix-test/instanz/config.php';
+$konfig = (defined('PRUEFSTAND') && PRUEFSTAND !== '') ? PRUEFSTAND . '/config.php' : '';
 if (!is_file($konfig)) return ['Zwei-Faktor (uebersprungen, kein Pruefstand)' => fn() => null];
 
 $roh = file_get_contents($konfig);
