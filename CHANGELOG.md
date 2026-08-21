@@ -8,6 +8,34 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.7.2 (2026-08-21)
+
+### Die Warnung vor dem Senden meldet nicht mehr, was ohnehin bleibt
+
+Beim ersten Einsatz an einem echten Beitrag meldete die Prüfung sieben
+Angaben, von denen zwei keine waren: `PassivePorts 49152 50000` galt als
+Telefonnummer und die Beispiel-Adresse daneben als IP — beide standen in
+einem `[code]`-Block.
+
+Das ist die schlimmste Sorte Falschmeldung. Codeblöcke und Zitate werden
+ohnehin nicht gesendet; gewarnt wurde also vor etwas, das gar nicht passiert.
+Genau daran stirbt eine Warnung: Wer dreimal seine eigene Beispiel-IP
+wegklickt, klickt beim vierten Mal die echte Angabe mit weg.
+
+- **`[code]` und `[quote]` werden nicht mehr durchsucht.** Dieselbe Angabe
+  außerhalb wird weiterhin gemeldet.
+- **Eine Telefonnummer beginnt mit 0 oder +.** Vorher reichten zehn Ziffern
+  mit einem Leerzeichen — damit war jede Portangabe und jede Bestellnummer
+  eine Nummer. Und sie darf nicht mitten in einer Zahl anfangen, sonst wurde
+  aus „2019 2020" die Nummer „019 2020".
+- **IBANs werden vollständig erfasst.** Eine deutsche IBAN hat 22 Stellen und
+  endet auf ein Ziffernpaar, nicht auf eine Vierergruppe — die letzten beiden
+  Ziffern blieben beim Schwärzen stehen.
+
+An demselben Beitrag bleiben jetzt fünf Funde übrig, und alle fünf sind echt.
+
+---
+
 ## v1.7.1 (2026-08-21)
 
 ### Modul-Einstellungen stehen im Adminbereich

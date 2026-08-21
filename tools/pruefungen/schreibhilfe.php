@@ -85,7 +85,8 @@ $vergleich = function (string $alt, string $neu) use ($inJs): ?array {
 
 /** Die Suche nach schutzwuerdigen Angaben. */
 $suche = function (string $text) use ($inJs): ?array {
-    $d = $inJs(['luhn', 'ipPlausibel', 'telefonPlausibel', 'MUSTER', 'funde'], 'funde', [$text]);
+    $d = $inJs(['luhn', 'ipPlausibel', 'telefonPlausibel', 'MUSTER',
+                'geschuetzteBereiche', 'liegtIn', 'funde'], 'funde', [$text]);
     return is_array($d) ? $d : null;
 };
 
@@ -259,6 +260,24 @@ return [
         }
     },
 
+    'Eine IBAN wird vollständig erfasst' => function () use ($suche) {
+        if (!trim((string) shell_exec('command -v node'))) return null;
+
+        // Eine deutsche IBAN hat 22 Stellen und endet damit auf ein Paar,
+        // nicht auf eine Vierergruppe. Wurde nur bis dorthin erkannt, blieben
+        // die letzten Ziffern beim Schwaerzen im Text stehen.
+        $f = $suche('Konto DE89 3704 0044 0532 0130 00 bitte.');
+        if ($f === null) throw new RuntimeException('Suche lieferte kein Ergebnis');
+        foreach ($f as $fund) {
+            if ($fund['art'] !== 'IBAN') continue;
+            if (!str_ends_with($fund['wert'], '00')) {
+                throw new RuntimeException('IBAN nur teilweise erfasst: ' . $fund['wert']);
+            }
+            return;
+        }
+        throw new RuntimeException('IBAN gar nicht gefunden');
+    },
+
     'Eine beliebige lange Zahl ist keine Kartennummer' => function () use ($suche) {
         if (!trim((string) shell_exec('command -v node'))) return null;
 
@@ -281,6 +300,74 @@ return [
         if ($f === null) throw new RuntimeException('Suche lieferte kein Ergebnis');
         if (!in_array('Kartennummer', array_column($f, 'art'), true)) {
             throw new RuntimeException('Eine gültige Kartennummer wurde übersehen');
+        }
+    },
+
+    'Was im Codeblock steht, wird nicht gemeldet' => function () use ($suche) {
+        if (!trim((string) shell_exec('command -v node'))) return null;
+
+        // Am 21.08.2026 im laufenden Forum aufgeschlagen: "PassivePorts 49152
+        // 50000" aus einem Codeblock wurde als Telefonnummer gemeldet, die
+        // Beispiel-IP daneben als IP-Adresse. Beides geht ohnehin nie hinaus —
+        // Codebloecke trennt der Server ab. Eine Warnung vor etwas, das nicht
+        // passiert, wird weggeklickt, und beim naechsten Mal die echte mit.
+        $text = "Meine Config:\n[code]\nPassivePorts 49152 50000\n"
+              . "MasqueradeAddress 192.168.178.42\n[/code]\nSo sieht das aus.";
+        $f = $suche($text);
+        if ($f === null) throw new RuntimeException('Suche lieferte kein Ergebnis');
+        if ($f) {
+            throw new RuntimeException('Falschmeldung aus dem Codeblock: '
+                . json_encode(array_column($f, 'wert'), JSON_UNESCAPED_UNICODE));
+        }
+    },
+
+    'Was im Zitat steht, wird auch nicht gemeldet' => function () use ($suche) {
+        if (!trim((string) shell_exec('command -v node'))) return null;
+
+        $f = $suche('[quote=Max]Schreib an max@example.org[/quote] Mach ich.');
+        if ($f === null) throw new RuntimeException('Suche lieferte kein Ergebnis');
+        if ($f) throw new RuntimeException('Falschmeldung aus dem Zitat');
+    },
+
+    'Dieselbe Angabe außerhalb wird sehr wohl gemeldet' => function () use ($suche) {
+        if (!trim((string) shell_exec('command -v node'))) return null;
+
+        // Die Gegenprobe: sonst waere die Pruefung oben auch dann gruen, wenn
+        // die Suche gar nichts mehr faende.
+        $f = $suche('[quote]egal[/quote] Schreib an max@example.org bitte.');
+        if ($f === null) throw new RuntimeException('Suche lieferte kein Ergebnis');
+        if (!in_array('E-Mail-Adresse', array_column($f, 'art'), true)) {
+            throw new RuntimeException('Die Adresse außerhalb des Zitats wurde übersehen');
+        }
+    },
+
+    'Eine Portangabe ist keine Telefonnummer' => function () use ($suche) {
+        if (!trim((string) shell_exec('command -v node'))) return null;
+
+        // Auch im Fliesstext: eine Nummer faengt mit 0 oder + an.
+        foreach (['Der Bereich 49152 50000 ist frei.',
+                  'Bestellung 1234567890 kam an.',
+                  'Wir hatten 2019 2020 und 2021 dasselbe.'] as $text) {
+            $f = $suche($text);
+            if ($f === null) throw new RuntimeException('Suche lieferte kein Ergebnis');
+            foreach ($f as $fund) {
+                if ($fund['art'] === 'Telefonnummer') {
+                    throw new RuntimeException('Falschmeldung in ' . var_export($text, true)
+                        . ': ' . $fund['wert']);
+                }
+            }
+        }
+    },
+
+    'Eine echte Nummer wird weiterhin gefunden' => function () use ($suche) {
+        if (!trim((string) shell_exec('command -v node'))) return null;
+
+        foreach (['Ruf an unter 0151 23456789.', 'Oder +49 151 23456789.'] as $text) {
+            $f = $suche($text);
+            if ($f === null) throw new RuntimeException('Suche lieferte kein Ergebnis');
+            if (!in_array('Telefonnummer', array_column($f, 'art'), true)) {
+                throw new RuntimeException('Nummer übersehen in ' . var_export($text, true));
+            }
         }
     },
 

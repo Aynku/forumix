@@ -95,8 +95,17 @@
 
   var MUSTER = [
     {art: 'E-Mail-Adresse',   re: /[\w.+-]+@[\w-]+\.[\w.-]{2,}/g},
-    {art: 'IBAN',             re: /\b[A-Z]{2}\d{2}(?:[ ]?[A-Z0-9]{4}){2,7}\b/g},
-    {art: 'Telefonnummer',    re: /(?:\+\d{1,3}[ /-]?)?\(?\d{2,5}\)?[ /-]?\d{3,}[ -]?\d{2,}/g, pruef: telefonPlausibel},
+    // Die letzte Gruppe ist oft kuerzer als vier Zeichen: eine deutsche IBAN
+    // hat 22 Stellen, also endet sie auf ein Paar. Ohne den Nachsatz blieben
+    // die letzten Ziffern beim Schwaerzen stehen.
+    {art: 'IBAN',             re: /\b[A-Z]{2}\d{2}(?:[ ]?[A-Z0-9]{4}){2,7}(?:[ ]?[A-Z0-9]{1,3})?\b/g},
+    // Beginnt mit 0 oder +. Ohne diese Bedingung war "PassivePorts 49152 50000"
+    // aus einem Codeblock eine Telefonnummer — zehn Ziffern mit Leerzeichen
+    // reichten. Deutsche und internationale Nummern fangen so an; eine
+    // Portnummer, eine Bestellnummer und ein Zahlenpaar nicht.
+    // Das (?<!\d) davor ist noetig, sonst faengt "2019 2020" bei der Null in
+    // der Jahreszahl an und ergibt "019 2020".
+    {art: 'Telefonnummer',    re: /(?<![\d+])(?:\+\d{1,3}|0)[ /-]?\(?\d{2,5}\)?[ /-]?\d{3,}(?:[ -]?\d{2,})?/g, pruef: telefonPlausibel},
     {art: 'Zugangsschlüssel', re: /\b(?:sk-|pk-|ghp_|gho_|xox[baprs]-|AKIA|AIza)[A-Za-z0-9_-]{10,}\b/g},
     {art: 'Kartennummer',     re: /\b(?:\d[ -]?){12,18}\d\b/g, pruef: luhn},
     {art: 'IP-Adresse',       re: /\b(?:\d{1,3}\.){3}\d{1,3}\b/g, pruef: ipPlausibel}
@@ -128,10 +137,36 @@
   }
 
   /**
+   * Bereiche, die ohnehin nicht gesendet werden: [code] und [quote].
+   *
+   * Was dort steht, trennt der Server ab — eine Warnung darüber wäre eine
+   * Warnung vor etwas, das nicht passiert. Und genau daran stirbt eine
+   * Warnung: die IP-Adresse aus der eigenen Beispielkonfiguration wird beim
+   * dritten Mal weggeklickt, und beim vierten Mal auch die echte.
+   *
+   * Gesucht wird flach mit einem Ausdruck — hier geht es nur darum, welche
+   * Stellen ausgespart werden. Das genaue Zählen der Verschachtelung macht
+   * der Server (lib/schutz.php), und er entscheidet auch, was hinausgeht.
+   */
+  function geschuetzteBereiche(text) {
+    var re = /\[(code|quote)(=[^\]]*)?\][\s\S]*?\[\/\1\]/gi;
+    var bereiche = [], t;
+    while ((t = re.exec(text)) !== null) {
+      bereiche.push({von: t.index, bis: t.index + t[0].length});
+    }
+    return bereiche;
+  }
+
+  function liegtIn(bereiche, von, bis) {
+    return bereiche.some(function (b) { return von >= b.von && bis <= b.bis; });
+  }
+
+  /**
    * Sucht die Funde. Überlappungen fallen weg: eine IBAN enthält Ziffernfolgen,
    * die auch als Kartennummer durchgehen könnten.
    */
   function funde(text) {
+    var geschuetzt = geschuetzteBereiche(text);
     var alle = [];
     MUSTER.forEach(function (m) {
       m.re.lastIndex = 0;
@@ -139,6 +174,7 @@
       while ((t = m.re.exec(text)) !== null) {
         var wert = t[0].trim();
         if (m.pruef && !m.pruef(wert)) continue;
+        if (liegtIn(geschuetzt, t.index, t.index + t[0].length)) continue;
         alle.push({art: m.art, wert: wert, von: t.index, bis: t.index + t[0].length});
       }
     });
