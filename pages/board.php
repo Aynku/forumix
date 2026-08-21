@@ -77,9 +77,10 @@ if (current_user() && !empty($threads)) {
     $unreadStatus = unread_status_for_threads((int) current_user()['user_id'], $threadIds);
 }
 
-// Ohne Schreibrecht wird der Knopf gar nicht erst gezeichnet — er fuehrte
-// sonst auf eine Absage.
-$darfSchreiben = board_can_write($boardId);
+// Ohne das Recht wird der Knopf gar nicht erst gezeichnet — er fuehrte sonst
+// auf eine Absage. Gemeint ist hier nur "Neues Thema": ob jemand antworten
+// darf, entscheidet sich im Thema selbst.
+$darfSchreiben = board_darf($boardId, 'thema');
 
 render('board', [
     'darfSchreiben' => $darfSchreiben,

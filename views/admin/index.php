@@ -455,19 +455,39 @@
             </div>
 
             <?php /* ── GRUPPENRECHTE ── */ ?>
-            <?php $rechte = $brettRechte ?? []; ?>
+            <?php
+              $rechte  = $brettRechte ?? [];
+              $fein    = $brettFeinrechte ?? [];
+              $feinDa  = !empty($feinrechteDa);
+              // Beschriftung der Feinrechte. Reihenfolge wie in BRETT_FEINRECHTE,
+              // damit Kopfzeile und Kaestchen nicht auseinanderlaufen.
+              $feinSpalten = [
+                'thema'      => ['Thema',  'Neue Themen eröffnen'],
+                'antwort'    => ['Antwort', 'Auf Themen antworten'],
+                'anhang'     => ['Anhang',  'Dateien anhängen'],
+                'bearbeiten' => ['Ändern',  'Eigene Beiträge nachträglich ändern'],
+                'umfrage'    => ['Umfrage', 'Umfragen anlegen'],
+              ];
+              $kopf = 'padding:8px 10px;font-size:11px;text-transform:uppercase;'
+                    . 'letter-spacing:.05em;color:var(--text-muted);border-bottom:1px solid var(--border)';
+              $trenn = 'border-left:1px solid var(--border)';
+            ?>
             <div class="form-row" style="border-top:1px dashed var(--border);padding-top:14px;margin-top:14px">
               <label>👪 Gruppenrechte</label>
               <div style="overflow-x:auto">
                 <table style="width:100%;border-collapse:collapse">
                   <tr>
-                    <th style="text-align:left;padding:8px 10px;font-size:11px;text-transform:uppercase;
-                               letter-spacing:.05em;color:var(--text-muted);border-bottom:1px solid var(--border)">Gruppe</th>
+                    <th style="text-align:left;<?= $kopf ?>">Gruppe</th>
                     <?php foreach (['none' => 'nichts', 'read' => 'lesen', 'write' => 'schreiben'] as $stufe => $beschriftung): ?>
-                      <th style="width:100px;padding:8px 10px;font-size:11px;text-transform:uppercase;
-                                 letter-spacing:.05em;color:var(--text-muted);border-bottom:1px solid var(--border)">
-                        <?= e($beschriftung) ?></th>
+                      <th style="width:90px;<?= $kopf ?>"><?= e($beschriftung) ?></th>
                     <?php endforeach; ?>
+                    <?php if ($feinDa): ?>
+                      <?php $erste = true; foreach ($feinSpalten as $recht => [$kurz, $lang]): ?>
+                        <th style="width:78px;<?= $kopf ?><?= $erste ? ';' . $trenn : '' ?>"
+                            title="<?= e($lang) ?>"><?= e($kurz) ?></th>
+                        <?php $erste = false; ?>
+                      <?php endforeach; ?>
+                    <?php endif; ?>
                   </tr>
                   <?php foreach (($gruppen ?? []) as $g): ?>
                     <?php
@@ -477,6 +497,10 @@
                       // Angemeldete schreiben.
                       $vorgabe = $rechte[$gid] ?? ($g['slug'] === 'guests' ? 'read'
                                                 : ($g['slug'] === 'members' ? 'write' : 'none'));
+                      // Genauso bei den Haken: keine Zeile heisst "alles erlaubt",
+                      // weil board_darf() es ebenso auswertet.
+                      $haken = $fein[$gid] ?? array_fill_keys(array_keys($feinSpalten), true);
+                      $zelle = 'text-align:center;padding:8px 10px;border-bottom:1px solid var(--border)';
                     ?>
                     <tr>
                       <td style="padding:8px 10px;border-bottom:1px solid var(--border)">
@@ -486,11 +510,23 @@
                         <?php endif; ?>
                       </td>
                       <?php foreach (['none', 'read', 'write'] as $stufe): ?>
-                        <td style="text-align:center;padding:8px 10px;border-bottom:1px solid var(--border)">
+                        <td style="<?= $zelle ?>">
                           <input type="radio" name="rechte[<?= $gid ?>]" value="<?= $stufe ?>"
+                                 data-stufe-fuer="<?= $gid ?>"
                                  <?= $vorgabe === $stufe ? 'checked' : '' ?>>
                         </td>
                       <?php endforeach; ?>
+                      <?php if ($feinDa): ?>
+                        <?php $erste = true; foreach ($feinSpalten as $recht => [$kurz, $lang]): ?>
+                          <td style="<?= $zelle ?><?= $erste ? ';' . $trenn : '' ?>"
+                              data-fein-fuer="<?= $gid ?>"
+                              title="<?= e($lang) ?>">
+                            <input type="checkbox" name="fein[<?= $gid ?>][<?= $recht ?>]" value="1"
+                                   <?= !empty($haken[$recht]) ? 'checked' : '' ?>>
+                          </td>
+                          <?php $erste = false; ?>
+                        <?php endforeach; ?>
+                      <?php endif; ?>
                     </tr>
                   <?php endforeach; ?>
                 </table>
@@ -498,8 +534,39 @@
               <div class="form-hint">
                 Inhaber, Admins und Moderatoren sind ausgenommen — sie dürfen immer.
                 Wer in mehreren Gruppen ist, bekommt das höhere Recht.
+                <?php if ($feinDa): ?>
+                  Die rechten Häkchen gelten nur bei „schreiben“ — bei „nichts“ und „lesen“
+                  sind sie wirkungslos und deshalb blass.
+                <?php else: ?>
+                  <br><strong>Feinere Rechte stehen noch nicht bereit.</strong>
+                  Sie kommen mit der Anpassung <em>v1.5.0 – Feinere Rechte je Forum und Gruppe</em>
+                  unter <a href="<?= FORUM_URL ?>/admin/?action=migrations">Datenbank-Anpassungen</a>.
+                <?php endif; ?>
               </div>
             </div>
+            <?php if ($feinDa): ?>
+            <script>
+            // Die Haken bleiben bedienbar, auch wenn die Stufe nicht "schreiben"
+            // ist — sie werden nur blass. Sie abzuschalten waere ein Fallstrick:
+            // abgeschaltete Kaestchen schickt der Browser nicht mit, ein Umweg
+            // ueber "lesen" und zurueck haette damit alle Haken geloescht.
+            (function () {
+              function anpassen(gid) {
+                var gewaehlt = document.querySelector('input[name="rechte[' + gid + ']"]:checked');
+                var aktiv = gewaehlt && gewaehlt.value === 'write';
+                document.querySelectorAll('[data-fein-fuer="' + gid + '"]').forEach(function (td) {
+                  td.style.opacity = aktiv ? '1' : '.35';
+                });
+              }
+              document.querySelectorAll('[data-stufe-fuer]').forEach(function (r) {
+                r.addEventListener('change', function () { anpassen(r.dataset.stufeFuer); });
+              });
+              document.querySelectorAll('[data-fein-fuer]').forEach(function (td) {
+                anpassen(td.dataset.feinFuer);
+              });
+            })();
+            </script>
+            <?php endif; ?>
 
             <div class="form-row">
               <label>Wenn jemand kein Recht hat</label>

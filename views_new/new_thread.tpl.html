@@ -11,10 +11,12 @@
         <label>Beitrag</label>
         {{ render_editor('content', 'content', formContent ?? '', 'Schreibe etwas zum Thema… (BBCode unterstützt)', true, false)|raw }}
       </div>
+      {% if darfAnhang %}
       <div class="form-row">
         <label>{{ t('attach_file') }} (optional, max. 5 MB pro Datei)</label>
         <input type="file" name="attachments[]" multiple accept="image/*,application/pdf,text/plain,.zip,.rar">
       </div>
+      {% endif %}
 
       {% if availableTags %}
       <div class="form-row">
@@ -30,6 +32,7 @@
       </div>
       {% endif %}
 
+      {% if darfUmfrage %}
       <details style="margin:14px 0;padding:12px;background:var(--bg-surface2);border:1px solid var(--border);border-radius:6px">
         <summary style="cursor:pointer;font-weight:600">{{ t('add_poll') }}</summary>
         <div style="margin-top:12px">
@@ -49,6 +52,7 @@
           </div>
         </div>
       </details>
+      {% endif %}
 
       <div style="display:flex;gap:8px">
         <button type="submit" class="btn btn-primary">Thema erstellen</button>

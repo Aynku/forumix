@@ -133,7 +133,22 @@ if ($action === 'update_board' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($_POST['rechte'] as $gid => $stufe) {
                 $stufen[(int) $gid] = (string) $stufe;
             }
-            board_permissions_set($bid, $stufen);
+
+            // Feinrechte: unangehakte Kaestchen schickt der Browser gar nicht
+            // mit, deshalb wird je Gruppe eine leere Liste vorbelegt. Fehlt
+            // der Block ganz, laesst board_permissions_set() alles erlaubt.
+            $fein = null;
+            if (isset($_POST['fein']) && is_array($_POST['fein'])) {
+                $fein = [];
+                foreach (array_keys($stufen) as $gid) {
+                    $haken = $_POST['fein'][$gid] ?? [];
+                    $fein[$gid] = [];
+                    foreach (array_keys(BRETT_FEINRECHTE) as $recht) {
+                        $fein[$gid][$recht] = !empty($haken[$recht]);
+                    }
+                }
+            }
+            board_permissions_set($bid, $stufen, $fein ?? []);
         }
 
         // Passwort-Behandlung:
@@ -1495,6 +1510,8 @@ switch ($action) {
         if ($selBoard > 0) {
             $vars['selectedBoard']  = db_fetch('SELECT * FROM boards WHERE board_id = ?', [$selBoard]);
             $vars['brettRechte']    = board_permissions_map($selBoard);
+            $vars['brettFeinrechte'] = board_feinrechte_map($selBoard);
+            $vars['feinrechteDa']    = feinrechte_bereit();
             $vars['selectedMods']   = board_moderators($selBoard);
             $vars['availableUsers'] = db_fetchAll('
                 SELECT user_id, username, is_admin, is_mod FROM users

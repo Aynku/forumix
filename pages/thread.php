@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
 
     // Lesen reicht nicht zum Antworten. Der Knopf wird zwar gar nicht erst
     // angezeigt, aber wer die Anfrage von Hand schickt, kommt hier an.
-    if (!board_can_write((int) $thread['board_id'])) {
+    if (!board_darf((int) $thread['board_id'], 'antwort')) {
         http_response_code(403);
         error_page(403, 'Nur zum Lesen', 'In diesem Forum darfst du nicht antworten.');
     }
@@ -137,8 +137,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
             update_user_rank($cu['user_id']);
         }
 
-        // Anhänge verarbeiten
-        try { process_attachments($postId, (int) $cu['user_id']); } catch (Exception $e) {}
+        // Anhänge verarbeiten — sofern die Gruppe hier anhängen darf. Das Feld
+        // wird sonst gar nicht gezeichnet; wer es von Hand schickt, laeuft
+        // hier ins Leere statt in eine Fehlermeldung.
+        if (board_darf((int) $thread['board_id'], 'anhang')) {
+            try { process_attachments($postId, (int) $cu['user_id']); } catch (Exception $e) {}
+        }
 
         // Erwähnungen + Subscriber nur wenn approved
         if ($isApproved) {
@@ -313,10 +317,14 @@ if ($cuThread && (is_admin() || is_mod_for_board((int) $cuThread['user_id'], (in
     ));
 }
 
-$darfSchreiben = board_can_write((int) $thread['board_id']);
+$darfSchreiben = board_darf((int) $thread['board_id'], 'antwort');
+$darfAnhang    = board_darf((int) $thread['board_id'], 'anhang');
+$darfBearbeiten = board_darf((int) $thread['board_id'], 'bearbeiten');
 
 render('thread', [
     'darfSchreiben' => $darfSchreiben,
+    'darfAnhang'    => $darfAnhang,
+    'darfBearbeiten' => $darfBearbeiten,
     'title'         => $thread['title'],
     'threadTopHtml' => $threadTopHtml,
     'thread'        => $thread,

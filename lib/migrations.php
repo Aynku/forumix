@@ -105,7 +105,12 @@ function migration_title(string $version): string {
         'v18_48' => 'v0.18.48 – Doppel-Opt-In für E-Mail-Änderung',
         'v18_52' => 'v0.18.52 – Spalte last_activity_at',
         'v18_56' => 'v0.18.56 – pending_email_token verbreitern',
+        'v25_6'  => 'v0.25.6 – Zwei-Faktor: verbrauchte Codes vermerken',
+        'v25_7'  => 'v0.25.7 – Zwei-Faktor: Geheimnis verschlüsselt ablegen',
         'v26'    => 'v1.1.0 – Gruppen und Rechte pro Forum',
+        'v28'    => 'v1.3.0 – Papierkorb für Beiträge und Themen',
+        'v29'    => 'v1.4.0 – Volltext-Index für die Suche',
+        'v30'    => 'v1.5.0 – Feinere Rechte je Forum und Gruppe',
     ];
     return $titles[$version] ?? $version;
 }

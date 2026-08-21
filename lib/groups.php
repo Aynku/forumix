@@ -137,16 +137,63 @@ function board_permissions_map(int $boardId): array {
  * Uebergang richtig, waere hier aber falsch: wer alle Haken wegnimmt, meint
  * "niemand", nicht "alle".
  */
-function board_permissions_set(int $boardId, array $stufen): void {
+function board_permissions_set(int $boardId, array $stufen, array $feinrechte = []): void {
     $erlaubt = ['none', 'read', 'write'];
+    $mitFein = feinrechte_bereit();
+
+    // Ohne die Migration v30 bleibt es beim alten Satz Spalten. Sonst schluege
+    // hier jedes Speichern eines Forums fehl, solange das Update halb ist.
+    if ($mitFein) {
+        $spalten = array_values(BRETT_FEINRECHTE);
+        $sql = 'INSERT INTO board_permissions (board_id, group_id, level, `'
+             . implode('`, `', $spalten) . '`) VALUES (?, ?, ?'
+             . str_repeat(', ?', count($spalten)) . ')';
+    } else {
+        $sql = 'INSERT INTO board_permissions (board_id, group_id, level) VALUES (?, ?, ?)';
+    }
+
     db_execute('DELETE FROM board_permissions WHERE board_id = ?', [$boardId]);
     foreach (groups_all() as $g) {
         $gid   = (int) $g['group_id'];
         $stufe = $stufen[$gid] ?? 'none';
         if (!in_array($stufe, $erlaubt, true)) $stufe = 'none';
-        db_execute('INSERT INTO board_permissions (board_id, group_id, level) VALUES (?, ?, ?)',
-                   [$boardId, $gid, $stufe]);
+
+        $werte = [$boardId, $gid, $stufe];
+        if ($mitFein) {
+            // Kam die Matrix ueberhaupt mit? Ein Formular, das nur die Stufen
+            // kennt (aeltere Vorlage, Skript), darf nicht stillschweigend
+            // alle Feinrechte abraeumen — dann gilt weiter "alles erlaubt".
+            $haken = $feinrechte[$gid] ?? null;
+            foreach (array_keys(BRETT_FEINRECHTE) as $recht) {
+                $werte[] = $haken === null ? 1 : (!empty($haken[$recht]) ? 1 : 0);
+            }
+        }
+        db_execute($sql, $werte);
     }
+}
+
+/**
+ * Die Feinrechte eines Forums: group_id => [recht => bool].
+ *
+ * Gruppen ohne Zeile und Foren ohne Eintrag kommen leer zurueck; der
+ * Adminbereich belegt dann mit "alles erlaubt" vor — so, wie board_darf() es
+ * auch auswertet.
+ */
+function board_feinrechte_map(int $boardId): array {
+    if (!feinrechte_bereit()) return [];
+    try {
+        $spalten = implode(', ', array_map(fn($s) => "`$s`", BRETT_FEINRECHTE));
+        $karte = [];
+        foreach (db_fetchAll("SELECT group_id, $spalten FROM board_permissions WHERE board_id = ?",
+                             [$boardId]) as $r) {
+            $eintrag = [];
+            foreach (BRETT_FEINRECHTE as $recht => $spalte) {
+                $eintrag[$recht] = !empty($r[$spalte]);
+            }
+            $karte[(int) $r['group_id']] = $eintrag;
+        }
+        return $karte;
+    } catch (Exception $e) { return []; }
 }
 
 /** Die Gruppen eines Benutzers, die als Abzeichen gezeigt werden sollen. */

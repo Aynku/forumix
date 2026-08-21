@@ -84,6 +84,9 @@ return [
 
         ob_start();
         require $wurzel . '/install/migrations/migrate_v26.php';
+        // Die Feinrechte gleich mit, sonst laesst dieser Lauf den Pruefstand
+        // in einem Zustand zurueck, den ein aktuelles Forum nicht hat.
+        require $wurzel . '/install/migrations/migrate_v30.php';
         ob_end_clean();
 
         foreach (['user_groups', 'group_members', 'board_permissions'] as $t) {

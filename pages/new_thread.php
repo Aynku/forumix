@@ -17,11 +17,16 @@ if (!board_user_can_access($board)) {
     redirect(FORUM_URL . '/board_unlock.php?id=' . $boardId);
 }
 
-// Lesen reicht zum Mitlesen, nicht zum Schreiben.
-if (!board_can_write($boardId)) {
+// Lesen reicht zum Mitlesen, nicht zum Schreiben. Seit 1.5.0 ist "Themen
+// eroeffnen" ein eigenes Recht: in einem Ankuendigungsforum darf jeder
+// antworten, aber nicht jeder ein Thema aufmachen.
+if (!board_darf($boardId, 'thema')) {
     http_response_code(403);
     error_page(403, 'Nur zum Lesen', 'In diesem Forum darfst du keine neuen Themen anlegen.');
 }
+
+$darfAnhang  = board_darf($boardId, 'anhang');
+$darfUmfrage = board_darf($boardId, 'umfrage');
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -68,12 +73,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Anhaenge, Umfrage und Schlagworte haengen am Formular, nicht am
             // Thema. Sie laufen zwischen Commit und Erwaehnung, damit die
             // Benachrichtigung auf ein vollstaendiges Thema zeigt.
-            'nachbereitung' => function (int $threadId, int $postId) use ($cu) {
-                try { process_attachments($postId, (int) $cu['user_id']); } catch (Exception $e) {}
+            'nachbereitung' => function (int $threadId, int $postId) use ($cu, $darfAnhang, $darfUmfrage) {
+                if ($darfAnhang) {
+                    try { process_attachments($postId, (int) $cu['user_id']); } catch (Exception $e) {}
+                }
 
                 $pollQ    = post_str('poll_question');
                 $pollOpts = $_POST['poll_options'] ?? [];
-                if (mb_strlen($pollQ) >= 3 && is_array($pollOpts) && count(array_filter($pollOpts, fn($o) => trim($o) !== '')) >= 2) {
+                if ($darfUmfrage && mb_strlen($pollQ) >= 3 && is_array($pollOpts) && count(array_filter($pollOpts, fn($o) => trim($o) !== '')) >= 2) {
                     try { create_poll($threadId, $pollQ, $pollOpts, isset($_POST['poll_multi'])); }
                     catch (Exception $e) {}
                 }
@@ -101,6 +108,8 @@ render('new_thread', [
     'formTitle'   => post_str('title'),
     'formContent' => post_str('content'),
     'availableTags' => all_tags(),
+    'darfAnhang'  => $darfAnhang,
+    'darfUmfrage' => $darfUmfrage,
     'breadcrumb'  => [
         ['title' => $board['title'], 'url' => FORUM_URL . '/board.php?id=' . $boardId],
     ],

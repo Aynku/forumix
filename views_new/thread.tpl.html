@@ -268,7 +268,7 @@
       <a class="post-action" href="{{ url('/post_history.php?post=') }}{{ post.post_id }}"
          title="{{ editCount }} Bearbeitung(en)">Verlauf ({{ editCount }})</a>
     {% endif %}
-    {% if currentUser and (currentUser.user_id == post.user_id or canModThis) %}
+    {% if currentUser and (canModThis or (currentUser.user_id == post.user_id and darfBearbeiten)) %}
       <a class="post-action" href="{{ url('/edit_post.php?id=') }}{{ post.post_id }}">{{ t('edit') }}</a>
     {% endif %}
     {% if canModThis %}
@@ -299,10 +299,12 @@
     <div class="form-row">
       {{ render_editor('content', 'content', '', 'Dein Beitrag… (@user erwähnen möglich)', true, false)|raw }}
     </div>
+    {% if darfAnhang %}
     <div class="form-row">
       <label>{{ t('attach_file') }} (max. 5 MB pro Datei, mehrere möglich)</label>
       <input type="file" name="attachments[]" multiple accept="image/*,application/pdf,text/plain,.zip,.rar">
     </div>
+    {% endif %}
     <button type="submit" class="btn btn-primary">{{ t('reply') }}</button>
   </form>
 </div>
@@ -310,7 +312,7 @@
   <p style="margin-top:16px;color:var(--text-muted);font-style:italic">Dieser Thread ist geschlossen.</p>
 {% elseif currentUser and not darfSchreiben %}
 <div class="form-card" style="margin-top:20px;text-align:center;color:var(--text-muted)">
-  In diesem Forum darfst du mitlesen, aber nicht schreiben.
+  In diesem Forum darfst du mitlesen, aber nicht antworten.
 </div>
 {% elseif not currentUser %}
   <p style="margin-top:16px">

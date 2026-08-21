@@ -20,6 +20,16 @@ if ($cu['user_id'] !== $post['user_id'] && !is_mod()) {
     error_page(403, 'Keine Berechtigung', 'Bearbeiten darf nur der Autor selbst oder ein Moderator.');
 }
 
+// Seit 1.5.0 laesst sich das nachtraegliche Aendern je Forum abschalten — in
+// einem Support- oder Protokollforum soll stehenbleiben, was geschrieben
+// wurde. Fuer Moderatoren gilt die Sperre nicht: sie brauchen den Weg zum
+// Aufraeumen, und board_darf() laesst sie ohnehin durch.
+if ((int) $cu['user_id'] === (int) $post['user_id']
+    && !board_darf((int) $post['board_id'], 'bearbeiten')) {
+    error_page(403, 'Nicht änderbar',
+               'In diesem Forum lassen sich eigene Beiträge nachträglich nicht ändern.');
+}
+
 $error = '';
 $isModEdit = $cu['user_id'] != $post['user_id'];  // bearbeitet jemand fremden Post?
 

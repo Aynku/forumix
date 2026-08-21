@@ -361,3 +361,139 @@ function board_id_zugangsgrund(int $boardId): string {
     if (!$b) return 'gruppe';
     return board_zugangsgrund($b);
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   FEINERE RECHTE (ab 1.5.0)
+
+   "Schreiben" war bis hierher alles auf einmal. Ab jetzt zerfaellt die Stufe
+   in fuenf Einzelrechte, die je Forum und Gruppe angehakt werden.
+
+   Zwei Regeln halten das ueberschaubar:
+     - Die Feinrechte greifen NUR bei Stufe "schreiben". Wer liest, haengt
+       auch mit gesetztem Haken nichts an.
+     - Wer in mehreren Gruppen ist, bekommt die Vereinigung — aber nur aus
+       den Gruppen, die in diesem Forum ueberhaupt schreiben duerfen. Eine
+       Lesegruppe mit Haken darf sonst durch die Hintertuer mit.
+
+   Fehlt die Migration, gilt jedes Recht als erlaubt: dann verhaelt sich das
+   Forum wie vor 1.5.0, statt nach einem halben Update alles zu verbieten.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/** Recht → Spalte in board_permissions. */
+const BRETT_FEINRECHTE = [
+    'thema'      => 'can_thread',
+    'antwort'    => 'can_reply',
+    'anhang'     => 'can_attach',
+    'bearbeiten' => 'can_edit',
+    'umfrage'    => 'can_poll',
+];
+
+/** Steht die Migration v30? */
+function feinrechte_bereit(): bool
+{
+    static $bereit = null;
+    if ($bereit === null) {
+        try {
+            $bereit = (bool) db_fetch("SHOW COLUMNS FROM board_permissions LIKE 'can_thread'");
+        } catch (Throwable $e) {
+            $bereit = false;
+        }
+    }
+    return $bereit;
+}
+
+/**
+ * board_id → [recht => bool] fuer den aktuellen Besucher.
+ *
+ * Foren ohne Eintrag tauchen hier nicht auf; board_darf() behandelt sie wie
+ * bisher als offen.
+ */
+function board_feinrechte_for_user(): array
+{
+    $c = &board_access_cache();
+    if (isset($c['feinrechte'])) return $c['feinrechte'];
+    if (!feinrechte_bereit()) return $c['feinrechte'] = [];
+
+    $gruppen = user_group_ids();
+    $spalten = implode(', ', array_map(fn($s) => "`$s`", BRETT_FEINRECHTE));
+    try {
+        $alle = db_fetchAll("SELECT board_id, group_id, level, $spalten FROM board_permissions");
+    } catch (Exception $e) {
+        return $c['feinrechte'] = [];
+    }
+
+    $karte = [];
+    foreach ($alle as $r) {
+        $bid = (int) $r['board_id'];
+        // Jedes Forum mit Eintraegen faengt bei "nichts erlaubt" an — sonst
+        // waere ein Forum, das nur EINER Gruppe gehoert, fuer alle offen.
+        if (!isset($karte[$bid])) {
+            $karte[$bid] = array_fill_keys(array_keys(BRETT_FEINRECHTE), false);
+        }
+        if ($r['level'] !== 'write') continue;
+        if (!in_array((int) $r['group_id'], $gruppen, true)) continue;
+        foreach (BRETT_FEINRECHTE as $recht => $spalte) {
+            if (!empty($r[$spalte])) $karte[$bid][$recht] = true;
+        }
+    }
+    return $c['feinrechte'] = $karte;
+}
+
+/**
+ * Darf der Besucher in diesem Forum das Genannte? $recht ist einer der
+ * Schluessel aus BRETT_FEINRECHTE.
+ *
+ * Der Aufruf ersetzt board_can_write() ueberall dort, wo es um eine BESTIMMTE
+ * Handlung geht. board_can_write() bleibt fuer die Frage "darf hier ueberhaupt
+ * jemand etwas beitragen" — daran haengt zum Beispiel, ob ein Antwortfeld
+ * gezeichnet wird.
+ */
+function board_darf(int $boardId, string $recht): bool
+{
+    if (!isset(BRETT_FEINRECHTE[$recht])) return false;
+    if (board_has_privileged_access($boardId)) return true;
+    if (!board_can_write($boardId)) return false;
+    if (!feinrechte_bereit()) return true;
+
+    $karte = board_feinrechte_for_user();
+    if (!isset($karte[$boardId])) return true;   // ohne Eintrag: offen wie bisher
+    return $karte[$boardId][$recht] ?? true;
+}
+
+/**
+ * Wie board_darf(), aber fuer einen beliebigen Benutzer — gebraucht ueberall
+ * dort, wo fuer jemand anderen entschieden wird. $userId = 0 steht fuer einen
+ * Gast.
+ */
+function board_darf_for_user(int $boardId, int $userId, string $recht): bool
+{
+    if (!isset(BRETT_FEINRECHTE[$recht])) return false;
+    if ($userId > 0 && board_privileged_for_user($boardId, $userId)) return true;
+    if (board_level_for_user($boardId, $userId) !== 'write') return false;
+    if (!feinrechte_bereit()) return true;
+
+    try {
+        $slug = $userId > 0 ? 'members' : 'guests';
+        $eingebaut = db_fetch('SELECT group_id FROM user_groups WHERE slug = ?', [$slug]);
+        $gruppen = $eingebaut ? [(int) $eingebaut['group_id']] : [];
+        if ($userId > 0) {
+            foreach (db_fetchAll('SELECT group_id FROM group_members WHERE user_id = ?', [$userId]) as $g) {
+                $gruppen[] = (int) $g['group_id'];
+            }
+        }
+
+        $spalte = BRETT_FEINRECHTE[$recht];
+        $zeilen = db_fetchAll("SELECT group_id, level, `$spalte` AS erlaubt
+                               FROM board_permissions WHERE board_id = ?", [$boardId]);
+        if (!$zeilen) return true;   // ohne Eintrag: offen wie bisher
+
+        foreach ($zeilen as $r) {
+            if ($r['level'] !== 'write') continue;
+            if (!in_array((int) $r['group_id'], $gruppen, true)) continue;
+            if (!empty($r['erlaubt'])) return true;
+        }
+        return false;
+    } catch (Exception $e) {
+        return true;
+    }
+}

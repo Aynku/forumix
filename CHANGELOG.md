@@ -8,6 +8,41 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.5.0 (2026-08-21)
+
+### Feinere Rechte je Forum und Gruppe
+
+Ein Forum kannte je Gruppe drei Stufen: nichts, lesen, schreiben. „Schreiben"
+war dabei alles auf einmal. Für ein Ankündigungsforum, in dem alle antworten
+dürfen, aber nur das Team ein Thema eröffnet, gab es keine Einstellung. Ab
+dieser Fassung zerfällt die Stufe in fünf Einzelrechte.
+
+- **Themen eröffnen** und **Antworten** sind getrennt. Damit lässt sich ein
+  Forum bauen, in das nur das Team schreibt und in dem trotzdem diskutiert
+  wird.
+- **Dateien anhängen** ist einzeln abschaltbar — auch dort, wo geschrieben
+  werden darf.
+- **Umfragen anlegen** ebenso.
+- **Eigene Beiträge ändern** lässt sich abschalten, wo Beiträge stehenbleiben
+  sollen. Für Moderatoren gilt die Sperre nicht.
+- Die Häkchen stehen in der Forenverwaltung rechts neben den bisherigen
+  Stufen. Sie gelten nur bei „schreiben"; bei „nichts" und „lesen" sind sie
+  wirkungslos und werden blass dargestellt.
+- Wer in mehreren Gruppen ist, bekommt die Summe der Rechte — aber nur aus
+  den Gruppen, die in diesem Forum überhaupt schreiben dürfen.
+- Inhaber, Admins und Moderatoren sind wie bisher ausgenommen.
+
+**Migration nötig** (v30). Alle fünf Rechte stehen danach auf „erlaubt": jede
+Gruppe darf genau das, was sie vorher durfte. Solange die Migration nicht
+gelaufen ist, verhält sich das Forum wie vor dieser Fassung.
+
+### Anpassungen tragen wieder ihren Namen
+
+Im Adminbereich standen die letzten Anpassungen nur mit ihrer Nummer da
+(„v29"). Die Titel für v25.6, v25.7, v28, v29 und v30 sind nachgetragen.
+
+---
+
 ## v1.4.0 (2026-08-20)
 
 ### Suche über einen Volltext-Index
