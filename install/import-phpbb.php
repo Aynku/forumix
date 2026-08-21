@@ -499,5 +499,194 @@ foreach ($alt->query("SELECT forum_id, forum_name, forum_desc, parent_id, left_i
 printf("  Kategorien           %d angelegt\n", $katAngelegt);
 printf("  Foren                %d angelegt\n", $forenAngelegt);
 
-fwrite(STDERR, "\nThemen, Beiträge, Anhänge und Nachrichten folgen in der nächsten Stufe.\n");
+/* ── Themen und Beitraege ─────────────────────────────────────────────── */
+
+/**
+ * Ein Konto fuer Beitraege, deren Verfasser nicht mitgekommen ist.
+ *
+ * Das trifft Gaeste (phpBB laesst sie schreiben, Forumix nicht) und Konten,
+ * die uebersprungen wurden, weil ihr Name hier schon vergeben war. Ohne einen
+ * Platzhalter muessten ihre Beitraege wegfallen — und damit halbe
+ * Unterhaltungen.
+ */
+function import_platzhalter(): int
+{
+    static $id = null;
+    if ($id !== null) return $id;
+
+    $da = db_fetch("SELECT user_id FROM users WHERE username = ?", ['Übernommener Beitrag']);
+    if ($da) return $id = (int) $da['user_id'];
+
+    $id = (int) db_execute(
+        "INSERT INTO users (username, password, email, `rank`, is_deleted, email_verified, registered_at)
+         VALUES (?, ?, ?, ?, 1, 1, NOW())",
+        ['Übernommener Beitrag', '', 'uebernommen@localhost.invalid', 'Archiv']
+    );
+    return $id;
+}
+
+$papierkorb = function_exists('papierkorb_bereit') && papierkorb_bereit();
+
+/* Themen. phpBB fuehrt drei Sichtbarkeiten: 1 sichtbar, 0 wartet auf Freigabe,
+   2 in den Papierkorb gelegt. Forumix kennt alle drei — die letzte allerdings
+   erst seit 1.3.0, deshalb der Rueckfall. */
+$themenAngelegt = $themenSchon = $themenUeber = 0;
+$abfrage = $alt->query("SELECT topic_id, forum_id, topic_poster, topic_title, topic_time,
+                               topic_status, topic_type, topic_views, topic_visibility
+                        FROM {$p}topics ORDER BY topic_id");
+
+foreach ($abfrage as $z) {
+    $altId = (int) $z['topic_id'];
+    if (import_neu_id('thema', $altId) !== null) { $themenSchon++; continue; }
+
+    $board = import_neu_id('board', (int) $z['forum_id']);
+    if ($board === null) { $themenUeber++; continue; }   // Forum nicht mitgekommen
+
+    $sicht = (int) $z['topic_visibility'];
+    if ($sicht === 2 && !$papierkorb) { $themenUeber++; continue; }
+
+    $verfasser = import_neu_id('user', (int) $z['topic_poster']) ?? import_platzhalter();
+    $titel = trim((string) $z['topic_title']);
+    if ($titel === '') $titel = '(ohne Titel)';
+
+    try {
+        $neuId = (int) db_execute(
+            'INSERT INTO threads (board_id, user_id, title, is_sticky, is_closed, is_approved,
+                                  view_count, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+                $board, $verfasser, mb_substr($titel, 0, 200),
+                ((int) $z['topic_type']) > 0 ? 1 : 0,      // 1 wichtig, 2 Ankuendigung
+                ((int) $z['topic_status']) === 1 ? 1 : 0,
+                $sicht === 0 ? 0 : 1,
+                (int) $z['topic_views'],
+                import_zeit((int) $z['topic_time']),
+            ]
+        );
+        if ($sicht === 2) {
+            db_execute('UPDATE threads SET deleted_at = ?, deleted_by = 0 WHERE thread_id = ?',
+                       [import_zeit((int) $z['topic_time']), $neuId]);
+        }
+    } catch (Throwable $e) {
+        fwrite(STDERR, "  Thema \"" . mb_substr($titel, 0, 40) . "\": " . $e->getMessage() . "\n");
+        $themenUeber++;
+        continue;
+    }
+
+    import_merken('thema', $altId, $neuId, mb_substr($titel, 0, 100));
+    $themenAngelegt++;
+}
+
+printf("  Themen               %d angelegt", $themenAngelegt);
+if ($themenSchon > 0) printf(", %d schon da", $themenSchon);
+if ($themenUeber > 0) printf(", %d übersprungen", $themenUeber);
+echo "\n";
+
+/* Beitraege. Die Abfrage laeuft ungepuffert: ein Forum mit hunderttausend
+   Beitraegen passt sonst nicht in den Arbeitsspeicher. Moeglich ist das, weil
+   auf einer zweiten Verbindung geschrieben wird. */
+/* Die Konstante ist ab PHP 8.5 veraltet, die Nachfolgerin gibt es erst ab
+   8.4 — Forumix laeuft ab 8.1. Also die nehmen, die vorhanden ist; im
+   else-Zweig landet nur, wer die alte noch ohne Warnung kennt. */
+$gepuffert = class_exists('\\Pdo\\Mysql')
+    ? constant('\\Pdo\\Mysql::ATTR_USE_BUFFERED_QUERY')
+    : constant('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY');
+
+$alt->setAttribute($gepuffert, false);
+
+$anhaengeJeBeitrag = [];
+if ($anhaenge > 0) {
+    foreach ($alt->query("SELECT post_msg_id, real_filename FROM {$p}attachments
+                          WHERE is_orphan = 0 ORDER BY attach_id") as $z) {
+        $anhaengeJeBeitrag[(int) $z['post_msg_id']][] = (string) $z['real_filename'];
+    }
+}
+
+$beitraegeAngelegt = $beitraegeSchon = $beitraegeUeber = 0;
+$abfrage = $alt->query("SELECT post_id, topic_id, poster_id, post_text, post_time,
+                               post_edit_time, poster_ip, post_visibility
+                        FROM {$p}posts ORDER BY post_id");
+
+foreach ($abfrage as $z) {
+    $altId = (int) $z['post_id'];
+    if (import_neu_id('beitrag', $altId) !== null) { $beitraegeSchon++; continue; }
+
+    $thema = import_neu_id('thema', (int) $z['topic_id']);
+    if ($thema === null) { $beitraegeUeber++; continue; }
+
+    $sicht = (int) $z['post_visibility'];
+    if ($sicht === 2 && !$papierkorb) { $beitraegeUeber++; continue; }
+
+    $verfasser = import_neu_id('user', (int) $z['poster_id']) ?? import_platzhalter();
+    $text = phpbb_text_zu_bbcode((string) $z['post_text'], $anhaengeJeBeitrag[$altId] ?? []);
+    if (trim($text) === '') $text = '(leerer Beitrag)';
+
+    // Eine IP aus einem fremden Forum ist eine personenbezogene Angabe, die
+    // hier niemand braucht — sie bleibt draussen.
+    try {
+        $neuId = (int) db_execute(
+            'INSERT INTO posts (thread_id, user_id, content, created_at, edited_at, is_approved)
+             VALUES (?, ?, ?, ?, ?, ?)',
+            [
+                $thema, $verfasser, $text,
+                import_zeit((int) $z['post_time']),
+                ((int) $z['post_edit_time']) > 0 ? import_zeit((int) $z['post_edit_time']) : null,
+                $sicht === 0 ? 0 : 1,
+            ]
+        );
+        if ($sicht === 2) {
+            db_execute('UPDATE posts SET deleted_at = ?, deleted_by = 0 WHERE post_id = ?',
+                       [import_zeit((int) $z['post_time']), $neuId]);
+        }
+    } catch (Throwable $e) {
+        fwrite(STDERR, "  Beitrag $altId: " . $e->getMessage() . "\n");
+        $beitraegeUeber++;
+        continue;
+    }
+
+    import_merken('beitrag', $altId, $neuId);
+    $beitraegeAngelegt++;
+
+    if ($beitraegeAngelegt % 500 === 0) {
+        printf("\r  Beiträge             %d …", $beitraegeAngelegt);
+    }
+}
+
+$alt->setAttribute($gepuffert, true);
+
+printf("\r  Beiträge             %d angelegt", $beitraegeAngelegt);
+if ($beitraegeSchon > 0) printf(", %d schon da", $beitraegeSchon);
+if ($beitraegeUeber > 0) printf(", %d übersprungen", $beitraegeUeber);
+echo "\n";
+
+/* ── Zaehler ──────────────────────────────────────────────────────────── */
+//
+// Themen, Foren und Konten fuehren Zaehler mit. Sie hier Zeile fuer Zeile
+// mitzurechnen waere langsam und bei einem Abbruch falsch; deshalb werden sie
+// am Ende in einem Zug aus dem gesetzt, was tatsaechlich dasteht.
+
+echo "  Zähler               werden neu gesetzt …";
+
+$sichtbar = $papierkorb ? ' AND p.deleted_at IS NULL' : '';
+
+db_execute("UPDATE threads t SET
+    reply_count = GREATEST((SELECT COUNT(*) FROM posts p
+                            WHERE p.thread_id = t.thread_id AND p.is_approved = 1$sichtbar) - 1, 0),
+    last_post_id = (SELECT MAX(p.post_id) FROM posts p
+                    WHERE p.thread_id = t.thread_id AND p.is_approved = 1$sichtbar)");
+
+db_execute("UPDATE boards b SET
+    thread_count = (SELECT COUNT(*) FROM threads t WHERE t.board_id = b.board_id AND t.is_approved = 1),
+    post_count   = (SELECT COUNT(*) FROM posts p JOIN threads t ON t.thread_id = p.thread_id
+                    WHERE t.board_id = b.board_id AND p.is_approved = 1$sichtbar),
+    last_post_id = (SELECT MAX(p.post_id) FROM posts p JOIN threads t ON t.thread_id = p.thread_id
+                    WHERE t.board_id = b.board_id AND p.is_approved = 1$sichtbar)");
+
+db_execute("UPDATE users u SET post_count = (SELECT COUNT(*) FROM posts p
+            WHERE p.user_id = u.user_id AND p.is_approved = 1$sichtbar)
+            WHERE u.user_id IN (SELECT neu_id FROM import_zuordnung WHERE art = 'user')");
+
+echo "\r  Zähler               neu gesetzt          \n";
+
+fwrite(STDERR, "\nAnhänge, Umfragen und Nachrichten folgen in der nächsten Stufe.\n");
 exit(0);
