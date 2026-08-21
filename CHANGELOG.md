@@ -13,22 +13,24 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 ### Zu alte phpBB-Foren werden abgewiesen statt halb übernommen
 
 Fassungen vor 3.2 legen Beiträge in einem anderen Format ab. Der Import
-versuchte es bisher trotzdem, und die Formatierung konnte dabei verlorengehen
-— ein Verlust, der erst auffällt, wenn die Mitglieder schon im neuen Forum
-sind. Er bricht jetzt ab und nennt den Weg: Das alte Forum zuerst mit phpBB
-selbst auf 3.3 bringen. Dabei schreibt phpBB die Beiträge um, und der Umzug
-läuft danach ohne Verluste.
+versuchte es bisher trotzdem — und die Formatierung konnte dabei
+verlorengehen, was erst auffällt, wenn die Mitglieder schon im neuen Forum
+sind.
+
+- Der Import bricht jetzt ab und nennt den Weg: das alte Forum zuerst mit
+  phpBB selbst auf 3.3 bringen. Dabei schreibt phpBB die Beiträge um, und der
+  Umzug läuft danach ohne Verluste.
+- Im Adminbereich erscheint die Schaltfläche zum Starten gar nicht erst.
 
 ### Gelöschte Foren lassen keine Rechte zurück
 
 Die Rechte einer Gruppe für ein Forum blieben in der Datenbank stehen, wenn
-das Forum verschwand. Sie zeigten auf nichts mehr und richteten keinen
-Schaden an, sammelten sich aber — bei einer gelöschten Kategorie gleich
-reihenweise, weil deren Foren mitgehen. Sie werden jetzt mit entfernt.
+das Forum verschwand.
 
-Dazu behauptete das Löschen immer, ein Forum sei entfernt worden — auch wenn
-es das gar nicht mehr gab, etwa nach einem Doppelklick. Die Meldung sagt jetzt,
-was tatsächlich geschehen ist.
+- Sie werden jetzt mit entfernt — auch beim Löschen einer Kategorie, deren
+  Foren mitgehen.
+- Das Löschen meldet außerdem, was tatsächlich geschehen ist. Bisher stand
+  immer „Forum gelöscht" da, auch wenn es das Forum gar nicht mehr gab.
 
 ---
 
