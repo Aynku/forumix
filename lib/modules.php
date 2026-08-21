@@ -36,6 +36,7 @@ function available_modules(): array {
             'author'       => $manifest['author']      ?? 'unbekannt',
             'requires'     => $manifest['requires']    ?? [],
             'menu'         => $manifest['menu']        ?? null,
+            'platzhalter'  => $manifest['platzhalter'] ?? [],
             'enabled'      => !empty($dbStatus[$code]['enabled']),
             'installed'    => isset($dbStatus[$code]),
             'installed_at' => $dbStatus[$code]['installed_at'] ?? null,
@@ -287,7 +288,22 @@ function module_menu_links_fuer(string $ort): array {
  */
 function module_platzhalter(string $kontext = ''): array {
     $alle = [];
+
     foreach (available_modules() as $code => $mod) {
+        // Die NAMEN stehen im Manifest und gelten auch fuer abgeschaltete
+        // Module. Das ist der ganze Sinn: Wer ein Modul abschaltet, will
+        // seinen Absatz los — und nicht "{{ki_hinweis}}" mitten in der
+        // Datenschutzerklaerung stehen haben. Ohne Eintrag hier bliebe der
+        // Platzhalter unersetzt im Text sichtbar.
+        foreach ((array) ($mod['platzhalter'] ?? []) as $name => $hilfe) {
+            if (!preg_match('/^\{\{[a-z0-9_]+\}\}$/', (string) $name)) continue;
+            $alle[$name] = [
+                'text'  => '',
+                'hilfe' => (string) $hilfe . ($mod['enabled'] ? '' : ' — Modul ist abgeschaltet'),
+            ];
+        }
+
+        // Der TEXT kommt nur von aktiven Modulen.
         if (!$mod['enabled']) continue;
         $datei = __DIR__ . '/../modules/' . $code . '/platzhalter.php';
         if (!file_exists($datei)) continue;

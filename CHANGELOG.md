@@ -8,6 +8,22 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.8.4 (2026-08-22)
+
+### Ein abgeschaltetes Modul lässt keinen Platzhalter zurück
+
+Wer das Modul abschaltete, hatte danach `{{ki_hinweis}}` sichtbar in seiner
+Datenschutzerklärung stehen — die Ersetzung kam ja aus dem Modul, und das war
+aus.
+
+Der **Name** eines Platzhalters steht deshalb jetzt im Manifest, das auch bei
+abgeschaltetem Modul gelesen wird; nur der **Text** kommt aus `platzhalter.php`
+und damit nur von aktiven Modulen. Ist das Modul aus, wird der Platzhalter
+durch nichts ersetzt und verschwindet spurlos. In der Hilfe unter *Admin →
+Rechtliches* steht er weiterhin, mit dem Zusatz „Modul ist abgeschaltet".
+
+---
+
 ## v1.8.3 (2026-08-22)
 
 ### Die Überschrift des KI-Absatzes passt sich ein
@@ -28,6 +44,7 @@ Damit lässt sich ein Absatz an das anpassen, was ihn umgibt.
 **Einschränkung:** Die Nummer ist die höchste im Dokument gefundene plus eins.
 Wer den Platzhalter mitten in den Text setzt, bekommt trotzdem die letzte
 Nummer.
+
 
 ---
 

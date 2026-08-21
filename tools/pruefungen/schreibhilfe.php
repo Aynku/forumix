@@ -690,6 +690,31 @@ return [
         }
     },
 
+    'Ein abgeschaltetes Modul lässt keinen Platzhalter zurück' => function () use ($modul, $wurzel) {
+        // Sonst steht "{{ki_hinweis}}" sichtbar in der Datenschutzerklaerung,
+        // sobald jemand das Modul abschaltet. Deshalb steht der NAME im
+        // Manifest — das wird auch bei abgeschaltetem Modul gelesen — und nur
+        // der TEXT in platzhalter.php.
+        $manifest = (string) file_get_contents($modul . '/module.php');
+        if (!str_contains($manifest, "'platzhalter'")) {
+            throw new RuntimeException('Der Platzhaltername steht nicht im Manifest');
+        }
+        if (!str_contains($manifest, '{{ki_hinweis}}')) {
+            throw new RuntimeException('Der Name im Manifest passt nicht zu platzhalter.php');
+        }
+
+        $kern = (string) file_get_contents($wurzel . '/lib/modules.php');
+        $pos  = strpos($kern, 'function module_platzhalter');
+        $koerper = substr($kern, $pos, 2000);
+        // Die Namen muessen VOR dem Ausstieg bei abgeschaltetem Modul kommen.
+        $namen  = strpos($koerper, "\$mod['platzhalter']");
+        $ausweg = strpos($koerper, "if (!\$mod['enabled']) continue;");
+        if ($namen === false || $ausweg === false || $namen > $ausweg) {
+            throw new RuntimeException('Abgeschaltete Module steuern keine Platzhalternamen bei — '
+                . 'ihr Platzhalter bliebe im Text stehen');
+        }
+    },
+
     'Der Absatz steht nicht doppelt da' => function () use ($modul) {
         // Platzhalter gesetzt UND Auffang aktiv waere derselbe Text zweimal.
         $hook = (string) file_get_contents($modul . '/hooks/privacy_bottom.php');
