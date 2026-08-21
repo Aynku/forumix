@@ -8,6 +8,57 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.6.0 (2026-08-21)
+
+### Ein phpBB-Forum lässt sich übernehmen
+
+Wer von phpBB wechselt, musste seine Inhalte bisher zurücklassen. Ab dieser
+Fassung holt Forumix sie herüber: Konten, Kategorien, Foren, Themen,
+Beiträge, Anhänge, Umfragen und private Nachrichten. Zu finden im
+Adminbereich unter *Wartung → Import aus phpBB*, oder auf der Kommandozeile
+mit `install/import-phpbb.php`.
+
+- **Die Passwörter kommen mit.** phpBB 3.2 und 3.3 legen sie in einer Form
+  ab, die Forumix unverändert prüfen kann — die Mitglieder melden sich nach
+  dem Umzug mit ihrem gewohnten Passwort an. Ältere Konten aus phpBB-3.0-Zeiten
+  können eine Form tragen, die sich hier nicht prüfen lässt; sie kommen mit
+  und ihre Inhaber setzen das Passwort einmal neu.
+- **Vorher nachsehen.** Ein Probelauf zeigt, was ankäme, ob die
+  Anhang-Dateien am angegebenen Ort liegen und wie viele Passwörter
+  übernommen werden können. Er schreibt nichts.
+- **Der Lauf ist unterbrechbar.** Er arbeitet in Runden und meldet den
+  Fortschritt. Bricht er ab, setzt ein neuer dort an, wo er stehengeblieben
+  ist. Ein Zeitlimit unterbricht ihn damit, es zerstört ihn nicht.
+- **Rückweg eingebaut.** *Import zurücknehmen* entfernt wieder, was ein Lauf
+  angelegt hat — und nur das. Von Hand Angelegtes bleibt.
+- **Auf Wunsch vorher leeren.** Wer ein Forum übernimmt, will meist nicht die
+  Reste der Neuinstallation daneben. Das Leeren nennt vorher die Zahlen
+  dessen, was wegfällt, und lässt das eigene Konto stehen.
+- Übernommen wird nicht alles: Bot-Konten bleiben draußen, ebenso Rechte und
+  Gruppen. phpBBs Rechtesystem maschinell abzubilden hieße, Rechte zu
+  vergeben, die niemand angeordnet hat — nach dem Import stehen die Foren
+  offen und werden im Adminbereich eingerichtet.
+- IP-Adressen aus dem alten Forum werden nicht übernommen.
+
+Unterstützt sind die Fassungen **3.2 und 3.3**. Ältere legen Beiträge anders
+ab; der Import versucht es, die Formatierung kann darunter leiden.
+
+### Beispiel-Foren nur noch auf Wunsch
+
+Der Installer legte vier Beispiel-Foren an, die jede neue Installation zuerst
+wegräumen musste. Er fragt jetzt danach, und die Vorgabe ist *nein*. Wer sie
+zum Ausprobieren möchte, setzt ein Häkchen.
+
+### Die Forenübersicht steht wieder gerade
+
+In Foren mit unterschiedlich langen Betreffs rutschte die Spalte mit den
+Themen- und Beitragszahlen von Zeile zu Zeile hin und her, weil die
+festgelegten Spaltenbreiten nicht durchgesetzt wurden. Beides ist behoben —
+die Spalten stehen bündig, und die Zeile mit Verfasser und Datum wird
+gekürzt statt umgebrochen.
+
+---
+
 ## v1.5.2 (2026-08-21)
 
 ### Ein Updatepaket prüft, auf welchen Stand es passt
