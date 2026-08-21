@@ -49,8 +49,12 @@ function phpbb_text_zu_bbcode(string $roh, array $anhaenge = []): string
     $roh = trim($roh);
     if ($roh === '') return '';
 
-    // Kein XML? Dann ist es eine aeltere Fassung, die BBCode mit einer
-    // eingestreuten Kennung ablegt: [b:1a2b3c]. Die Kennung fliegt raus.
+    // Kein XML? Dann steht hier BBCode mit einer eingestreuten Kennung:
+    // [b:1a2b3c]. Der Import weist Fassungen unter 3.2 zwar ab — sie sollen
+    // erst mit phpBB selbst aktualisiert werden, dessen Text-Reparser den
+    // Umbau ohnehin macht. Aber auch in einem 3.3 koennen einzelne Reste im
+    // alten Format liegen: der Reparser laeuft im Hintergrund, und was er
+    // noch nicht erwischt hat, kaeme sonst mit Kennungen im Text an.
     if (!str_starts_with($roh, '<')) {
         $text = preg_replace('/:[a-z0-9]{5,8}(?=\])/i', '', $roh) ?? $roh;
         return bbcode_angleichen($text, $anhaenge);

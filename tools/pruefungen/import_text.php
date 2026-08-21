@@ -104,6 +104,28 @@ return [
         }
     },
 
+    'Fassungen unter 3.2 werden abgewiesen, nicht halb verarbeitet' => function () use ($wurzel) {
+        // phpBB baut das Beitragsformat beim Update auf 3.2 selbst um; sein
+        // Text-Reparser laeuft ueber alle Beitraege. Diesen Weg nachzubauen
+        // hiesse, etwas zu verdoppeln, das der Hersteller pflegt — und ein
+        // halb gelungener Import ist schlechter als eine klare Absage.
+        $cli   = (string) file_get_contents($wurzel . '/install/import-phpbb.php');
+        $admin = (string) file_get_contents($wurzel . '/views/admin/index.php');
+
+        if (!preg_match("/version_compare\(.*'3\.2\.0', '<'\)/", $cli)) {
+            throw new RuntimeException('Der Läufer prüft die phpBB-Fassung nicht mehr');
+        }
+        // Nach der Feststellung muss Schluss sein, nicht nur eine Warnung.
+        $nach = substr($cli, strpos($cli, "'3.2.0', '<'"));
+        if (!str_contains(substr($nach, 0, 700), 'exit(1)')) {
+            throw new RuntimeException('Eine zu alte Fassung führt nicht mehr zum Abbruch');
+        }
+        // Und im Adminbereich darf der Startknopf dann gar nicht erst stehen.
+        if (!str_contains($admin, '<?php if (!$alt32): ?>')) {
+            throw new RuntimeException('Der Adminbereich bietet den Import trotz zu alter Fassung an');
+        }
+    },
+
     'Das Ergebnis ueberlebt den BBCode-Parser ohne Rest' => function () use ($wurzel, $r) {
         // Der eigentliche Zweck: was hier herauskommt, muss Forumix zeichnen
         // koennen. Bleibt rohe Auszeichnung stehen, sieht der Leser Klammern.

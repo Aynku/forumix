@@ -115,9 +115,17 @@ $zahl = fn(int $n): string => number_format($n, 0, ',', '.');
 echo "── Gefunden ──\n";
 printf("  phpBB-Fassung        %s\n", $bs['fassung'] !== '' ? $bs['fassung'] : 'unbekannt');
 
+// Aeltere Fassungen legen Beitraege in einem anderen Format ab. Das hier
+// nachzubauen waere unnoetig: phpBB bringt den Umbau selbst mit, sein
+// Text-Reparser schreibt beim Update auf 3.2+ alle Beitraege um. Wer von
+// 3.1 kommt, aktualisiert also zuerst dort — das ist ein Weg, den der
+// Hersteller pflegt, und danach ist der Import derselbe wie fuer alle.
 if ($bs['fassung'] !== '' && version_compare($bs['fassung'], '3.2.0', '<')) {
-    echo "\n  ACHTUNG  Diese Fassung ist älter als 3.2. Beiträge werden dort anders\n";
-    echo "           abgelegt; die Formatierung kann darunter leiden.\n\n";
+    fwrite(STDERR, "\nDiese phpBB-Fassung ({$bs['fassung']}) ist zu alt.\n\n"
+        . "Ab 3.2 legt phpBB Beiträge in einem anderen Format ab. Bitte das alte\n"
+        . "Forum zuerst mit phpBB selbst auf 3.3 bringen — dabei werden die\n"
+        . "Beiträge umgeschrieben. Danach läuft dieser Import ohne Verluste.\n");
+    exit(1);
 }
 
 foreach ([['Konten', 'konten'], ['Kategorien', 'kategorien'], ['Foren', 'foren'],

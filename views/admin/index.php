@@ -2900,10 +2900,18 @@
         </div>
 
         <?php if ($alt32): ?>
-          <div class="card" style="padding:16px 20px;margin-bottom:16px;background:rgba(170,102,68,0.1);border-left:3px solid #aa6644">
-            <strong>⚠️ Diese Fassung ist älter als 3.2.</strong>
-            Beiträge werden dort anders abgelegt. Der Import versucht es, aber die Formatierung
-            kann darunter leiden. Ein Blick in ein paar Beiträge lohnt sich hinterher.
+          <?php /* Der Umbau des Beitragsformats ist phpBBs eigene Arbeit — sein
+                    Text-Reparser erledigt ihn beim Update auf 3.2. Ihn hier
+                    nachzubauen hiesse, einen gepflegten Weg zu verdoppeln. */ ?>
+          <div class="card" style="padding:16px 20px;margin-bottom:16px;
+                      background:rgba(229,83,75,0.1);border-left:3px solid var(--color-danger)">
+            <strong style="display:block;margin-bottom:6px">⛔ Diese Fassung ist zu alt</strong>
+            <p style="margin:0 0 10px;font-size:13px;line-height:1.7">
+              Ab 3.2 legt phpBB Beiträge in einem anderen Format ab. Bitte das alte Forum
+              zuerst <strong>mit phpBB selbst auf 3.3 bringen</strong> — dabei werden die
+              Beiträge umgeschrieben. Danach läuft dieser Import ohne Verluste.
+            </p>
+            <a href="?action=import_vergessen" class="btn btn-ghost btn-sm">Zurück</a>
           </div>
         <?php endif; ?>
 
@@ -2993,6 +3001,7 @@
         <?php endif; ?>
 
         <?php /* ── Schritt 3: Der Lauf ── */ ?>
+        <?php if (!$alt32): ?>
         <div class="card" style="padding:18px 22px" id="import-lauf">
           <h3 style="margin:0 0 12px">Übernehmen</h3>
 
@@ -3066,6 +3075,8 @@
             </p>
           </div>
         </div>
+
+        <?php endif; ?>
 
         <script>
         (function () {
