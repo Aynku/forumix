@@ -84,16 +84,32 @@ function enable_module(string $code): array {
     $code     = $manifest['code'];
 
     try {
-        // Erstinstallation? → install.sql ausführen
         $existing = db_fetch('SELECT * FROM modules WHERE code = ?', [$code]);
-        if (!$existing) {
-            $sqlFile = $modulesDir . '/' . $code . '/install.sql';
-            if (file_exists($sqlFile)) {
-                $sql = file_get_contents($sqlFile);
-                foreach (sql_in_anweisungen($sql) as $stmt) {
+
+        // Das Schema kommt bei JEDEM Aktivieren, nicht nur beim ersten.
+        //
+        // Der Grund ist ein Fall, der am 22.08.2026 live aufgeschlagen ist:
+        // Ein Modul bekam in einer neuen Fassung eine zusaetzliche Tabelle.
+        // Weil install.sql nur bei der Erstinstallation lief, fehlte sie —
+        // und aus- und wieder einschalten half nicht, denn das Modul war ja
+        // installiert. Es gab schlicht keinen Weg, eine Tabelle nachzuliefern.
+        //
+        // Ausgefuehrt werden nur CREATE-TABLE-Anweisungen. Sie tragen
+        // IF NOT EXISTS und richten deshalb beim zweiten Lauf nichts an.
+        // Alles andere — INSERT etwa — bleibt der Erstinstallation
+        // vorbehalten: ein wiederholtes INSERT legt Daten doppelt an.
+        $sqlFile = $modulesDir . '/' . $code . '/install.sql';
+        if (file_exists($sqlFile)) {
+            $anweisungen = sql_in_anweisungen((string) file_get_contents($sqlFile));
+            foreach ($anweisungen as $stmt) {
+                $istTabelle = (bool) preg_match('/^CREATE\s+TABLE/i', $stmt);
+                if (!$existing || $istTabelle) {
                     DB::get()->exec($stmt);
                 }
             }
+        }
+
+        if (!$existing) {
             // name gehoert mit in das INSERT: die Spalte ist NOT NULL ohne
             // Vorgabewert, und mit STRICT_TRANS_TABLES — der Voreinstellung —
             // scheitert das Einfuegen sonst mit Fehler 1364. Damit liess sich

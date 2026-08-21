@@ -205,19 +205,18 @@
 
   <div class="form-row">
     <label>Meldendes Konto</label>
-    <select name="mod_melder">
-      <option value="0">— keins gewählt —</option>
+    <input type="text" name="mod_melder" list="ki-melder-vorschlaege" autocomplete="off"
+           value="<?= e($melder_name) ?>" placeholder="Benutzername">
+    <datalist id="ki-melder-vorschlaege">
       <?php foreach ($melder_wahl as $m): ?>
-        <option value="<?= (int) $m['user_id'] ?>"
-                <?= (int) ($cfg['mod_melder'] ?? 0) === (int) $m['user_id'] ? 'selected' : '' ?>>
-          <?= e($m['username']) ?><?= (int) $m['post_count'] === 0 ? '' : ' (' . (int) $m['post_count'] . ' Beiträge)' ?>
-        </option>
+        <option value="<?= e($m['username']) ?>"></option>
       <?php endforeach; ?>
-    </select>
+    </datalist>
     <div class="form-hint">
-      Unter diesem Namen erscheinen die Meldungen. Am besten ein eigenes Konto,
-      das sonst nichts schreibt — dann ist auf einen Blick klar, woher die
-      Meldung kommt. Ohne Konto entsteht keine Meldung.
+      Unter diesem Namen erscheinen die Meldungen. Am besten ein Konto, das
+      sonst wenig schreibt — dann ist auf einen Blick klar, woher die Meldung
+      kommt. Die Vorschläge sind nur eine Hilfe; eintragen lässt sich jedes
+      Konto. Ohne Eintrag entsteht keine Meldung.
     </div>
   </div>
 

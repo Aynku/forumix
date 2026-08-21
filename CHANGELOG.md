@@ -8,6 +8,35 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.8.1 (2026-08-22)
+
+### Module können Tabellen nachliefern
+
+Ein Modul, das in einer neuen Fassung eine zusätzliche Tabelle braucht, bekam
+sie nicht: `install.sql` lief nur bei der Erstinstallation. Aus- und wieder
+einschalten half nicht, denn installiert war das Modul ja — beim erneuten
+Aktivieren wurde nur der Schalter umgelegt. Die Modulseite antwortete danach
+mit einem Fehler, weil die Tabelle fehlte.
+
+Beim Aktivieren laufen jetzt alle `CREATE TABLE`-Anweisungen aus `install.sql`,
+auch bei einem bereits installierten Modul. Sie tragen `IF NOT EXISTS` und
+richten deshalb beim zweiten Lauf nichts an. Alles andere — `INSERT` etwa —
+bleibt weiterhin der Erstinstallation vorbehalten, sonst würden Daten doppelt
+angelegt.
+
+**Für Betreiber, die 1.8.0 bereits eingespielt haben:** Das Modul einmal
+deaktivieren und wieder aktivieren, dann ist die fehlende Tabelle da.
+
+### Als meldendes Konto lässt sich jedes Konto eintragen
+
+Die Auswahl bot nur Administratoren und Konten ohne Beiträge an. Damit fehlte
+ausgerechnet ein Konto, das Ankündigungen schreibt — es hat Beiträge. Statt
+einer Liste steht dort jetzt ein Feld für den Benutzernamen, mit Vorschlägen
+als Eingabehilfe. Ein Name, den es nicht gibt, wird beim Speichern gemeldet
+statt stillschweigend verworfen.
+
+---
+
 ## v1.8.0 (2026-08-22)
 
 ### Beiträge automatisch vorsortieren

@@ -467,6 +467,53 @@ return [
         }
     },
 
+    // ── Nachlieferbares Schema ────────────────────────────────────────
+
+    'Ein Modul kann eine Tabelle nachliefern' => function () use ($wurzel) {
+        // Am 22.08.2026 live aufgeschlagen: Das Modul bekam mit einer neuen
+        // Fassung eine zusaetzliche Tabelle. install.sql lief nur bei der
+        // Erstinstallation, also fehlte sie — und aus- und wieder einschalten
+        // half nicht, denn installiert war das Modul ja. Die Seite antwortete
+        // mit "Table doesn't exist".
+        $quelle = (string) file_get_contents($wurzel . '/lib/modules.php');
+        $pos = strpos($quelle, 'function enable_module');
+        if ($pos === false) throw new RuntimeException('enable_module fehlt');
+        $koerper = substr($quelle, $pos, 2500);
+
+        if (!str_contains($koerper, 'CREATE') || !str_contains($koerper, 'TABLE')) {
+            throw new RuntimeException('Beim Aktivieren werden CREATE-TABLE-Anweisungen '
+                . 'nicht gesondert behandelt — dann kann kein Modul je eine Tabelle nachliefern');
+        }
+        // Und nur die: ein wiederholtes INSERT legt Daten doppelt an.
+        if (!str_contains($koerper, '$istTabelle')) {
+            throw new RuntimeException('Es wird nicht zwischen Tabellen und übrigem SQL '
+                . 'unterschieden');
+        }
+    },
+
+    'Alle Tabellen des Moduls vertragen einen zweiten Lauf' => function () use ($modul) {
+        // Die Unterscheidung oben taugt nur, solange die Anweisungen das auch
+        // aushalten.
+        // Zerlegt wie der Kern: erst Kommentarzeilen weg, dann am Semikolon
+        // trennen. Andersherum zerreisst ein Semikolon im Kommentar die
+        // Anweisung — genau der Fehler, der gestern eine Stunde gekostet hat.
+        $sql    = (string) file_get_contents($modul . '/install.sql');
+        $zeilen = array_filter(preg_split('/\R/', $sql) ?: [],
+                               static fn ($z) => !str_starts_with(ltrim($z), '--'));
+        foreach (explode(';', implode("\n", $zeilen)) as $stmt) {
+            $stmt = trim($stmt);
+            if ($stmt === '') continue;
+            if (!preg_match('/^CREATE\s+TABLE/i', $stmt)) {
+                throw new RuntimeException('install.sql enthält etwas anderes als CREATE TABLE — '
+                    . 'das läuft beim erneuten Aktivieren nicht mit: ' . substr($stmt, 0, 60));
+            }
+            if (!preg_match('/^CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS/i', $stmt)) {
+                throw new RuntimeException('Ohne IF NOT EXISTS scheitert der zweite Lauf: '
+                    . substr($stmt, 0, 60));
+            }
+        }
+    },
+
     // ── Vorsortierung ─────────────────────────────────────────────────
 
     'Die Vorsortierung hält keinen Beitrag zurück' => function () use ($modul) {
@@ -495,6 +542,28 @@ return [
                 throw new RuntimeException("$rolle wird nicht ausgenommen — dann meldet das "
                     . 'Modul einen Moderator an die Moderation');
             }
+        }
+    },
+
+    'Jedes Konto kann melden' => function () use ($modul) {
+        // Die erste Fassung bot eine Auswahl aus Verwaltung und Konten ohne
+        // Beitraege. Damit fehlte ausgerechnet das Konto, unter dem die
+        // Ankuendigungen erscheinen — es hat Beitraege. Jede Einschraenkung
+        // einer solchen Liste schliesst irgendwann das richtige Konto aus.
+        $admin = (string) file_get_contents($modul . '/ki.php');
+        if (preg_match("/'melder_wahl'.*?WHERE.*?post_count = 0/s", $admin)) {
+            throw new RuntimeException('Die Kandidatenliste ist wieder eine Einschränkung');
+        }
+        $view = (string) file_get_contents($modul . '/views/ki.php');
+        if (str_contains($view, '<select name="mod_melder"')) {
+            throw new RuntimeException('Das Konto wird aus einer festen Liste gewählt');
+        }
+        if (!str_contains($view, 'datalist')) {
+            throw new RuntimeException('Ohne Vorschlagsliste muss der Name blind getippt werden');
+        }
+        // Und ein Tippfehler darf nicht still ins Leere laufen.
+        if (!str_contains($admin, 'melder_fehler')) {
+            throw new RuntimeException('Ein unbekannter Name wird stillschweigend verworfen');
         }
     },
 

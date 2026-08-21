@@ -64,11 +64,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $gruppen[] = (int) $g;
     }
 
-    // Wer meldet: nur ein Konto, das es gibt. Die Kennung kommt aus dem
-    // Formular, und sie wandert in reports.reporter_id.
-    $melder = (int) ($_POST['mod_melder'] ?? 0);
-    if ($melder > 0 && !db_fetch('SELECT user_id FROM users WHERE user_id = ?', [$melder])) {
-        $melder = 0;
+    // Wer meldet: der Benutzername, nicht eine Auswahl aus einer Liste. Eine
+    // Liste muesste eingeschraenkt werden, und jede Einschraenkung schliesst
+    // das falsche Konto aus — die erste Fassung liess nur Konten ohne
+    // Beitraege zu und uebersah damit ausgerechnet das Konto, das die
+    // Ankuendigungen schreibt.
+    $melder     = 0;
+    $melder_fehler = '';
+    $melder_name = trim((string) ($_POST['mod_melder'] ?? ''));
+    if ($melder_name !== '') {
+        $gefunden = db_fetch('SELECT user_id FROM users WHERE username = ?', [$melder_name]);
+        if ($gefunden) {
+            $melder = (int) $gefunden['user_id'];
+        } else {
+            $melder_fehler = $melder_name;
+        }
     }
 
     $neu = [
@@ -88,6 +98,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'pro_stunde'   => max(0, min(500, (int) ($_POST['pro_stunde'] ?? 30))),
     ];
     ki_einstellungen_speichern($neu);
+
+    if ($melder_fehler !== '') {
+        flash('Ein Konto namens „' . $melder_fehler . '" gibt es nicht. '
+            . 'Ohne meldendes Konto entsteht keine Meldung.', 'error');
+    }
 
     if (!empty($_POST['probe'])) {
         $fehler = ki_probe(ki_einstellungen());
@@ -150,12 +165,19 @@ render('@ki/ki', [
     'crypt_da'     => forum_crypt_available(),
     'crypt_vorschlag' => $crypt_vorschlag,
     'nachgezogen'  => $nachgezogen,
-    // Kandidaten fuer das meldende Konto. Nur Verwaltung und Konten ohne
-    // Beitraege: ein Melder soll kein Mitglied sein, das nebenbei schreibt.
+    // Der eingestellte Name — gespeichert wird die Kennung, angezeigt der Name.
+    'melder_name'  => (function () use ($cfg) {
+        $id = (int) ($cfg['mod_melder'] ?? 0);
+        if ($id <= 0) return '';
+        $u = db_fetch('SELECT username FROM users WHERE user_id = ?', [$id]);
+        return $u ? (string) $u['username'] : '';
+    })(),
+    // Vorschlaege fuer die Eingabehilfe, keine Einschraenkung: eintragen laesst
+    // sich jedes Konto.
     'melder_wahl'  => db_fetchAll(
-        'SELECT user_id, username, post_count FROM users
-          WHERE is_admin = 1 OR COALESCE(is_owner,0) = 1 OR post_count = 0
-       ORDER BY post_count, username LIMIT 50'),
+        'SELECT username FROM users
+          WHERE is_admin = 1 OR COALESCE(is_owner,0) = 1 OR post_count < 50
+       ORDER BY post_count, username LIMIT 30'),
     'mod_offen'    => (int) db_count("SELECT COUNT(*) FROM ki_pruefung WHERE status = 'offen'"),
     'mod_befunde'  => db_fetchAll("SELECT befund, COUNT(*) AS anzahl FROM ki_pruefung
                                     WHERE status = 'fertig' AND created_at > (NOW() - INTERVAL 7 DAY)
