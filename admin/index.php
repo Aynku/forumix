@@ -29,8 +29,19 @@ if ($action === 'update_cat' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if ($action === 'delete_cat') {
     if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
-    db_execute('DELETE FROM categories WHERE cat_id = ?', [get_int('id')]);
-    flash('Kategorie gelöscht.', 'success');
+    $cid = get_int('id');
+
+    // An der Kategorie haengen die Foren, an denen wiederum die Rechte je
+    // Gruppe — und die haben keinen Fremdschluessel, bleiben also liegen.
+    // Bei einer Kategorie mit fuenf Foren sind das gleich zehn Zeilen.
+    try {
+        db_execute('DELETE FROM board_permissions
+                    WHERE board_id IN (SELECT board_id FROM boards WHERE cat_id = ?)', [$cid]);
+    } catch (Exception $e) {}
+
+    $weg = db_affected('DELETE FROM categories WHERE cat_id = ?', [$cid]);
+    flash($weg > 0 ? 'Kategorie gelöscht.' : 'Diese Kategorie gibt es nicht mehr.',
+          $weg > 0 ? 'success' : 'info');
     redirect(FORUM_URL . '/admin/?action=categories');
 }
 
@@ -50,8 +61,17 @@ if ($action === 'add_board' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if ($action === 'delete_board') {
     if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
-    db_execute('DELETE FROM boards WHERE board_id = ?', [get_int('id')]);
-    flash('Forum gelöscht.', 'success');
+    $bid = get_int('id');
+
+    // Die Rechte je Gruppe haengen an keinem Fremdschluessel und bleiben
+    // deshalb liegen, wenn das Forum verschwindet. Zeigen auf nichts mehr,
+    // sammeln sich aber.
+    try { db_execute('DELETE FROM board_permissions WHERE board_id = ?', [$bid]); }
+    catch (Exception $e) {}
+
+    $weg = db_affected('DELETE FROM boards WHERE board_id = ?', [$bid]);
+    flash($weg > 0 ? 'Forum gelöscht.' : 'Dieses Forum gibt es nicht mehr.',
+          $weg > 0 ? 'success' : 'info');
     redirect(FORUM_URL . '/admin/?action=boards');
 }
 
