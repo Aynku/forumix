@@ -8,6 +8,42 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.8.2 (2026-08-22)
+
+### Der Themen-Titel wird mitgeprüft
+
+Die Vorsortierung sah bisher nur den Beitragstext. Wer die Werbung in die
+Überschrift schrieb und darunter etwas Harmloses, kam durch. Beim ersten
+Beitrag eines Themas geht der Titel jetzt mit in die Prüfung — bei Antworten
+nicht, dort stammt er von jemand anderem.
+
+### Der Datenschutz-Absatz landet dort, wo er hingehört
+
+Der Absatz zur KI-Verarbeitung hing unten an der Seite an und stand damit
+hinter „Stand: 08.2026" — nach dem Datum gehört in einem Rechtstext nichts
+mehr hin. Außerdem war er HTML zwischen BBCode und hatte deshalb andere
+Abstände als der Text darum.
+
+Beides ist behoben: Module können jetzt **Platzhalter für Seitentexte**
+mitbringen. Das Modul liefert `{{ki_hinweis}}`, und wo dieser Platzhalter im
+Text der Datenschutzerklärung steht, erscheint der Absatz — als BBCode, also
+im selben Satzbild wie der Rest. Die Platzhalter aktiver Module stehen in der
+Hilfe unter *Admin → Rechtliches*.
+
+Fehlt der Platzhalter im Text, hängt der Absatz weiterhin unten an: lieber an
+der falschen Stelle als gar nicht. Steht er drin, erscheint er nur einmal.
+
+Für eigene Module: eine Datei `platzhalter.php`, die
+`['{{name}}' => ['text' => '…', 'hilfe' => '…']]` zurückgibt.
+
+### Der Hinweis am Editor ist sichtbar
+
+„automatische Prüfung" stand in Grau bei 10 Pixeln und war damit zu übersehen.
+Ein Hinweis auf eine Datenweitergabe muss man sehen, ohne ihn zu suchen — er
+steht jetzt in der Akzentfarbe mit Rahmen und einem ⓘ davor.
+
+---
+
 ## v1.8.1 (2026-08-22)
 
 ### Module können Tabellen nachliefern

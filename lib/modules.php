@@ -270,6 +270,47 @@ function module_menu_links_fuer(string $ort): array {
 }
 
 /**
+ * Platzhalter, die Module fuer Seitentexte beisteuern.
+ *
+ * Ein Modul legt dafuer `platzhalter.php` an und gibt ein Array zurueck:
+ *   ['{{ki_hinweis}}' => ['text' => '…', 'hilfe' => 'Wofuer das gut ist']]
+ *
+ * Warum ueberhaupt: Rechtstexte sind bearbeitbare Seiten. Ein Modul, das
+ * einen Absatz beisteuern muss, kann ihn nicht einfach unten anhaengen — dort
+ * steht das Datum ("Stand: 08.2026"), und danach gehoert nichts mehr hin. Mit
+ * einem Platzhalter setzt der Betreiber die Stelle selbst.
+ *
+ * @return array<string, array{text: string, hilfe: string}>
+ */
+function module_platzhalter(): array {
+    $alle = [];
+    foreach (available_modules() as $code => $mod) {
+        if (!$mod['enabled']) continue;
+        $datei = __DIR__ . '/../modules/' . $code . '/platzhalter.php';
+        if (!file_exists($datei)) continue;
+
+        try {
+            $liste = include $datei;
+        } catch (Throwable $e) {
+            error_log('[modul ' . $code . '] Platzhalter: ' . $e->getMessage());
+            continue;
+        }
+        if (!is_array($liste)) continue;
+
+        foreach ($liste as $name => $eintrag) {
+            // Nur echte Platzhalter-Namen: der Wert wandert durch strtr() in
+            // einen Rechtstext.
+            if (!preg_match('/^\{\{[a-z0-9_]+\}\}$/', (string) $name)) continue;
+            $alle[$name] = [
+                'text'  => (string) ($eintrag['text']  ?? ''),
+                'hilfe' => (string) ($eintrag['hilfe'] ?? $code),
+            ];
+        }
+    }
+    return $alle;
+}
+
+/**
  * Wie render_module_hook(), gibt die Ausgabe aber zurueck statt sie
  * auszugeben.
  *

@@ -93,9 +93,17 @@ function ki_pruefung_arbeiten(int $menge = 3): int {
 
     try {
         $offen = db_fetchAll(
-            "SELECT k.post_id, k.versuche, p.content, p.user_id
+            // Der Titel kommt mit, aber nur beim ersten Beitrag eines Themas:
+            // dort hat ihn derselbe Mensch geschrieben. Bei einer Antwort
+            // waere es der Titel eines anderen — und eine Meldung wegen
+            // fremder Worte ist keine.
+            "SELECT k.post_id, k.versuche, p.content, p.user_id,
+                    CASE WHEN p.post_id = (SELECT MIN(p2.post_id) FROM posts p2
+                                            WHERE p2.thread_id = p.thread_id)
+                         THEN t.title ELSE NULL END AS titel
                FROM ki_pruefung k
-               JOIN posts p ON p.post_id = k.post_id
+               JOIN posts p   ON p.post_id = k.post_id
+               JOIN threads t ON t.thread_id = p.thread_id
               WHERE k.status = 'offen' AND k.versuche < 3
            ORDER BY k.created_at
               LIMIT " . max(1, min(20, $menge)));
@@ -121,7 +129,7 @@ function ki_pruefung_arbeiten(int $menge = 3): int {
         if ($gegriffen !== 1) continue;
 
         try {
-            $befund = ki_beitrag_pruefen((string) $z['content'], $cfg);
+            $befund = ki_beitrag_pruefen((string) $z['content'], $cfg, (string) ($z['titel'] ?? ''));
         } catch (KiFehler $e) {
             error_log('[ki] Pruefung fehlgeschlagen fuer Beitrag ' . $postId . ': ' . $e->getMessage());
             continue;                                   // Versuch verbraucht, spaeter noch einmal
@@ -159,18 +167,28 @@ function ki_pruefung_spaeter(int $menge = 3): void {
     });
 }
 
-/** Fragt das Modell. Gibt 'spam', 'offensive' oder 'ok' zurueck. */
-function ki_beitrag_pruefen(string $text, array $cfg): string {
+/**
+ * Fragt das Modell. Gibt 'spam', 'offensive' oder 'ok' zurueck.
+ *
+ * $titel ist der Themen-Titel und nur beim ersten Beitrag gefuellt. Ohne ihn
+ * kaeme durch, wer die Werbung in die Ueberschrift schreibt und darunter
+ * etwas Harmloses.
+ */
+function ki_beitrag_pruefen(string $text, array $cfg, string $titel = ''): string {
     // Zitate gehen auch hier nicht mit: sonst wird jemand fuer die Worte
     // gemeldet, die er zitiert hat.
     require_once __DIR__ . '/schutz.php';
     [$vorne, $mitte, $hinten] = ki_raender_abtrennen($text);
     [$ohne, ]                 = ki_bloecke_heraus($mitte);
-    if (trim($ohne) === '') return 'ok';
+    if (trim($ohne) === '' && trim($titel) === '') return 'ok';
 
     $cfg['modell'] = trim((string) ($cfg['mod_modell'] ?? '')) ?: (string) ($cfg['modell'] ?? '');
 
-    $antwort = strtolower(trim(ki_anfrage(KI_MOD_SYSTEM, mb_substr($ohne, 0, 4000), $cfg, 10)));
+    $vorlage = $titel !== ''
+        ? "Titel des Themas: " . mb_substr(trim($titel), 0, 200) . "\n\nBeitrag:\n" . mb_substr($ohne, 0, 4000)
+        : mb_substr($ohne, 0, 4000);
+
+    $antwort = strtolower(trim(ki_anfrage(KI_MOD_SYSTEM, $vorlage, $cfg, 10)));
     $antwort = preg_replace('/[^a-z]/', '', $antwort);
 
     return in_array($antwort, KI_BEFUNDE, true) ? $antwort : 'ok';

@@ -610,7 +610,9 @@ return [
         if (!str_contains($editor, "mod_an")) {
             throw new RuntimeException('Der Hinweis am Editor steht unabhängig von der Einstellung');
         }
-        $datenschutz = (string) file_get_contents($modul . '/hooks/privacy_bottom.php');
+        // Der Text liegt seit dem Platzhalter-Umbau in platzhalter.php; der
+        // Haken holt ihn nur noch von dort.
+        $datenschutz = (string) file_get_contents($modul . '/platzhalter.php');
         if (!str_contains($datenschutz, "mod_an")) {
             throw new RuntimeException('Der Moderations-Absatz steht auch ohne eingeschaltete Prüfung');
         }
@@ -632,6 +634,53 @@ return [
         $mod = (string) file_get_contents($modul . '/lib/moderation.php');
         if (!str_contains($mod, 'fastcgi_finish_request')) {
             throw new RuntimeException('Die Antwort wird nicht vorher abgeschlossen');
+        }
+    },
+
+    'Der Themen-Titel wird mitgeprüft' => function () use ($modul) {
+        // Sonst kommt durch, wer die Werbung in die Ueberschrift schreibt und
+        // darunter etwas Harmloses.
+        $quelle = (string) file_get_contents($modul . '/lib/moderation.php');
+        if (!str_contains($quelle, 'Titel des Themas')) {
+            throw new RuntimeException('Der Titel geht nicht in die Anfrage');
+        }
+        // Aber nur beim ersten Beitrag: bei einer Antwort waere es der Titel
+        // eines anderen, und dafuer soll niemand gemeldet werden.
+        if (!str_contains($quelle, 'MIN(p2.post_id)')) {
+            throw new RuntimeException('Der Titel geht auch bei Antworten mit');
+        }
+    },
+
+    'Der Datenschutz-Absatz steht als Platzhalter bereit' => function () use ($modul, $wurzel) {
+        // Unten anhaengen genuegt nicht: dort steht "Stand: 08.2026", und nach
+        // dem Datum gehoert in einem Rechtstext nichts mehr hin.
+        if (!is_file($modul . '/platzhalter.php')) {
+            throw new RuntimeException('Das Modul bringt keinen Platzhalter mit');
+        }
+        $kern = (string) file_get_contents($wurzel . '/lib/pages.php');
+        if (!str_contains($kern, 'module_platzhalter')) {
+            throw new RuntimeException('Seitentexte kennen keine Platzhalter aus Modulen');
+        }
+        // Als BBCode, nicht als HTML: der Text darum wird durch bbcode()
+        // gerendert, HTML dazwischen bekaeme andere Abstaende.
+        $platz = (string) file_get_contents($modul . '/platzhalter.php');
+        if (str_contains($platz, '<p>') || str_contains($platz, '<h3')) {
+            throw new RuntimeException('Der Absatz ist HTML statt BBCode');
+        }
+        if (!str_contains($platz, '[b]')) {
+            throw new RuntimeException('Keine BBCode-Auszeichnung im Absatz');
+        }
+    },
+
+    'Der Absatz steht nicht doppelt da' => function () use ($modul) {
+        // Platzhalter gesetzt UND Auffang aktiv waere derselbe Text zweimal.
+        $hook = (string) file_get_contents($modul . '/hooks/privacy_bottom.php');
+        if (!str_contains($hook, '{{ki_hinweis}}')) {
+            throw new RuntimeException('Der Auffang prüft nicht, ob der Platzhalter im Text steht');
+        }
+        if (!str_contains($hook, 'platzhalter.php')) {
+            throw new RuntimeException('Auffang und Platzhalter haben verschiedene Texte — '
+                . 'dann laufen sie auseinander');
         }
     },
 

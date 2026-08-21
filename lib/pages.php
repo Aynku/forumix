@@ -60,6 +60,17 @@ function replace_page_placeholders(string $content): string {
         '{{date}}'       => date('d.m.Y'),
         '{{month_year}}' => date('m.Y'),
     ];
+
+    // Module duerfen eigene Platzhalter beisteuern — etwa einen Absatz fuer
+    // die Datenschutzerklaerung, wenn sie Daten an Dritte geben. Sie stehen
+    // hinten: einen der festen Platzhalter kann ein Modul so nicht ersetzen.
+    if (function_exists('module_platzhalter')) {
+        foreach (module_platzhalter() as $name => $eintrag) {
+            if (isset($replacements[$name])) continue;
+            $replacements[$name] = $eintrag['text'];
+        }
+    }
+
     return strtr($content, $replacements);
 }
 
@@ -80,7 +91,7 @@ function render_page_content(string $slug): string {
  * @return array<string,string>  ['{{platzhalter}}' => 'Beschreibung']
  */
 function page_placeholder_list(): array {
-    return [
+    $liste = [
         '{{name}}'       => 'Name des Verantwortlichen (aus Settings)',
         '{{street}}'     => 'Straße und Hausnummer',
         '{{city}}'       => 'PLZ und Ort',
@@ -90,4 +101,13 @@ function page_placeholder_list(): array {
         '{{date}}'       => 'Heutiges Datum (dd.mm.yyyy)',
         '{{month_year}}' => 'Aktueller Monat und Jahr (mm.yyyy)',
     ];
+
+    // Was aktive Module mitbringen, gehoert in die Hilfe — sonst weiss
+    // niemand, dass es den Platzhalter gibt.
+    if (function_exists('module_platzhalter')) {
+        foreach (module_platzhalter() as $name => $eintrag) {
+            $liste[$name] = $eintrag['hilfe'];
+        }
+    }
+    return $liste;
 }
