@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     }
     if (!$canAdmin) {
-        error_page(403, 'Kein Zugriff', 'Dateien darf nur die Verwaltung einstellen.');
+        error_page(403, 'Kein Zugriff', 'Dateien dürfen nur Inhaber und Administratoren einstellen.');
     }
 
     $tun = $_POST['tun'] ?? '';

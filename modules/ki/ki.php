@@ -12,9 +12,10 @@ require_once __DIR__ . '/lib/befehle.php';
 if (!module_enabled('ki')) {
     error_page(404, 'Nicht gefunden', 'Die KI-Schreibhilfe ist nicht aktiv.');
 }
-// Der Menuepunkt ist fuer andere ausgeblendet — das ersetzt keine Pruefung.
+// Der Punkt im Adminbereich ist fuer andere ausgeblendet — das ersetzt
+// keine Pruefung.
 if (!(is_admin() || is_owner())) {
-    error_page(403, 'Kein Zugriff', 'Diese Einstellungen darf nur die Verwaltung sehen.');
+    error_page(403, 'Kein Zugriff', 'Diese Einstellungen dürfen nur Inhaber und Administratoren sehen.');
 }
 
 $probe_ergebnis = null;

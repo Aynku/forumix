@@ -329,6 +329,43 @@ return [
         }
     },
 
+    // ── Platz im Adminbereich ─────────────────────────────────────────
+
+    'Verwaltungsseiten stehen nicht in der Hauptnavigation' => function () use ($wurzel) {
+        // Ein Modul, das nur die Verwaltung angeht, hat im Menue zwischen
+        // "Mitglieder" und "Suchen" nichts zu suchen. Der Haken 'admin_nav'
+        // im Adminbereich ist der richtige Platz — 'menu' im Manifest waere
+        // der bequeme.
+        foreach (glob($wurzel . '/modules/*/module.php') as $datei) {
+            $code = basename(dirname($datei));
+            $inhalt = (string) file_get_contents($datei);
+            if (!preg_match("/'menu'\s*=>/", $inhalt)) continue;
+            if (preg_match("/'admin'\s*=>\s*true/", $inhalt)) {
+                throw new RuntimeException("Modul $code hängt eine Verwaltungsseite in die "
+                    . "Hauptnavigation — gehört nach hooks/admin_nav.php");
+            }
+        }
+    },
+
+    'Der Adminbereich hat den Einhängepunkt' => function () use ($wurzel) {
+        $inhalt = (string) file_get_contents($wurzel . '/views/admin/index.php');
+        if (!str_contains($inhalt, "render_module_hook('admin_nav'")) {
+            throw new RuntimeException('Ohne den Haken sind die Modulseiten nicht mehr erreichbar');
+        }
+    },
+
+    'Jeder admin_nav-Haken prüft selbst die Rechte' => function () use ($wurzel) {
+        // Der Haken laeuft im Adminbereich, der ist schon geschuetzt — aber
+        // ein Modul darf sich darauf nicht verlassen. Wer den Haken spaeter
+        // woanders aufruft, haette sonst eine offene Tuer gebaut.
+        foreach (glob($wurzel . '/modules/*/hooks/admin_nav.php') as $datei) {
+            $inhalt = (string) file_get_contents($datei);
+            if (!str_contains($inhalt, 'is_admin()') && !str_contains($inhalt, 'is_owner()')) {
+                throw new RuntimeException('Ohne eigene Prüfung: ' . basename(dirname($datei, 2)));
+            }
+        }
+    },
+
     // ── Wer darf ──────────────────────────────────────────────────────
 
     'Die Gästegruppe steht nicht zur Wahl' => function () use ($modul) {
@@ -469,6 +506,25 @@ return [
         }
         if ($treffer) {
             throw new RuntimeException('curl_close() steht noch in: ' . implode(', ', $treffer));
+        }
+    },
+
+    'Rollen werden beim Namen genannt' => function () use ($wurzel) {
+        // "Die Verwaltung" ist kein Rollenname in diesem Forum — es gibt
+        // Inhaber, Administratoren, Moderatoren und Mitglieder. Wer liest,
+        // "nur die Verwaltung darf das", weiss nicht, ob er gemeint ist.
+        // (Als "Verwaltung VON etwas" — IP-Verwaltung, Tag-Verwaltung — ist
+        // das Wort in Ordnung und wird hier nicht getroffen.)
+        $treffer = [];
+        foreach (glob($wurzel . '/modules/*/*.php') as $datei) {
+            $inhalt = (string) file_get_contents($datei);
+            if (preg_match('/(die|der) Verwaltung\b/u', $inhalt)) {
+                $treffer[] = str_replace($wurzel . '/', '', $datei);
+            }
+        }
+        if ($treffer) {
+            throw new RuntimeException('"die Verwaltung" statt eines Rollennamens in: '
+                . implode(', ', $treffer));
         }
     },
 

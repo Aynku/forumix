@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     }
     if (!$canAdmin) {
-        error_page(403, 'Kein Zugriff', 'Termine darf nur die Verwaltung pflegen.');
+        error_page(403, 'Kein Zugriff', 'Termine dürfen nur Inhaber und Administratoren pflegen.');
     }
 
     $tun = $_POST['tun'] ?? '';

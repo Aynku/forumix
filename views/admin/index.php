@@ -104,6 +104,15 @@
           </div>
         </div>
       <?php endforeach; ?>
+
+      <?php
+        // Platz fuer Module mit eigener Einstellungsseite. Ohne ihn bliebe
+        // ihnen nur die Hauptnavigation des Forums — und dort steht eine
+        // Einstellung, die nur Inhaber und Administratoren angeht, falsch.
+        if (function_exists('render_module_hook')) {
+            render_module_hook('admin_nav', ['action' => $action]);
+        }
+      ?>
     </div>
   </nav>
 

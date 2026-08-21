@@ -131,7 +131,7 @@
   <div class="section-heading" style="margin-top:24px">Wer darf</div>
   <div class="form-row">
     <?php if (!$gruppen): ?>
-      <div class="form-hint">Es gibt noch keine Gruppen. Verwaltung und Inhaber dürfen immer.</div>
+      <div class="form-hint">Es gibt noch keine Gruppen. Inhaber und Administratoren dürfen immer.</div>
     <?php else: ?>
       <div style="display:flex;flex-wrap:wrap;gap:14px">
         <?php foreach ($gruppen as $g): ?>
@@ -143,8 +143,8 @@
         <?php endforeach; ?>
       </div>
       <div class="form-hint">
-        Ohne Haken darf nur die Verwaltung. Das ist Absicht: eine Funktion, die
-        Geld kostet, soll nicht versehentlich für alle offen stehen.
+        Ohne Haken dürfen nur Inhaber und Administratoren. Das ist Absicht: eine
+        Funktion, die Geld kostet, soll nicht versehentlich für alle offen stehen.
       </div>
     <?php endif; ?>
   </div>

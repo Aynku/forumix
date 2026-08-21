@@ -10,6 +10,7 @@ return [
                    . 'was der Verfasser übernimmt. Der API-Schlüssel kommt vom Betreiber.',
     'icon'        => '✨',
     'version'     => '1.0',
-    'menu'        => ['label' => 'KI-Schreibhilfe', 'url' => 'modules/ki/ki.php', 'admin' => true, 'ort' => 'menue'],
+    // Kein 'menu': die Einstellungen stehen im Adminbereich, nicht in der
+    // Hauptnavigation des Forums — siehe hooks/admin_nav.php.
     'author'      => 'Forumix',
 ];

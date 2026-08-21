@@ -63,7 +63,7 @@ function ki_einstellungen_vergessen(): void {
  *
  * Die Freigabe laeuft ueber Gruppen. `board_permissions` hilft hier nicht —
  * das ist forumsbezogen, und die Schreibhilfe haengt an der Person, nicht am
- * Forum. Ohne Eintrag darf niemand ausser der Verwaltung: eine Funktion, die
+ * Forum. Ohne Eintrag duerfen nur Inhaber und Administratoren: eine Funktion, die
  * Geld kostet, wird nicht versehentlich fuer alle offen sein.
  */
 function ki_darf(?array $u = null): bool {

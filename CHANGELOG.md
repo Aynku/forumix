@@ -8,6 +8,38 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.7.1 (2026-08-21)
+
+### Modul-Einstellungen stehen im Adminbereich
+
+Seiten, die nur die Verwaltung angehen, standen in der Hauptnavigation des
+Forums — zwischen „Mitglieder" und „Suchen", also zwischen Punkten, die alle
+Besucher betreffen. Für andere waren sie ausgeblendet, für den Betreiber
+standen sie am falschen Platz.
+
+Der Grund war eine Lücke, keine Absicht: Im Adminbereich gab es keinen
+Einhängepunkt für Module. Jetzt gibt es ihn (`admin_nav`), und die
+Einstellungen der **KI-Schreibhilfe** und des **Ankündigungsbandes** stehen
+dort, wo man sie sucht.
+
+Für eigene Module: eine Datei `hooks/admin_nav.php` mit einem `<a
+class="admin-nav-item">`, und `menu` mit `'admin' => true` aus dem Manifest
+nehmen. Der Haken muss die Rechte selbst prüfen — dass er heute nur im
+Adminbereich aufgerufen wird, ist kein Schutz für morgen.
+
+Keine Migration. Wer beide Module aktiv hat, findet die Seiten nach dem
+Einspielen an der neuen Stelle.
+
+### „Die Verwaltung" heißt jetzt beim Namen
+
+In mehreren Modulen stand „das darf nur die Verwaltung" — ein Wort, das in
+diesem Forum keine Rolle bezeichnet. Es gibt Inhaber, Administratoren,
+Moderatoren und Mitglieder. Wer las, dass „die Verwaltung" etwas darf, konnte
+nicht wissen, ob er gemeint ist. Betrifft KI-Schreibhilfe, Band, Downloads,
+Termine und Kontakt.
+
+---
+
 ## v1.7.0 (2026-08-21)
 
 ### KI-Schreibhilfe als Modul

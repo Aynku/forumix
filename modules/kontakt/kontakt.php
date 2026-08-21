@@ -99,7 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fuer die Verwaltung: die letzten Nachrichten direkt unter dem Formular.
+// Fuer Inhaber und Administratoren: die letzten Nachrichten direkt unter
+// dem Formular.
 $letzte = [];
 if ($canAdmin) {
     $letzte = db_fetchAll('SELECT * FROM kontakt_nachrichten ORDER BY created_at DESC LIMIT 20');

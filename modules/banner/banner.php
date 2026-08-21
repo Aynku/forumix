@@ -12,7 +12,7 @@ if (!module_enabled('banner')) {
 
 // Der Menuepunkt ist fuer andere ausgeblendet — das ersetzt keine Pruefung.
 if (!(is_admin() || is_owner())) {
-    error_page(403, 'Kein Zugriff', 'Das Band darf nur die Verwaltung setzen.');
+    error_page(403, 'Kein Zugriff', 'Das Band dürfen nur Inhaber und Administratoren setzen.');
 }
 
 const BANNER_ARTEN = ['info' => 'Hinweis', 'warnung' => 'Warnung', 'erfolg' => 'Gute Nachricht'];
