@@ -8,6 +8,35 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.5.2 (2026-08-21)
+
+### Ein Updatepaket prüft, auf welchen Stand es passt
+
+Ein Updatepaket enthält nur die Dateien, die sich seit der davor
+veröffentlichten Fassung geändert haben — bei 1.5.1 waren das acht. Bisher
+ließ es sich trotzdem auf jeden beliebigen Stand einspielen: Die acht Dateien
+landeten auf einem älteren Forum, alles andere blieb alt, und die
+Versionsnummer wurde dennoch hochgesetzt. Ein Forum konnte danach behaupten,
+auf 1.5.1 zu sein, während die Hälfte seiner Dateien von 1.2.0 stammte.
+
+- Das Paket nennt jetzt die Fassung, für die es gebaut wurde. Passt sie nicht
+  zur laufenden, wird es abgewiesen — bevor eine einzige Datei geschrieben
+  ist.
+- Die Absage nennt beide Nummern und den Weg: Für einen Sprung über mehrere
+  Fassungen ist das **Vollpaket** vorgesehen. Es enthält alle Dateien und ist
+  von jedem Stand aus richtig, die Datenbank-Anpassungen holen den Rest.
+- Bereits heruntergeladene Pakete bleiben gültig. Wo die Angabe fehlt, ändert
+  sich nichts.
+
+### Eingespielte Pakete machten die Fassung zur Beta
+
+Wurde ein Paket über den Adminbereich eingespielt, hängte das Forum an die
+Versionsnummer das Wort „Beta" an — aus 1.5.1 wurde „1.5.1 Beta", sichtbar im
+Adminbereich und im Fußbereich. Der Zusatz stammte aus der Zeit vor 1.0 und
+verschwand von selbst nicht wieder. Er entfällt.
+
+---
+
 ## v1.5.1 (2026-08-21)
 
 ### Neuinstallationen bekommen wieder das ganze Forum

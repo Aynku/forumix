@@ -171,6 +171,33 @@ function update_validate_zip(string $zipPath): array {
         return ['ok' => false, 'error' => 'Ungültige Versions-Angabe im Manifest.'];
     }
 
+    // Passt das Paket auf diesen Stand?
+    //
+    // Ein Updatepaket enthaelt NUR die Dateien, die sich seit der genannten
+    // Fassung geaendert haben — bei 1.5.1 waren das acht. Auf einem aelteren
+    // Forum eingespielt legt es diese acht ab, laesst alles andere auf dem
+    // alten Stand und setzt die Versionsnummer trotzdem hoch. Danach behauptet
+    // ein Forum, 1.5.1 zu sein, waehrend die Haelfte seiner Dateien von 1.2.0
+    // stammt — und der Fehler faellt erst auf, wenn eine Seite bricht.
+    //
+    // Ein Vollpaket traegt kein "from" und laeuft deshalb durch: es bringt
+    // alle Dateien mit und ist von jedem Stand aus richtig.
+    $von = trim((string) ($manifest['from'] ?? ''));
+    if ($von !== '') {
+        $hier = forum_version();
+        // Suffixe wie " Beta" abschneiden, damit ein Altbestand nicht haengen
+        // bleibt (bis 1.5.2 hat der Einspielweg eines angehaengt).
+        $blank = static fn(string $v): string => trim(strtok(trim($v), ' ') ?: '');
+        if (version_compare($blank($hier), $blank($von), '!=')) {
+            $zip->close();
+            return ['ok' => false, 'error' =>
+                'Dieses Updatepaket setzt Fassung ' . $von . ' voraus, hier läuft '
+                . $hier . '. Ein Updatepaket enthält nur die geänderten Dateien und '
+                . 'lässt den Rest auf dem alten Stand. Für den Sprung über mehrere '
+                . 'Fassungen bitte das Vollpaket nehmen — es geht von jedem Stand aus.'];
+        }
+    }
+
     return [
         'ok'       => true,
         'manifest' => $manifest,
@@ -370,7 +397,16 @@ function update_record_package(array $manifest, array $log): void {
              ON DUPLICATE KEY UPDATE executed_at = NOW(), executed_by = VALUES(executed_by), output = VALUES(output)',
             [$key, $name, (int) ($cu['user_id'] ?? 0), $output]
         );
-        // forum_version auf die Paket-Version setzen
-        set_setting('forum_version', $version . ' Beta');
+        // forum_version auf die Paket-Version setzen.
+        //
+        // Hier stand bis 1.5.2 ein angehaengtes " Beta". Bei der Freigabe von
+        // 1.0.0 fiel das Wort an drei Stellen weg (README, bootstrap.php,
+        // install.sql) — diese vierte wurde uebersehen, weil es dort nicht in
+        // einer Zeichenkette steht, sondern zur Laufzeit angehaengt wird. Ein
+        // ueber den Adminbereich eingespieltes Paket machte damit aus 1.5.1
+        // ein "1.5.1 Beta", und die Selbstheilung in bootstrap.php holte es
+        // nicht zurueck: sie schneidet alles ab dem ersten Leerzeichen weg und
+        // sieht deshalb keinen Unterschied.
+        set_setting('forum_version', $version);
     } catch (Exception $e) {}
 }
