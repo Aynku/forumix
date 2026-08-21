@@ -4,6 +4,8 @@
  *
  *   php tools/pruefen.php            alle Pruefungen
  *   php tools/pruefen.php auth       nur eine Gruppe
+ *   php tools/pruefen.php --auch=/pfad/zu/pruefungen
+ *                                    zusaetzlich fremde Pruefungen mitfahren
  *
  * Jede Datei in tools/pruefungen/ liefert ein Array
  *   'Beschreibung' => fn() => ...   (wirft bei Fehlschlag)
@@ -24,9 +26,30 @@ define('FORUM_RUNNING', true);
 define('FORUM_PRUEFLAUF', true);
 
 $wurzel = dirname(__DIR__);
-$gruppe = $argv[1] ?? '';
+
+// Wo das Forum liegt, muss der Laeufer sagen: seit der Trennung vom
+// 21.08.2026 koennen Pruefungen auch ausserhalb dieses Repos liegen (die
+// Betriebswerkzeuge von forumix.de etwa), und die koennen es nicht mehr aus
+// ihrem eigenen Pfad erschliessen.
+define('FORUM_WURZEL', $wurzel);
+
+$gruppe = '';
+$fremde = [];
+foreach (array_slice($argv, 1) as $arg) {
+    if (str_starts_with($arg, '--auch=')) {
+        $pfad = substr($arg, strlen('--auch='));
+        if (!is_dir($pfad)) { fwrite(STDERR, "Kein Verzeichnis: $pfad\n"); exit(2); }
+        $fremde[] = $pfad;
+    } elseif (!str_starts_with($arg, '-')) {
+        $gruppe = $arg;
+    }
+}
 
 $dateien = glob($wurzel . '/tools/pruefungen/*.php') ?: [];
+foreach ($fremde as $pfad) {
+    $dateien = array_merge($dateien, glob(rtrim($pfad, '/') . '/*.php') ?: []);
+}
+sort($dateien);
 if ($gruppe !== '') {
     $dateien = array_filter($dateien, fn($d) => basename($d, '.php') === $gruppe);
     if (!$dateien) { fwrite(STDERR, "Keine Gruppe '$gruppe'.\n"); exit(2); }
