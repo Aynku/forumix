@@ -32,10 +32,17 @@ return [
             '/root/'           => 'ein Pfad im Heimatverzeichnis des Betreibers',
         ];
 
-        // Zwei Ausnahmen, mit Grund:
+        // Drei Ausnahmen, mit Grund:
         //   CHANGELOG.md   ist Geschichte und nennt Wege, die es einmal gab.
         //   README.md      darf auf das eigene Forum als Beispiel verweisen.
-        $ausgenommen = ['CHANGELOG.md', 'README.md'];
+        //   diese Datei    traegt die Muster selbst — sonst meldet sie sich
+        //                  selbst, und zwar erst nach dem Einchecken, weil
+        //                  git ls-files nur Eingechecktes kennt.
+        $ausgenommen = [
+            'CHANGELOG.md',
+            'README.md',
+            'tools/pruefungen/' . basename(__FILE__),
+        ];
 
         exec('cd ' . escapeshellarg($wurzel) . ' && git ls-files 2>/dev/null', $dateien, $rc);
         if ($rc !== 0 || !$dateien) throw new RuntimeException('git ls-files liefert nichts');
