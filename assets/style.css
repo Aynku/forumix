@@ -581,7 +581,20 @@ code {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.forum-table .last-post-cell { width: 240px; }
+.forum-table .last-post-cell { width: 268px; }
+
+/* Ohne das rechnet der Browser die Spaltenbreiten aus dem Inhalt — die
+   Breiten oben sind dann nur ein Vorschlag. Ein Forum mit einem langen
+   Betreff im letzten Beitrag schob dadurch die Zahlenspalte nach links,
+   und die Uebersicht sah aus wie eine Treppe. Aufgefallen ist es an einem
+   uebernommenen Forum, wo die Betreffs zum ersten Mal verschieden lang
+   waren.
+
+   Nur die Uebersicht, nicht jede Tabelle mit dieser Klasse: im
+   Adminbereich stehen Spalten, deren Breite sich aus dem Inhalt ergeben
+   soll. Die Icon-Spalte traegt ihre 48px im Markup, die Hauptspalte
+   bekommt, was uebrigbleibt. */
+.forum-table-responsive { table-layout: fixed; }
 .forum-table .mod-cell { width: 150px; font-size: 12.5px; }
 .stat-cell b { color: var(--text-base); font-weight: 600; }
 .stat-cell .stat-label { color: var(--text-faint); }
@@ -607,11 +620,18 @@ code {
   font-weight: 500;
 }
 .last-post-cell a:hover { color: var(--text-link-hover); }
+/* Wie der Betreff darueber: lieber kuerzen als umbrechen. Seit die Spalte
+   eine feste Breite hat, passt "von Nameeeee · 12.08.2026, 06:26 Uhr" nicht
+   immer hinein — und eine umgebrochene Zeile macht die Zeile hoeher als die
+   daneben. Die Uebersicht sah dadurch aus, als staenden die Foren schief. */
 .last-post-cell .last-post-meta {
   display: block;
   color: var(--text-faint);
   font-size: 11.5px;
   margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .last-post-cell .last-post-meta a { color: var(--text-muted); }
 

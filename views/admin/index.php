@@ -3013,6 +3013,42 @@
           </div>
 
           <div id="import-start">
+            <?php
+              $h = $b['hier'] ?? [];
+              // Was hier schon steht, ohne das eigene Konto: nur das koennte weg.
+              $vorhanden = (int) ($h['foren'] ?? 0) + (int) ($h['themen'] ?? 0)
+                         + (int) ($h['beitraege'] ?? 0) + max(0, (int) ($h['konten'] ?? 0) - 1);
+            ?>
+            <?php if ($vorhanden > 0): ?>
+              <div style="border:1px solid #aa6644;background:rgba(170,102,68,0.08);border-radius:6px;
+                          padding:14px 16px;margin-bottom:16px">
+                <strong style="display:block;margin-bottom:8px">⚠️ Hier steht schon etwas</strong>
+                <div style="font-size:13px;line-height:1.8;color:var(--text-muted)">
+                  <?php
+                    $teile = [];
+                    foreach ([['foren','Forum','Foren'], ['themen','Thema','Themen'],
+                              ['beitraege','Beitrag','Beiträge'], ['anhaenge','Anhang','Anhänge'],
+                              ['pn','Nachricht','Nachrichten']] as [$k, $ein, $viele]) {
+                        $n = (int) ($h[$k] ?? 0);
+                        if ($n > 0) $teile[] = number_format($n, 0, ',', '.') . ' ' . ($n === 1 ? $ein : $viele);
+                    }
+                    $fremde = max(0, (int) ($h['konten'] ?? 0) - 1);
+                    if ($fremde > 0) $teile[] = number_format($fremde, 0, ',', '.')
+                                              . ' ' . ($fremde === 1 ? 'weiteres Konto' : 'weitere Konten');
+                    echo e(implode(' · ', $teile));
+                  ?>
+                </div>
+                <label class="checkbox-line" style="margin-top:12px">
+                  <input type="checkbox" id="import-leeren">
+                  <span><strong>Das alles vorher löschen.</strong>
+                    Dein eigenes Konto bleibt — sonst könntest du dich hinterher nicht anmelden.</span>
+                </label>
+                <div class="form-hint" style="margin-top:8px">
+                  Ohne Häkchen kommt das Übernommene zu dem hinzu, was schon da ist.
+                  Das Löschen lässt sich <strong>nicht</strong> zurücknehmen — der Import selbst schon.
+                </div>
+              </div>
+            <?php endif; ?>
             <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin:0 0 14px">
               Der Import läuft in Runden und meldet, wie weit er ist. Das Fenster darf dabei nicht
               geschlossen werden. Bricht er ab, setzt ein neuer Lauf dort an, wo er stehengeblieben
@@ -3106,10 +3142,28 @@
           }
 
           knopf.addEventListener('click', function () {
+            var leerenAn = document.getElementById('import-leeren');
+            if (leerenAn && leerenAn.checked &&
+                !confirm('Wirklich alles löschen, was hier steht? Das lässt sich nicht zurücknehmen.')) {
+              return;
+            }
             document.getElementById('import-start').hidden = true;
             document.getElementById('import-fortschritt').hidden = false;
             malen();
-            runde();
+
+            if (leerenAn && leerenAn.checked) {
+              var d = new FormData();
+              d.append('csrf', csrf);
+              fetch('?action=import_leeren', { method: 'POST', body: d })
+                .then(function (a) { return a.json(); })
+                .then(function (e) {
+                  if (e.fehler) { fehler(e.fehler); return; }
+                  runde();
+                })
+                .catch(function (ex) { fehler('Leeren abgebrochen: ' + ex.message); });
+            } else {
+              runde();
+            }
           });
         })();
         </script>

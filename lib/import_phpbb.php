@@ -753,3 +753,98 @@ function import_zuruecknehmen(): array
     db_execute('DROP TABLE import_zuordnung');
     return $bericht;
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   LEEREN VOR DEM IMPORT
+
+   Wer ein Forum uebernimmt, will meist das uebernommene und nicht die Reste
+   der Neuinstallation daneben. Das Leeren ist deshalb angeboten — aber nie
+   die Vorgabe, und nie ohne Zahlen.
+
+   EINE GRENZE, DIE NICHT VERHANDELBAR IST: Das Konto, mit dem gerade
+   gearbeitet wird, bleibt. Wer sich beim Leeren selbst mitloescht, kann
+   hinterher nicht einmal nachsehen, ob der Import geklappt hat.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/** Was steht hier schon? Die Zahlen fuer die Warnung vor dem Leeren. */
+function import_ziel_bestand(): array
+{
+    $z = function (string $tabelle): int {
+        try { return (int) db_count("SELECT COUNT(*) FROM `$tabelle`"); }
+        catch (Throwable $e) { return 0; }
+    };
+    return [
+        'kategorien' => $z('categories'),
+        'foren'      => $z('boards'),
+        'themen'     => $z('threads'),
+        'beitraege'  => $z('posts'),
+        'anhaenge'   => $z('attachments'),
+        'pn'         => $z('private_messages'),
+        'konten'     => $z('users'),
+    ];
+}
+
+/**
+ * Leert das Forum bis auf das genannte Konto.
+ *
+ * Der grosse Teil der Arbeit erledigen die Fremdschluessel: an `categories`
+ * haengen die Foren, daran die Themen, daran die Beitraege und daran wieder
+ * Anhaenge, Reaktionen und Umfragen. An `users` haengt alles Persoenliche.
+ * Zwei Dinge kaskadieren nicht und stehen deshalb ausdruecklich hier:
+ * `board_permissions` hat keinen Fremdschluessel, und Dateien im
+ * Dateisystem kennt keine Datenbank.
+ *
+ * Gibt zurueck, was entfernt wurde.
+ */
+function import_leeren(int $behalten): array
+{
+    $bericht = [];
+
+    // Die Dateien zuerst — nach dem DELETE sind ihre Namen nicht mehr da.
+    $dateien = 0;
+    try {
+        foreach (db_fetchAll('SELECT filename FROM attachments') as $a) {
+            $pfad = rtrim(UPLOAD_DIR, '/') . '/attachments/' . basename((string) $a['filename']);
+            if (is_file($pfad) && @unlink($pfad)) $dateien++;
+        }
+    } catch (Throwable $e) {}
+    if ($dateien > 0) $bericht['Dateien'] = $dateien;
+
+    // Inhalte: eine Zeile, der Rest folgt ueber die Fremdschluessel.
+    foreach (['private_messages' => 'DELETE FROM private_messages',
+              'categories'       => 'DELETE FROM categories'] as $was => $sql) {
+        try {
+            $n = db_affected($sql);
+            if ($n > 0) $bericht[$was] = $n;
+        } catch (Throwable $e) {}
+    }
+
+    // Was ohne Kategorie dastand — sollte es nicht geben, kostet aber nichts.
+    foreach (['posts', 'threads', 'boards'] as $tabelle) {
+        try {
+            $n = db_affected("DELETE FROM `$tabelle`");
+            if ($n > 0) $bericht[$tabelle] = ($bericht[$tabelle] ?? 0) + $n;
+        } catch (Throwable $e) {}
+    }
+
+    // Konten — bis auf das eine.
+    try {
+        $n = db_affected('DELETE FROM users WHERE user_id <> ?', [$behalten]);
+        if ($n > 0) $bericht['users'] = $n;
+    } catch (Throwable $e) {}
+
+    // Was keinen Fremdschluessel hat und sonst liegenbliebe.
+    foreach (['board_permissions', 'group_members'] as $tabelle) {
+        try { db_execute("DELETE FROM `$tabelle`"); } catch (Throwable $e) {}
+    }
+    try {
+        db_execute('DELETE FROM group_members WHERE user_id = ?', [$behalten]);
+    } catch (Throwable $e) {}
+
+    // Und die Zuordnung eines frueheren Imports: sie zeigt jetzt ins Leere.
+    if (import_zuordnung_da()) {
+        try { db_execute('DROP TABLE import_zuordnung'); } catch (Throwable $e) {}
+    }
+
+    return $bericht;
+}

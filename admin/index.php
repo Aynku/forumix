@@ -1053,8 +1053,32 @@ if ($action === 'import_pruefen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         'bestand'    => import_bestand($alt, $opt['praefix']),
         'passwoerter'=> import_passwoerter($alt, $opt['praefix']),
         'dateien'    => import_dateien_pruefen($alt, $opt['praefix'], $opt['dateien']),
+        'hier'       => import_ziel_bestand(),
     ];
     redirect(FORUM_URL . '/admin/?action=import');
+}
+
+if ($action === 'import_leeren' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json; charset=utf-8');
+    if (!verify_csrf(post_str('csrf'))) {
+        echo json_encode(['fehler' => 'Sicherheits-Token ungültig. Bitte die Seite neu laden.']);
+        exit;
+    }
+    // Das eigene Konto bleibt — wer sich selbst mitloescht, kann hinterher
+    // nicht einmal nachsehen, ob der Import geklappt hat.
+    $ich = (int) (current_user()['user_id'] ?? 0);
+    if ($ich <= 0) {
+        echo json_encode(['fehler' => 'Kein angemeldetes Konto — abgebrochen.']);
+        exit;
+    }
+    @set_time_limit(300);
+    try {
+        $bericht = import_leeren($ich);
+        echo json_encode(['weg' => array_sum($bericht)]);
+    } catch (Throwable $ex) {
+        echo json_encode(['fehler' => $ex->getMessage()]);
+    }
+    exit;
 }
 
 if ($action === 'import_runde' && $_SERVER['REQUEST_METHOD'] === 'POST') {

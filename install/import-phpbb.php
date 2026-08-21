@@ -6,6 +6,11 @@
  *   php install/import-phpbb.php --db=phpbb --user=… --pass=… --dateien=/pfad/zu/phpBB3/files
  *   php install/import-phpbb.php --zuruecknehmen
  *
+ * `--leeren` raeumt vorher weg, was hier schon steht — Foren, Themen,
+ * Beitraege, Nachrichten und alle Konten ausser dem Inhaber. Wer ein Forum
+ * uebernimmt, will meist das uebernommene und nicht die Reste daneben. Das
+ * Leeren laesst sich NICHT zurueckdrehen; der Import selbst schon.
+ *
  * Denselben Weg gibt es im Adminbereich unter „Import aus phpBB" — wer keinen
  * Zugang zur Kommandozeile hat, braucht ihn dort. Beide Wege benutzen
  * `lib/import_phpbb.php`; hier stehen nur Aufruf und Ausgabe.
@@ -47,11 +52,12 @@ require_once $wurzel . '/lib/import_phpbb.php';
 
 $opt = ['host' => 'localhost', 'port' => '3306', 'db' => '', 'user' => '', 'pass' => '',
         'praefix' => 'phpbb_', 'dateien' => ''];
-$probe = $zurueck = false;
+$probe = $zurueck = $leeren = false;
 
 foreach (array_slice($argv, 1) as $arg) {
     if ($arg === '--probe')          { $probe = true;   continue; }
     if ($arg === '--zuruecknehmen')  { $zurueck = true; continue; }
+    if ($arg === '--leeren')         { $leeren = true;  continue; }
     if (preg_match('/^--([a-z]+)=(.*)$/s', $arg, $t) && array_key_exists($t[1], $opt)) {
         $opt[$t[1]] = $t[2];
         continue;
@@ -166,6 +172,25 @@ if ($probe) {
 // etwas unterbricht.
 
 echo "\n── Import ──\n";
+
+if ($leeren) {
+    // Das Konto mit der Kennung 1 ist der Inhaber. Es bleibt stehen: wer
+    // sich selbst mitloescht, kommt hinterher nicht mehr hinein.
+    $hier = import_ziel_bestand();
+    $summe = $hier['foren'] + $hier['themen'] + $hier['beitraege']
+           + max(0, $hier['konten'] - 1);
+    if ($summe > 0) {
+        printf("  Vorher leeren        %s Foren, %s Themen, %s Beiträge, %s Konten\n",
+               $zahl($hier['foren']), $zahl($hier['themen']),
+               $zahl($hier['beitraege']), $zahl(max(0, $hier['konten'] - 1)));
+        foreach (import_leeren(1) as $was => $n) {
+            printf("    %-18s %s entfernt\n", $was, $zahl($n));
+        }
+    } else {
+        echo "  Vorher leeren        nichts zu tun\n";
+    }
+}
+
 import_zuordnung_bereit();
 
 foreach (IMPORT_SCHRITTE as $schritt => $label) {
