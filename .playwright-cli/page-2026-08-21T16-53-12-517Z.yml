@@ -1,8 +1,0 @@
-- generic [active] [ref=e1]:
-  - generic [ref=e2]:
-    - generic [ref=e3]: role_owner
-    - generic [ref=e5]: role_admin
-    - generic [ref=e7]: role_mod
-    - generic [ref=e9]: default_avatar
-  - generic [ref=e11]: logo_default (Standard-Logo eines Forums)
-  - generic [ref=e13]: logo-forumix (Projektseite)

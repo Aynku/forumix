@@ -16,3 +16,6 @@
 /backup/*.sql
 /backup/*.zip
 /backup/*.note
+
+# Ablage des Browser-Werkzeugs, entsteht beim Hinsehen waehrend der Arbeit.
+.playwright-cli/
