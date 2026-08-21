@@ -416,6 +416,60 @@ return [
         }
     },
 
+    // ── Beschriftungen ────────────────────────────────────────────────
+
+    'Kein Knopf der Schreibhilfe sagt „senden"' => function () use ($modul) {
+        // In einem Forum heisst senden: Beitrag veroeffentlichen. Die Knoepfe
+        // der Schreibhilfe stehen eine Handbreit ueber "Antworten" — wer dort
+        // "Schwärzen und senden" liest, kann glauben, er stellt gerade seinen
+        // Beitrag ein. Keiner dieser Knoepfe veroeffentlicht irgendetwas.
+        $js = (string) file_get_contents($modul . '/assets/ki.js');
+        if (preg_match_all("/knopf\(\s*'([^']*senden[^']*)'/i", $js, $t)) {
+            throw new RuntimeException('Knopfbeschriftung mit „senden": '
+                . implode(', ', $t[1]));
+        }
+    },
+
+    'Die Warnung sagt, dass der Beitrag unangetastet bleibt' => function () use ($modul) {
+        $js = (string) file_get_contents($modul . '/assets/ki.js');
+        if (!str_contains($js, 'Dein Beitrag bleibt unverändert')) {
+            throw new RuntimeException('Der Hinweis fehlt — ohne ihn liest sich die '
+                . 'Warnung wie eine Frage vor dem Veröffentlichen');
+        }
+    },
+
+    // ── Auslieferung an den Browser ───────────────────────────────────
+
+    'Geänderte Dateien kommen auch im Browser an' => function () use ($modul) {
+        // Ein fester Stempel (?v=1.0) aendert sich nur, wenn jemand daran
+        // denkt. Niemand denkt daran — und dann liegt eine Korrektur live,
+        // waehrend der Browser die alte Datei weiterbenutzt und der Fehler
+        // als nicht behoben gilt.
+        foreach (['hooks/editor_toolbar.php', 'hooks/layout_top.php'] as $datei) {
+            $inhalt = (string) file_get_contents($modul . '/' . $datei);
+            if (preg_match('/\?v=\d+\.\d+/', $inhalt)) {
+                throw new RuntimeException("Fester Versionsstempel in $datei");
+            }
+            if (str_contains($inhalt, '.js?v=') || str_contains($inhalt, '.css?v=')) {
+                if (!str_contains($inhalt, 'ki_stempel')) {
+                    throw new RuntimeException("Stempel in $datei kommt nicht aus der Dateizeit");
+                }
+            }
+        }
+    },
+
+    'Der Stempel ändert sich mit der Datei' => function () use ($modul) {
+        require_once $modul . '/lib/marken.php';
+        $a = ki_stempel('assets/ki.js');
+        if ($a === '0')  throw new RuntimeException('Datei nicht gefunden');
+        if ($a === ki_stempel('assets/ki.css')) {
+            // Beide gleichzeitig geschrieben ist moeglich, aber unwahrscheinlich
+            // genug, dass es hier auffallen darf.
+            throw new RuntimeException('Beide Dateien tragen denselben Stempel — '
+                . 'kommt er wirklich aus der Datei?');
+        }
+    },
+
     // ── Platz im Adminbereich ─────────────────────────────────────────
 
     'Verwaltungsseiten stehen nicht in der Hauptnavigation' => function () use ($wurzel) {

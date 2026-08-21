@@ -8,6 +8,32 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.7.3 (2026-08-21)
+
+### Kein Knopf der Schreibhilfe sagt mehr „senden"
+
+Die Warnung vor dem Senden bot „Schwärzen und senden" an — eine Handbreit
+über dem Knopf „Antworten". In einem Forum heißt senden aber:
+**Beitrag veröffentlichen.** Wer das las, konnte glauben, er stellt seinen
+Beitrag gerade ein; tatsächlich geht dort nur die Anfrage an das Sprachmodell
+hinaus, und am Beitrag ändert sich nichts.
+
+Die Knöpfe nennen jetzt den gewählten Befehl: **„Ohne diese Angaben kürzen"**
+und **„Mit diesen Angaben kürzen"**. Und im Hinweis darüber steht als erstes,
+was nicht passiert: *Dein Beitrag bleibt unverändert — es geht nichts ins
+Forum.*
+
+### Geänderte Modul-Dateien kommen auch im Browser an
+
+Stylesheet und Skript der Schreibhilfe wurden mit einem festen `?v=1.0`
+eingebunden. Der ändert sich nur, wenn jemand daran denkt — und niemand denkt
+daran. Genau das ist mit 1.7.2 passiert: Die Korrektur lag eingespielt auf dem
+Server, der Browser benutzte weiter die alte Datei, und die behobene
+Falschmeldung erschien unverändert. Der Stempel kommt jetzt aus der
+Änderungszeit der Datei selbst.
+
+---
+
 ## v1.7.2 (2026-08-21)
 
 ### Die Warnung vor dem Senden meldet nicht mehr, was ohnehin bleibt

@@ -391,19 +391,25 @@
 
     var hinweis = document.createElement('div');
     hinweis.className = 'ki-fund-hinweis';
-    hinweis.textContent = 'Geschwärzt bleibt der Text vollständig: an Stelle der Angabe geht '
-      + 'eine Marke hinaus, danach steht sie wieder da. Sie verlässt diesen Browser nicht.';
+    hinweis.textContent = 'Dein Beitrag bleibt unverändert — es geht nichts ins Forum. '
+      + 'Geschwärzt steht an Stelle der Angabe nur eine Marke in der Anfrage, im '
+      + 'Ergebnis steht sie wieder da. Sie verlässt diesen Browser nicht.';
     p.appendChild(hinweis);
 
     var leiste = document.createElement('div');
     leiste.className = 'ki-leiste';
 
-    leiste.appendChild(knopf('Schwärzen und senden', 'ki-btn ki-btn-haupt', function () {
+    // Kein "senden" in der Beschriftung: der Knopf steht eine Handbreit ueber
+    // "Antworten", und in einem Forum heisst senden "Beitrag veroeffentlichen".
+    // Was hier passiert, ist der gewaehlte Befehl — also steht der da.
+    var tun = befehl.name.toLowerCase();
+
+    leiste.appendChild(knopf('Ohne diese Angaben ' + tun, 'ki-btn ki-btn-haupt', function () {
       var g = schwaerzen(stueck.text, gefunden);
       senden(ta, stueck, g.text, g.werte, befehl, ziel);
     }));
 
-    leiste.appendChild(knopf('Unverändert senden', 'ki-btn', function () {
+    leiste.appendChild(knopf('Mit diesen Angaben ' + tun, 'ki-btn', function () {
       senden(ta, stueck, stueck.text, [], befehl, ziel);
     }));
 

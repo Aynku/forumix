@@ -28,3 +28,18 @@ function ki_marken_fuer_thema(int $threadId): array {
     }
     return $cache[$threadId] = $karte;
 }
+
+/**
+ * Stempel fuer eine Moduldatei, damit der Browser eine geaenderte Fassung
+ * auch holt.
+ *
+ * Vorher stand hier eine feste 1.0. Die aendert sich nur, wenn jemand daran
+ * denkt — und niemand denkt daran: eine Korrektur am Javascript war live,
+ * aber im Browser lag weiter die alte Datei, und der Fehler galt als nicht
+ * behoben. Die Zeit der Datei weiss es von selbst.
+ */
+function ki_stempel(string $datei): string {
+    $pfad = __DIR__ . '/../' . ltrim($datei, '/');
+    $zeit = @filemtime($pfad);
+    return $zeit ? (string) $zeit : '0';
+}

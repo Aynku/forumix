@@ -8,5 +8,6 @@
  */
 if (!defined('FORUM_RUNNING')) return;
 if (!module_enabled('ki')) return;
+require_once __DIR__ . '/../lib/marken.php';
 ?>
-<link rel="stylesheet" href="<?= FORUM_URL ?>/modules/ki/assets/ki.css?v=1.0">
+<link rel="stylesheet" href="<?= FORUM_URL ?>/modules/ki/assets/ki.css?v=<?= ki_stempel('assets/ki.css') ?>">

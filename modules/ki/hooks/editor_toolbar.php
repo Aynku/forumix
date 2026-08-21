@@ -13,6 +13,7 @@ if (!defined('FORUM_RUNNING')) return;
 
 require_once __DIR__ . '/../lib/einstellungen.php';
 require_once __DIR__ . '/../lib/befehle.php';
+require_once __DIR__ . '/../lib/marken.php';
 
 if (!ki_bereit()) return;
 
@@ -36,7 +37,7 @@ if (empty($GLOBALS['ki_assets_geladen'])) {
     $GLOBALS['ki_assets_geladen'] = true;
     // Das Stylesheet kommt aus hooks/layout_top.php — es wird auch ohne
     // Editor gebraucht, fuer die Kennzeichnung am Beitrag.
-    $ki_v = '1.0';
+    $ki_v = ki_stempel('assets/ki.js');
     ?>
     <script>
       window.KI_EINSTELLUNGEN = {
