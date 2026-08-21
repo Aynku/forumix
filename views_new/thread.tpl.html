@@ -157,6 +157,10 @@
         <div class="post-admin-badge">Admin</div>
       {% elseif post.is_mod %}
         <div class="post-mod-badge">Mod</div>
+      {% elseif post.ohne_rang %}
+        {# Nichts. Die Gruppe unten tritt an die Stelle des Rangs — so wie
+           bei Admins und Moderatoren ihr Abzeichen. Fuer ein Konto, das
+           nicht mitschreibt sondern ankuendigt, sagt "Neuling" nichts. #}
       {% else %}
         {{ rank_badge(post.rank, post.post_count)|raw }}
       {% endif %}

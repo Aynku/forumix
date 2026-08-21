@@ -78,7 +78,7 @@ function group_create(string $name, bool $abzeichen = false): int {
     return (int) db_fetch('SELECT group_id FROM user_groups WHERE slug = ?', [$slug])['group_id'];
 }
 
-function group_rename(int $id, string $name, bool $abzeichen): void {
+function group_rename(int $id, string $name, bool $abzeichen, bool $rangErsetzen = false): void {
     $name = trim($name);
     if ($name === '') throw new InvalidArgumentException('Die Gruppe braucht einen Namen.');
     $g = group_by_id($id);
@@ -86,6 +86,16 @@ function group_rename(int $id, string $name, bool $abzeichen): void {
 
     // Bei den eingebauten darf der Name geaendert werden (manche nennen ihre
     // Gaeste "Besucher"), der Kurzname aber nicht — daran haengt der Code.
+
+    // hide_rank gibt es erst ab v31. Fehlt die Spalte, wird ohne sie
+    // geschrieben, statt das Speichern scheitern zu lassen.
+    try {
+        db_execute('UPDATE user_groups SET name = ?, show_badge = ?, hide_rank = ? WHERE group_id = ?',
+                   [$name, $abzeichen ? 1 : 0, $rangErsetzen ? 1 : 0, $id]);
+        return;
+    } catch (Exception $e) {
+        // weiter unten ohne die Spalte
+    }
     db_execute('UPDATE user_groups SET name = ?, show_badge = ? WHERE group_id = ?',
                [$name, $abzeichen ? 1 : 0, $id]);
 }

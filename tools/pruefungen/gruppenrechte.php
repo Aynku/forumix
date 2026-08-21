@@ -26,7 +26,7 @@ $hole = function (string $name) use ($roh): string {
     return $t[1] ?? '';
 };
 $pdo = new PDO("mysql:host={$hole('DB_HOST')};dbname=$db;charset=utf8mb4",
-               $hole('DB_USER'), $hole('DB_PASS'), [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+               $hole('DB_USER'), $hole('DB_PASS'), PRUEF_PDO_OPTIONEN);
 
 $GLOBALS['__pdo'] = $GLOBALS['__pdo'] ?? $pdo;
 $GLOBALS['__testNutzer'] = null;

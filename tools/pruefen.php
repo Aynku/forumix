@@ -43,6 +43,17 @@ define('FORUM_WURZEL', $wurzel);
 // zweite Installation brauchen, sich selbst.
 define('PRUEFSTAND', rtrim((string) getenv('FORUM_PRUEFSTAND'), '/'));
 
+/* Dieselben Verbindungsoptionen, die das Forum benutzt (siehe lib/db.php).
+   Ohne sie prueft der Lauf unter anderen Bedingungen als der Betrieb: PDO
+   emuliert dann die Prepared Statements, und Abfragen, die MariaDB
+   serverseitig ablehnt, gehen hier durch. Genau daran ist am 21.08.2026 eine
+   Migration vorbeigekommen, die sich kein zweites Mal fahren liess. */
+const PRUEF_PDO_OPTIONEN = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
+
 $gruppe = '';
 $fremde = [];
 foreach (array_slice($argv, 1) as $arg) {

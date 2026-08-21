@@ -38,7 +38,7 @@ return [
         $ordner   = sys_get_temp_dir() . '/forumix-neuinstallation';
         $pdo = new PDO("mysql:host={$hole('DB_HOST')};charset=utf8mb4",
                        $hole('DB_USER'), $hole('DB_PASS'),
-                       [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+                       PRUEF_PDO_OPTIONEN);
 
         $aufraeumen = function () use ($pdo, $probeDb, $ordner) {
             try { $pdo->exec("DROP DATABASE IF EXISTS `$probeDb`"); } catch (Throwable $e) {}
@@ -137,7 +137,7 @@ return [
         $ordner  = sys_get_temp_dir() . '/forumix-demo';
         $pdo = new PDO("mysql:host={$hole('DB_HOST')};charset=utf8mb4",
                        $hole('DB_USER'), $hole('DB_PASS'),
-                       [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+                       PRUEF_PDO_OPTIONEN);
 
         $aufraeumen = function () use ($pdo, $probeDb, $ordner) {
             try { $pdo->exec("DROP DATABASE IF EXISTS `$probeDb`"); } catch (Throwable $e) {}

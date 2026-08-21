@@ -21,9 +21,16 @@ if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
 
 $zeile = function (string $text) { echo '<div class="req-row">' . htmlspecialchars($text) . '</div>'; };
 
+// Der Name steht fest im Code, nicht in einer Eingabe — er wird deshalb
+// direkt eingesetzt. Mit Platzhalter ginge es nicht: MariaDB bereitet
+// SHOW COLUMNS serverseitig vor und lehnt das "?" dort ab. Der Fehler landete
+// im catch, die Pruefung meldete "nicht da", und das ALTER TABLE scheiterte
+// mit "Duplicate column name" — die Anpassung liess sich kein zweites Mal
+// fahren.
 $hatSpalte = function (string $tabelle, string $name): bool {
+    if (!preg_match('/^[a-z_]+$/', $tabelle) || !preg_match('/^[a-z_]+$/', $name)) return false;
     try {
-        return (bool) db_fetch("SHOW COLUMNS FROM `$tabelle` LIKE ?", [$name]);
+        return (bool) db_fetch("SHOW COLUMNS FROM `$tabelle` LIKE '$name'");
     } catch (Throwable $e) {
         return false;
     }

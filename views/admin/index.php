@@ -860,6 +860,16 @@
               <input type="checkbox" name="show_badge" value="1" <?= !empty($gruppe['show_badge']) ? 'checked' : '' ?>>
               <span>Als Abzeichen neben dem Namen zeigen</span>
             </label>
+            <label class="checkbox-line" style="margin-top:8px">
+              <input type="checkbox" name="hide_rank" value="1" <?= !empty($gruppe['hide_rank']) ? 'checked' : '' ?>>
+              <span>Statt des Rangs zeigen</span>
+            </label>
+            <div class="form-hint" style="margin-top:6px">
+              Der Rang kommt aus der Beitragszahl. Für ein Konto, das nicht mitschreibt, sondern
+              ankündigt — einen Bot etwa —, sagt „Neuling“ nichts. Mit diesem Haken tritt das
+              Abzeichen an die Stelle des Rangs, so wie bei Administratoren und Moderatoren.
+              Er wirkt nur zusammen mit dem Haken darüber.
+            </div>
             <div style="margin-top:14px"><button class="btn btn-primary">Speichern</button></div>
           </form>
 

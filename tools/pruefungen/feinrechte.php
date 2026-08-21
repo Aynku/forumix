@@ -26,7 +26,7 @@ $hole = function (string $name) use ($roh): string {
     return $t[1] ?? '';
 };
 $pdo = new PDO("mysql:host={$hole('DB_HOST')};dbname=$db;charset=utf8mb4",
-               $hole('DB_USER'), $hole('DB_PASS'), [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+               $hole('DB_USER'), $hole('DB_PASS'), PRUEF_PDO_OPTIONEN);
 
 $GLOBALS['__pdo'] = $GLOBALS['__pdo'] ?? $pdo;
 $GLOBALS['__testNutzer'] = $GLOBALS['__testNutzer'] ?? null;
@@ -119,8 +119,19 @@ return [
     },
 
     'Zweimal gefahren aendert nichts' => function () use ($pdo, $wurzel) {
+        // Der zweite Lauf muss durchgehen, nicht nur nichts aendern. Am
+        // 21.08.2026 tat er das nicht: die Pruefung, ob eine Spalte schon
+        // existiert, benutzte "SHOW COLUMNS ... LIKE ?" mit Platzhalter. Den
+        // lehnt MariaDB ab, wenn das Statement serverseitig vorbereitet wird
+        // — der Fehler landete im catch, die Pruefung meldete "nicht da", und
+        // das ALTER TABLE scheiterte mit "Duplicate column name".
         ob_start();
-        require $wurzel . '/install/migrations/migrate_v30.php';
+        try {
+            require $wurzel . '/install/migrations/migrate_v30.php';
+        } catch (Throwable $e) {
+            ob_end_clean();
+            throw new RuntimeException('Der zweite Lauf scheitert: ' . $e->getMessage());
+        }
         ob_end_clean();
         $n = (int) $pdo->query("SELECT COUNT(*) FROM information_schema.columns
                                 WHERE table_schema = DATABASE() AND table_name = 'board_permissions'

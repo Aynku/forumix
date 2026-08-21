@@ -93,7 +93,8 @@ if ($action === 'create_group' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($action === 'update_group' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     try {
-        group_rename(post_int('group_id'), post_str('name'), !empty($_POST['show_badge']));
+        group_rename(post_int('group_id'), post_str('name'),
+                     !empty($_POST['show_badge']), !empty($_POST['hide_rank']));
         flash('Gruppe gespeichert.', 'success');
     } catch (Exception $e) {
         flash($e->getMessage(), 'error');

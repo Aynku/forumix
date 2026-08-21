@@ -226,20 +226,27 @@ $posts = db_fetchAll(
 // Gruppen-Abzeichen der Verfasser. Eine Abfrage fuer alle Beitraege der Seite
 // statt einer je Beitrag — sonst waeren es bei zwanzig Beitraegen zwanzig.
 $abzeichen = [];
+$ohneRang  = [];   // Konten, deren Gruppe den Rang ersetzt
 $verfasser = array_values(array_unique(array_map(fn($p) => (int) $p['user_id'], $posts)));
 if ($verfasser) {
     $platzhalter = implode(',', array_fill(0, count($verfasser), '?'));
-    try {
-        foreach (db_fetchAll('
-            SELECT m.user_id, g.name FROM group_members m
+    // hide_rank gibt es erst ab v31. Fehlt die Spalte, wird die Abfrage ohne
+    // sie wiederholt — sonst stuenden nach einem halben Update gar keine
+    // Abzeichen mehr da.
+    $sql = 'SELECT m.user_id, g.name, %s AS versteckt FROM group_members m
             JOIN user_groups g ON g.group_id = m.group_id
             WHERE g.show_badge = 1 AND m.user_id IN (' . $platzhalter . ')
-            ORDER BY g.position, g.name
-        ', $verfasser) as $r) {
-            $abzeichen[(int) $r['user_id']][] = $r['name'];
+            ORDER BY g.position, g.name';
+    foreach (['g.hide_rank', '0'] as $spalte) {
+        try {
+            foreach (db_fetchAll(sprintf($sql, $spalte), $verfasser) as $r) {
+                $abzeichen[(int) $r['user_id']][] = $r['name'];
+                if (!empty($r['versteckt'])) $ohneRang[(int) $r['user_id']] = true;
+            }
+            break;
+        } catch (Exception $e) {
+            // Erster Versuch mit der Spalte gescheitert: ohne sie nochmal.
         }
-    } catch (Exception $e) {
-        // Migration noch nicht gefahren: dann eben keine Abzeichen.
     }
 }
 
@@ -247,6 +254,7 @@ if ($verfasser) {
 $reactionTypes = reaction_types();
 foreach ($posts as &$p) {
     $p['gruppen']     = $abzeichen[(int) $p['user_id']] ?? [];
+    $p['ohne_rang']   = isset($ohneRang[(int) $p['user_id']]);
     $p['attachments'] = post_attachments((int) $p['post_id']);
     $p['reactions']   = post_reactions((int) $p['post_id'], current_user() ? (int) current_user()['user_id'] : null);
 

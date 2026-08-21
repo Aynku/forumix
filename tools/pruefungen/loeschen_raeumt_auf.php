@@ -27,7 +27,7 @@ $hole = function (string $name) use ($roh): string {
     return $t[1] ?? '';
 };
 $pdo = new PDO("mysql:host={$hole('DB_HOST')};dbname=$db;charset=utf8mb4",
-               $hole('DB_USER'), $hole('DB_PASS'), [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+               $hole('DB_USER'), $hole('DB_PASS'), PRUEF_PDO_OPTIONEN);
 
 /** Legt Kategorie, Forum und Rechte an; raeumt hinterher auf. */
 $buehne = function (callable $koerper) use ($pdo) {
