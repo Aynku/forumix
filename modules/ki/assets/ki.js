@@ -29,6 +29,17 @@
    */
   var DIFF_GRENZE = 1200;
 
+  /**
+   * Zwei Wörter sind dasselbe Wort, wenn ihr Kern gleich ist.
+   *
+   * Der anhängende Leerraum gehört nicht dazu: Bricht das Modell eine Zeile
+   * anders um, wäre "der\n" sonst etwas anderes als "der " — und jedes Wort
+   * am Zeilenende erschiene als geändert, obwohl es unverändert dasteht.
+   */
+  function gleich(x, y) {
+    return x.trim() === y.trim();
+  }
+
   function vergleiche(alt, neu) {
     var a = inWoerter(alt), b = inWoerter(neu);
     if (a.length > DIFF_GRENZE || b.length > DIFF_GRENZE) return null;
@@ -39,7 +50,7 @@
 
     for (i = n - 1; i >= 0; i--) {
       for (j = m - 1; j >= 0; j--) {
-        tab[i][j] = (a[i] === b[j])
+        tab[i][j] = gleich(a[i], b[j])
           ? tab[i + 1][j + 1] + 1
           : Math.max(tab[i + 1][j], tab[i][j + 1]);
       }
@@ -48,13 +59,52 @@
     var teile = [];
     i = 0; j = 0;
     while (i < n && j < m) {
-      if (a[i] === b[j])                  { teile.push({t: '=', w: a[i]}); i++; j++; }
+      // Bei '=' beide Fassungen mitführen: links soll der alte Umbruch
+      // stehen, rechts der neue, und markiert wird trotzdem nichts.
+      if (gleich(a[i], b[j]))                  { teile.push({t: '=', w: a[i], w2: b[j]}); i++; j++; }
       else if (tab[i + 1][j] >= tab[i][j + 1]) { teile.push({t: '-', w: a[i]}); i++; }
-      else                                { teile.push({t: '+', w: b[j]}); j++; }
+      else                                     { teile.push({t: '+', w: b[j]}); j++; }
     }
     while (i < n) { teile.push({t: '-', w: a[i]}); i++; }
     while (j < m) { teile.push({t: '+', w: b[j]}); j++; }
-    return teile;
+    return verfeinern(teile);
+  }
+
+  /**
+   * Markiert innerhalb eines geänderten Wortes nur den geänderten Teil.
+   *
+   * Kommt bei einer Rechtschreibkorrektur ein Komma dazu, wäre sonst "sagen"
+   * rot und "sagen," grün — der Leser sieht zwei Wörter markiert, die für ihn
+   * identisch aussehen, und sucht den Unterschied. Jetzt bleibt "sagen"
+   * unmarkiert und nur das Komma ist grün.
+   *
+   * Nur bei Wörtern, die sich wirklich ähneln: bei "und" und "oder" wäre das
+   * gemeinsame "d" ein Zufall und die Hervorhebung Unsinn.
+   */
+  function verfeinern(teile) {
+    var aus = [];
+    for (var i = 0; i < teile.length; i++) {
+      var weg = teile[i], hin = teile[i + 1];
+      if (weg.t === '-' && hin && hin.t === '+') {
+        var x = weg.w, y = hin.w;
+        var p = 0;
+        while (p < x.length && p < y.length && x[p] === y[p]) p++;
+        var q = 0;
+        while (q < x.length - p && q < y.length - p && x[x.length - 1 - q] === y[y.length - 1 - q]) q++;
+
+        var kurz = Math.min(x.trim().length, y.trim().length);
+        if (p + q >= 2 && p + q >= kurz * 0.4) {
+          if (p) aus.push({t: '=', w: x.substring(0, p)});
+          if (x.length - p - q > 0) aus.push({t: '-', w: x.substring(p, x.length - q)});
+          if (y.length - p - q > 0) aus.push({t: '+', w: y.substring(p, y.length - q)});
+          if (q) aus.push({t: '=', w: x.substring(x.length - q)});
+          i++;
+          continue;
+        }
+      }
+      aus.push(weg);
+    }
+    return aus;
   }
 
   /** Eine Spalte ohne Hervorhebung — wenn der Text fuer den Vergleich zu lang war. */
@@ -71,7 +121,12 @@
     box.className = 'ki-text';
 
     teile.forEach(function (s) {
-      if (s.t === '=' ) { box.appendChild(document.createTextNode(s.w)); return; }
+      if (s.t === '=') {
+        // Links die alte Fassung, rechts die neue — sie unterscheiden sich
+        // hoechstens im Leerraum, und der gehoert zur jeweiligen Seite.
+        box.appendChild(document.createTextNode(seite === 'neu' && s.w2 ? s.w2 : s.w));
+        return;
+      }
       if (seite === 'alt' && s.t !== '-') return;
       if (seite === 'neu' && s.t !== '+') return;
       var m = document.createElement('mark');

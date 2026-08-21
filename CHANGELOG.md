@@ -8,23 +8,43 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.7.5 (2026-08-21)
+
+### Die Gegenüberstellung markiert nur, was sich wirklich geändert hat
+
+Bei einer Rechtschreibkorrektur standen Wörter rot durchgestrichen links, die
+rechts unverändert dastanden. Zwei Ursachen:
+
+- **Der Leerraum hing am Wort.** Bricht das Modell eine Zeile anders um, war
+  `der⏎` nicht dasselbe wie `der ` — und jedes Wort am Zeilenende erschien als
+  geändert, obwohl es unverändert dastand. Verglichen wird jetzt der Kern des
+  Wortes; angezeigt wird links die alte Fassung, rechts die neue.
+- **Ein Komma färbte das ganze Wort.** Aus „sagen" wurde „sagen,", markiert
+  waren beide, obwohl sich nur das Satzzeichen geändert hat. Jetzt wird
+  innerhalb eines geänderten Wortes nur der geänderte Teil hervorgehoben, hier
+  also das Komma. Das greift nur bei Wörtern, die sich stark ähneln: „und" und
+  „oder" teilen sich ein „d", dort bleibt die Markierung auf dem ganzen Wort.
+
+---
+
 ## v1.7.4 (2026-08-21)
 
 ### Ein nachgetragener Schlüssel holt den Klartext nach
 
-`FORUM_CRYPT_KEY` legt der Installer erst seit v0.23.0 an. Wer sein Forum
-vorher eingerichtet hat, trägt ihn nachträglich ein — und hat damit zunächst
-nichts gewonnen: Was schon in der Datenbank steht, bleibt dort im Klartext,
-und man sieht es ihm nicht an.
+`FORUM_CRYPT_KEY` legt der Installer erst seit v0.23.0 an. Ältere Foren können
+ihn nachträglich in die `config.php` eintragen. Bereits gespeicherte Werte
+bleiben dabei im Klartext, denn der Schlüssel wirkt nur beim Speichern.
 
-Die Einstellungsseite der Schreibhilfe holt das jetzt einmal nach und sagt es
-auch. Fehlt der Schlüssel noch, steht dort ab sofort die **fertige Zeile zum
-Kopieren** statt nur der Hinweis, dass etwas fehlt. Bisher gab es die nur unter
-E-Mail, und dort auch nur, wenn ein SMTP-Passwort hinterlegt war.
+Die Einstellungsseite der Schreibhilfe verschlüsselt einen im Klartext
+gefundenen API-Schlüssel jetzt einmalig nach und meldet das.
 
-**Wichtig:** Wurde von der Datenbank schon eine Sicherung gezogen, während der
-API-Schlüssel im Klartext darin stand, steht er dort weiter. Dagegen hilft
-keine Software — dann beim Anbieter einen neuen erzeugen.
+Fehlt `FORUM_CRYPT_KEY` ganz, zeigt die Seite die fertige Zeile zum Kopieren.
+Bisher gab es die nur unter E-Mail, und dort nur bei hinterlegtem
+SMTP-Passwort.
+
+**Hinweis:** Sicherungen, die vor dem Nachverschlüsseln entstanden sind,
+enthalten den Schlüssel weiterhin im Klartext. In dem Fall beim Anbieter einen
+neuen Schlüssel erzeugen und den alten widerrufen.
 
 ### Meldungen in Alltagssprache
 
@@ -38,11 +58,10 @@ hat unverständlich geantwortet" heißt „Die Antwort war nicht lesbar".
 
 ### Kein Knopf der Schreibhilfe sagt mehr „senden"
 
-Die Warnung vor dem Senden bot „Schwärzen und senden" an — eine Handbreit
-über dem Knopf „Antworten". In einem Forum heißt senden aber:
-**Beitrag veröffentlichen.** Wer das las, konnte glauben, er stellt seinen
-Beitrag gerade ein; tatsächlich geht dort nur die Anfrage an das Sprachmodell
-hinaus, und am Beitrag ändert sich nichts.
+Die Warnung bot „Schwärzen und senden" an — wenige Zeilen über dem Knopf
+„Antworten". In einem Forum heißt senden aber: **Beitrag veröffentlichen.**
+Tatsächlich geht dort nur die Anfrage an das Sprachmodell hinaus, und am
+Beitrag ändert sich nichts.
 
 Die Knöpfe nennen jetzt den gewählten Befehl: **„Ohne diese Angaben kürzen"**
 und **„Mit diesen Angaben kürzen"**. Und im Hinweis darüber steht als erstes,
@@ -52,11 +71,11 @@ Forum.*
 ### Geänderte Modul-Dateien kommen auch im Browser an
 
 Stylesheet und Skript der Schreibhilfe wurden mit einem festen `?v=1.0`
-eingebunden. Der ändert sich nur, wenn jemand daran denkt — und niemand denkt
-daran. Genau das ist mit 1.7.2 passiert: Die Korrektur lag eingespielt auf dem
-Server, der Browser benutzte weiter die alte Datei, und die behobene
-Falschmeldung erschien unverändert. Der Stempel kommt jetzt aus der
-Änderungszeit der Datei selbst.
+eingebunden. Der müsste bei jeder Änderung von Hand hochgesetzt werden. Mit
+1.7.2 ist genau das unterblieben: Die Korrektur lag eingespielt auf dem Server,
+der Browser benutzte weiter die alte Datei, und die behobene Falschmeldung
+erschien unverändert. Der Stempel kommt jetzt aus der Änderungszeit der Datei
+selbst.
 
 ---
 
@@ -69,10 +88,9 @@ Angaben, von denen zwei keine waren: `PassivePorts 49152 50000` galt als
 Telefonnummer und die Beispiel-Adresse daneben als IP — beide standen in
 einem `[code]`-Block.
 
-Das ist die schlimmste Sorte Falschmeldung. Codeblöcke und Zitate werden
-ohnehin nicht gesendet; gewarnt wurde also vor etwas, das gar nicht passiert.
-Genau daran stirbt eine Warnung: Wer dreimal seine eigene Beispiel-IP
-wegklickt, klickt beim vierten Mal die echte Angabe mit weg.
+Codeblöcke und Zitate werden ohnehin nicht gesendet. Gemeldet wurden also
+Angaben, die den Browser nie verlassen hätten. Wer solche Meldungen mehrfach
+wegklickt, sieht die nächste nicht mehr genau an.
 
 - **`[code]` und `[quote]` werden nicht mehr durchsucht.** Dieselbe Angabe
   außerhalb wird weiterhin gemeldet.
@@ -92,20 +110,19 @@ An demselben Beitrag bleiben jetzt fünf Funde übrig, und alle fünf sind echt.
 
 ### Modul-Einstellungen stehen im Adminbereich
 
-Seiten, die nur die Verwaltung angehen, standen in der Hauptnavigation des
-Forums — zwischen „Mitglieder" und „Suchen", also zwischen Punkten, die alle
-Besucher betreffen. Für andere waren sie ausgeblendet, für den Betreiber
-standen sie am falschen Platz.
+Seiten, die nur Inhaber und Administratoren angehen, standen in der
+Hauptnavigation des Forums — zwischen „Mitglieder" und „Suchen", also zwischen
+Punkten für alle Besucher. Für andere waren sie ausgeblendet, am richtigen
+Platz standen sie deshalb nicht.
 
-Der Grund war eine Lücke, keine Absicht: Im Adminbereich gab es keinen
-Einhängepunkt für Module. Jetzt gibt es ihn (`admin_nav`), und die
-Einstellungen der **KI-Schreibhilfe** und des **Ankündigungsbandes** stehen
-dort, wo man sie sucht.
+Ursache war ein fehlender Einhängepunkt: Im Adminbereich gab es keinen für
+Module. Jetzt gibt es ihn (`admin_nav`), und die Einstellungen der
+**KI-Schreibhilfe** und des **Ankündigungsbandes** stehen dort.
 
 Für eigene Module: eine Datei `hooks/admin_nav.php` mit einem `<a
 class="admin-nav-item">`, und `menu` mit `'admin' => true` aus dem Manifest
-nehmen. Der Haken muss die Rechte selbst prüfen — dass er heute nur im
-Adminbereich aufgerufen wird, ist kein Schutz für morgen.
+nehmen. Der Haken prüft die Rechte selbst — die Stelle, an der er aufgerufen
+wird, kann sich ändern.
 
 Keine Migration. Wer beide Module aktiv hat, findet die Seiten nach dem
 Einspielen an der neuen Stelle.
@@ -114,9 +131,8 @@ Einspielen an der neuen Stelle.
 
 In mehreren Modulen stand „das darf nur die Verwaltung" — ein Wort, das in
 diesem Forum keine Rolle bezeichnet. Es gibt Inhaber, Administratoren,
-Moderatoren und Mitglieder. Wer las, dass „die Verwaltung" etwas darf, konnte
-nicht wissen, ob er gemeint ist. Betrifft KI-Schreibhilfe, Band, Downloads,
-Termine und Kontakt.
+Moderatoren und Mitglieder. Die Meldungen nennen jetzt die Rolle. Betrifft
+KI-Schreibhilfe, Band, Downloads, Termine und Kontakt.
 
 ---
 
@@ -128,28 +144,27 @@ Vier Knöpfe im Editor: Rechtschreibung und Grammatik, Kürzen, Zusammenfassen,
 Übersetzen. Der Betreiber hinterlegt einen eigenen API-Schlüssel — ohne ihn
 erscheint der Knopf gar nicht erst. Anthropic und OpenAI stehen zur Wahl.
 
-Der Ablauf ist absichtlich umständlich: **anfordern, ansehen, übernehmen.**
-Kein Knopf schreibt in den Beitrag. Das Ergebnis erscheint als
-Gegenüberstellung — links der bisherige Text mit dem Entfernten durchgestrichen,
-rechts der Vorschlag mit dem Hinzugekommenen hervorgehoben. So sieht man, wenn
-beim Glattbügeln ein „nicht" verschwindet.
+Der Ablauf ist dreistufig: **anfordern, ansehen, übernehmen.** Kein Knopf
+schreibt direkt in den Beitrag. Das Ergebnis erscheint als Gegenüberstellung —
+links der bisherige Text mit dem Entfernten durchgestrichen, rechts der
+Vorschlag mit dem Hinzugekommenen hervorgehoben. Damit ist erkennbar, wenn
+beim Umformulieren eine Verneinung wegfällt.
 
 - **Zitate und Quelltext werden nicht mitgeschickt.** `[quote]` und `[code]`
   am Rand des Beitrags werden abgetrennt und danach wieder angesetzt, mitten
-  im Text stehende durch eine Marke ersetzt. Das ist keine Bitte an das Modell,
-  sondern Mechanik: was nicht gesendet wird, kann nicht umformuliert
-  zurückkommen. Wer fremde Zitate glätten lässt, legt jemandem Worte in den
-  Mund, die er nicht gesagt hat.
+  im Text stehende durch eine Marke ersetzt. Das ist keine Anweisung an das
+  Modell, sondern Mechanik: was nicht gesendet wird, kommt auch nicht
+  umformuliert zurück. Ein umformuliertes Zitat gibt fremde Worte falsch
+  wieder.
 - **Prüfung vor dem Senden.** E-Mail-Adressen, Telefonnummern, IBANs,
   Zugangsschlüssel, Kartennummern und IP-Adressen werden im Browser erkannt,
-  bevor etwas hinausgeht. Der Verfasser entscheidet: abbrechen, schwärzen oder
-  unverändert senden. Geschwärzt bleibt der Text vollständig — an Stelle der
-  Angabe geht eine Marke hinaus, danach steht sie wieder da. Sie verlässt den
-  Browser nicht.
+  bevor etwas hinausgeht. Der Verfasser entscheidet, ob sie mitgeschickt
+  werden. Wenn nicht, geht an ihrer Stelle eine Marke hinaus und im Ergebnis
+  steht die Angabe wieder da. Sie verlässt den Browser nicht.
 - **Kennzeichnung.** Beiträge, an denen ein Sprachmodell mitgeschrieben hat,
   tragen den Hinweis sichtbar. Welcher Befehl das auslöst, bestimmt der
-  Betreiber: eine Rechtschreibkorrektur macht niemanden zum KI-Autor, beim
-  Zusammenfassen entscheidet das Modell mit, was wegfällt.
+  Betreiber. Bei einer Rechtschreibkorrektur bleibt die Urheberschaft beim
+  Verfasser; beim Zusammenfassen entscheidet das Modell mit, was wegfällt.
 - **Modell je Befehl.** Gemessen am selben Beitrag: bei der Rechtschreibung
   setzen ein kleines und ein großes Modell dieselben Kommas. Beim Kürzen nicht
   — das kleine schrieb den Beitrag um statt ihn zu straffen. Deshalb lässt

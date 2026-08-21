@@ -79,7 +79,7 @@ JS;
 
 /** Der Wortvergleich. */
 $vergleich = function (string $alt, string $neu) use ($inJs): ?array {
-    $d = $inJs(['inWoerter', 'vergleiche'], 'vergleiche', [$alt, $neu]);
+    $d = $inJs(['inWoerter', 'gleich', 'verfeinern', 'vergleiche'], 'vergleiche', [$alt, $neu]);
     return is_array($d) ? $d : null;
 };
 
@@ -388,6 +388,56 @@ return [
         $quelle = (string) file_get_contents($modul . '/api.php');
         if (!str_contains($quelle, 'BLOCK0') || !str_contains($quelle, 'DATEN0')) {
             throw new RuntimeException('Die Anweisung zu den Marken fehlt im Endpunkt');
+        }
+    },
+
+    'Ein anderer Zeilenumbruch ist keine Änderung' => function () use ($vergleich, $woerter) {
+        if (!trim((string) shell_exec('command -v node'))) return null;
+
+        // Der Leerraum haengt am Wort. Bricht das Modell die Zeile anders um,
+        // waere "der\n" etwas anderes als "der " — dann steht ein Wort rot
+        // durchgestrichen links, und rechts steht dasselbe Wort. Genau das ist
+        // Juergen am 21.08.2026 aufgefallen.
+        $teile = $vergleich("Ein Satz der\nüber zwei Zeilen geht.",
+                            "Ein Satz der über zwei Zeilen geht.");
+        if ($teile === null) throw new RuntimeException('Vergleich lieferte kein Ergebnis');
+
+        if ($woerter($teile, '-') !== '' || $woerter($teile, '+') !== '') {
+            throw new RuntimeException('Nur der Umbruch änderte sich, markiert wurde: '
+                . var_export($woerter($teile, '-') . ' / ' . $woerter($teile, '+'), true));
+        }
+    },
+
+    'Ein dazugekommenes Komma markiert nur das Komma' => function () use ($vergleich, $woerter) {
+        if (!trim((string) shell_exec('command -v node'))) return null;
+
+        // Sonst steht "sagen" rot und "sagen," gruen — fuer den Leser zweimal
+        // dasselbe Wort, und er sucht den Unterschied.
+        $teile = $vergleich('Also ich muss sagen das geht nicht.',
+                            'Also ich muss sagen, das geht nicht.');
+        if ($teile === null) throw new RuntimeException('Vergleich lieferte kein Ergebnis');
+
+        if ($woerter($teile, '-') !== '') {
+            throw new RuntimeException('Es wurde etwas als entfernt markiert: '
+                . var_export($woerter($teile, '-'), true));
+        }
+        if ($woerter($teile, '+') !== ',') {
+            throw new RuntimeException('Markiert wurde ' . var_export($woerter($teile, '+'), true)
+                . ' statt nur des Kommas');
+        }
+    },
+
+    'Zwei verschiedene Wörter werden nicht künstlich zusammengezogen' => function () use ($vergleich, $woerter) {
+        if (!trim((string) shell_exec('command -v node'))) return null;
+
+        // "und" und "oder" haben ein gemeinsames "d" — das ist Zufall, und
+        // eine Hervorhebung davon waere Unsinn.
+        $teile = $vergleich('Er kam und ging.', 'Er kam oder ging.');
+        if ($teile === null) throw new RuntimeException('Vergleich lieferte kein Ergebnis');
+
+        if ($woerter($teile, '-') !== 'und' || $woerter($teile, '+') !== 'oder') {
+            throw new RuntimeException('Zerlegt statt ganz markiert: '
+                . var_export($woerter($teile, '-') . ' / ' . $woerter($teile, '+'), true));
         }
     },
 
