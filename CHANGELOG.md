@@ -8,6 +8,48 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.6.2 (2026-08-21)
+
+### Gruppen können den Rang ersetzen und ein Bild tragen
+
+Der Rang eines Mitglieds kommt aus seiner Beitragszahl. Für ein Konto, das
+nicht mitschreibt, sondern ankündigt — einen Bot etwa —, sagt „Neuling"
+nichts, und weglassen ließ er sich nicht.
+
+- **Statt des Rangs zeigen:** Ein Haken an der Gruppe, und ihr Abzeichen
+  tritt an die Stelle des Rangs — so wie bei Administratoren und Moderatoren
+  ihre Rolle.
+- **Bild je Gruppe:** Wer in der Gruppe ist und kein eigenes Bild hochgeladen
+  hat, bekommt deren. Die festen Rollen gehen vor: ein Moderator behält sein
+  Rollenbild, auch wenn er nebenbei in einer solchen Gruppe steht. Ein selbst
+  hochgeladenes Bild schlägt beides.
+- PNG, JPG oder WEBP, höchstens 512 KB. Kein SVG — eine solche Datei darf
+  Skripte enthalten und liefe unter der Adresse des Forums.
+
+**Migration nötig** (v31). Bestehende Gruppen verhalten sich wie bisher; beide
+Einstellungen sind zunächst aus.
+
+### Die Moderatoren stehen beim Forum
+
+In der Forenübersicht hatten sie eine eigene Spalte, die meistens leer war —
+und die Tabelle wechselte ihre Form, je nachdem ob eine Kategorie überhaupt
+welche hatte. Sie stehen jetzt unter der Forumbeschreibung, wo man sie im
+selben Zug liest, und der Platz kommt der Spalte mit den Themen zugute.
+
+Dabei ist auch „1 Themen · 1 Beiträge" verschwunden — an drei Stellen stand
+die Mehrzahl fest im Text.
+
+### Kleinigkeiten
+
+- Eine Datenbank-Anpassung ließ sich kein zweites Mal fahren: Die Prüfung, ob
+  eine Spalte schon existiert, wurde von der Datenbank abgelehnt, und danach
+  scheiterte das Anlegen. Wer v1.5.0 wiederholte — nach einem Abbruch etwa —
+  bekam einen Fehler statt einer Bestätigung.
+- Die Meldung beim Hochladen eines Rollenbilds nannte SVG als erlaubt,
+  obwohl es abgelehnt wird.
+
+---
+
 ## v1.6.1 (2026-08-21)
 
 ### Zu alte phpBB-Foren werden abgewiesen statt halb übernommen

@@ -111,7 +111,7 @@ function migration_title(string $version): string {
         'v28'    => 'v1.3.0 – Papierkorb für Beiträge und Themen',
         'v29'    => 'v1.4.0 – Volltext-Index für die Suche',
         'v30'    => 'v1.5.0 – Feinere Rechte je Forum und Gruppe',
-        'v31'    => 'v1.6.2 – Eine Gruppe kann den Rang ersetzen',
+        'v31'    => 'v1.6.2 – Gruppen: Rang ersetzen und eigenes Bild',
     ];
     return $titles[$version] ?? $version;
 }

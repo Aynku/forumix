@@ -400,7 +400,14 @@ function avatar_url($userOrAvatar): string {
         if (!empty($user['is_mod'])) {
             return _role_avatar_url('mod');
         }
-        // 3. Fallback
+        // 3. Bild einer Gruppe. Nach den festen Rollen, damit ein Moderator
+        // sein Rollenbild behaelt, auch wenn er nebenbei in einer Gruppe mit
+        // eigenem Bild steht. Unter mehreren Gruppen gewinnt die vorderste —
+        // dieselbe Reihenfolge wie bei den Abzeichen.
+        $gruppenBild = gruppen_avatar_url((int) ($user['user_id'] ?? 0));
+        if ($gruppenBild !== null) return $gruppenBild;
+
+        // 4. Fallback
         return FORUM_URL . '/assets/default_avatar.svg';
     }
 
@@ -410,6 +417,42 @@ function avatar_url($userOrAvatar): string {
         return FORUM_URL . '/uploads/avatars/' . rawurlencode($avatar);
     }
     return FORUM_URL . '/assets/default_avatar.svg';
+}
+
+/**
+ * Das Bild der vordersten Gruppe eines Kontos, oder null.
+ *
+ * Gruppen koennen ein Bild tragen — gedacht fuer Konten, die keine Person
+ * sind: ein Bot, der Ankuendigungen schreibt, ein Archiv-Konto. Es tritt an
+ * die Stelle des grauen Standard-Avatars, nicht an die der festen Rollen.
+ *
+ * Das Ergebnis wird je Aufruf gemerkt: In einer Themenseite steht derselbe
+ * Verfasser oft mehrfach, und jedes Mal nachzusehen waere eine Abfrage je
+ * Beitrag.
+ */
+function gruppen_avatar_url(int $userId): ?string
+{
+    static $gemerkt = [];
+    if ($userId <= 0) return null;
+    if (array_key_exists($userId, $gemerkt)) return $gemerkt[$userId];
+
+    try {
+        $z = db_fetch('SELECT g.avatar FROM group_members m
+                       JOIN user_groups g ON g.group_id = m.group_id
+                       WHERE m.user_id = ? AND g.avatar IS NOT NULL AND g.avatar <> \'\'
+                       ORDER BY g.position, g.name LIMIT 1', [$userId]);
+    } catch (Exception $e) {
+        // Spalte fehlt (Migration v31 nicht gefahren): dann eben kein Bild.
+        return $gemerkt[$userId] = null;
+    }
+
+    // Aus UPLOAD_DIR abgeleitet, nicht als eigene Konstante: die config.php
+    // bestehender Installationen kennt sie nicht, und dort etwas zu ergaenzen
+    // hiesse, jede einzelne anzufassen.
+    if (!$z || !is_file(rtrim(UPLOAD_DIR, '/') . '/gruppen/' . basename((string) $z['avatar']))) {
+        return $gemerkt[$userId] = null;
+    }
+    return $gemerkt[$userId] = FORUM_URL . '/uploads/gruppen/' . rawurlencode((string) $z['avatar']);
 }
 
 /**

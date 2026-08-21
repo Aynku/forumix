@@ -1,6 +1,6 @@
 <?php
 /**
- * v1.6.2 – Eine Gruppe kann den Rang ersetzen
+ * v1.6.2 – Eine Gruppe kann den Rang ersetzen und ein Bild tragen
  *
  * Der Rang wird aus der Beitragszahl berechnet. Fuer ein Konto, das gar nicht
  * mitschreibt, sondern etwas ankuendigt — einen Bot etwa — ergibt "Neuling"
@@ -28,13 +28,29 @@ if (!$da) {
     return;
 }
 
-$spalte = null;
-try { $spalte = db_fetch("SHOW COLUMNS FROM user_groups LIKE 'hide_rank'"); } catch (Throwable $e) {}
+// Kein Platzhalter im SHOW COLUMNS: MariaDB lehnt ihn ab, sobald das
+// Statement serverseitig vorbereitet wird. Der Name steht hier fest im Code.
+$hat = function (string $name): bool {
+    try { return (bool) db_fetch("SHOW COLUMNS FROM user_groups LIKE '$name'"); }
+    catch (Throwable $e) { return false; }
+};
 
-if ($spalte) {
+if ($hat('hide_rank')) {
     $zeile('user_groups.hide_rank war schon da.');
 } else {
     db_execute("ALTER TABLE user_groups
                 ADD COLUMN hide_rank TINYINT(1) NOT NULL DEFAULT 0 AFTER show_badge");
     $zeile('user_groups.hide_rank angelegt (Vorgabe: aus).');
+}
+
+// Das Bild einer Gruppe. Es tritt an die Stelle des Standard-Avatars fuer
+// alle, die kein eigenes Bild hochgeladen haben — so wie die festen Rollen
+// es fuer Inhaber, Admins und Moderatoren tun. Gespeichert wird nur der
+// Dateiname; die Datei liegt in uploads/gruppen/.
+if ($hat('avatar')) {
+    $zeile('user_groups.avatar war schon da.');
+} else {
+    db_execute("ALTER TABLE user_groups
+                ADD COLUMN avatar VARCHAR(255) DEFAULT NULL AFTER hide_rank");
+    $zeile('user_groups.avatar angelegt.');
 }

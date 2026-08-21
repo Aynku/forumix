@@ -125,6 +125,76 @@ if ($action === 'group_member_add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect(FORUM_URL . '/admin/?action=groups&group=' . $gid);
 }
 
+if ($action === 'group_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    $gid = post_int('group_id');
+    $ziel = FORUM_URL . '/admin/?action=groups&group=' . $gid;
+
+    // Entfernen
+    if (!empty($_POST['entfernen'])) {
+        $g = group_by_id($gid);
+        if ($g && !empty($g['avatar'])) {
+            $pfad = rtrim(UPLOAD_DIR, '/') . '/gruppen/' . basename((string) $g['avatar']);
+            if (is_file($pfad)) @unlink($pfad);
+        }
+        try { db_execute('UPDATE user_groups SET avatar = NULL WHERE group_id = ?', [$gid]); }
+        catch (Exception $e) {}
+        flash('Bild entfernt.', 'success');
+        redirect($ziel);
+    }
+
+    if (empty($_FILES['bild']) || $_FILES['bild']['error'] !== UPLOAD_ERR_OK) {
+        flash('Keine Datei angekommen.', 'error');
+        redirect($ziel);
+    }
+    $datei = $_FILES['bild'];
+    if (!is_uploaded_file($datei['tmp_name'])) {
+        flash('Sicherheits-Abbruch: keine echte Upload-Datei.', 'error');
+        redirect($ziel);
+    }
+
+    // Kein SVG, aus demselben Grund wie beim Rollen-Avatar: eine SVG-Datei
+    // ist ein XML-Dokument und darf Skripte enthalten. Sie laege hier unter
+    // einer festen Adresse in der eigenen Herkunft; wer sie oeffnet, fuehrt
+    // das Skript im Namen des Forums aus.
+    $erlaubt = ['image/png' => 'png', 'image/jpeg' => 'jpg', 'image/webp' => 'webp'];
+    $mime = mime_content_type($datei['tmp_name']) ?: '';
+    if (!isset($erlaubt[$mime])) {
+        flash('Nur PNG, JPG oder WEBP.', 'error');
+        redirect($ziel);
+    }
+    if ($datei['size'] > 512 * 1024) {
+        flash('Datei zu groß (höchstens 512 KB).', 'error');
+        redirect($ziel);
+    }
+
+    $ordner = rtrim(UPLOAD_DIR, '/') . '/gruppen/';
+    if (!is_dir($ordner)) @mkdir($ordner, 0755, true);
+
+    // Vorheriges Bild derselben Gruppe wegräumen, sonst bleibt es liegen.
+    $g = group_by_id($gid);
+    if ($g && !empty($g['avatar'])) {
+        $alt = $ordner . basename((string) $g['avatar']);
+        if (is_file($alt)) @unlink($alt);
+    }
+
+    $name = 'gruppe_' . $gid . '_' . bin2hex(random_bytes(5)) . '.' . $erlaubt[$mime];
+    if (!move_uploaded_file($datei['tmp_name'], $ordner . $name)) {
+        flash('Konnte die Datei nicht speichern. Schreibrechte prüfen.', 'error');
+        redirect($ziel);
+    }
+    @chmod($ordner . $name, 0644);
+
+    try {
+        db_execute('UPDATE user_groups SET avatar = ? WHERE group_id = ?', [$name, $gid]);
+        flash('Bild gespeichert.', 'success');
+    } catch (Exception $e) {
+        @unlink($ordner . $name);
+        flash('Die Spalte fehlt — bitte zuerst die Anpassung v1.6.2 fahren.', 'error');
+    }
+    redirect($ziel);
+}
+
 if ($action === 'group_member_remove') {
     if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
     $gid = get_int('group');
@@ -597,7 +667,7 @@ if ($action === 'upload_role_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $allowed = ['image/png' => 'png', 'image/jpeg' => 'jpg', 'image/webp' => 'webp'];
     $mime = mime_content_type($file['tmp_name']) ?: '';
     if (!isset($allowed[$mime])) {
-        flash('Nur PNG, JPG, WEBP oder SVG erlaubt.', 'error');
+        flash('Nur PNG, JPG oder WEBP erlaubt — SVG nicht, siehe Hinweis darunter.', 'error');
         redirect(FORUM_URL . '/admin/?action=settings');
     }
     if ($file['size'] > 2 * 1024 * 1024) {

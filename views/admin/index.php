@@ -873,6 +873,41 @@
             <div style="margin-top:14px"><button class="btn btn-primary">Speichern</button></div>
           </form>
 
+          <?php /* ── Bild der Gruppe ── */ ?>
+          <div style="border-top:1px dashed var(--border);margin-top:18px;padding-top:16px">
+            <h3 style="font-size:14px;margin:0 0 10px">Bild</h3>
+            <div style="display:flex;gap:16px;align-items:flex-start">
+              <?php if (!empty($gruppe['avatar'])): ?>
+                <img src="<?= e(FORUM_URL . '/uploads/gruppen/' . rawurlencode($gruppe['avatar'])) ?>"
+                     alt="" width="64" height="64"
+                     style="border-radius:50%;background:var(--bg-surface2);object-fit:cover">
+              <?php else: ?>
+                <div style="width:64px;height:64px;border-radius:50%;background:var(--bg-surface2);
+                            display:flex;align-items:center;justify-content:center;color:var(--text-faint)">–</div>
+              <?php endif; ?>
+              <div style="flex:1">
+                <form method="post" action="?action=group_avatar" enctype="multipart/form-data">
+                  <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
+                  <input type="hidden" name="group_id" value="<?= (int) $gruppe['group_id'] ?>">
+                  <input type="file" name="bild" accept="image/png,image/jpeg,image/webp">
+                  <div style="margin-top:10px;display:flex;gap:8px">
+                    <button class="btn btn-primary btn-sm">Hochladen</button>
+                    <?php if (!empty($gruppe['avatar'])): ?>
+                      <button name="entfernen" value="1" class="btn btn-ghost btn-sm">Entfernen</button>
+                    <?php endif; ?>
+                  </div>
+                </form>
+                <div class="form-hint" style="margin-top:8px">
+                  Wer in dieser Gruppe ist und kein eigenes Bild hochgeladen hat, bekommt dieses —
+                  gedacht für Konten, die keine Person sind. Die festen Rollen gehen vor: ein
+                  Moderator behält sein Rollenbild.
+                  PNG, JPG oder WEBP, höchstens 512 KB. Kein SVG: eine solche Datei darf Skripte
+                  enthalten und liefe hier im Namen des Forums.
+                </div>
+              </div>
+            </div>
+          </div>
+
           <?php if (empty($gruppe['is_builtin'])): ?>
             <div style="border-top:1px dashed var(--border);margin-top:18px;padding-top:16px">
               <h3 style="font-size:14px;margin-bottom:10px">Mitglieder (<?= count($mitglieder ?? []) ?>)</h3>
