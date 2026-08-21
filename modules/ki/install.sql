@@ -25,3 +25,23 @@ CREATE TABLE IF NOT EXISTS `ki_nutzung` (
   INDEX `idx_user_zeit` (`user_id`, `created_at`),
   FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+;
+
+-- Was noch geprueft werden muss.
+--
+-- Warum eine Warteschlange und nicht gleich im Speicherweg: Eine Anfrage an
+-- das Modell dauert ein bis zwei Sekunden. Die haengen sonst am Absenden des
+-- Beitrags — der Verfasser wartet auf eine Pruefung, die ihn nichts angeht,
+-- und bei einer Stoerung beim Anbieter wartet er die volle Zeitgrenze.
+--
+-- Der Text steht auch hier nicht: er liegt schon in `posts`, und eine zweite
+-- Kopie waere eine zweite Stelle, die jemand loeschen muesste.
+CREATE TABLE IF NOT EXISTS `ki_pruefung` (
+  `post_id`    INT UNSIGNED NOT NULL PRIMARY KEY,
+  `status`     ENUM('offen','fertig','fehler') NOT NULL DEFAULT 'offen',
+  `versuche`   TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  `befund`     VARCHAR(30)  DEFAULT NULL,
+  `created_at` DATETIME     DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_status` (`status`, `created_at`),
+  FOREIGN KEY (`post_id`) REFERENCES `posts`(`post_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4

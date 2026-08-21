@@ -8,6 +8,50 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.8.0 (2026-08-22)
+
+### Beiträge automatisch vorsortieren
+
+Die KI-Schreibhilfe bekommt einen zweiten Teil: Neue Beiträge werden nach dem
+Absenden auf Werbung und Beleidigungen geprüft. Findet die Prüfung etwas,
+entsteht eine Meldung in der Moderationsliste — dieselbe, die ein Mitglied
+über „Melden" erzeugt.
+
+Der Beitrag bleibt dabei sichtbar. Es wird nichts zurückgehalten, gelöscht
+oder gesperrt, und kein Konto wird angefasst. Bei einer Trefferquote unter
+100 Prozent kostet ein zurückgehaltener Beitrag eines Unschuldigen mehr, als
+durchgelassene Werbung kostet: Die steht ein paar Minuten und ist dann weg.
+
+- **Standardmäßig aus.** Einschalten im Adminbereich unter KI-Schreibhilfe.
+- **Nur neue Mitglieder**, Vorgabe bis 20 Beiträge, einstellbar. Wer länger
+  dabei ist, fängt selten mit Werbung an; die Grenze senkt die Zahl der
+  Anfragen erheblich. Moderatoren, Administratoren und Inhaber werden nie
+  geprüft.
+- **Meldendes Konto** wird ausgewählt. Ohne Konto entsteht keine Meldung —
+  eine Meldung ohne Absender wäre in der Liste eine Zeile ohne Herkunft.
+- **Zitate und Quelltext gehen nicht mit** in die Prüfung. Sonst wird jemand
+  für Worte gemeldet, die er zitiert hat.
+- **Hinweis am Editor** und **Absatz in der Datenschutzerklärung**, beides nur
+  bei eingeschalteter Prüfung. Ein Absatz, der eine Weitergabe beschreibt, die
+  nicht stattfindet, ist genauso falsch wie ein fehlender.
+- Für die Prüfung reicht das kleinste Modell; es beantwortet eine Frage mit
+  einem Wort.
+
+Die Prüfung läuft **nach** dem Ausliefern der Seite, nicht im Speicherweg.
+Sonst wartet der Verfasser ein bis zwei Sekunden auf etwas, das ihn nichts
+angeht — bei einer Störung beim Anbieter die volle Zeitgrenze.
+
+### Module können Vorlagen ergänzen
+
+`module_hook_html()` gibt zurück, was ein Haken ausgibt, statt es direkt
+auszugeben. Damit lässt sich ein Haken mitten in einer Vorlage setzen:
+`{{ module_hook_html('name')|raw }}`. Erster Einhängepunkt ist
+`privacy_bottom` in der Datenschutzerklärung — der Text dort ist eine
+bearbeitbare Seite, ein fester Satz in der Vorlage würde Betreiber mit
+angepasstem Text nie erreichen.
+
+---
+
 ## v1.7.5 (2026-08-21)
 
 ### Die Gegenüberstellung markiert nur, was sich wirklich geändert hat

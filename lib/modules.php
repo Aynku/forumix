@@ -254,6 +254,20 @@ function module_menu_links_fuer(string $ort): array {
 }
 
 /**
+ * Wie render_module_hook(), gibt die Ausgabe aber zurueck statt sie
+ * auszugeben.
+ *
+ * Fuer Vorlagen: dort steht der Haken mitten im Text, und was er ausgibt,
+ * muss an genau dieser Stelle landen. Ein echo waere je nach Pufferung vorher
+ * oder nachher da. Aufruf: {{ module_hook_html('name')|raw }}
+ */
+function module_hook_html(string $hookName, array $context = []): string {
+    ob_start();
+    render_module_hook($hookName, $context);
+    return (string) ob_get_clean();
+}
+
+/**
  * Ereignis-Haken: ein Modul erfaehrt, dass etwas geschehen ist.
  *
  * Der Unterschied zu render_module_hook(): der hier zeigt nichts an, er

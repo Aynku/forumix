@@ -184,6 +184,77 @@
     <div class="form-hint">0 schaltet die Bremse ab. Das ist nur sinnvoll, wenn du der einzige Benutzer bist.</div>
   </div>
 
+  <div class="section-heading" style="margin-top:24px">Beiträge vorsortieren</div>
+  <div class="form-hint" style="margin-bottom:10px">
+    Neue Beiträge werden nach dem Absenden auf Werbung und Beleidigungen geprüft.
+    Der Beitrag bleibt dabei sichtbar und wird nicht zurückgehalten — bei einem
+    Verdacht entsteht eine Meldung, der ein Moderator nachgeht. Gelöscht oder
+    gesperrt wird nichts automatisch.
+  </div>
+
+  <div class="form-row">
+    <label>
+      <input type="checkbox" name="mod_an" value="1" <?= !empty($cfg['mod_an']) ? 'checked' : '' ?>>
+      Vorsortierung einschalten
+    </label>
+    <div class="form-hint">
+      Im Auslieferungszustand aus. Sobald sie läuft, steht am Editor ein Hinweis
+      darauf und in der Datenschutzerklärung ein Absatz dazu.
+    </div>
+  </div>
+
+  <div class="form-row">
+    <label>Meldendes Konto</label>
+    <select name="mod_melder">
+      <option value="0">— keins gewählt —</option>
+      <?php foreach ($melder_wahl as $m): ?>
+        <option value="<?= (int) $m['user_id'] ?>"
+                <?= (int) ($cfg['mod_melder'] ?? 0) === (int) $m['user_id'] ? 'selected' : '' ?>>
+          <?= e($m['username']) ?><?= (int) $m['post_count'] === 0 ? '' : ' (' . (int) $m['post_count'] . ' Beiträge)' ?>
+        </option>
+      <?php endforeach; ?>
+    </select>
+    <div class="form-hint">
+      Unter diesem Namen erscheinen die Meldungen. Am besten ein eigenes Konto,
+      das sonst nichts schreibt — dann ist auf einen Blick klar, woher die
+      Meldung kommt. Ohne Konto entsteht keine Meldung.
+    </div>
+  </div>
+
+  <div class="form-row">
+    <label>Nur bis zu dieser Beitragszahl prüfen</label>
+    <input type="number" name="mod_bis" min="0" max="10000"
+           value="<?= (int) ($cfg['mod_bis'] ?? 20) ?>">
+    <div class="form-hint">
+      Wer schon länger dabei ist, fängt selten mit Werbung an. 0 prüft jeden
+      Beitrag — das kostet ein Vielfaches. Die Moderation selbst wird nie geprüft.
+    </div>
+  </div>
+
+  <div class="form-row">
+    <label>Modell für die Vorprüfung</label>
+    <input type="text" name="mod_modell" value="<?= e((string) ($cfg['mod_modell'] ?? '')) ?>"
+           placeholder="wie oben">
+    <div class="form-hint">
+      Hier reicht das kleinste Modell: Die Frage ist „Werbung, Beleidigung oder
+      in Ordnung", nicht das Umschreiben eines Textes.
+    </div>
+  </div>
+
+  <?php if (!empty($mod_offen) || !empty($mod_befunde)): ?>
+    <div class="form-hint" style="margin-bottom:14px">
+      <?php if (!empty($mod_offen)): ?>
+        <strong><?= (int) $mod_offen ?></strong> Beiträge warten noch auf die Prüfung.
+      <?php endif; ?>
+      <?php if (!empty($mod_befunde)): ?>
+        Sieben Tage:
+        <?php foreach ($mod_befunde as $b): ?>
+          <?= e((string) $b['befund']) ?> <strong><?= (int) $b['anzahl'] ?></strong><?= $b === end($mod_befunde) ? '' : ' ·' ?>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </div>
+  <?php endif; ?>
+
   <div class="form-actions" style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
     <button type="submit" class="btn btn-primary">Speichern</button>
     <button type="submit" name="probe" value="1" class="btn">Speichern und Verbindung prüfen</button>

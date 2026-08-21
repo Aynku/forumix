@@ -17,4 +17,9 @@
     <p>Die Datenschutzerklärung wurde noch nicht eingerichtet.</p>
   {% endif %}
 
+  {# Module, die Daten an Dritte geben, haengen hier ihren Absatz an. Der Text
+     oben ist eine bearbeitbare Seite — wer ihn angepasst hat, bekaeme einen
+     festen Satz aus der Vorlage sonst nie zu sehen. #}
+  {{ module_hook_html('privacy_bottom')|raw }}
+
 </div>

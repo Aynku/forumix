@@ -8,6 +8,7 @@ if (!defined('FORUM_RUNNING')) define('FORUM_RUNNING', true);
 require_once __DIR__ . '/../../bootstrap.php';
 require_once __DIR__ . '/lib/einstellungen.php';
 require_once __DIR__ . '/lib/befehle.php';
+require_once __DIR__ . '/lib/moderation.php';
 
 if (!module_enabled('ki')) {
     error_page(404, 'Nicht gefunden', 'Die KI-Schreibhilfe ist nicht aktiv.');
@@ -63,8 +64,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $gruppen[] = (int) $g;
     }
 
+    // Wer meldet: nur ein Konto, das es gibt. Die Kennung kommt aus dem
+    // Formular, und sie wandert in reports.reporter_id.
+    $melder = (int) ($_POST['mod_melder'] ?? 0);
+    if ($melder > 0 && !db_fetch('SELECT user_id FROM users WHERE user_id = ?', [$melder])) {
+        $melder = 0;
+    }
+
     $neu = [
         'anbieter'     => $anbieter,
+        'mod_an'       => !empty($_POST['mod_an']),
+        'mod_bis'      => max(0, min(10000, (int) ($_POST['mod_bis'] ?? 20))),
+        'mod_melder'   => $melder,
+        'mod_modell'   => preg_match('/^[A-Za-z0-9._-]{0,80}$/', (string) ($_POST['mod_modell'] ?? ''))
+                            ? trim((string) $_POST['mod_modell']) : '',
         'schluessel'   => $schluessel,
         'modell'       => trim((string) ($_POST['modell'] ?? '')),
         'modelle'      => $modelle,
@@ -137,5 +150,15 @@ render('@ki/ki', [
     'crypt_da'     => forum_crypt_available(),
     'crypt_vorschlag' => $crypt_vorschlag,
     'nachgezogen'  => $nachgezogen,
+    // Kandidaten fuer das meldende Konto. Nur Verwaltung und Konten ohne
+    // Beitraege: ein Melder soll kein Mitglied sein, das nebenbei schreibt.
+    'melder_wahl'  => db_fetchAll(
+        'SELECT user_id, username, post_count FROM users
+          WHERE is_admin = 1 OR COALESCE(is_owner,0) = 1 OR post_count = 0
+       ORDER BY post_count, username LIMIT 50'),
+    'mod_offen'    => (int) db_count("SELECT COUNT(*) FROM ki_pruefung WHERE status = 'offen'"),
+    'mod_befunde'  => db_fetchAll("SELECT befund, COUNT(*) AS anzahl FROM ki_pruefung
+                                    WHERE status = 'fertig' AND created_at > (NOW() - INTERVAL 7 DAY)
+                                 GROUP BY befund ORDER BY anzahl DESC"),
     'hat_schluessel' => (string) ($cfg['schluessel'] ?? '') !== '',
 ]);

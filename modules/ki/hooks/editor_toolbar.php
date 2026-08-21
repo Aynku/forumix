@@ -15,6 +15,18 @@ require_once __DIR__ . '/../lib/einstellungen.php';
 require_once __DIR__ . '/../lib/befehle.php';
 require_once __DIR__ . '/../lib/marken.php';
 
+// Laeuft die Vorsortierung, muss das am Editor stehen — dort, wo jemand
+// gerade schreibt, und nicht nur in der Datenschutzerklaerung. Der Hinweis
+// haengt an der Einstellung: ist sie aus, geht auch nichts hinaus, und dann
+// darf da auch nichts stehen.
+$ki_cfg_mod = ki_einstellungen();
+if (!empty($ki_cfg_mod['mod_an']) && (string) ($ki_cfg_mod['schluessel'] ?? '') !== '') {
+    echo '<span class="ki-mod-hinweis" title="Beiträge werden nach dem Absenden '
+       . 'automatisch auf Werbung und Beleidigungen geprüft. Der Beitrag bleibt '
+       . 'dabei sichtbar. Bei einem Verdacht entscheidet ein Moderator.">'
+       . 'automatische Prüfung</span>';
+}
+
 if (!ki_bereit()) return;
 
 $ki_cfg = ki_einstellungen();

@@ -243,3 +243,17 @@
   margin-bottom: 4px;
 }
 .ki-kopf-still { font-size: 11px; color: var(--text-faint); }
+
+/* ── Hinweis am Editor ───────────────────────────────────────────── */
+
+.ki-mod-hinweis {
+  align-self: center;
+  margin-right: 8px;
+  padding: 2px 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 10px;
+  color: var(--text-faint);
+  cursor: help;
+  white-space: nowrap;
+}

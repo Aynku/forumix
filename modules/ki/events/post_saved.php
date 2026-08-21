@@ -21,6 +21,15 @@ if (!isset($post_id, $content)) return;
 
 require_once __DIR__ . '/../lib/einstellungen.php';
 require_once __DIR__ . '/../lib/befehle.php';
+require_once __DIR__ . '/../lib/moderation.php';
+
+// ── Vorsortieren ──────────────────────────────────────────────────────
+// Nur was sichtbar ist: ein Beitrag, der ohnehin auf Freigabe wartet, hat
+// schon einen Menschen vor sich.
+if (!empty($freigegeben) && !empty($user_id) && ki_pruefung_faellig((int) $user_id)) {
+    ki_pruefung_einreihen((int) $post_id);
+    ki_pruefung_spaeter();
+}
 
 $befehl = '';
 

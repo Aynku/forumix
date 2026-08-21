@@ -29,6 +29,7 @@ if (!defined('FORUM_RUNNING')) define('FORUM_RUNNING', true);
 require_once $modul . '/lib/anbieter.php';
 require_once $modul . '/lib/befehle.php';
 require_once $modul . '/lib/schutz.php';
+require_once $modul . '/lib/moderation.php';
 
 /**
  * Ruft eine Funktion aus ki.js in node auf.
@@ -463,6 +464,105 @@ return [
     'Ein unbekannter Befehl wird im Zweifel gekennzeichnet' => function () {
         if (!ki_kennzeichnet('gibtesnicht', [])) {
             throw new RuntimeException('Unbekanntes muss auf der sicheren Seite landen');
+        }
+    },
+
+    // ── Vorsortierung ─────────────────────────────────────────────────
+
+    'Die Vorsortierung hält keinen Beitrag zurück' => function () use ($modul) {
+        // Das ist die Zusage des Moduls, und sie steht in der
+        // Datenschutzerklaerung. Sie darf nicht durch eine spaetere
+        // "Verbesserung" verlorengehen.
+        $quelle = (string) file_get_contents($modul . '/lib/moderation.php');
+        foreach (['is_approved', 'DELETE FROM posts', 'UPDATE posts',
+                  'is_banned', 'UPDATE users'] as $verboten) {
+            if (str_contains($quelle, $verboten)) {
+                throw new RuntimeException("Die Vorsortierung greift in Beiträge oder Konten ein: $verboten");
+            }
+        }
+        if (!str_contains($quelle, 'create_report')) {
+            throw new RuntimeException('Sie legt keine Meldung an — dann tut sie gar nichts');
+        }
+    },
+
+    'Wer moderiert, wird nicht selbst geprüft' => function () use ($modul) {
+        $quelle = (string) file_get_contents($modul . '/lib/moderation.php');
+        $pos = strpos($quelle, 'function ki_pruefung_faellig');
+        if ($pos === false) throw new RuntimeException('Die Prüfung auf Fälligkeit fehlt');
+        $koerper = substr($quelle, $pos, 900);
+        foreach (['is_admin', 'is_mod', 'is_owner'] as $rolle) {
+            if (!str_contains($koerper, $rolle)) {
+                throw new RuntimeException("$rolle wird nicht ausgenommen — dann meldet das "
+                    . 'Modul einen Moderator an die Moderation');
+            }
+        }
+    },
+
+    'Die Anweisung nennt „ok" als Vorgabe' => function () {
+        // Ohne diesen Satz meldet das Modell im Zweifel — und eine Meldeliste,
+        // in der zu viel steht, wird nicht mehr gelesen.
+        if (!str_contains(KI_MOD_SYSTEM, '"ok" ist die Vorgabe')) {
+            throw new RuntimeException('Der Vorgabe-Satz fehlt in der Anweisung');
+        }
+        // Und sie muss benennen, was ausdruecklich in Ordnung ist.
+        foreach (['harte Kritik', 'Unhoeflichkeit', 'Rechtschreibung'] as $stichwort) {
+            if (!str_contains(KI_MOD_SYSTEM, $stichwort)) {
+                throw new RuntimeException("Die Abgrenzung fehlt: $stichwort");
+            }
+        }
+    },
+
+    'Nur Meldegründe, die es im Forum gibt' => function () use ($wurzel) {
+        // KI_BEFUNDE wandert in reports.reason. Steht dort etwas Unbekanntes,
+        // weist create_report() es stillschweigend ab — die Meldung entsteht
+        // dann einfach nicht.
+        $quelle = (string) file_get_contents($wurzel . '/lib/reports.php');
+        foreach (KI_BEFUNDE as $grund) {
+            if (!str_contains($quelle, "'" . $grund . "'")) {
+                throw new RuntimeException("Meldegrund '$grund' gibt es in lib/reports.php nicht");
+            }
+        }
+    },
+
+    'Zitate werden auch bei der Vorsortierung ausgenommen' => function () use ($modul) {
+        // Sonst wird jemand für die Worte gemeldet, die er zitiert hat.
+        $quelle = (string) file_get_contents($modul . '/lib/moderation.php');
+        $pos = strpos($quelle, 'function ki_beitrag_pruefen');
+        $koerper = substr($quelle, $pos, 800);
+        if (!str_contains($koerper, 'ki_raender_abtrennen') || !str_contains($koerper, 'ki_bloecke_heraus')) {
+            throw new RuntimeException('Der Beitragstext geht samt Zitaten in die Prüfung');
+        }
+    },
+
+    'Hinweis und Datenschutz-Absatz hängen an der Einstellung' => function () use ($modul) {
+        // Ein Absatz, der eine Weitergabe beschreibt, die nicht stattfindet,
+        // ist genauso falsch wie ein fehlender.
+        $editor = (string) file_get_contents($modul . '/hooks/editor_toolbar.php');
+        if (!str_contains($editor, "mod_an")) {
+            throw new RuntimeException('Der Hinweis am Editor steht unabhängig von der Einstellung');
+        }
+        $datenschutz = (string) file_get_contents($modul . '/hooks/privacy_bottom.php');
+        if (!str_contains($datenschutz, "mod_an")) {
+            throw new RuntimeException('Der Moderations-Absatz steht auch ohne eingeschaltete Prüfung');
+        }
+        if (!str_contains($datenschutz, "schluessel")) {
+            throw new RuntimeException('Der ganze Absatz steht auch ohne hinterlegten Schlüssel');
+        }
+    },
+
+    'Die Prüfung läuft nicht im Speicherweg' => function () use ($modul) {
+        // Sonst wartet der Verfasser ein bis zwei Sekunden auf etwas, das ihn
+        // nichts angeht — und bei einer Stoerung die volle Zeitgrenze.
+        $ereignis = (string) file_get_contents($modul . '/events/post_saved.php');
+        if (str_contains($ereignis, 'ki_pruefung_arbeiten')) {
+            throw new RuntimeException('Es wird direkt beim Speichern geprüft');
+        }
+        if (!str_contains($ereignis, 'ki_pruefung_spaeter')) {
+            throw new RuntimeException('Der Nachlauf fehlt');
+        }
+        $mod = (string) file_get_contents($modul . '/lib/moderation.php');
+        if (!str_contains($mod, 'fastcgi_finish_request')) {
+            throw new RuntimeException('Die Antwort wird nicht vorher abgeschlossen');
         }
     },
 
