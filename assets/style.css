@@ -595,7 +595,17 @@ code {
    soll. Die Icon-Spalte traegt ihre 48px im Markup, die Hauptspalte
    bekommt, was uebrigbleibt. */
 .forum-table-responsive { table-layout: fixed; }
-.forum-table .mod-cell { width: 150px; font-size: 12.5px; }
+/* Die Moderatoren standen bis 1.6.2 in einer eigenen Spalte. Sie stehen
+   jetzt unter der Forumbeschreibung — dort, wo man sie im selben Zug liest,
+   und ohne dass die Tabelle ihre Form wechselt, je nachdem ob eine Kategorie
+   welche hat. Die 150 Pixel gehen an die Hauptspalte. */
+.board-mods {
+  font-size: 12px;
+  color: var(--text-faint);
+  margin-top: 3px;
+}
+.board-mods a { font-weight: 600; }
+.board-mods a:hover { text-decoration: none; filter: brightness(1.2); }
 .stat-cell b { color: var(--text-base); font-weight: 600; }
 .stat-cell .stat-label { color: var(--text-faint); }
 
@@ -1957,25 +1967,6 @@ input[type="file"]::file-selector-button {
 
 /* ════════════ FORUM-MODERATOREN ════════════ */
 
-.mod-cell {
-  vertical-align: top;
-  padding: 14px 12px;
-  font-size: 12px;
-}
-.board-mods-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px 4px;
-  line-height: 1.5;
-}
-.board-mods-list a {
-  text-decoration: none;
-  transition: opacity var(--transition);
-}
-.board-mods-list a:hover {
-  opacity: .7;
-  text-decoration: underline;
-}
 .board-mods-list a:not(:last-child)::after {
   content: ',';
   color: var(--text-muted);
@@ -1983,8 +1974,7 @@ input[type="file"]::file-selector-button {
 }
 
 @media (max-width: 900px) {
-  .mod-cell { display: none; }
-}
+  }
 
 /* ════════════ MITGLIEDER-SEITE ════════════ */
 
@@ -3169,12 +3159,7 @@ a.dash-list-item:hover {
   }
 
   /* Mods */
-  .forum-table-responsive .mod-cell {
-    grid-area: mods;
-    padding: 4px 0 0 0;
-    font-size: 12px;
-  }
-  .forum-table-responsive .mod-cell::before {
+  .forum-table-responsive   .forum-table-responsive .mod-cell::before {
     content: "🛡️ " attr(data-label) ": ";
     color: var(--text-faint);
     font-size: 11px;
@@ -3182,10 +3167,7 @@ a.dash-list-item:hover {
     letter-spacing: .3px;
     margin-right: 4px;
   }
-  .forum-table-responsive .mod-cell .board-mods-list {
-    display: inline;
-  }
-}
+  .forum-table-responsive .mod-cell }
 
 /* ════════════ THREAD-TABELLE → MOBILE CARDS ════════════ */
 

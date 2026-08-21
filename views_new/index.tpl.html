@@ -2,7 +2,6 @@
 
 {% for cat in categories %}
   <div class="category-label">{{ cat.title }}</div>
-  {% set zeigeMods = boards_have_mods(cat.boards, boardMods) %}
   <div class="card">
     {# Ohne Kopfzeile: "12 Themen" sagt selbst, was es ist, und der Betreff
        unter "Letzter Beitrag" ebenso. Uebrig blieben Ueberschriften, die
@@ -36,12 +35,31 @@
             {% if b.description %}
               <div class="board-desc">{{ b.description }}</div>
             {% endif %}
+            {# Die Moderatoren standen frueher in einer eigenen Spalte. Die war
+               150 Pixel breit und meistens leer, und die Tabelle wechselte
+               ihre Form, je nachdem ob eine Kategorie welche hatte. Hier
+               stehen sie beim Forum, zu dem sie gehoeren. #}
+            {% set mods = tpl_get(boardMods, b.board_id) %}
+            {% if mods %}
+              {# count() statt |length: die Vorlagen-Sprache liest alles nach
+                 dem | als Namen eines Filters, "length == 1 ? ..." waere fuer
+                 sie also ein Filter mit sehr langem Namen. #}
+              <div class="board-mods">
+                {{ count(mods) == 1 ? 'Moderator:' : 'Moderatoren:' }}
+                {% for m in mods %}
+                  {% set role = user_role_style(m) %}
+                  <a href="{{ url('/profile.php?id=') }}{{ m.user_id }}"
+                     style="color:{{ role.color }}"
+                     title="{{ role.title|default('Moderator') }}">{{ zeigename(m.username) }}</a>{{ loop.last ? '' : ',' }}
+                {% endfor %}
+              </div>
+            {% endif %}
           </td>
           <td class="stat-cell">
             <b>{{ number_format(b.thread_count, 0, ',', '.') }}</b>
-            <span class="stat-label">Themen</span><br>
+            <span class="stat-label">{{ b.thread_count == 1 ? 'Thema' : 'Themen' }}</span><br>
             <b>{{ number_format(b.post_count, 0, ',', '.') }}</b>
-            <span class="stat-label">Beiträge</span>
+            <span class="stat-label">{{ b.post_count == 1 ? 'Beitrag' : 'Beiträge' }}</span>
           </td>
           <td class="last-post-cell" data-label="Letzter Beitrag">
             {% if b.last_post_date %}
@@ -54,23 +72,6 @@
               <span style="color:var(--text-faint)">Noch kein Beitrag</span>
             {% endif %}
           </td>
-          {% if zeigeMods %}
-          <td class="mod-cell" data-label="Mods">
-            {% set mods = tpl_get(boardMods, b.board_id) %}
-            {% if not mods %}
-              <span style="color:var(--text-faint);font-size:11px">–</span>
-            {% else %}
-              <div class="board-mods-list">
-                {% for m in mods %}
-                  {% set role = user_role_style(m) %}
-                  <a href="{{ url('/profile.php?id=') }}{{ m.user_id }}"
-                     style="color:{{ role.color }};font-weight:600"
-                     title="{{ role.title|default('Moderator') }}">{{ zeigename(m.username) }}</a>
-                {% endfor %}
-              </div>
-            {% endif %}
-          </td>
-          {% endif %}
         </tr>
         {% endfor %}
       </tbody>
@@ -123,9 +124,11 @@
     </div>
     <div style="padding:12px 16px;font-size:13px;line-height:1.9">
       <div>
-        <strong>{{ number_format(forumStats.threads, 0, ',', '.') }}</strong> Themen
+        <strong>{{ number_format(forumStats.threads, 0, ',', '.') }}</strong>
+        {{ forumStats.threads == 1 ? 'Thema' : 'Themen' }}
         &middot;
-        <strong>{{ number_format(forumStats.posts, 0, ',', '.') }}</strong> Beiträge
+        <strong>{{ number_format(forumStats.posts, 0, ',', '.') }}</strong>
+        {{ forumStats.posts == 1 ? 'Beitrag' : 'Beiträge' }}
       </div>
       <div>
         <strong>{{ number_format(forumStats.members, 0, ',', '.') }}</strong> {{ forumStats.members == 1 ? 'Mitglied' : 'Mitglieder' }}
