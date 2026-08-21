@@ -6,8 +6,13 @@
  *   php install/import-phpbb.php --host=localhost --db=phpbb --user=… --pass=… \
  *                                --dateien=/pfad/zu/phpBB3/files
  *
+ *   php install/import-phpbb.php --zuruecknehmen
+ *
  * `--probe` liest und zaehlt, schreibt aber nichts. Der erste Aufruf gehoert
  * immer dorthin: er sagt, was ankommen wuerde und was nicht.
+ *
+ * `--zuruecknehmen` entfernt wieder, was ein Import angelegt hat — und nur
+ * das. Wer von Hand etwas dazugestellt hat, behaelt es.
  *
  * ── Was mitkommt ──────────────────────────────────────────────────────
  *
@@ -57,6 +62,7 @@ ini_set('session.use_cookies', '0');
 
 define('FORUM_RUNNING', true);
 require_once $wurzel . '/bootstrap.php';
+require_once __DIR__ . '/import_text.php';
 
 /* ── Aufruf lesen ─────────────────────────────────────────────────────── */
 
@@ -65,8 +71,10 @@ $opt = [
     'praefix' => 'phpbb_', 'dateien' => '', 'port' => '3306',
 ];
 $probe = false;
+$zurueck = false;
 foreach (array_slice($argv, 1) as $arg) {
     if ($arg === '--probe') { $probe = true; continue; }
+    if ($arg === '--zuruecknehmen') { $zurueck = true; continue; }
     if (preg_match('/^--([a-z]+)=(.*)$/s', $arg, $t) && array_key_exists($t[1], $opt)) {
         $opt[$t[1]] = $t[2];
         continue;
@@ -75,11 +83,56 @@ foreach (array_slice($argv, 1) as $arg) {
     exit(2);
 }
 
-foreach (['db', 'user'] as $pflicht) {
+foreach ($zurueck ? [] : ['db', 'user'] as $pflicht) {
     if ($opt[$pflicht] === '') {
         fwrite(STDERR, "--$pflicht fehlt. Aufruf siehe Kopf dieser Datei.\n");
         exit(2);
     }
+}
+
+/* ── Zuruecknehmen ────────────────────────────────────────────────────── */
+
+/**
+ * Nimmt zurueck, was ein frueherer Lauf angelegt hat — und nur das.
+ *
+ * Moeglich wird das durch die Zuordnungstabelle: Sie haelt fest, welche Zeile
+ * hier aus welcher Zeile dort entstanden ist. Angefasst wird ausschliesslich,
+ * was dort steht. Was von Hand dazukam, bleibt.
+ *
+ * Ein Import, den man zurueckdrehen kann, ist ein Import, den jemand wagt.
+ */
+if ($zurueck) {
+    try {
+        db_fetch('SELECT 1 FROM import_zuordnung LIMIT 1');
+    } catch (Throwable $e) {
+        fwrite(STDERR, "Es gibt nichts zurückzunehmen (keine Zuordnung vorhanden).\n");
+        exit(1);
+    }
+
+    // Reihenfolge von innen nach aussen, sonst haengen Verweise in der Luft.
+    $schritte = [
+        ['beitrag',   'posts',            'post_id'],
+        ['thema',     'threads',          'thread_id'],
+        ['board',     'boards',           'board_id'],
+        ['kategorie', 'categories',       'cat_id'],
+        ['pn',        'private_messages', 'pm_id'],
+        ['user',      'users',            'user_id'],
+    ];
+
+    echo "── Zurücknehmen ──\n";
+    foreach ($schritte as [$art, $tabelle, $spalte]) {
+        try {
+            $n = db_affected(
+                "DELETE t FROM `$tabelle` t
+                 JOIN import_zuordnung z ON z.art = ? AND z.neu_id = t.`$spalte`", [$art]);
+            if ($n > 0) printf("  %-20s %d entfernt\n", $tabelle, $n);
+        } catch (Throwable $e) {
+            fwrite(STDERR, "  $tabelle: " . $e->getMessage() . "\n");
+        }
+    }
+    db_execute('DROP TABLE import_zuordnung');
+    echo "  Zuordnung            entfernt\n";
+    exit(0);
 }
 
 /* ── Verbindung zur phpBB-Datenbank ───────────────────────────────────── */
@@ -224,10 +277,227 @@ try {
     exit(1);
 }
 
+/* ── Was beim Schreiben passieren wuerde ──────────────────────────────── */
+
+/**
+ * Die Zuordnung alter auf neue Kennungen.
+ *
+ * Sie steht in einer Tabelle und nicht im Speicher, aus zwei Gruenden: Ein
+ * Forum mit hunderttausend Beitraegen sprengt sonst den Arbeitsspeicher, und
+ * ein Lauf, der auf halber Strecke abbricht, laesst sich fortsetzen statt von
+ * vorn zu beginnen.
+ *
+ * Sie bleibt nach dem Import stehen. Wer spaeter wissen will, woher ein
+ * Beitrag stammt, findet es hier — und ein zweiter Lauf ueberspringt, was
+ * schon da ist, statt Doppelgaenger anzulegen.
+ */
+function import_zuordnung_bereit(): void
+{
+    db_execute("
+        CREATE TABLE IF NOT EXISTS `import_zuordnung` (
+            `art`    VARCHAR(20)  NOT NULL,
+            `alt_id` INT UNSIGNED NOT NULL,
+            `neu_id` INT UNSIGNED NOT NULL,
+            `notiz`  VARCHAR(100) NOT NULL DEFAULT '',
+            PRIMARY KEY (`art`, `alt_id`),
+            KEY `neu` (`art`, `neu_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+}
+
+function import_merken(string $art, int $alt, int $neu, string $notiz = ''): void
+{
+    db_execute('INSERT INTO import_zuordnung (art, alt_id, neu_id, notiz) VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE neu_id = VALUES(neu_id), notiz = VALUES(notiz)',
+               [$art, $alt, $neu, mb_substr($notiz, 0, 100)]);
+}
+
+function import_neu_id(string $art, int $alt): ?int
+{
+    $z = db_fetch('SELECT neu_id FROM import_zuordnung WHERE art = ? AND alt_id = ?', [$art, $alt]);
+    return $z ? (int) $z['neu_id'] : null;
+}
+
+/** Ein Zeitstempel von phpBB (Unix) als Datum fuer Forumix. */
+function import_zeit(?int $unix): string
+{
+    return date('Y-m-d H:i:s', ($unix !== null && $unix > 0) ? $unix : time());
+}
+
 if ($probe) {
+    echo "\n── Was der Import tun würde ──\n";
+
+    // Namen und Adressen, die es hier schon gibt. Beide sind in Forumix
+    // eindeutig; ein Zusammenlegen kaeme einer Uebergabe fremder Konten
+    // gleich und findet deshalb nicht statt.
+    $namen = $mails = [];
+    foreach (db_fetchAll('SELECT username, email FROM users') as $z) {
+        $namen[mb_strtolower((string) $z['username'])] = true;
+        $mails[mb_strtolower((string) $z['email'])]    = true;
+    }
+
+    $neu = $nameDoppelt = $mailDoppelt = 0;
+    foreach ($alt->query("SELECT username, user_email FROM {$p}users WHERE user_type <> 2") as $z) {
+        $n = mb_strtolower((string) $z['username']);
+        $m = mb_strtolower((string) $z['user_email']);
+        if (isset($namen[$n]))      { $nameDoppelt++; continue; }
+        if ($m !== '' && isset($mails[$m])) { $mailDoppelt++; continue; }
+        $neu++;
+    }
+
+    printf("  Konten anlegen       %d\n", $neu);
+    if ($nameDoppelt > 0) printf("  Name schon vergeben  %d (werden übersprungen)\n", $nameDoppelt);
+    if ($mailDoppelt > 0) printf("  Adresse schon da     %d (werden übersprungen)\n", $mailDoppelt);
+    printf("  Kategorien anlegen   %d\n", $kategorien);
+    printf("  Foren anlegen        %d\n", $foren);
+
     echo "\n── Probelauf — es wurde nichts geschrieben ──\n";
     exit(0);
 }
 
-fwrite(STDERR, "\nDas Schreiben ist noch nicht gebaut. Bis dahin: --probe.\n");
-exit(2);
+/* ── Schreiben ────────────────────────────────────────────────────────── */
+
+echo "\n── Import ──\n";
+import_zuordnung_bereit();
+
+/* Konten. Uebersprungen wird, wessen Name oder Adresse hier schon vergeben
+   ist: beide sind eindeutig, und ein Zusammenlegen waere die Uebergabe eines
+   fremden Kontos an jemanden, der zufaellig dieselbe Adresse benutzt. */
+$namen = $mails = [];
+foreach (db_fetchAll('SELECT username, email FROM users') as $z) {
+    $namen[mb_strtolower((string) $z['username'])] = true;
+    $mails[mb_strtolower((string) $z['email'])]    = true;
+}
+
+$angelegt = $uebersprungen = $schon = 0;
+
+/* Wohnort, Beruf und Interessen liegen seit 3.1 nicht mehr in der
+   Benutzertabelle, sondern als Profilfelder daneben — und die Tabelle gibt es
+   nur, wenn welche eingerichtet sind. Fehlt sie, bleiben die Felder leer. */
+$profilDa = $tabelle_da($p . 'profile_fields_data');
+$profilSpalten = [];
+if ($profilDa) {
+    try {
+        foreach ($alt->query("SHOW COLUMNS FROM {$p}profile_fields_data") as $sp) {
+            $profilSpalten[$sp['Field']] = true;
+        }
+    } catch (Throwable $e) { $profilDa = false; }
+}
+$hatProfil = fn(string $f): bool => $profilDa && isset($profilSpalten[$f]);
+
+$felder = "u.user_id, u.username, u.user_email, u.user_password, u.user_type,
+           u.user_regdate, u.user_lastvisit, u.user_posts, u.user_sig";
+foreach (['pf_phpbb_location' => 'ort', 'pf_phpbb_occupation' => 'beruf',
+          'pf_phpbb_interests' => 'interessen'] as $sp => $als) {
+    $felder .= $hatProfil($sp) ? ", d.`$sp` AS $als" : ", NULL AS $als";
+}
+$join = $profilDa ? "LEFT JOIN {$p}profile_fields_data d ON d.user_id = u.user_id" : '';
+
+$abfrage = $alt->query("SELECT $felder FROM {$p}users u $join
+                        WHERE u.user_type <> 2 ORDER BY u.user_id");
+
+foreach ($abfrage as $z) {
+    $altId = (int) $z['user_id'];
+    if (import_neu_id('user', $altId) !== null) { $schon++; continue; }
+
+    $name = trim((string) $z['username']);
+    $mail = mb_strtolower(trim((string) $z['user_email']));
+    if ($name === '' || $mail === '') { $uebersprungen++; continue; }
+    if (isset($namen[mb_strtolower($name)]) || isset($mails[$mail])) {
+        $uebersprungen++;
+        continue;
+    }
+
+    // Die Signatur steht wie der Beitragstext als XML da.
+    $signatur = phpbb_text_zu_bbcode((string) ($z['user_sig'] ?? ''));
+
+    try {
+        $ort = mb_substr(trim((string) ($z['ort'] ?? '')), 0, 100);
+        $neuId = (int) db_execute(
+            'INSERT INTO users (username, password, email, signature, post_count, `rank`,
+                                registered_at, last_login, email_verified, location, is_banned,
+                                profile_location, profile_occupation, profile_interests)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?)',
+            [
+                $name,
+                (string) $z['user_password'],
+                $mail,
+                $signatur !== '' ? $signatur : null,
+                (int) $z['user_posts'],
+                'Mitglied',
+                import_zeit((int) $z['user_regdate']),
+                ((int) $z['user_lastvisit']) > 0 ? import_zeit((int) $z['user_lastvisit']) : null,
+                $ort,
+                ((int) $z['user_type']) === 1 ? 1 : 0,   // 1 = inaktiv/gesperrt
+                $ort !== '' ? $ort : null,
+                mb_substr(trim((string) ($z['beruf'] ?? '')), 0, 100) ?: null,
+                mb_substr(trim((string) ($z['interessen'] ?? '')), 0, 500) ?: null,
+            ]
+        );
+    } catch (Throwable $e) {
+        fwrite(STDERR, "  Konto \"$name\" nicht angelegt: " . $e->getMessage() . "\n");
+        $uebersprungen++;
+        continue;
+    }
+
+    import_merken('user', $altId, $neuId, $name);
+    $namen[mb_strtolower($name)] = true;
+    $mails[$mail] = true;
+    $angelegt++;
+}
+
+printf("  Konten               %d angelegt", $angelegt);
+if ($schon > 0)          printf(", %d schon aus einem früheren Lauf", $schon);
+if ($uebersprungen > 0)  printf(", %d übersprungen", $uebersprungen);
+echo "\n";
+
+/* Kategorien und Foren. phpBB fuehrt beide in einer Tabelle und unterscheidet
+   sie am forum_type; Forumix hat zwei Tabellen. Verschachtelte Foren (ein
+   Forum in einem Forum) gibt es in Forumix nicht — sie landen flach in der
+   Kategorie ihres obersten Elternteils. */
+$katAngelegt = $forenAngelegt = 0;
+
+foreach ($alt->query("SELECT forum_id, forum_name, forum_desc, left_id
+                      FROM {$p}forums WHERE forum_type = 0 ORDER BY left_id") as $z) {
+    $altId = (int) $z['forum_id'];
+    if (import_neu_id('kategorie', $altId) !== null) continue;
+    $neuId = (int) db_execute('INSERT INTO categories (title, position) VALUES (?, ?)',
+                              [mb_substr((string) $z['forum_name'], 0, 100), (int) $z['left_id']]);
+    import_merken('kategorie', $altId, $neuId, (string) $z['forum_name']);
+    $katAngelegt++;
+}
+
+// Ein Forum ohne eigene Kategorie braucht trotzdem eine.
+$sammel = null;
+$sammel_holen = function () use (&$sammel): int {
+    if ($sammel === null) {
+        $da = db_fetch('SELECT cat_id FROM categories ORDER BY position, cat_id LIMIT 1');
+        $sammel = $da ? (int) $da['cat_id']
+                      : (int) db_execute('INSERT INTO categories (title, position) VALUES (?, ?)',
+                                         ['Übernommen', 99]);
+    }
+    return $sammel;
+};
+
+foreach ($alt->query("SELECT forum_id, forum_name, forum_desc, parent_id, left_id
+                      FROM {$p}forums WHERE forum_type = 1 ORDER BY left_id") as $z) {
+    $altId = (int) $z['forum_id'];
+    if (import_neu_id('board', $altId) !== null) continue;
+
+    $kat = import_neu_id('kategorie', (int) $z['parent_id']) ?? $sammel_holen();
+    $beschreibung = trim(strip_tags((string) $z['forum_desc']));
+
+    $neuId = (int) db_execute(
+        'INSERT INTO boards (cat_id, title, description, position) VALUES (?, ?, ?, ?)',
+        [$kat, mb_substr((string) $z['forum_name'], 0, 100),
+         mb_substr($beschreibung, 0, 255), (int) $z['left_id']]
+    );
+    import_merken('board', $altId, $neuId, (string) $z['forum_name']);
+    $forenAngelegt++;
+}
+
+printf("  Kategorien           %d angelegt\n", $katAngelegt);
+printf("  Foren                %d angelegt\n", $forenAngelegt);
+
+fwrite(STDERR, "\nThemen, Beiträge, Anhänge und Nachrichten folgen in der nächsten Stufe.\n");
+exit(0);
