@@ -212,6 +212,20 @@ return [
         if (!str_contains($block, 'nicht rückgängig')) {
             throw new RuntimeException('Die Rückfrage sagt nicht, dass es endgültig ist');
         }
+
+        // Und sie muss beim Leser ankommen. json_encode liefert einen String
+        // MIT Anfuehrungszeichen; ohne e() beendet das erste davon das
+        // onsubmit-Attribut. Der Dialog fiel dadurch ersatzlos aus — geloescht
+        // wurde trotzdem, ohne jede Warnung.
+        if (!preg_match('/onsubmit="return confirm\(<\?=\s*e\(/', $block)) {
+            throw new RuntimeException('Die Rückfrage geht ungeschützt ins HTML-Attribut — '
+                . 'dann bricht es beim ersten Anführungszeichen ab und der Dialog fällt aus');
+        }
+        // Umbrueche in doppelten Anfuehrungszeichen, sonst steht \n sichtbar da.
+        if (preg_match("/'\\\\n\\\\nGelöscht/", $block)) {
+            throw new RuntimeException('Die Umbrüche stehen in einfachen Anführungszeichen '
+                . 'und erscheinen als sichtbares \n');
+        }
     },
 
     'Ein aktives Modul wird nicht entfernt' => function () use ($wurzel) {

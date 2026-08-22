@@ -2941,14 +2941,21 @@
                       // gehen verloren" liest sich wie eine Floskel; "shoutbox_messages
                       // wird gelöscht" nicht.
                       $tab = function_exists('module_tabellen') ? module_tabellen($m['code']) : [];
+                      // Doppelte Anfuehrungszeichen: in einfachen bleibt \n ein
+                      // Backslash mit einem n, und die Rueckfrage stuende als
+                      // eine lange Zeile mit sichtbaren \n darin.
                       $warnung = 'Modul „' . $m['name'] . '“ entfernen?'
-                          . '\n\nGelöscht werden die Dateien'
-                          . ($tab ? ' und diese Tabellen samt Inhalt:\n  ' . implode("\n  ", $tab) : '')
-                          . '.\n\nDas lässt sich nicht rückgängig machen. Wer die Daten behalten '
+                          . "\n\nGelöscht werden die Dateien"
+                          . ($tab ? " und diese Tabellen samt Inhalt:\n  " . implode("\n  ", $tab) : '')
+                          . ".\n\nDas lässt sich nicht rückgängig machen. Wer die Daten behalten "
                           . 'will, lässt das Modul abgeschaltet stehen.';
                     ?>
                     <form method="post" action="?action=module_entfernen" style="display:inline;margin-left:6px"
-                          onsubmit="return confirm(<?= json_encode($warnung, JSON_UNESCAPED_UNICODE) ?>)">
+                          <?php /* Durch e(): json_encode liefert einen String MIT
+                                  Anfuehrungszeichen, und das erste beendet sonst
+                                  das onsubmit-Attribut. Die Rueckfrage fiel damit
+                                  ersatzlos aus — geloescht wurde trotzdem. */ ?>
+                          onsubmit="return confirm(<?= e(json_encode($warnung, JSON_UNESCAPED_UNICODE)) ?>)">
                       <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                       <input type="hidden" name="code" value="<?= e($m['code']) ?>">
                       <button type="submit" class="btn btn-danger btn-sm">🗑️ Entfernen</button>

@@ -8,6 +8,24 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.9.3 (2026-08-22)
+
+### Die Rückfrage vor dem Entfernen kam gar nicht
+
+Ein Klick auf „Entfernen" löschte sofort — ohne die Rückfrage, die dort
+vorgesehen war. Der Grund steckte im Detail: Der Warntext wird als JSON in ein
+`onsubmit`-Attribut geschrieben, und JSON bringt Anführungszeichen mit. Das
+erste davon beendete das Attribut, der Rest ging als Text unter, und der
+Dialog fiel ersatzlos aus. Gelöscht wurde trotzdem.
+
+Behoben, und die Umbrüche im Text stimmen jetzt auch — sie standen in
+einfachen Anführungszeichen und wären als sichtbares `\n` erschienen.
+
+Die Prüfung dazu sah bisher nur nach, ob der Text im Quelltext steht. Sie
+prüft jetzt, dass er auch heil im Attribut ankommt.
+
+---
+
 ## v1.9.2 (2026-08-22)
 
 ### Rot steht jetzt am endgültigen Knopf
