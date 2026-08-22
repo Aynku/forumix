@@ -179,6 +179,25 @@ return [
         }
     },
 
+    'Rot steht am endgültigen Knopf' => function () use ($wurzel) {
+        // Abschalten ist reversibel und laesst alles stehen — das ist kein
+        // roter Knopf. Entfernen ist endgueltig. Vorher war es andersherum,
+        // und der Entfernen-Knopf sah in Grau nach "deaktiviert" aus.
+        $view = (string) file_get_contents($wurzel . '/views/admin/index.php');
+        $pos  = strpos($view, 'module_entfernen');
+        if ($pos === false) throw new RuntimeException('Kein Entfernen-Knopf');
+
+        $block = substr($view, $pos, 900);
+        if (!str_contains($block, 'btn-danger')) {
+            throw new RuntimeException('Der Entfernen-Knopf ist nicht als endgültig erkennbar');
+        }
+        // Und der Abschalten-Knopf traegt es nicht mehr.
+        $ab = strpos($view, 'enable=0');
+        if ($ab !== false && str_contains(substr($view, $ab, 260), 'btn-danger')) {
+            throw new RuntimeException('Abschalten ist rot — dann ist Rot kein Signal mehr');
+        }
+    },
+
     'Die Rückfrage nennt die Tabellen beim Namen' => function () use ($wurzel) {
         // "Alle Daten gehen verloren" liest sich wie eine Floskel und wird
         // weggeklickt. "shoutbox_messages wird gelöscht" nicht.

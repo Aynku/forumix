@@ -2921,10 +2921,12 @@
               </div>
               <div class="module-toggle">
                 <?php if ($m['enabled']): ?>
+                  <?php /* Kein rotes Rot: Abschalten ist reversibel und laesst
+                          alles stehen. Rot gehoert an den Entfernen-Knopf. */ ?>
                   <a href="?action=module_toggle&code=<?= urlencode($m['code']) ?>&enable=0&csrf=<?= e($csrfToken) ?>"
-                     class="btn btn-danger btn-sm"
+                     class="btn btn-ghost btn-sm"
                      onclick="return confirm('Modul „<?= e($m['name']) ?>“ deaktivieren?')">
-                    🔴 Deaktivieren
+                    ⏸️ Abschalten
                   </a>
                 <?php else: ?>
                   <a href="?action=module_toggle&code=<?= urlencode($m['code']) ?>&enable=1&csrf=<?= e($csrfToken) ?>"
@@ -2949,8 +2951,7 @@
                           onsubmit="return confirm(<?= json_encode($warnung, JSON_UNESCAPED_UNICODE) ?>)">
                       <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                       <input type="hidden" name="code" value="<?= e($m['code']) ?>">
-                      <button type="submit" class="btn btn-sm"
-                              style="color:var(--text-muted)">🗑️ Entfernen</button>
+                      <button type="submit" class="btn btn-danger btn-sm">🗑️ Entfernen</button>
                     </form>
                   <?php endif; ?>
                 <?php endif; ?>

@@ -8,6 +8,20 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.9.2 (2026-08-22)
+
+### Rot steht jetzt am endgültigen Knopf
+
+„Deaktivieren" war rot, „Entfernen" grau auf hellem Grund — und sah damit
+aus, als wäre es nicht anklickbar. Genau verkehrt herum: Abschalten ist
+reversibel und lässt alles stehen, Entfernen löscht Dateien und Tabellen.
+
+Der Abschalten-Knopf ist jetzt neutral und heißt **⏸️ Abschalten**, der
+Entfernen-Knopf ist rot. Wo Rot an der falschen Stelle steht, ist es überall
+kein Signal mehr.
+
+---
+
 ## v1.9.1 (2026-08-22)
 
 ### Module lassen sich wieder entfernen
