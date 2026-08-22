@@ -121,6 +121,139 @@ return [
         }
     },
 
+    // ── Entfernen ─────────────────────────────────────────────────────
+
+    'Entfernen räumt auch die Datenbank ab' => function () use ($wurzel) {
+        // Die drei Stufen sind aktivieren, abschalten, entfernen. Wenn
+        // "entfernen" die Daten stehen laesst, unterscheidet es sich vom
+        // Abschalten nur noch im Plattenplatz — und niemand weiss, wie er
+        // ein Modul wirklich loswird.
+        $quelle = (string) file_get_contents($wurzel . '/lib/modules.php');
+        $pos = strpos($quelle, 'function module_entfernen');
+        if ($pos === false) throw new RuntimeException('Das Entfernen fehlt');
+        $koerper = substr($quelle, $pos, 3000);
+
+        foreach (['DROP TABLE' => 'die Tabellen des Moduls',
+                  'DELETE FROM modules' => 'der Eintrag in der Modultabelle'] as $noetig => $was) {
+            if (!str_contains($koerper, $noetig)) {
+                throw new RuntimeException("Beim Entfernen bleibt $was liegen");
+            }
+        }
+    },
+
+    'Kern-Tabellen werden nie gedroppt' => function () use ($wurzel) {
+        // Ein Modul, dessen install.sql "CREATE TABLE users" enthaelt — aus
+        // Versehen oder mit Absicht —, darf beim Entfernen nicht die Benutzer
+        // mitnehmen.
+        $quelle = (string) file_get_contents($wurzel . '/lib/modules.php');
+        if (!str_contains($quelle, 'function module_kern_tabellen')) {
+            throw new RuntimeException('Es gibt keine Ausnahmeliste für Kern-Tabellen');
+        }
+        $pos = strpos($quelle, 'function module_tabellen');
+        $koerper = substr($quelle, $pos, 1200);
+        if (!str_contains($koerper, 'module_kern_tabellen')) {
+            throw new RuntimeException('Die Ausnahmeliste wird beim Sammeln nicht angewendet');
+        }
+
+        // Die Liste kommt aus install.sql, nicht aus dem Code: eine Liste im
+        // Code waere bei der naechsten neuen Kern-Tabelle veraltet, und zwar
+        // unbemerkt.
+        $kern = strpos($quelle, 'function module_kern_tabellen');
+        if (!str_contains(substr($quelle, $kern, 900), 'install/install.sql')) {
+            throw new RuntimeException('Die Ausnahmeliste steht fest im Code statt aus install.sql zu kommen');
+        }
+    },
+
+    'Die Tabellennamen werden vor dem Löschen der Dateien geholt' => function () use ($wurzel) {
+        // Sie stehen in der install.sql des Moduls — nach dem Loeschen der
+        // Dateien gibt es sie nicht mehr, und die Tabellen blieben fuer immer.
+        $quelle = (string) file_get_contents($wurzel . '/lib/modules.php');
+        $pos = strpos($quelle, 'function module_entfernen');
+        $koerper = substr($quelle, $pos, 3000);
+
+        $holen   = strpos($koerper, 'module_tabellen($code)');
+        $loeschen = strpos($koerper, 'module_verzeichnis_leeren($ziel)');
+        if ($holen === false || $loeschen === false || $holen > $loeschen) {
+            throw new RuntimeException('Die Tabellennamen werden nach dem Löschen der install.sql '
+                . 'gesucht — dann bleiben die Tabellen für immer stehen');
+        }
+    },
+
+    'Die Rückfrage nennt die Tabellen beim Namen' => function () use ($wurzel) {
+        // "Alle Daten gehen verloren" liest sich wie eine Floskel und wird
+        // weggeklickt. "shoutbox_messages wird gelöscht" nicht.
+        $view = (string) file_get_contents($wurzel . '/views/admin/index.php');
+        $pos = strpos($view, 'module_entfernen');
+        if ($pos === false) throw new RuntimeException('Kein Entfernen-Knopf');
+        $block = substr($view, max(0, $pos - 1200), 2000);
+
+        if (!str_contains($block, 'module_tabellen(')) {
+            throw new RuntimeException('Die Rückfrage zählt die Tabellen nicht auf');
+        }
+        if (!str_contains($block, 'nicht rückgängig')) {
+            throw new RuntimeException('Die Rückfrage sagt nicht, dass es endgültig ist');
+        }
+    },
+
+    'Ein aktives Modul wird nicht entfernt' => function () use ($wurzel) {
+        // Sonst verschwinden mitten im Betrieb die Dateien unter einer Seite,
+        // die gerade jemand offen hat.
+        $quelle = (string) file_get_contents($wurzel . '/lib/modules.php');
+        $pos = strpos($quelle, 'function module_entfernen');
+        $koerper = substr($quelle, $pos, 2200);
+
+        if (!str_contains($koerper, 'noch aktiv')) {
+            throw new RuntimeException('Ein laufendes Modul lässt sich entfernen');
+        }
+        // Und nicht ueber den Anfrage-Cache: der merkt sich seine Antwort.
+        // Gesucht wird nur in Code-Zeilen — im Kommentar darueber steht der
+        // Name absichtlich, als Begruendung, warum er nicht benutzt wird.
+        foreach (explode("\n", $koerper) as $zeile) {
+            $blank = ltrim($zeile);
+            if ($blank === '' || str_starts_with($blank, '//') || str_starts_with($blank, '*')) continue;
+            if (str_contains($blank, 'module_enabled(')) {
+                throw new RuntimeException('Der Aktiv-Zustand kommt aus dem Anfrage-Cache — '
+                    . 'wer im selben Aufruf abschaltet und entfernt, wird abgewiesen');
+            }
+        }
+    },
+
+    'Der Pfad wird gegen Ausbrechen geprüft' => function () use ($wurzel) {
+        $quelle = (string) file_get_contents($wurzel . '/lib/modules.php');
+        $pos = strpos($quelle, 'function module_entfernen');
+        $koerper = substr($quelle, $pos, 2200);
+
+        if (!str_contains($koerper, 'realpath')) {
+            throw new RuntimeException('Der Zielpfad wird nicht aufgelöst');
+        }
+        if (!str_contains($koerper, 'str_starts_with')) {
+            throw new RuntimeException('Es wird nicht geprüft, ob der Pfad im Modulverzeichnis bleibt');
+        }
+        // Symlinks entfernen, nicht verfolgen.
+        $leeren = strpos($quelle, 'function module_verzeichnis_leeren');
+        if ($leeren === false || !str_contains(substr($quelle, $leeren, 900), 'is_link')) {
+            throw new RuntimeException('Symlinks werden verfolgt statt entfernt');
+        }
+    },
+
+    'Nur der Inhaber darf entfernen' => function () use ($wurzel) {
+        $admin = (string) file_get_contents($wurzel . '/admin/index.php');
+        $pos = strpos($admin, "action === 'module_entfernen'");
+        if ($pos === false) throw new RuntimeException('Der Weg zum Entfernen fehlt');
+        $block = substr($admin, $pos, 900);
+
+        foreach (['is_owner()', 'verify_csrf'] as $riegel) {
+            if (!str_contains($block, $riegel)) {
+                throw new RuntimeException("Riegel fehlt: $riegel");
+            }
+        }
+        // Ueber POST, nicht ueber einen Link: ein Loeschen per GET fuehrt ein
+        // Vorschaubild oder ein Sicherheitswerkzeug aus.
+        if (!str_contains($block, "REQUEST_METHOD'] === 'POST'")) {
+            throw new RuntimeException('Entfernen läuft über GET');
+        }
+    },
+
     // ── Der einzige Aufruf eines fremden Servers ──────────────────────
 
     'Der Modulbezug ist im Auslieferungszustand aus' => function () use ($wurzel) {

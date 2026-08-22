@@ -729,6 +729,33 @@ if ($action === 'module_toggle') {
     redirect(FORUM_URL . '/admin/?action=modules');
 }
 
+// ─── MODUL ENTFERNEN ──────────────────────────────────────────────
+//
+// Nur der Inhaber, und nur was abgeschaltet ist. Die Datenbank bleibt
+// unangetastet — siehe module_entfernen().
+if ($action === 'module_entfernen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf($_POST['csrf'] ?? '')) {
+        error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    }
+    if (!is_owner()) {
+        error_page(403, 'Kein Zugriff', 'Module darf nur der Inhaber entfernen.');
+    }
+
+    $code = (string) ($_POST['code'] ?? '');
+    $name = available_modules()[$code]['name'] ?? $code;
+
+    $r = module_entfernen($code);
+    $tabellen = $r['tabellen'] ?? [];
+    flash($r['ok']
+        ? 'Modul „' . $name . '" entfernt: ' . (int) $r['geloescht'] . ' Dateien'
+          . ($tabellen ? ' und ' . count($tabellen) . ' '
+             . (count($tabellen) === 1 ? 'Tabelle' : 'Tabellen') . ' (' . implode(', ', $tabellen) . ')' : '')
+          . '.'
+        : 'Nicht entfernt: ' . ($r['error'] ?? '?'),
+        $r['ok'] ? 'success' : 'error');
+    redirect(FORUM_URL . '/admin/?action=modules');
+}
+
 // ─── MODUL EINSPIELEN ─────────────────────────────────────────────
 //
 // Nur der Inhaber, nicht jeder Administrator: Hier landen PHP-Dateien auf dem

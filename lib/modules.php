@@ -189,6 +189,165 @@ function disable_module(string $code): array {
 }
 
 /**
+ * Welche Tabellen hat dieses Modul angelegt?
+ *
+ * Gelesen aus seiner install.sql — das ist die einzige Stelle, an der ein
+ * Modul Schema anlegt. Kern-Tabellen werden ausgenommen: Ein Modul, dessen
+ * install.sql versehentlich (oder absichtlich) `CREATE TABLE users` enthaelt,
+ * darf beim Entfernen nicht die Benutzer mitnehmen.
+ *
+ * @return array<int, string> Tabellennamen
+ */
+function module_tabellen(string $code): array {
+    if (!module_code_is_valid($code)) return [];
+
+    $sql = @file_get_contents(__DIR__ . '/../modules/' . $code . '/install.sql');
+    if ($sql === false) return [];
+
+    $gefunden = [];
+    foreach (sql_in_anweisungen($sql) as $stmt) {
+        if (preg_match('/^CREATE\\s+TABLE\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?`?([a-z0-9_]+)`?/i', $stmt, $t)) {
+            $gefunden[] = strtolower($t[1]);
+        }
+    }
+
+    $kern = module_kern_tabellen();
+    return array_values(array_unique(array_filter(
+        $gefunden,
+        static fn (string $n): bool => !in_array($n, $kern, true)
+    )));
+}
+
+/**
+ * Die Tabellen des Forums selbst, aus install/install.sql.
+ *
+ * Sie stehen hier nicht als Liste im Code: Die waere bei der naechsten neuen
+ * Kern-Tabelle veraltet, und zwar unbemerkt — bis jemand ein Modul entfernt
+ * und die Tabelle mitgeht.
+ */
+function module_kern_tabellen(): array {
+    static $liste = null;
+    if ($liste !== null) return $liste;
+
+    $liste = [];
+    $sql = @file_get_contents(__DIR__ . '/../install/install.sql');
+    if ($sql !== false && preg_match_all('/CREATE\\s+TABLE\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?`?([a-z0-9_]+)`?/i', $sql, $t)) {
+        $liste = array_map('strtolower', $t[1]);
+    }
+    // Fallback, falls install.sql nach der Installation entfernt wurde: die
+    // Tabellen, ohne die kein Forum laeuft.
+    if (!$liste) {
+        $liste = ['users', 'posts', 'threads', 'boards', 'categories', 'settings',
+                  'modules', 'reports', 'user_groups', 'group_members', 'pages'];
+    }
+    return $liste;
+}
+
+/**
+ * Entfernt ein Modul vollstaendig: Dateien, Tabellen, Eintrag.
+ *
+ * Entfernen heisst entfernen. Wer die Daten behalten will, schaltet das Modul
+ * ab — dafuer gibt es die Stufe dazwischen, und dort bleibt alles stehen.
+ *
+ * Ein aktives Modul wird nicht entfernt: Sonst verschwinden mitten im Betrieb
+ * die Dateien unter einer Seite, die gerade jemand offen hat.
+ *
+ * @return array{ok: bool, error?: string, geloescht?: int, tabellen?: array}
+ */
+function module_entfernen(string $code): array {
+    if (!module_code_is_valid($code)) {
+        return ['ok' => false, 'error' => 'Ungültiger Modulname'];
+    }
+
+    // Frisch aus der Datenbank, nicht ueber den Anfrage-Cache: der merkt sich
+    // seine Antwort. Wer im selben Aufruf abschaltet und entfernt, bekaeme
+    // sonst die Antwort von vorher.
+    try {
+        $zeile = db_fetch('SELECT enabled FROM modules WHERE code = ?', [$code]);
+    } catch (Exception $e) {
+        $zeile = null;
+    }
+    if ($zeile && (int) $zeile['enabled'] === 1) {
+        return ['ok' => false, 'error' => 'Das Modul ist noch aktiv. Erst abschalten, dann entfernen.'];
+    }
+
+    $wurzel = realpath(__DIR__ . '/../modules');
+    $ziel   = realpath(__DIR__ . '/../modules/' . $code);
+
+    if ($wurzel === false || $ziel === false) {
+        return ['ok' => false, 'error' => 'Das Modulverzeichnis gibt es nicht.'];
+    }
+    // Der Name kommt aus der Anfrage. module_code_is_valid() laesst keine
+    // Schraegstriche zu, aber ein Symlink im Modulordner koennte woanders
+    // hinzeigen — geprueft wird deshalb das Ergebnis, nicht die Absicht.
+    if ($ziel === $wurzel || !str_starts_with($ziel . '/', $wurzel . '/')) {
+        return ['ok' => false, 'error' => 'Der Pfad zeigt aus dem Modulverzeichnis heraus.'];
+    }
+
+    // Die Tabellennamen VOR dem Loeschen der Dateien holen — danach ist die
+    // install.sql weg, aus der sie stammen.
+    $tabellen = module_tabellen($code);
+
+    $zahl = module_verzeichnis_leeren($ziel);
+    if ($zahl < 0) {
+        return ['ok' => false, 'error' => 'Nicht alles liess sich löschen — fehlen Schreibrechte?'];
+    }
+    @rmdir($ziel);
+
+    $weg = [];
+    foreach ($tabellen as $t) {
+        try {
+            // Der Name stammt aus einem CREATE TABLE der eigenen install.sql
+            // und ist gegen [a-z0-9_] geprueft — trotzdem in Anfuehrungszeichen.
+            DB::get()->exec('DROP TABLE IF EXISTS `' . $t . '`');
+            $weg[] = $t;
+        } catch (Exception $e) {
+            error_log('[modul ' . $code . '] Tabelle ' . $t . ' blieb: ' . $e->getMessage());
+        }
+    }
+
+    try {
+        db_execute('DELETE FROM modules WHERE code = ?', [$code]);
+    } catch (Exception $e) {
+        error_log('[modul ' . $code . '] Eintrag blieb: ' . $e->getMessage());
+    }
+
+    return ['ok' => true, 'geloescht' => $zahl, 'tabellen' => $weg];
+}
+
+/**
+ * Loescht ein Verzeichnis samt Inhalt.
+ *
+ * Symlinks werden entfernt, nicht verfolgt: Ein Verweis im Modulordner auf
+ * /var/www zeigt sonst dorthin, wohin er zeigt.
+ *
+ * @return int Zahl der geloeschten Dateien, -1 bei einem Fehler
+ */
+function module_verzeichnis_leeren(string $pfad): int {
+    $zahl = 0;
+    $eintraege = @scandir($pfad);
+    if ($eintraege === false) return -1;
+
+    foreach ($eintraege as $e) {
+        if ($e === '.' || $e === '..') continue;
+        $voll = $pfad . '/' . $e;
+
+        if (is_link($voll) || is_file($voll)) {
+            if (!@unlink($voll)) return -1;
+            $zahl++;
+            continue;
+        }
+        if (is_dir($voll)) {
+            $tiefer = module_verzeichnis_leeren($voll);
+            if ($tiefer < 0) return -1;
+            $zahl += $tiefer;
+            if (!@rmdir($voll)) return -1;
+        }
+    }
+    return $zahl;
+}
+
+/**
  * Config eines Moduls abrufen (JSON-Feld)
  */
 function module_config(string $code): array {

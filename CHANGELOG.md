@@ -8,6 +8,33 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.9.1 (2026-08-22)
+
+### Module lassen sich wieder entfernen
+
+Einspielen ging, loswerden nicht — ein Modul ließ sich nur abschalten, die
+Dateien blieben liegen. Auf der Modulseite steht bei abgeschalteten Modulen
+jetzt **Entfernen**, und das heißt entfernen: Dateien, Tabellen, Eintrag.
+
+Die drei Stufen sind damit klar getrennt. **Abschalten** ist die Stufe, die
+alles behält — Beiträge, Einstellungen, Tabellen bleiben stehen, das Modul ist
+nur aus. **Entfernen** räumt ab. Die Rückfrage nennt die betroffenen Tabellen
+beim Namen und sagt, dass es endgültig ist; „alle Daten gehen verloren" liest
+sich wie eine Floskel, `shoutbox_messages wird gelöscht` nicht.
+
+- **Kern-Tabellen werden nie gedroppt.** Ein Modul, dessen `install.sql`
+  `CREATE TABLE users` enthält — aus Versehen oder mit Absicht —, nimmt beim
+  Entfernen nicht die Benutzer mit. Die Ausnahmeliste kommt aus
+  `install/install.sql`, nicht aus einer Liste im Code: die wäre bei der
+  nächsten neuen Kern-Tabelle veraltet, und zwar unbemerkt.
+- **Nur abgeschaltete Module.** Sonst verschwinden mitten im Betrieb die
+  Dateien unter einer Seite, die gerade jemand offen hat.
+- **Nur der Inhaber**, über POST mit CSRF-Prüfung — ein Löschen per Link
+  führt irgendwann ein Vorschaubild aus.
+- Symlinks im Modulordner werden entfernt, nicht verfolgt.
+
+---
+
 ## v1.9.0 (2026-08-22)
 
 ### Module gibt es einzeln

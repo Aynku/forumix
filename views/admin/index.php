@@ -2931,6 +2931,28 @@
                      class="btn btn-primary btn-sm">
                     🟢 Aktivieren
                   </a>
+                  <?php /* Entfernen nur, wenn abgeschaltet — und nur fuer den
+                          Inhaber, weil hier Dateien vom Server verschwinden. */ ?>
+                  <?php if (is_owner()): ?>
+                    <?php
+                      // Die Rueckfrage nennt die Tabellen beim Namen. "Alle Daten
+                      // gehen verloren" liest sich wie eine Floskel; "shoutbox_messages
+                      // wird gelöscht" nicht.
+                      $tab = function_exists('module_tabellen') ? module_tabellen($m['code']) : [];
+                      $warnung = 'Modul „' . $m['name'] . '“ entfernen?'
+                          . '\n\nGelöscht werden die Dateien'
+                          . ($tab ? ' und diese Tabellen samt Inhalt:\n  ' . implode("\n  ", $tab) : '')
+                          . '.\n\nDas lässt sich nicht rückgängig machen. Wer die Daten behalten '
+                          . 'will, lässt das Modul abgeschaltet stehen.';
+                    ?>
+                    <form method="post" action="?action=module_entfernen" style="display:inline;margin-left:6px"
+                          onsubmit="return confirm(<?= json_encode($warnung, JSON_UNESCAPED_UNICODE) ?>)">
+                      <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
+                      <input type="hidden" name="code" value="<?= e($m['code']) ?>">
+                      <button type="submit" class="btn btn-sm"
+                              style="color:var(--text-muted)">🗑️ Entfernen</button>
+                    </form>
+                  <?php endif; ?>
                 <?php endif; ?>
               </div>
             </div>
