@@ -2787,6 +2787,114 @@
         Aktivierbare Erweiterungen für dein Forum. Beim Deaktivieren bleiben alle Daten erhalten – das Modul ist nur „aus".
       </p>
 
+      <?php /* ── Beim Hersteller nachsehen ── */ ?>
+      <?php if (is_owner() && empty($quelleAn)): ?>
+        <form method="post" action="?action=save_settings" class="card"
+              style="padding:14px 16px;margin-bottom:18px">
+          <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
+          <input type="hidden" name="settings_section" value="module">
+          <strong style="font-size:14px">Module beim Hersteller nachschlagen</strong>
+          <p style="font-size:13px;color:var(--text-muted);margin:6px 0 10px;line-height:1.6">
+            Forumix ruft von sich aus keinen fremden Server auf. Mit dieser
+            Einstellung kannst du auf Knopfdruck nachsehen, welche Module es bei
+            forumix.de gibt, und sie von dort holen — statt sie herunterzuladen
+            und wieder hochzuladen.<br>
+            Der Abruf geschieht nur, wenn du ihn auslöst. Es geht nichts über
+            dein Forum hinaus: keine Adresse, keine Fassung, keine Kennung.
+          </p>
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <input type="checkbox" name="module_quelle_an" value="1">
+            Nachschlagen erlauben
+          </label>
+          <button type="submit" class="btn">Speichern</button>
+        </form>
+      <?php endif; ?>
+
+      <?php if (is_owner() && !empty($quelleAn)): ?>
+        <div class="card" style="padding:14px 16px;margin-bottom:18px">
+          <form method="post" action="<?= e(FORUM_URL) ?>/admin/?action=module_quelle"
+                style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:0">
+            <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
+            <strong style="font-size:14px">Module beim Hersteller</strong>
+            <button type="submit" name="suchen" value="1" class="btn">Nachsehen</button>
+            <?php if (!empty($quelleStand)): ?>
+              <span style="font-size:12px;color:var(--text-faint)">
+                Stand: <?= e(date('d.m.Y H:i', (int) $quelleStand)) ?> Uhr
+              </span>
+            <?php endif; ?>
+          </form>
+
+          <?php if (!empty($quelleModule)): ?>
+            <table class="forum-table" style="margin-top:12px">
+              <tbody>
+                <?php foreach ($quelleModule as $q): ?>
+                  <tr>
+                    <td>
+                      <strong><?= e($q['icon']) ?> <?= e($q['name']) ?></strong>
+                      <div style="font-size:12px;color:var(--text-muted)"><?= e($q['beschreibung']) ?></div>
+                    </td>
+                    <td style="width:150px;font-size:12px;color:var(--text-muted)">
+                      <?php if ($q['hier'] === null): ?>
+                        nicht installiert
+                      <?php elseif ($q['neuer']): ?>
+                        <?= e((string) $q['hier']) ?> → <strong><?= e($q['dort']) ?></strong>
+                      <?php else: ?>
+                        <?= e((string) $q['hier']) ?> · aktuell
+                      <?php endif; ?>
+                    </td>
+                    <td style="width:130px;text-align:right">
+                      <?php if (!$q['passt']): ?>
+                        <span style="font-size:12px;color:var(--color-warning)">braucht neueres Forumix</span>
+                      <?php elseif ($q['hier'] === null || $q['neuer']): ?>
+                        <form method="post" action="<?= e(FORUM_URL) ?>/admin/?action=module_quelle" style="margin:0">
+                          <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
+                          <input type="hidden" name="code" value="<?= e($q['code']) ?>">
+                          <button type="submit" class="btn btn-primary" style="font-size:12px">
+                            <?= $q['hier'] === null ? 'Holen' : 'Aktualisieren' ?>
+                          </button>
+                        </form>
+                      <?php endif; ?>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          <?php endif; ?>
+
+          <p style="font-size:12px;color:var(--text-faint);margin:10px 0 0">
+            Der Abruf geschieht nur, wenn du ihn auslöst. Es geht dabei nichts
+            über dieses Forum hinaus — keine Adresse, keine Fassung, keine Kennung.
+          </p>
+          <form method="post" action="?action=save_settings" style="margin:6px 0 0">
+            <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
+            <input type="hidden" name="settings_section" value="module">
+            <button type="submit" class="btn btn-link" style="font-size:12px;padding:0;background:none;border:0;color:var(--text-faint);text-decoration:none;cursor:pointer">
+              Nachschlagen wieder abschalten
+            </button>
+          </form>
+        </div>
+      <?php endif; ?>
+
+      <?php /* Nur der Inhaber: hier landen PHP-Dateien auf dem Server. */ ?>
+      <?php if (is_owner()): ?>
+        <form method="post" enctype="multipart/form-data"
+              action="<?= e(FORUM_URL) ?>/admin/?action=module_upload"
+              class="card" style="padding:14px 16px;margin-bottom:18px">
+          <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
+          <strong style="font-size:14px">Modul einspielen</strong>
+          <p style="font-size:13px;color:var(--text-muted);margin:6px 0 10px">
+            Module gibt es einzeln zum Herunterladen. Das Paket ist eine ZIP-Datei
+            mit <code>module.json</code>; eingespielt wird es hier, eingeschaltet
+            danach von Hand. Ein vorhandenes Modul wird dabei aktualisiert,
+            Einstellungen und Daten bleiben.
+          </p>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <input type="file" name="modulpaket" accept=".zip" required>
+            <button type="submit" class="btn btn-primary">Einspielen</button>
+          </div>
+        </form>
+      <?php endif; ?>
+
       <?php if (empty($modules)): ?>
         <div class="card" style="padding:40px;text-align:center">
           <div style="font-size:48px;margin-bottom:12px">📦</div>

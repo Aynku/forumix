@@ -20,7 +20,7 @@ function ki_json(array $daten, int $code = 200): never {
 }
 
 if (!module_enabled('ki')) {
-    ki_json(['ok' => false, 'fehler' => 'Die Schreibhilfe ist nicht aktiv.'], 404);
+    ki_json(['ok' => false, 'fehler' => 'Die KI-Funktionen sind nicht aktiv.'], 404);
 }
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ki_json(['ok' => false, 'fehler' => 'Nur POST.'], 405);

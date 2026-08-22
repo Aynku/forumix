@@ -323,6 +323,12 @@ if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         'maintenance_mode' => [
             'maintenance_mode', 'maintenance_message',
         ],
+        // Eigener Abschnitt: Der Modulbezug ist die einzige Stelle, an der
+        // dieses Forum einen fremden Server aufruft. Ein Schalter dafuer
+        // gehoert nicht zwischen Seitentitel und Zeitzone.
+        'module' => [
+            'module_quelle_an',
+        ],
     ];
 
     // Wenn keine Sektion angegeben → altes Verhalten (alle Felder, Kompatibilität)
@@ -331,7 +337,8 @@ if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $sectionFields['general'],
             $sectionFields['email'],
             $sectionFields['registration'],
-            $sectionFields['maintenance_mode']
+            $sectionFields['maintenance_mode'],
+            $sectionFields['module']
         );
     } else {
         $allowed = $sectionFields[$section];
@@ -347,6 +354,7 @@ if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         'cookie_banner_enabled',
         'registration_approval_required',
         'registration_terms_required',
+        'module_quelle_an',
     ];
 
     // Felder, die im Formular absichtlich leer bleiben, wenn sich nichts
@@ -718,6 +726,119 @@ if ($action === 'module_toggle') {
         $r = disable_module($code);
         flash($r['ok'] ? 'Modul deaktiviert.' : 'Fehler: ' . ($r['error'] ?? '?'), $r['ok'] ? 'success' : 'error');
     }
+    redirect(FORUM_URL . '/admin/?action=modules');
+}
+
+// ─── MODUL EINSPIELEN ─────────────────────────────────────────────
+//
+// Nur der Inhaber, nicht jeder Administrator: Hier landen PHP-Dateien auf dem
+// Server, das ist ein Weg zur Codeausfuehrung. Dieselbe Grenze gilt beim
+// Updatepaket, und aus demselben Grund.
+if ($action === 'module_upload' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf($_POST['csrf'] ?? '')) {
+        error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    }
+    if (!is_owner()) {
+        error_page(403, 'Kein Zugriff', 'Module darf nur der Inhaber einspielen.');
+    }
+
+    require_once __DIR__ . '/../lib/module_package.php';
+
+    $datei = $_FILES['modulpaket'] ?? null;
+    if (!$datei || ($datei['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+        flash('Es wurde keine Datei hochgeladen.', 'error');
+        redirect(FORUM_URL . '/admin/?action=modules');
+    }
+    if (!is_uploaded_file($datei['tmp_name'])) {
+        flash('Die Datei kam nicht über den Upload.', 'error');
+        redirect(FORUM_URL . '/admin/?action=modules');
+    }
+
+    $ergebnis = modulpaket_pruefen($datei['tmp_name']);
+    if (empty($ergebnis['ok'])) {
+        flash('Paket abgelehnt: ' . ($ergebnis['error'] ?? 'unbekannter Grund'), 'error');
+        redirect(FORUM_URL . '/admin/?action=modules');
+    }
+
+    $eingespielt = modulpaket_einspielen($ergebnis['zip'], $ergebnis['manifest'], $ergebnis['files']);
+    $ergebnis['zip']->close();
+
+    if (empty($eingespielt['ok'])) {
+        flash('Einspielen fehlgeschlagen: ' . ($eingespielt['error'] ?? '?'), 'error');
+    } else {
+        flash('Modul „' . ($ergebnis['manifest']['name'] ?? $eingespielt['code']) . '" '
+            . ($ergebnis['manifest']['version'] ?? '') . ' eingespielt ('
+            . (int) $eingespielt['geschrieben'] . ' Dateien). Es ist noch nicht aktiv.', 'success');
+    }
+    redirect(FORUM_URL . '/admin/?action=modules');
+}
+
+// ─── MODULE BEIM HERSTELLER NACHSCHLAGEN ──────────────────────────
+//
+// Nur auf Klick, nie im Hintergrund: Das ist der einzige Aufruf eines fremden
+// Servers, den Forumix macht, und er soll erkennbar von einem Menschen
+// ausgeloest sein.
+if ($action === 'module_quelle' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf($_POST['csrf'] ?? '')) {
+        error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    }
+    if (!is_owner()) {
+        error_page(403, 'Kein Zugriff', 'Module darf nur der Inhaber beziehen.');
+    }
+
+    require_once __DIR__ . '/../lib/module_quelle.php';
+
+    // Nachsehen, was es gibt.
+    if (isset($_POST['suchen'])) {
+        $liste = modulquelle_liste(true);
+        flash($liste['ok']
+            ? 'Liste abgerufen: ' . count($liste['module']) . ' Module verfügbar.'
+            : 'Abruf fehlgeschlagen: ' . ($liste['error'] ?? '?'),
+            $liste['ok'] ? 'success' : 'error');
+        redirect(FORUM_URL . '/admin/?action=modules');
+    }
+
+    // Eines davon holen und einspielen.
+    $code = (string) ($_POST['code'] ?? '');
+    $liste = modulquelle_liste();
+    if (!$liste['ok']) {
+        flash('Abruf fehlgeschlagen: ' . ($liste['error'] ?? '?'), 'error');
+        redirect(FORUM_URL . '/admin/?action=modules');
+    }
+
+    $eintrag = null;
+    foreach ($liste['module'] as $m) {
+        if (($m['code'] ?? '') === $code) { $eintrag = $m; break; }
+    }
+    if ($eintrag === null) {
+        flash('Dieses Modul steht beim Hersteller nicht (mehr) bereit.', 'error');
+        redirect(FORUM_URL . '/admin/?action=modules');
+    }
+
+    $geladen = modulquelle_paket_laden($eintrag);
+    if (!$geladen['ok']) {
+        flash('Laden fehlgeschlagen: ' . ($geladen['error'] ?? '?'), 'error');
+        redirect(FORUM_URL . '/admin/?action=modules');
+    }
+
+    // Ab hier derselbe Weg wie beim Hochladen von Hand — dieselben Pruefungen,
+    // egal woher die Datei kommt.
+    $geprueft = modulpaket_pruefen($geladen['datei']);
+    if (empty($geprueft['ok'])) {
+        @unlink($geladen['datei']);
+        flash('Paket abgelehnt: ' . ($geprueft['error'] ?? '?'), 'error');
+        redirect(FORUM_URL . '/admin/?action=modules');
+    }
+
+    $eingespielt = modulpaket_einspielen($geprueft['zip'], $geprueft['manifest'], $geprueft['files']);
+    $geprueft['zip']->close();
+    @unlink($geladen['datei']);
+
+    flash(empty($eingespielt['ok'])
+        ? 'Einspielen fehlgeschlagen: ' . ($eingespielt['error'] ?? '?')
+        : 'Modul „' . ($geprueft['manifest']['name'] ?? $code) . '" '
+          . ($geprueft['manifest']['version'] ?? '') . ' eingespielt.',
+        empty($eingespielt['ok']) ? 'error' : 'success');
     redirect(FORUM_URL . '/admin/?action=modules');
 }
 
@@ -1989,6 +2110,20 @@ switch ($action) {
 
     case 'modules':
         $vars['modules'] = available_modules();
+
+        // Nur aus dem Zwischenspeicher — beim blossen Aufrufen der Seite wird
+        // nichts abgerufen. Wer nachsehen will, drueckt den Knopf.
+        require_once __DIR__ . '/../lib/module_quelle.php';
+        $vars['quelleAn']      = modulquelle_erlaubt();
+        $vars['quelleModule']  = [];
+        $vars['quelleStand']   = null;
+        if ($vars['quelleAn']) {
+            $liste = modulquelle_liste();
+            if (!empty($liste['ok'])) {
+                $vars['quelleModule'] = modulquelle_vergleich($liste['module']);
+                $vars['quelleStand']  = $liste['stand'] ?? null;
+            }
+        }
         break;
 
     case 'design':

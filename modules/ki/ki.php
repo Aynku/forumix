@@ -11,7 +11,7 @@ require_once __DIR__ . '/lib/befehle.php';
 require_once __DIR__ . '/lib/moderation.php';
 
 if (!module_enabled('ki')) {
-    error_page(404, 'Nicht gefunden', 'Die KI-Schreibhilfe ist nicht aktiv.');
+    error_page(404, 'Nicht gefunden', 'Die KI-Funktionen sind nicht aktiv.');
 }
 // Der Punkt im Adminbereich ist fuer andere ausgeblendet — das ersetzt
 // keine Pruefung.
@@ -151,7 +151,7 @@ try {
 } catch (Exception $e) {}
 
 render('@ki/ki', [
-    'title'        => 'KI-Schreibhilfe',
+    'title'        => 'KI-Funktionen',
     'cfg'          => $cfg,
     'anbieter'     => KI_ANBIETER,
     'befehle'      => ki_befehle(),

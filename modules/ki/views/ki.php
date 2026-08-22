@@ -3,7 +3,7 @@
         @var array $verbrauch; @var int $gesamt; @var ?string $probe;
         @var bool $crypt_da; @var bool $hat_schluessel */ ?>
 
-<div class="section-heading">✨ KI-Schreibhilfe</div>
+<div class="section-heading">✨ KI-Funktionen</div>
 
 <?php if ($probe !== null): ?>
   <div class="flash <?= $probe === '' ? 'flash-success' : 'flash-error' ?>" style="margin-bottom:16px">

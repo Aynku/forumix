@@ -11,3 +11,19 @@
 /tools/         export-ignore
 /.gitattributes export-ignore
 /.gitignore     export-ignore
+
+# Module gibt es einzeln zum Herunterladen (forumix-modul-<code>-<fassung>.zip)
+# und werden im Adminbereich eingespielt. Im Kernpaket bleiben nur FAQ und
+# Kontakt: die gehoeren zur Grundausstattung, alles andere waere Ballast fuer
+# jeden, der es nicht benutzt.
+#
+# Der eigentliche Grund ist aber die Fassungsnummer. Steckt ein Modul im
+# Kernpaket, braucht jede Kleinigkeit daran eine neue Forumix-Fassung — an
+# einem einzigen Abend sind so fuenf entstanden, von denen keine den Kern
+# betraf. Jetzt zaehlt jedes Modul fuer sich.
+/modules/banner/    export-ignore
+/modules/downloads/ export-ignore
+/modules/ki/        export-ignore
+/modules/loesung/   export-ignore
+/modules/shoutbox/  export-ignore
+/modules/termine/   export-ignore

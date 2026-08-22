@@ -8,6 +8,91 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.9.0 (2026-08-22)
+
+### Module gibt es einzeln
+
+Bisher steckten alle Module im Kernpaket. Damit brauchte jede Änderung an
+einem Modul eine neue Forumix-Fassung — an einem einzigen Abend sind so fünf
+entstanden, von denen keine den Kern betraf. Und wer die Shoutbox nie benutzt
+hat, hatte sie trotzdem auf der Platte.
+
+Module sind jetzt eigene Pakete mit eigener Fassung. Im Kernpaket bleiben
+**FAQ** und **Kontakt** als Grundausstattung; Ankündigungsband, Downloads,
+KI-Funktionen, Lösung markieren, Shoutbox und Termine gibt es einzeln zum
+Herunterladen.
+
+- **Einspielen** im Adminbereich unter *System → Module*: ZIP auswählen,
+  einspielen, danach von Hand einschalten. Ein vorhandenes Modul wird dabei
+  aktualisiert; Einstellungen und Daten bleiben.
+- **Nur der Inhaber** darf einspielen, nicht jeder Administrator. Hier landen
+  PHP-Dateien auf dem Server — dieselbe Grenze wie beim Updatepaket, aus
+  demselben Grund.
+- **Fassungsprüfung:** Verlangt ein Modul eine neuere Forumix-Fassung, wird es
+  abgewiesen statt installiert. Sonst fällt es später mit einem Fehler um, den
+  niemand mit dem Modul in Verbindung bringt.
+- Die Prüfungen des Pakets sind **dieselben** wie beim Updatepaket — Zip-Slip,
+  Endungen, Größe. Nicht als Kopie: eine Sicherheitsprüfung, die zweimal
+  dasteht, wird beim nächsten Fund einmal vergessen.
+- **Kein SQL im Paket.** Ein Modul bringt sein Schema in `install.sql` mit, und
+  die läuft beim Aktivieren. Damit gibt es keinen zweiten Weg, SQL auszuführen.
+
+**Für Betreiber:** Vorhandene Module bleiben liegen und laufen weiter — ein
+Update löscht keine Dateien. Sie bekommen aber keine Aktualisierung mehr über
+das Kernpaket. Wer eine neuere Fassung eines Moduls will, lädt sie einzeln.
+
+### Module beim Hersteller nachschlagen
+
+Auf Knopfdruck zeigt der Adminbereich, welche Module es bei forumix.de gibt,
+welche davon schon installiert sind und wo eine neuere Fassung bereitsteht.
+Ein Klick holt sie und spielt sie ein — kein Herunterladen und Wiederhochladen.
+
+Das ist die **einzige** Stelle, an der Forumix einen fremden Server aufruft,
+und sie ist entsprechend eng gefasst:
+
+- **Im Auslieferungszustand aus.** Wer nichts einschaltet, dessen Forum ruft
+  nichts auf.
+- **Nur auf Klick.** Nie im Hintergrund, nie beim Seitenaufbau, nie
+  zeitgesteuert. Auch das Öffnen der Modulseite löst keinen Abruf aus — sie
+  zeigt, was beim letzten Nachsehen da war.
+- **Es geht nichts hinaus.** Keine Adresse des Forums, keine Fassung, keine
+  Kennung, kein eigener User-Agent. Was auf der Gegenseite ankommt, ist der
+  Abruf einer statischen Datei.
+- **Nur HTTPS, feste Adresse, keine Umleitungen.** Eine einstellbare Quelle
+  wäre eine Einladung, Code von irgendwoher zu holen.
+- **Dieselben Prüfungen** wie beim Hochladen von Hand. Woher die Datei kommt,
+  ändert nichts daran, was mit ihr geschieht.
+- Die Prüfsumme aus der Liste wird verglichen. Sie fängt einen
+  Übertragungsfehler ab — sie beweist nicht, dass beim Hersteller das Richtige
+  liegt. Wer das nicht will, lädt von Hand.
+
+**Paketformat** für eigene Module: eine ZIP mit `module.json`
+(`code`, `name`, `version`, optional `requires.forumix`) und einem Verzeichnis
+`files/`, dessen Inhalt nach `modules/<code>/` wandert. `files/module.php` ist
+Pflicht.
+
+---
+
+## v1.8.5 (2026-08-22)
+
+### Das Modul heißt jetzt „KI-Funktionen"
+
+„KI-Schreibhilfe" beschrieb nur die Hälfte: Seit 1.8.0 gehört die
+Vorsortierung neuer Beiträge dazu, und die hilft nicht dem Schreibenden,
+sondern der Moderation. Wer nur sie wollte, musste trotzdem eine
+„Schreibhilfe" einschalten.
+
+Der interne Name bleibt `ki`, es ändert sich nur die Beschriftung — im
+Adminbereich, in der Modulübersicht und in den Meldungen. Einstellungen und
+Daten bleiben unangetastet.
+
+Nebenbei: Beim Aktivieren zieht der Kern jetzt Name und Fassung aus dem
+Manifest in die `modules`-Tabelle nach. Angezeigt wurde ohnehin der Wert aus
+dem Manifest, aber ein veralteter Name in der Tabelle ist eine Falle für jeden,
+der dort nachsieht.
+
+---
+
 ## v1.8.4 (2026-08-22)
 
 ### Ein abgeschaltetes Modul lässt keinen Platzhalter zurück

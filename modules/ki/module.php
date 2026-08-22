@@ -4,7 +4,7 @@ if (!defined('FORUM_RUNNING')) return [];
 
 return [
     'code'        => 'ki',
-    'name'        => 'KI-Schreibhilfe',
+    'name'        => 'KI-Funktionen',
     'description' => 'Zwei Dinge: Knöpfe im Editor für Rechtschreibung, Kürzen, '
                    . 'Zusammenfassen und Übersetzen — jedes Ergebnis erscheint erst in einer '
                    . 'Vorschau, übernommen wird nur, was der Verfasser übernimmt. Und eine '

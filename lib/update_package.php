@@ -57,7 +57,14 @@ function update_ext_of(string $path): string {
  * Prüft EINEN ZIP-Eintrag auf Sicherheit.
  * Returns null wenn ok, sonst Fehlertext.
  */
-function update_validate_entry(string $entryName): ?string {
+/**
+ * $wurzelDateien: was im ZIP-Wurzelverzeichnis liegen darf. Alles andere muss
+ * unter files/ stehen. Als Parameter, weil Modul-Pakete dieselbe Pruefung
+ * brauchen, aber ein anderes Manifest mitbringen (module.json) — und
+ * Sicherheitscode zweimal zu haben ist die schlechteste aller Loesungen: die
+ * zweite Kopie wird beim naechsten Fund vergessen.
+ */
+function update_validate_entry(string $entryName, array $wurzelDateien = ['update.json', 'update.sql']): ?string {
     // Verzeichnis-Einträge (enden auf /) sind ok
     if (str_ends_with($entryName, '/')) return null;
 
@@ -81,13 +88,13 @@ function update_validate_entry(string $entryName): ?string {
         }
     }
 
-    // Manifest + SQL sind im ZIP-Root erlaubt
+    // Manifest (und ggf. SQL) sind im ZIP-Root erlaubt
     $lower = strtolower($entryName);
-    if ($lower === 'update.json' || $lower === 'update.sql') return null;
+    if (in_array($lower, array_map('strtolower', $wurzelDateien), true)) return null;
 
     // Alles andere MUSS unter files/ liegen
     if (!str_starts_with($lower, 'files/')) {
-        return 'Datei außerhalb von files/ (und nicht update.json/update.sql): ' . $entryName;
+        return 'Datei außerhalb von files/ (und nicht ' . implode('/', $wurzelDateien) . '): ' . $entryName;
     }
 
     // Endung gegen Whitelist

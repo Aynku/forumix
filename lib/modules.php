@@ -118,7 +118,12 @@ function enable_module(string $code): array {
             db_execute('INSERT INTO modules (code, name, enabled, version) VALUES (?, ?, 1, ?)',
                 [$code, (string) ($manifest['name'] ?? $code), $manifest['version'] ?? '1.0']);
         } else {
-            db_execute('UPDATE modules SET enabled = 1 WHERE code = ?', [$code]);
+            // Name und Fassung mitziehen: sie stehen im Manifest und koennen
+            // sich mit einer neuen Fassung aendern. Angezeigt wird ohnehin der
+            // aus dem Manifest — ein veralteter Wert in der Tabelle ist
+            // trotzdem eine Falle fuer jeden, der dort nachsieht.
+            db_execute('UPDATE modules SET enabled = 1, name = ?, version = ? WHERE code = ?',
+                [(string) ($manifest['name'] ?? $code), $manifest['version'] ?? '1.0', $code]);
         }
 
         // Activation-Hook (falls definiert)

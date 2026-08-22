@@ -1,6 +1,6 @@
 <?php
 /**
- * Die KI-Schreibhilfe (modules/ki).
+ * Die KI-Funktionen (modules/ki) — Schreibhilfe und Vorsortierung.
  *
  * Zwei Dinge sind hier gefaehrlich und werden deshalb geprueft:
  *
@@ -22,7 +22,7 @@ $wurzel = defined('FORUM_WURZEL') ? FORUM_WURZEL : dirname(__DIR__, 2);
 $modul  = $wurzel . '/modules/ki';
 
 if (!is_dir($modul)) {
-    return ['KI-Schreibhilfe (uebersprungen, Modul fehlt)' => fn() => null];
+    return ['KI-Funktionen (uebersprungen, Modul fehlt)' => fn() => null];
 }
 
 if (!defined('FORUM_RUNNING')) define('FORUM_RUNNING', true);
