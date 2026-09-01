@@ -2,13 +2,13 @@
   {{ board.title }}
   <span style="display:inline-flex;gap:6px">
     <a href="{{ url('/rss.php?type=board&id=') }}{{ board.board_id }}"
-       class="btn btn-ghost btn-sm" title="Neue Beiträge als RSS abonnieren">RSS</a>
+       class="btn btn-ghost btn-sm" title="{{ t('board_rss_hint') }}">RSS</a>
     {% if currentUser %}
       <a href="{{ url('/mark_all_read.php?csrf=') }}{{ csrfToken }}"
-         class="btn btn-ghost btn-sm" title="Alle Themen dieses Forums als gelesen markieren">Alles gelesen</a>
+         class="btn btn-ghost btn-sm" title="Alle Themen dieses Forums als gelesen markieren">{{ t('board_alles_gelesen') }}</a>
       {% if darfSchreiben %}
         <a href="{{ url('/new_thread.php?board=') }}{{ board.board_id }}"
-           class="btn btn-primary btn-sm">+ Neues Thema</a>
+           class="btn btn-primary btn-sm">{{ t('board_neues_thema') }}</a>
       {% endif %}
     {% endif %}
   </span>
@@ -18,17 +18,17 @@
   <table class="forum-table thread-table-responsive">
     <thead>
       <tr>
-        <th colspan="2">Thema</th>
-        <th style="text-align:center;width:90px">Antworten</th>
-        <th style="text-align:center;width:80px">Aufrufe</th>
-        <th style="width:210px">Letzter Beitrag</th>
+        <th colspan="2">{{ t('board_thema') }}</th>
+        <th style="text-align:center;width:90px">{{ t('board_antworten') }}</th>
+        <th style="text-align:center;width:80px">{{ t('board_aufrufe') }}</th>
+        <th style="width:210px">{{ t('board_letzter_beitrag') }}</th>
       </tr>
     </thead>
     <tbody>
       {% if not threads %}
         <tr>
           <td colspan="5" style="text-align:center;padding:30px;color:var(--text-faint)">
-            Noch keine Themen in diesem Forum.
+            {{ t('board_noch_keine_themen_in') }}
           </td>
         </tr>
       {% endif %}
@@ -43,8 +43,8 @@
         <td class="thread-main-cell">
           <div>
             {% if isUnread %}<span class="unread-dot" title="Ungelesen"></span>{% endif %}
-            {% if t.is_sticky %}<span class="badge badge-sticky">Angepinnt</span>{% endif %}
-            {% if t.is_closed %}<span class="badge badge-closed">Geschlossen</span>{% endif %}
+            {% if t.is_sticky %}<span class="badge badge-sticky">{{ t('board_angepinnt') }}</span>{% endif %}
+            {% if t.is_closed %}<span class="badge badge-closed">{{ t('board_geschlossen') }}</span>{% endif %}
             <a href="{{ url('/thread.php?id=') }}{{ t.thread_id }}" class="thread-title-link">
               {{ t.title }}
             </a>

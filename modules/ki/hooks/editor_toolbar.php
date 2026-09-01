@@ -21,10 +21,8 @@ require_once __DIR__ . '/../lib/marken.php';
 // darf da auch nichts stehen.
 $ki_cfg_mod = ki_einstellungen();
 if (!empty($ki_cfg_mod['mod_an']) && (string) ($ki_cfg_mod['schluessel'] ?? '') !== '') {
-    echo '<span class="ki-mod-hinweis" title="Beiträge werden nach dem Absenden '
-       . 'automatisch auf Werbung und Beleidigungen geprüft. Der Beitrag bleibt '
-       . 'dabei sichtbar. Bei einem Verdacht entscheidet ein Moderator.">'
-       . 'automatische Prüfung</span>';
+    echo '<span class="ki-mod-hinweis" title="' . htmlspecialchars(t('ki_autocheck_hint'), ENT_QUOTES, 'UTF-8') . '">'
+       . htmlspecialchars(t('ki_autocheck'), ENT_QUOTES, 'UTF-8') . '</span>';
 }
 
 if (!ki_bereit()) return;
@@ -37,8 +35,8 @@ foreach (ki_befehle() as $code => $b) {
     if (!ki_befehl_frei($code, $ki_cfg)) continue;
     $ki_liste[] = [
         'code'    => $code,
-        'name'    => $b['name'],
-        'hinweis' => $b['hinweis'],
+        'name'    => t($b['name']),
+        'hinweis' => t($b['hinweis']),
         'ziel'    => !empty($b['ziel']),
         'marke'   => ki_kennzeichnet($code, $ki_cfg),
     ];

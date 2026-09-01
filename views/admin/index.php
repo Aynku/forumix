@@ -12,41 +12,41 @@
       $openReports         = open_reports_count();
 
       $primary = [
-          'dashboard' => '📊 Dashboard',
-          'approval'  => '🚦 Freigabe' . ($pendingApproval > 0 ? ' <span class="nav-badge">' . $pendingApproval . '</span>' : ''),
-          'reports'   => '🚨 Meldungen' . ($openReports > 0 ? ' <span class="nav-badge">' . $openReports . '</span>' : ''),
+          'dashboard' => '📊 ' . t('dashboard'),
+          'approval'  => '🚦 ' . t('admin_freigabe') . ($pendingApproval > 0 ? ' <span class="nav-badge">' . $pendingApproval . '</span>' : ''),
+          'reports'   => '🚨 ' . t('admin_nav_reports') . ($openReports > 0 ? ' <span class="nav-badge">' . $openReports . '</span>' : ''),
       ];
 
       $groups = [
           'users' => [
-              'label' => '👥 Benutzer',
+              'label' => '👥 ' . t('admin_nav_users'),
               'items' => [
-                  'users'           => '👥 Benutzerliste',
-                  'groups'          => '👪 Gruppen',
-                  'approvals_users' => '🆕 Reg.-Freigaben' . ($pendingUserApproval > 0 ? ' <span class="nav-badge">' . $pendingUserApproval . '</span>' : ''),
-                  'invitations'     => '✉️ Einladungen' . ($activeInvitations > 0 ? ' <span class="nav-badge">' . $activeInvitations . '</span>' : ''),
-                  'warnings'        => '⚠️ Warnungen',
-                  'modlog'          => '📜 Mod-Log',
-                  'iplookup'        => '🌐 IP-Verwaltung',
-                  'bot_log'         => '🤖 Bot-Verkehr',
+                  'users'           => '👥 ' . t('admin_nav_userlist'),
+                  'groups'          => '👪 ' . t('admin_nav_groups'),
+                  'approvals_users' => '🆕 ' . t('admin_nav_approvals') . ($pendingUserApproval > 0 ? ' <span class="nav-badge">' . $pendingUserApproval . '</span>' : ''),
+                  'invitations'     => '✉️ ' . t('admin_nav_invitations') . ($activeInvitations > 0 ? ' <span class="nav-badge">' . $activeInvitations . '</span>' : ''),
+                  'warnings'        => '⚠️ ' . t('admin_nav_warnings'),
+                  'modlog'          => '📜 ' . t('admin_nav_modlog'),
+                  'iplookup'        => '🌐 ' . t('admin_nav_iplookup'),
+                  'bot_log'         => '🤖 ' . t('admin_nav_bots'),
               ],
           ],
           'content' => [
-              'label' => '📁 Inhalt',
+              'label' => '📁 ' . t('admin_nav_content'),
               'items' => [
-                  'categories' => '📁 Kategorien',
-                  'boards'     => '📋 Foren',
-                  'tags'       => '🏷️ Tags',
-                  'ranks'      => '🏅 Ränge',
-                  'smileys'    => '😀 Smileys',
-                  'legal'      => '📄 Seiten',
+                  'categories' => '📁 ' . t('admin_nav_categories'),
+                  'boards'     => '📋 ' . t('admin_nav_boards'),
+                  'tags'       => '🏷️ ' . t('admin_nav_tags'),
+                  'ranks'      => '🏅 ' . t('admin_nav_ranks'),
+                  'smileys'    => '😀 ' . t('admin_nav_smileys'),
+                  'legal'      => '📄 ' . t('admin_nav_pages'),
               ],
           ],
           'appearance' => [
-              'label' => '🎨 Darstellung',
+              'label' => '🎨 ' . t('admin_nav_appearance'),
               'items' => [
-                  'design'    => '🎨 Design',
-                  'templates' => '🖼️ Templates',
+                  'design'    => '🎨 ' . t('admin_nav_design'),
+                  'templates' => '🖼️ ' . t('admin_nav_templates'),
               ],
           ],
           // System ist, wie die Installation EINGESTELLT ist. Wartung ist, was
@@ -54,22 +54,22 @@
           // und gehoeren nach dieser Regel herueber — zumal sie ein Handgriff
           // sind: Sicherung anlegen, Update einspielen, notfalls Wartungsmodus.
           'system' => [
-              'label' => '⚙️ System',
+              'label' => '⚙️ ' . t('admin_nav_system'),
               'items' => [
-                  'settings'     => '🔧 Einstellungen',
-                  'email'        => '📧 E-Mail',
-                  'registration' => '📝 Registrierung',
-                  'modules'      => '🧩 Module',
+                  'settings'     => '🔧 ' . t('settings'),
+                  'email'        => '📧 ' . t('admin_e_mail'),
+                  'registration' => '📝 ' . t('admin_nav_registration'),
+                  'modules'      => '🧩 ' . t('admin_nav_modules'),
               ],
           ],
           'maintenance_group' => [
-              'label' => '🛠️ Wartung',
+              'label' => '🛠️ ' . t('admin_nav_maintenance'),
               'items' => [
-                  'backups'           => '💾 Backups',
-                  'updates'           => '🚀 Updates',
-                  'import'            => '📦 Import aus phpBB',
-                  'maintenance_mode'  => '🛠️ Wartungsmodus',
-                  'maintenance'       => '🧹 Tools',
+                  'backups'           => '💾 ' . t('admin_nav_backups'),
+                  'updates'           => '🚀 ' . t('admin_nav_updates'),
+                  'import'            => '📦 ' . t('admin_nav_import'),
+                  'maintenance_mode'  => '🛠️ ' . t('admin_nav_maintenance_mode'),
+                  'maintenance'       => '🧹 ' . t('admin_nav_tools'),
               ],
           ],
       ];
@@ -120,7 +120,7 @@
 
     <?php /* ════════════ DASHBOARD ════════════ */ ?>
     <?php if ($action === 'dashboard'): ?>
-      <h2>📊 Dashboard</h2>
+      <h2><?= t('admin_dashboard') ?></h2>
 
       <div class="stat-grid">
         <?php foreach ($stats as $stat): ?>
@@ -132,10 +132,10 @@
         <?php endforeach; ?>
       </div>
 
-      <div class="section-heading">🆕 Neueste Mitglieder</div>
+      <div class="section-heading"><?= t('admin_neueste_mitglieder') ?></div>
       <div class="card">
         <table class="forum-table">
-          <thead><tr><th>Name</th><th>E-Mail</th><th>Registrierungs-IP</th><th>Registriert</th></tr></thead>
+          <thead><tr><th><?= t('admin_name') ?></th><th><?= t('admin_e_mail') ?></th><th><?= t('admin_registrierungs_ip') ?></th><th><?= t('admin_registriert') ?></th></tr></thead>
           <tbody>
             <?php foreach ($newestUsers as $u): ?>
             <tr>
@@ -149,13 +149,13 @@
         </table>
       </div>
 
-      <div class="section-heading">🔑 Letzte Logins</div>
+      <div class="section-heading"><?= t('admin_letzte_logins') ?></div>
       <div class="card">
         <table class="forum-table">
-          <thead><tr><th>Benutzer</th><th>IP</th><th>Zeitpunkt</th></tr></thead>
+          <thead><tr><th><?= t('admin_benutzer') ?></th><th><?= t('admin_ip') ?></th><th><?= t('admin_zeitpunkt') ?></th></tr></thead>
           <tbody>
             <?php if (empty($recentLogins)): ?>
-              <tr><td colspan="3" style="text-align:center;color:var(--text-faint);padding:16px">Noch keine Logins protokolliert.</td></tr>
+              <tr><td colspan="3" style="text-align:center;color:var(--text-faint);padding:16px"><?= t('admin_noch_keine_logins_protokolliert') ?></td></tr>
             <?php endif; ?>
             <?php foreach ($recentLogins as $l): ?>
             <tr>
@@ -172,7 +172,7 @@
 
     <?php /* ════════════ BENUTZER ════════════ */ ?>
     <?php elseif ($action === 'users'): ?>
-      <h2>👥 Benutzerverwaltung</h2>
+      <h2><?= t('admin_benutzerverwaltung') ?></h2>
 
       <form method="get" style="margin-bottom:14px">
         <input type="hidden" name="action" value="users">
@@ -180,9 +180,9 @@
           <input type="text" name="q" value="<?= e($searchQuery ?? '') ?>"
                  placeholder="🔍 Name, E-Mail oder IP suchen…"
                  style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg-surface);color:var(--text-base)">
-          <button type="submit" class="btn btn-primary">Suchen</button>
+          <button type="submit" class="btn btn-primary"><?= t('admin_suchen') ?></button>
           <?php if (!empty($searchQuery)): ?>
-            <a href="?action=users" class="btn btn-ghost">Zurücksetzen</a>
+            <a href="?action=users" class="btn btn-ghost"><?= t('admin_zuruecksetzen') ?></a>
           <?php endif; ?>
         </div>
       </form>
@@ -191,12 +191,12 @@
         <table class="forum-table">
           <thead>
             <tr>
-              <th>Name / E-Mail</th>
-              <th>Reg.-IP</th>
-              <th>Letzte IP</th>
-              <th>Beiträge</th>
-              <th>Status</th>
-              <th>Aktionen</th>
+              <th><?= t('admin_name_e_mail') ?></th>
+              <th><?= t('admin_reg_ip') ?></th>
+              <th><?= t('admin_letzte_ip') ?></th>
+              <th><?= t('admin_beitraege') ?></th>
+              <th><?= t('admin_status') ?></th>
+              <th><?= t('admin_aktionen') ?></th>
             </tr>
           </thead>
           <tbody>
@@ -227,15 +227,15 @@
               <td><?= (int) $u['post_count'] ?></td>
               <td>
                 <?php if (!empty($u['is_owner'])): ?>
-                  <span class="role-tag" style="background:#7c3aed">👑 Owner</span>
+                  <span class="role-tag" style="background:#7c3aed"><?= t('admin_owner') ?></span>
                 <?php elseif ($u['is_banned']): ?>
-                  <span class="role-tag" style="background:#6b7280">Gesperrt</span>
+                  <span class="role-tag" style="background:#6b7280"><?= t('admin_gesperrt') ?></span>
                 <?php elseif ($u['is_admin']): ?>
-                  <span class="role-tag" style="background:#dc2626">Admin</span>
+                  <span class="role-tag" style="background:#dc2626"><?= t('admin_admin') ?></span>
                 <?php elseif ($u['is_mod']): ?>
-                  <span class="role-tag" style="background:#f59e0b">Mod</span>
+                  <span class="role-tag" style="background:#f59e0b"><?= t('admin_mod') ?></span>
                 <?php else: ?>
-                  <span class="role-tag" style="background:var(--bg-surface3);color:var(--text-muted)">Mitglied</span>
+                  <span class="role-tag" style="background:var(--bg-surface3);color:var(--text-muted)"><?= t('admin_mitglied') ?></span>
                 <?php endif; ?>
               </td>
               <td>
@@ -249,10 +249,10 @@
                 ?>
                 <?php /* Founder (User-ID 1) ist hart geschützt – keinerlei Aktionen für ihn */ ?>
                 <?php if ($targetIsFounder): ?>
-                  <span style="font-size:11px;color:var(--text-faint);font-style:italic">🏛️ Gründer (geschützt)</span>
+                  <span style="font-size:11px;color:var(--text-faint);font-style:italic"><?= t('admin_gruender_geschuetzt') ?></span>
                 <?php /* Andere Owner: nur der Founder kann die anfassen */ ?>
                 <?php elseif (!empty($u['is_owner']) && !$isFounderViewer): ?>
-                  <span style="font-size:11px;color:var(--text-faint);font-style:italic">🛡️ Inhaber (geschützt)</span>
+                  <span style="font-size:11px;color:var(--text-faint);font-style:italic"><?= t('admin_inhaber_geschuetzt') ?></span>
                 <?php else: ?>
                   <div class="action-dropdown">
                     <button type="button" class="action-dropdown-toggle action-toggle-icon btn btn-ghost btn-xs">⋯</button>
@@ -293,7 +293,7 @@
                         <?php if ($uid !== $cuid): ?>
                           <a href="<?= $base ?>ban_user&id=<?= $uid . $csrfQS ?>"
                              class="action-danger"
-                             onclick="return confirm('Benutzer wirklich sperren?')">🚫 Sperren</a>
+                             onclick="return confirm('Benutzer wirklich sperren?')"><?= t('admin_sperren') ?></a>
                         <?php endif; ?>
                       <?php endif; ?>
 
@@ -322,13 +322,13 @@
 
     <?php /* ════════════ KATEGORIEN ════════════ */ ?>
     <?php elseif ($action === 'categories'): ?>
-      <h2>📁 Kategorien</h2>
+      <h2><?= t('admin_kategorien_2') ?></h2>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-        Kategorien fassen mehrere Foren zusammen. Klick auf „✏️ Bearbeiten" um Titel oder Position zu ändern.
+        <?= t('admin_kategorien_fassen_mehrere_foren') ?>
       </p>
       <div class="card" style="margin-bottom:16px">
         <table class="forum-table">
-          <thead><tr><th>ID</th><th>Titel</th><th>Position</th><th>Aktion</th></tr></thead>
+          <thead><tr><th><?= t('admin_id') ?></th><th><?= t('admin_titel') ?></th><th><?= t('admin_position') ?></th><th><?= t('admin_aktion') ?></th></tr></thead>
           <tbody>
             <?php foreach ($categories as $c): ?>
             <tr>
@@ -337,19 +337,19 @@
               <td><?= (int) $c['position'] ?></td>
               <td>
                 <details class="cat-edit-details">
-                  <summary class="btn btn-ghost btn-xs">✏️ Bearbeiten</summary>
+                  <summary class="btn btn-ghost btn-xs"><?= t('admin_bearbeiten') ?></summary>
                   <form method="post" action="?action=update_cat" class="cat-edit-form">
                     <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                     <input type="hidden" name="cat_id" value="<?= (int) $c['cat_id'] ?>">
                     <div class="form-row">
-                      <label>Titel</label>
+                      <label><?= t('admin_titel') ?></label>
                       <input type="text" name="title" value="<?= e($c['title']) ?>" required maxlength="100">
                     </div>
                     <div class="form-row">
-                      <label>Position</label>
+                      <label><?= t('admin_position') ?></label>
                       <input type="number" name="position" value="<?= (int) $c['position'] ?>" min="0" style="width:80px">
                     </div>
-                    <button type="submit" class="btn btn-primary btn-sm">💾 Speichern</button>
+                    <button type="submit" class="btn btn-primary btn-sm"><?= t('admin_speichern_2') ?></button>
                   </form>
                 </details>
                 <a href="?action=delete_cat&id=<?= (int) $c['cat_id'] ?>&csrf=<?= e($csrfToken) ?>"
@@ -362,21 +362,21 @@
         </table>
       </div>
       <div class="form-card">
-        <h2>➕ Neue Kategorie</h2>
+        <h2><?= t('admin_neue_kategorie') ?></h2>
         <form method="post" action="?action=add_cat">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
-          <div class="form-row"><label>Titel</label><input type="text" name="title" required></div>
-          <div class="form-row"><label>Position</label><input type="number" name="position" value="0" min="0"></div>
-          <button type="submit" class="btn btn-primary">Anlegen</button>
+          <div class="form-row"><label><?= t('admin_titel') ?></label><input type="text" name="title" required></div>
+          <div class="form-row"><label><?= t('admin_position') ?></label><input type="number" name="position" value="0" min="0"></div>
+          <button type="submit" class="btn btn-primary"><?= t('admin_anlegen') ?></button>
         </form>
       </div>
 
     <?php /* ════════════ FOREN ════════════ */ ?>
     <?php elseif ($action === 'boards'): ?>
-      <h2>📋 Foren</h2>
+      <h2><?= t('admin_foren_2') ?></h2>
       <div class="card" style="margin-bottom:16px">
         <table class="forum-table">
-          <thead><tr><th>Titel</th><th>Kategorie</th><th>Threads</th><th>Posts</th><th>Freigabe</th><th>Moderatoren</th><th>Aktion</th></tr></thead>
+          <thead><tr><th><?= t('admin_titel') ?></th><th><?= t('admin_kategorie') ?></th><th><?= t('admin_threads') ?></th><th><?= t('admin_posts') ?></th><th><?= t('admin_freigabe') ?></th><th><?= t('admin_moderatoren') ?></th><th><?= t('admin_aktion') ?></th></tr></thead>
           <tbody>
             <?php foreach ($boards as $b):
               $mods = $boardMods[(int) $b['board_id']] ?? [];
@@ -399,8 +399,8 @@
                 <?php if (!$approveThr && !$approveRep): ?>
                   <span style="color:var(--text-faint)">aus</span>
                 <?php else: ?>
-                  <?php if ($approveThr): ?><span style="color:var(--color-warning)">📝 Themen</span><?php endif; ?>
-                  <?php if ($approveRep): ?><?php if ($approveThr): ?><br><?php endif; ?><span style="color:var(--color-warning)">💬 Antworten</span><?php endif; ?>
+                  <?php if ($approveThr): ?><span style="color:var(--color-warning)"><?= t('admin_themen_2') ?></span><?php endif; ?>
+                  <?php if ($approveRep): ?><?php if ($approveThr): ?><br><?php endif; ?><span style="color:var(--color-warning)"><?= t('admin_antworten') ?></span><?php endif; ?>
                 <?php endif; ?>
               </td>
               <td style="font-size:12px">
@@ -416,11 +416,11 @@
                 endif; ?>
               </td>
               <td style="white-space:nowrap">
-                <a href="?action=boards&board=<?= (int) $b['board_id'] ?>&edit=details" class="btn btn-ghost btn-xs">✏️ Bearbeiten</a>
+                <a href="?action=boards&board=<?= (int) $b['board_id'] ?>&edit=details" class="btn btn-ghost btn-xs"><?= t('admin_bearbeiten') ?></a>
                 <a href="?action=boards&board=<?= (int) $b['board_id'] ?>&edit=approval" class="btn btn-ghost btn-xs">🚦 Freigabe</a>
                 <a href="?action=boards&board=<?= (int) $b['board_id'] ?>" class="btn btn-ghost btn-xs">🛡️ Mods</a>
                 <a href="?action=delete_board&id=<?= (int) $b['board_id'] ?>&csrf=<?= e($csrfToken) ?>"
-                   class="btn btn-danger btn-xs" onclick="return confirm('Forum löschen?')">Löschen</a>
+                   class="btn btn-danger btn-xs" onclick="return confirm('Forum löschen?')"><?= t('admin_x_loeschen') ?></a>
               </td>
             </tr>
             <?php endforeach; ?>
@@ -437,17 +437,17 @@
             <input type="hidden" name="board_id" value="<?= (int) $selectedBoard['board_id'] ?>">
 
             <div class="form-row">
-              <label>Titel</label>
+              <label><?= t('admin_titel') ?></label>
               <input type="text" name="title" value="<?= e($selectedBoard['title']) ?>" required>
             </div>
 
             <div class="form-row">
-              <label>Beschreibung</label>
+              <label><?= t('admin_beschreibung') ?></label>
               <input type="text" name="description" value="<?= e($selectedBoard['description'] ?? '') ?>">
             </div>
 
             <div class="form-row">
-              <label>Kategorie</label>
+              <label><?= t('admin_kategorie') ?></label>
               <select name="cat_id" required>
                 <?php foreach ($categories as $c): ?>
                   <option value="<?= (int) $c['cat_id'] ?>" <?= (int) $selectedBoard['cat_id'] === (int) $c['cat_id'] ? 'selected' : '' ?>>
@@ -455,13 +455,13 @@
                   </option>
                 <?php endforeach; ?>
               </select>
-              <div class="form-hint">Verschiebe das Forum in eine andere Kategorie.</div>
+              <div class="form-hint"><?= t('admin_verschiebe_das_forum_in') ?></div>
             </div>
 
             <div class="form-row">
-              <label>Position</label>
+              <label><?= t('admin_position') ?></label>
               <input type="number" name="position" value="<?= (int) $selectedBoard['position'] ?>" min="0" max="999">
-              <div class="form-hint">Niedrigere Zahl = weiter oben in der Kategorie.</div>
+              <div class="form-hint"><?= t('admin_niedrigere_zahl_weiter_oben') ?></div>
             </div>
 
             <?php /* ── GRUPPENRECHTE ── */ ?>
@@ -472,22 +472,22 @@
               // Beschriftung der Feinrechte. Reihenfolge wie in BRETT_FEINRECHTE,
               // damit Kopfzeile und Kaestchen nicht auseinanderlaufen.
               $feinSpalten = [
-                'thema'      => ['Thema',  'Neue Themen eröffnen'],
-                'antwort'    => ['Antwort', 'Auf Themen antworten'],
-                'anhang'     => ['Anhang',  'Dateien anhängen'],
-                'bearbeiten' => ['Ändern',  'Eigene Beiträge nachträglich ändern'],
-                'umfrage'    => ['Umfrage', 'Umfragen anlegen'],
+                'thema'      => ['Thema',  t('admin_neue_themen_eroeffnen')],
+                'antwort'    => ['Antwort', t('admin_auf_themen_antworten')],
+                'anhang'     => ['Anhang',  t('admin_dateien_anhaengen')],
+                'bearbeiten' => [t('admin_aendern'),  t('admin_eigene_beitraege_nachtraeglich_aendern')],
+                'umfrage'    => ['Umfrage', t('admin_umfragen_anlegen')],
               ];
               $kopf = 'padding:8px 10px;font-size:11px;text-transform:uppercase;'
                     . 'letter-spacing:.05em;color:var(--text-muted);border-bottom:1px solid var(--border)';
               $trenn = 'border-left:1px solid var(--border)';
             ?>
             <div class="form-row" style="border-top:1px dashed var(--border);padding-top:14px;margin-top:14px">
-              <label>👪 Gruppenrechte</label>
+              <label><?= t('admin_gruppenrechte') ?></label>
               <div style="overflow-x:auto">
                 <table style="width:100%;border-collapse:collapse">
                   <tr>
-                    <th style="text-align:left;<?= $kopf ?>">Gruppe</th>
+                    <th style="text-align:left;<?= $kopf ?>"><?= t('admin_gruppe') ?></th>
                     <?php foreach (['none' => 'nichts', 'read' => 'lesen', 'write' => 'schreiben'] as $stufe => $beschriftung): ?>
                       <th style="width:90px;<?= $kopf ?>"><?= e($beschriftung) ?></th>
                     <?php endforeach; ?>
@@ -548,8 +548,8 @@
                   Die rechten Häkchen gelten nur bei „schreiben“ — bei „nichts“ und „lesen“
                   sind sie wirkungslos und deshalb blass.
                 <?php else: ?>
-                  <br><strong>Feinere Rechte stehen noch nicht bereit.</strong>
-                  Sie kommen mit der Anpassung <em>v1.5.0 – Feinere Rechte je Forum und Gruppe</em>
+                  <br><strong><?= t('admin_feinere_rechte_stehen_noch') ?></strong>
+                  <?= t('admin_sie_kommen_mit_der') ?> <em>v1.5.0 – Feinere Rechte je Forum und Gruppe</em>
                   unter <a href="<?= FORUM_URL ?>/admin/?action=updates">Forum-Updates</a>.
                 <?php endif; ?>
               </div>
@@ -579,41 +579,39 @@
             <?php endif; ?>
 
             <div class="form-row">
-              <label>Wenn jemand kein Recht hat</label>
+              <label><?= t('admin_wenn_jemand_kein_recht') ?></label>
               <?php $sicht = $selectedBoard['visibility'] ?? 'hidden'; ?>
               <label class="checkbox-line" style="margin-bottom:6px">
                 <input type="radio" name="visibility" value="hidden" <?= $sicht !== 'locked' ? 'checked' : '' ?>>
-                <span><strong>Verstecken</strong> — das Forum taucht nirgends auf, direkter Aufruf endet auf 404</span>
+                <span><strong><?= t('admin_verstecken') ?></strong> — das Forum taucht nirgends auf, direkter Aufruf endet auf 404</span>
               </label>
               <label class="checkbox-line">
                 <input type="radio" name="visibility" value="locked" <?= $sicht === 'locked' ? 'checked' : '' ?>>
-                <span><strong>Zeigen, aber gesperrt</strong> — sichtbar mit Schloss, der Inhalt bleibt zu</span>
+                <span><strong><?= t('admin_zeigen_aber_gesperrt') ?></strong> — sichtbar mit Schloss, der Inhalt bleibt zu</span>
               </label>
               <div class="form-hint">
-                Verstecken heißt wirklich weg: nicht in der Suche, nicht im RSS, nicht über Schlagworte,
-                nicht im Profil eines Mitglieds.
+                <?= t('admin_verstecken_heisst_wirklich_weg') ?>
               </div>
             </div>
 
             <?php /* ── PASSWORT-SCHUTZ ── */ ?>
             <div class="form-row" style="border-top:1px dashed var(--border);padding-top:14px;margin-top:14px">
-              <label>🔒 Passwort-Schutz</label>
+              <label><?= t('admin_passwort_schutz') ?></label>
               <?php $isProtected = !empty($selectedBoard['password_hash']); ?>
               <?php if ($isProtected): ?>
                 <div style="padding:10px 12px;background:var(--color-accent-soft);border-radius:var(--radius-sm);margin-bottom:8px">
-                  <strong>✓ Dieses Forum ist aktuell passwort-geschützt.</strong>
+                  <strong><?= t('admin_dieses_forum_ist_aktuell') ?></strong>
                   <div style="font-size:12px;color:var(--text-muted);margin-top:4px">
-                    Owner, Admins, globale Mods und Forum-Mods sind ausgenommen.
-                    Alle anderen User müssen das Passwort einmal pro Session eingeben.
+                    <?= t('admin_owner_admins_globale_mods') ?>
                   </div>
                 </div>
                 <label class="checkbox-line" style="margin-bottom:8px">
                   <input type="checkbox" name="remove_password" value="1">
-                  <span>🔓 Passwort-Schutz entfernen (Forum wird öffentlich)</span>
+                  <span><?= t('admin_passwort_schutz_entfernen_forum') ?></span>
                 </label>
               <?php endif; ?>
               <input type="password" name="new_password" value="" autocomplete="new-password"
-                     placeholder="<?= $isProtected ? 'Neues Passwort eingeben um es zu ändern...' : 'Passwort setzen (leer = kein Schutz)' ?>">
+                     placeholder="<?= $isProtected ? t('admin_neues_passwort_eingeben_um') : t('admin_passwort_setzen_leer_kein') ?>">
               <div class="form-hint">
                 <?php if ($isProtected): ?>
                   Aus Sicherheitsgründen wird das aktuelle Passwort nicht angezeigt.
@@ -627,8 +625,8 @@
             </div>
 
             <div style="display:flex;gap:8px">
-              <button type="submit" class="btn btn-primary">💾 Speichern</button>
-              <a href="?action=boards" class="btn btn-ghost">Abbrechen</a>
+              <button type="submit" class="btn btn-primary"><?= t('admin_speichern_2') ?></button>
+              <a href="?action=boards" class="btn btn-ghost"><?= t('admin_abbrechen') ?></a>
             </div>
           </form>
         </div>
@@ -639,8 +637,8 @@
         <div class="form-card" style="margin-bottom:16px;border:2px solid var(--color-warning)">
           <h2>🚦 Freigabe-Einstellungen für „<?= e($selectedBoard['title']) ?>"</h2>
           <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">
-            Hier festlegen, welche neuen Beiträge in diesem Forum erst freigegeben werden müssen.
-            <strong>Admins und Moderatoren sind immer ausgenommen</strong> – ihre Beiträge erscheinen sofort.
+            <?= t('admin_hier_festlegen_welche_neuen') ?>
+            <strong><?= t('admin_admins_und_moderatoren_sind') ?></strong> – ihre Beiträge erscheinen sofort.
           </p>
           <form method="post" action="?action=update_board_approval">
             <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
@@ -651,9 +649,9 @@
                   <?= !empty($selectedBoard['require_approval_threads']) ? 'checked' : '' ?>
                   style="margin-top:3px">
                 <div>
-                  <strong>📝 Neue Themen freigeben</strong>
+                  <strong><?= t('admin_neue_themen_freigeben') ?></strong>
                   <div style="font-size:12px;color:var(--text-muted);margin-top:3px">
-                    Neue Themen im Forum müssen erst von einem Mod genehmigt werden, bevor sie sichtbar sind.
+                    <?= t('admin_neue_themen_im_forum') ?>
                   </div>
                 </div>
               </label>
@@ -664,15 +662,15 @@
                   <?= !empty($selectedBoard['require_approval_replies']) ? 'checked' : '' ?>
                   style="margin-top:3px">
                 <div>
-                  <strong>💬 Antworten freigeben</strong>
+                  <strong><?= t('admin_antworten_freigeben') ?></strong>
                   <div style="font-size:12px;color:var(--text-muted);margin-top:3px">
-                    Antworten auf bestehende Themen müssen erst genehmigt werden.
+                    <?= t('admin_antworten_auf_bestehende_themen') ?>
                   </div>
                 </div>
               </label>
             </div>
-            <button type="submit" class="btn btn-primary">💾 Speichern</button>
-            <a href="?action=boards" class="btn btn-ghost">Abbrechen</a>
+            <button type="submit" class="btn btn-primary"><?= t('admin_speichern_2') ?></button>
+            <a href="?action=boards" class="btn btn-ghost"><?= t('admin_abbrechen') ?></a>
           </form>
         </div>
       <?php endif; ?>
@@ -681,36 +679,35 @@
         <div class="form-card" style="margin-bottom:16px;border:2px solid var(--text-base)">
           <h2>🛡️ Moderatoren für „<?= e($selectedBoard['title']) ?>"</h2>
           <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">
-            <strong>Hinweis:</strong> Globale Moderatoren (is_mod=1) und Administratoren dürfen sowieso überall moderieren.
-            Hier zugeordnete User dürfen ausschließlich in diesem Forum moderieren.
+            <strong><?= t('admin_hinweis') ?></strong> <?= t('admin_globale_moderatoren_is_mod') ?>
           </p>
 
-          <div class="section-heading">Aktuelle Moderatoren</div>
+          <div class="section-heading"><?= t('admin_aktuelle_moderatoren') ?></div>
           <?php if (empty($selectedMods)): ?>
             <p style="color:var(--text-faint);font-style:italic;padding:14px 0">
-              Keine Moderatoren zugewiesen.
+              <?= t('admin_keine_moderatoren_zugewiesen') ?>
             </p>
           <?php else: ?>
             <table class="forum-table" style="margin-bottom:16px">
-              <thead><tr><th>Benutzer</th><th>Rolle</th><th>Zugewiesen am</th><th></th></tr></thead>
+              <thead><tr><th><?= t('admin_benutzer') ?></th><th><?= t('admin_rolle') ?></th><th><?= t('admin_zugewiesen_am') ?></th><th></th></tr></thead>
               <tbody>
                 <?php foreach ($selectedMods as $m): ?>
                   <tr>
                     <td><a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $m['user_id'] ?>"><?= e($m['username']) ?></a></td>
                     <td style="font-size:11px">
                       <?php if ($m['is_admin']): ?>
-                        <span style="color:#dc2626;font-weight:600">Administrator</span>
+                        <span style="color:#dc2626;font-weight:600"><?= t('admin_administrator') ?></span>
                       <?php elseif ($m['is_mod']): ?>
-                        <span style="color:#f59e0b;font-weight:600">Globaler Moderator</span>
+                        <span style="color:#f59e0b;font-weight:600"><?= t('admin_globaler_moderator') ?></span>
                       <?php else: ?>
-                        <span style="color:#f59e0b;font-weight:600">Forum-Moderator</span>
+                        <span style="color:#f59e0b;font-weight:600"><?= t('admin_forum_moderator') ?></span>
                       <?php endif; ?>
                     </td>
                     <td style="font-size:11px;color:var(--text-muted)"><?= e(format_date($m['assigned_at'])) ?></td>
                     <td>
                       <a href="?action=remove_board_mod&board=<?= (int) $selectedBoard['board_id'] ?>&user=<?= (int) $m['user_id'] ?>&csrf=<?= e($csrfToken) ?>"
                          class="btn btn-danger btn-xs"
-                         onclick="return confirm('Moderator entfernen?')">Entfernen</a>
+                         onclick="return confirm('Moderator entfernen?')"><?= t('admin_entfernen') ?></a>
                     </td>
                   </tr>
                 <?php endforeach; ?>
@@ -718,12 +715,12 @@
             </table>
           <?php endif; ?>
 
-          <div class="section-heading">Moderator hinzufügen</div>
+          <div class="section-heading"><?= t('admin_moderator_hinzufuegen') ?></div>
           <form method="post" action="?action=add_board_mod">
             <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
             <input type="hidden" name="board_id" value="<?= (int) $selectedBoard['board_id'] ?>">
             <div class="form-row">
-              <label>Benutzer auswählen</label>
+              <label><?= t('admin_benutzer_auswaehlen') ?></label>
               <select name="user_id" required>
                 <option value="">– Bitte wählen –</option>
                 <?php foreach ($availableUsers as $u):
@@ -738,57 +735,54 @@
                 <?php endforeach; ?>
               </select>
             </div>
-            <button type="submit" class="btn btn-primary">+ Hinzufügen</button>
-            <a href="?action=boards" class="btn btn-ghost">Schließen</a>
+            <button type="submit" class="btn btn-primary"><?= t('admin_hinzufuegen') ?></button>
+            <a href="?action=boards" class="btn btn-ghost"><?= t('admin_schliessen') ?></a>
           </form>
         </div>
       <?php endif; ?>
 
       <div class="form-card">
-        <h2>➕ Neues Forum</h2>
+        <h2><?= t('admin_neues_forum') ?></h2>
         <form method="post" action="?action=add_board" autocomplete="off">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
           <div class="form-row">
-            <label>Kategorie</label>
+            <label><?= t('admin_kategorie') ?></label>
             <select name="cat_id">
               <?php foreach ($categories as $c): ?>
               <option value="<?= (int) $c['cat_id'] ?>"><?= e($c['title']) ?></option>
               <?php endforeach; ?>
             </select>
           </div>
-          <div class="form-row"><label>Titel</label><input type="text" name="title" required></div>
-          <div class="form-row"><label>Beschreibung</label><input type="text" name="description"></div>
-          <div class="form-row"><label>Position</label><input type="number" name="position" value="0" min="0"></div>
+          <div class="form-row"><label><?= t('admin_titel') ?></label><input type="text" name="title" required></div>
+          <div class="form-row"><label><?= t('admin_beschreibung') ?></label><input type="text" name="description"></div>
+          <div class="form-row"><label><?= t('admin_position') ?></label><input type="number" name="position" value="0" min="0"></div>
 
           <div class="form-row" style="border-top:1px dashed var(--border);padding-top:14px;margin-top:14px">
-            <label>🔒 Passwort-Schutz <span style="font-weight:400;color:var(--text-muted);font-size:11px">(optional)</span></label>
+            <label><?= t('admin_passwort_schutz') ?> <span style="font-weight:400;color:var(--text-muted);font-size:11px"><?= t('admin_optional') ?></span></label>
             <input type="password" name="new_password" value="" autocomplete="new-password"
                    placeholder="Passwort setzen (leer = öffentliches Forum)">
             <div class="form-hint">
-              Wenn gesetzt: User müssen dieses Passwort eingeben um das Forum zu betreten.
-              Owner, Admins, globale Mods und Forum-Mods sind ausgenommen.
-              Kann jederzeit nachträglich gesetzt oder geändert werden.
+              <?= t('admin_wenn_gesetzt_user_muessen_2') ?>
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary">Anlegen</button>
+          <button type="submit" class="btn btn-primary"><?= t('admin_anlegen') ?></button>
         </form>
       </div>
 
     <?php /* ════════════ RÄNGE ════════════ */ ?>
     <?php elseif ($action === 'groups'): ?>
       <?php /* ── GRUPPEN ────────────────────────────────────────────────── */ ?>
-      <h2>👪 Gruppen</h2>
+      <h2><?= t('admin_gruppen') ?></h2>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-        Gruppen entscheiden, wer welches Forum sehen, lesen und beschreiben darf.
-        Eingestellt wird das je Forum unter <a href="?action=boards">Foren</a>.
+        <?= t('admin_gruppen_entscheiden_wer_welches') ?> <a href="?action=boards"><?= t('admin_foren') ?></a>.
       </p>
 
       <div class="card" style="margin-bottom:16px">
         <div style="overflow-x:auto">
           <table class="forum-table">
             <thead>
-              <tr><th>Gruppe</th><th>Mitglieder</th><th>Abzeichen</th><th>In Rechten</th><th></th></tr>
+              <tr><th><?= t('admin_gruppe') ?></th><th><?= t('admin_mitglieder') ?></th><th><?= t('admin_abzeichen') ?></th><th><?= t('admin_in_rechten') ?></th><th></th></tr>
             </thead>
             <tbody>
               <?php foreach (($gruppen ?? []) as $g): ?>
@@ -815,11 +809,11 @@
                   <?php $nForen = (int) ($rechteJeGruppe[$gid] ?? 0); ?>
                   <td><?= $nForen ?> <?= $nForen === 1 ? 'Forum' : 'Foren' ?></td>
                   <td style="white-space:nowrap">
-                    <a href="?action=groups&group=<?= $gid ?>" class="btn btn-ghost btn-xs">Bearbeiten</a>
+                    <a href="?action=groups&group=<?= $gid ?>" class="btn btn-ghost btn-xs"><?= t('admin_x_bearbeiten') ?></a>
                     <?php if (!$eingebaut): ?>
                       <a href="?action=delete_group&id=<?= $gid ?>&csrf=<?= e($csrfToken) ?>"
                          class="btn btn-ghost btn-xs"
-                         onclick="return confirm('Gruppe „<?= e($g['name']) ?>“ löschen? Die Rechte, die daran hängen, verschwinden mit.')">Löschen</a>
+                         onclick="return confirm('Gruppe „<?= e($g['name']) ?>“ löschen? Die Rechte, die daran hängen, verschwinden mit.')"><?= t('admin_x_loeschen') ?></a>
                     <?php endif; ?>
                   </td>
                 </tr>
@@ -830,21 +824,21 @@
       </div>
 
       <div class="card" style="margin-bottom:16px">
-        <h3 style="margin-bottom:12px">Neue Gruppe</h3>
+        <h3 style="margin-bottom:12px"><?= t('admin_neue_gruppe') ?></h3>
         <form method="post" action="?action=create_group">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
           <div class="form-row">
-            <label>Name</label>
+            <label><?= t('admin_name') ?></label>
             <input type="text" name="name" required maxlength="60" placeholder="z. B. Kunden">
           </div>
           <label class="checkbox-line">
             <input type="checkbox" name="show_badge" value="1">
-            <span>Als Abzeichen neben dem Namen zeigen</span>
+            <span><?= t('admin_als_abzeichen_neben_dem') ?></span>
           </label>
           <div class="form-hint">
-            Ohne Häkchen bleibt die Gruppe unsichtbar — für eine interne Gruppe ist das der Sinn der Sache.
+            <?= t('admin_ohne_haekchen_bleibt_die') ?>
           </div>
-          <div style="margin-top:14px"><button class="btn btn-primary">Anlegen</button></div>
+          <div style="margin-top:14px"><button class="btn btn-primary"><?= t('admin_anlegen') ?></button></div>
         </form>
       </div>
 
@@ -856,35 +850,31 @@
             <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
             <input type="hidden" name="group_id" value="<?= (int) $gruppe['group_id'] ?>">
             <div class="form-row">
-              <label>Name</label>
+              <label><?= t('admin_name') ?></label>
               <input type="text" name="name" value="<?= e($gruppe['name']) ?>" required maxlength="60">
               <?php if (!empty($gruppe['is_builtin'])): ?>
                 <div class="form-hint">
-                  Der Anzeigename lässt sich ändern, der interne Kurzname
-                  (<code><?= e($gruppe['slug']) ?></code>) nicht — daran hängt der Code.
+                  <?= t('admin_der_anzeigename_laesst_sich') ?><code><?= e($gruppe['slug']) ?></code>) nicht — daran hängt der Code.
                 </div>
               <?php endif; ?>
             </div>
             <label class="checkbox-line">
               <input type="checkbox" name="show_badge" value="1" <?= !empty($gruppe['show_badge']) ? 'checked' : '' ?>>
-              <span>Als Abzeichen neben dem Namen zeigen</span>
+              <span><?= t('admin_als_abzeichen_neben_dem') ?></span>
             </label>
             <label class="checkbox-line" style="margin-top:8px">
               <input type="checkbox" name="hide_rank" value="1" <?= !empty($gruppe['hide_rank']) ? 'checked' : '' ?>>
-              <span>Statt des Rangs zeigen</span>
+              <span><?= t('admin_statt_des_rangs_zeigen') ?></span>
             </label>
             <div class="form-hint" style="margin-top:6px">
-              Der Rang kommt aus der Beitragszahl. Für ein Konto, das nicht mitschreibt, sondern
-              ankündigt — einen Bot etwa —, sagt „Neuling“ nichts. Mit diesem Haken tritt das
-              Abzeichen an die Stelle des Rangs, so wie bei Administratoren und Moderatoren.
-              Er wirkt nur zusammen mit dem Haken darüber.
+              <?= t('admin_der_rang_kommt_aus') ?>
             </div>
-            <div style="margin-top:14px"><button class="btn btn-primary">Speichern</button></div>
+            <div style="margin-top:14px"><button class="btn btn-primary"><?= t('admin_speichern') ?></button></div>
           </form>
 
           <?php /* ── Bild der Gruppe ── */ ?>
           <div style="border-top:1px dashed var(--border);margin-top:18px;padding-top:16px">
-            <h3 style="font-size:14px;margin:0 0 10px">Bild</h3>
+            <h3 style="font-size:14px;margin:0 0 10px"><?= t('admin_bild') ?></h3>
             <div style="display:flex;gap:16px;align-items:flex-start">
               <?php if (!empty($gruppe['avatar'])): ?>
                 <img src="<?= e(FORUM_URL . '/uploads/gruppen/' . rawurlencode($gruppe['avatar'])) ?>"
@@ -900,18 +890,14 @@
                   <input type="hidden" name="group_id" value="<?= (int) $gruppe['group_id'] ?>">
                   <input type="file" name="bild" accept="image/png,image/jpeg,image/webp">
                   <div style="margin-top:10px;display:flex;gap:8px">
-                    <button class="btn btn-primary btn-sm">Hochladen</button>
+                    <button class="btn btn-primary btn-sm"><?= t('admin_hochladen') ?></button>
                     <?php if (!empty($gruppe['avatar'])): ?>
-                      <button name="entfernen" value="1" class="btn btn-ghost btn-sm">Entfernen</button>
+                      <button name="entfernen" value="1" class="btn btn-ghost btn-sm"><?= t('admin_entfernen') ?></button>
                     <?php endif; ?>
                   </div>
                 </form>
                 <div class="form-hint" style="margin-top:8px">
-                  Wer in dieser Gruppe ist und kein eigenes Bild hochgeladen hat, bekommt dieses —
-                  gedacht für Konten, die keine Person sind. Die festen Rollen gehen vor: ein
-                  Moderator behält sein Rollenbild.
-                  PNG, JPG oder WEBP, höchstens 512 KB. Kein SVG: eine solche Datei darf Skripte
-                  enthalten und liefe hier im Namen des Forums.
+                  <?= t('admin_wer_in_dieser_gruppe') ?>
                 </div>
               </div>
             </div>
@@ -922,7 +908,7 @@
               <h3 style="font-size:14px;margin-bottom:10px">Mitglieder (<?= count($mitglieder ?? []) ?>)</h3>
 
               <?php if (empty($mitglieder)): ?>
-                <p style="color:var(--text-muted);font-size:14px">Noch niemand eingetragen.</p>
+                <p style="color:var(--text-muted);font-size:14px"><?= t('admin_noch_niemand_eingetragen') ?></p>
               <?php else: ?>
                 <div style="overflow-x:auto">
                   <table class="forum-table">
@@ -933,7 +919,7 @@
                           <td style="color:var(--text-muted)"><?= e((string) $m['added_at']) ?></td>
                           <td style="text-align:right">
                             <a class="btn btn-ghost btn-xs"
-                               href="?action=group_member_remove&group=<?= (int) $gruppe['group_id'] ?>&user=<?= (int) $m['user_id'] ?>&csrf=<?= e($csrfToken) ?>">Entfernen</a>
+                               href="?action=group_member_remove&group=<?= (int) $gruppe['group_id'] ?>&user=<?= (int) $m['user_id'] ?>&csrf=<?= e($csrfToken) ?>"><?= t('admin_entfernen') ?></a>
                           </td>
                         </tr>
                       <?php endforeach; ?>
@@ -946,29 +932,28 @@
                 <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                 <input type="hidden" name="group_id" value="<?= (int) $gruppe['group_id'] ?>">
                 <div class="form-row">
-                  <label>Mitglied hinzufügen</label>
+                  <label><?= t('admin_mitglied_hinzufuegen') ?></label>
                   <select name="user_id" required>
                     <?php foreach (($waehlbar ?? []) as $u): ?>
                       <option value="<?= (int) $u['user_id'] ?>"><?= e($u['username']) ?></option>
                     <?php endforeach; ?>
                   </select>
                 </div>
-                <button class="btn btn-primary">Eintragen</button>
+                <button class="btn btn-primary"><?= t('admin_eintragen') ?></button>
               </form>
             </div>
           <?php else: ?>
             <div class="form-hint" style="margin-top:14px">
-              In diese Gruppe wird niemand eingetragen: wer angemeldet ist, gehört zu
-              „Angemeldete", alle anderen zu „Gäste". Eine gepflegte Liste wäre sofort veraltet.
+              <?= t('admin_in_diese_gruppe_wird') ?>
             </div>
           <?php endif; ?>
         </div>
       <?php endif; ?>
 
     <?php elseif ($action === 'ranks'): ?>
-      <h2>🏅 Rangsystem</h2>
+      <h2><?= t('admin_rangsystem') ?></h2>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-        Ränge werden automatisch nach Beitragsanzahl vergeben.
+        <?= t('admin_raenge_automatisch') ?>
         <a href="?action=recalc_ranks&csrf=<?= e($csrfToken) ?>" class="btn btn-primary btn-sm"
            onclick="return confirm('Alle Ränge neu berechnen?')" style="margin-left:8px">
           🔄 Alle neu berechnen
@@ -976,7 +961,7 @@
       </p>
       <div class="card" style="margin-bottom:16px">
         <table class="forum-table">
-          <thead><tr><th>Rang</th><th>Beiträge ab</th><th>Sterne</th><th>Mitglieder</th></tr></thead>
+          <thead><tr><th><?= t('admin_rang') ?></th><th><?= t('admin_beitraege_ab') ?></th><th><?= t('admin_sterne') ?></th><th><?= t('admin_mitglieder') ?></th></tr></thead>
           <tbody>
             <?php foreach ($rankData as $r): ?>
             <tr>
@@ -989,10 +974,10 @@
           </tbody>
         </table>
       </div>
-      <div class="section-heading">🏆 Top 10 Mitglieder</div>
+      <div class="section-heading"><?= t('admin_top_10_mitglieder') ?></div>
       <div class="card">
         <table class="forum-table">
-          <thead><tr><th>#</th><th>Mitglied</th><th>Rang</th><th>Beiträge</th></tr></thead>
+          <thead><tr><th>#</th><th><?= t('admin_mitglied') ?></th><th><?= t('admin_rang') ?></th><th><?= t('admin_beitraege') ?></th></tr></thead>
           <tbody>
             <?php foreach ($topUsers as $i => $u): ?>
             <tr>
@@ -1008,7 +993,7 @@
 
     <?php /* ════════════ EINSTELLUNGEN ════════════ */ ?>
     <?php elseif ($action === 'settings'): ?>
-      <h2>🔧 Forum-Einstellungen</h2>
+      <h2><?= t('admin_forum_einstellungen') ?></h2>
 
       <?php
         // Welche Custom-Uploads gibt es?
@@ -1021,11 +1006,9 @@
         }
       ?>
       <div class="form-card" style="margin-bottom:20px">
-        <h2>👤 Rollen-Avatare</h2>
+        <h2><?= t('admin_rollen_avatare') ?></h2>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-          Diese Bilder werden für User mit einer Rolle angezeigt, die <strong>kein eigenes Avatar</strong> hochgeladen haben.
-          Wird die Rolle entzogen, bekommt der User automatisch wieder das Standard-Bild.
-          Falls du keine eigenen Bilder hochlädst, werden hübsche SVG-Standard-Avatare verwendet.
+          <?= t('admin_rollenbilder_hinweis', '<strong>' . e(t('admin_kein_eigenes_avatar')) . '</strong>') ?>
         </p>
 
         <div class="role-avatars-grid">
@@ -1043,9 +1026,9 @@
                 <div class="role-avatar-label"><?= $label ?></div>
                 <div class="role-avatar-status">
                   <?php if ($hasCustom): ?>
-                    <span style="color:var(--color-success)">✓ Eigenes Bild aktiv</span>
+                    <span style="color:var(--color-success)"><?= t('admin_eigenes_bild_aktiv') ?></span>
                   <?php else: ?>
-                    <span style="color:var(--text-muted)">Standard-SVG aktiv</span>
+                    <span style="color:var(--text-muted)"><?= t('admin_standard_svg_aktiv') ?></span>
                   <?php endif; ?>
                 </div>
                 <form method="post" action="?action=upload_role_avatar" enctype="multipart/form-data"
@@ -1054,14 +1037,14 @@
                   <input type="hidden" name="role" value="<?= e($role) ?>">
                   <input type="file" name="image" accept="image/png,image/jpeg,image/webp,image/svg+xml" required
                          style="font-size:11px;flex:1;min-width:140px">
-                  <button type="submit" class="btn btn-primary btn-sm">⬆️ Hochladen</button>
+                  <button type="submit" class="btn btn-primary btn-sm"><?= t('admin_hochladen') ?></button>
                 </form>
                 <?php if ($hasCustom): ?>
                   <form method="post" action="?action=delete_role_avatar" style="margin-top:4px"
                         onsubmit="return confirm('Eigenes <?= e($label) ?>-Bild löschen und zum Standard zurück?')">
                     <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                     <input type="hidden" name="role" value="<?= e($role) ?>">
-                    <button type="submit" class="btn btn-ghost btn-sm" style="font-size:11px">🗑️ Zurück zum Standard</button>
+                    <button type="submit" class="btn btn-ghost btn-sm" style="font-size:11px"><?= t('admin_zurueck_zum_standard') ?></button>
                   </form>
                 <?php endif; ?>
               </div>
@@ -1078,52 +1061,52 @@
         <input type="hidden" name="settings_section" value="general">
 
         <div class="alert alert-info" style="margin-bottom:16px">
-          💡 <strong>Hinweis:</strong> Branding (Logo, Name, Slogan), Farben, Footer und Custom CSS findest du jetzt im neuen Bereich
-          <a href="?action=design"><strong>🎨 Design</strong></a>. Hier sind nur noch funktionale Einstellungen.
+          💡 <strong><?= t('admin_hinweis') ?></strong> <?= t('admin_branding_logo_name_slogan') ?>
+          <a href="?action=design"><strong><?= t('admin_design') ?></strong></a>. Hier sind nur noch funktionale Einstellungen.
         </div>
 
         <?php /* ═══ 1. ALLGEMEIN ═════════════════════════════════════ */ ?>
         <div class="form-card" style="margin-bottom:16px">
-          <h2>📋 Allgemein</h2>
+          <h2><?= t('admin_allgemein') ?></h2>
           <div class="form-row">
-            <label>Forenbeschreibung</label>
+            <label><?= t('admin_forenbeschreibung') ?></label>
             <input type="text" name="forum_description" value="<?= e($settings['forum_description'] ?? '') ?>"
                    placeholder="Eine kurze Beschreibung deines Forums">
-            <div class="form-hint">Erscheint im Browser, in Suchmaschinen und als Meta-Beschreibung.</div>
+            <div class="form-hint"><?= t('admin_erscheint_im_browser_in') ?></div>
           </div>
           <div class="form-row">
-            <label>Standard-Sprache</label>
+            <label><?= t('admin_standard_sprache') ?></label>
             <select name="forum_default_lang">
               <?php $lang = $settings['forum_default_lang'] ?? 'de'; ?>
               <option value="de" <?= $lang === 'de' ? 'selected' : '' ?>>🇩🇪 Deutsch</option>
               <option value="en" <?= $lang === 'en' ? 'selected' : '' ?>>🇬🇧 English</option>
             </select>
-            <div class="form-hint">Wird für nicht-eingeloggte Besucher verwendet.</div>
+            <div class="form-hint"><?= t('admin_wird_fuer_nicht_eingeloggte') ?></div>
           </div>
         </div>
 
         <?php /* ═══ 2. BEITRÄGE & THREADS ════════════════════════════ */ ?>
         <div class="form-card" style="margin-bottom:16px">
-          <h2>📝 Beiträge & Threads</h2>
+          <h2><?= t('admin_beitraege_threads') ?></h2>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
             <div class="form-row">
-              <label>Min. Beitragslänge (Zeichen)</label>
+              <label><?= t('admin_min_beitragslaenge_zeichen') ?></label>
               <input type="number" name="min_post_length" min="1" max="1000"
                      value="<?= e($settings['min_post_length'] ?? '3') ?>">
             </div>
             <div class="form-row">
-              <label>Max. Beitragslänge (Zeichen)</label>
+              <label><?= t('admin_max_beitragslaenge_zeichen') ?></label>
               <input type="number" name="max_post_length" min="100" max="100000"
                      value="<?= e($settings['max_post_length'] ?? '20000') ?>">
             </div>
             <div class="form-row">
-              <label>Bearbeitungsfenster (Minuten)</label>
+              <label><?= t('admin_bearbeitungsfenster_minuten') ?></label>
               <input type="number" name="edit_window_minutes" min="0" max="10080"
                      value="<?= e($settings['edit_window_minutes'] ?? '0') ?>">
-              <div class="form-hint">0 = unbegrenzt. Mods/Admins können immer.</div>
+              <div class="form-hint"><?= t('admin_0_unbegrenzt_mods_admins') ?></div>
             </div>
             <div class="form-row">
-              <label>Bot-Erkennung</label>
+              <label><?= t('admin_bot_erkennung') ?></label>
               <select name="bot_detection_level">
                 <?php $bd = $settings['bot_detection_level'] ?? 'medium'; ?>
                 <option value="off"    <?= $bd === 'off'    ? 'selected' : '' ?>>🚫 Aus</option>
@@ -1131,15 +1114,15 @@
                 <option value="medium" <?= $bd === 'medium' ? 'selected' : '' ?>>🟡 Normal</option>
                 <option value="high"   <?= $bd === 'high'   ? 'selected' : '' ?>>🔴 Streng</option>
               </select>
-              <div class="form-hint">Honeypots, Submission-Timing, User-Agent-Checks.</div>
+              <div class="form-hint"><?= t('admin_honeypots_submission_timing_user') ?></div>
             </div>
             <div class="form-row">
-              <label>Beiträge pro Seite</label>
+              <label><?= t('admin_beitraege_pro_seite') ?></label>
               <input type="number" name="posts_per_page" min="5" max="100"
                      value="<?= e($settings['posts_per_page'] ?? '20') ?>">
             </div>
             <div class="form-row">
-              <label>Threads pro Seite</label>
+              <label><?= t('admin_threads_pro_seite') ?></label>
               <input type="number" name="threads_per_page" min="5" max="100"
                      value="<?= e($settings['threads_per_page'] ?? '25') ?>">
             </div>
@@ -1148,13 +1131,13 @@
 
         <?php /* ═══ 3. MODERATION & SICHERHEIT ═══════════════════════ */ ?>
         <div class="form-card" style="margin-bottom:16px">
-          <h2>🛡️ Moderation & Sicherheit</h2>
+          <h2><?= t('admin_moderation_sicherheit') ?></h2>
 
           <div class="form-row">
-            <label>Auto-Bann ab X Warnungs-Punkten</label>
+            <label><?= t('admin_auto_bann_ab_x') ?></label>
             <input type="number" name="warning_ban_threshold" min="0" max="100"
                    value="<?= e($settings['warning_ban_threshold'] ?? '10') ?>">
-            <div class="form-hint">Sammelt ein User so viele aktive Punkte, wird er automatisch gesperrt. 0 = deaktiviert.</div>
+            <div class="form-hint"><?= t('admin_sammelt_ein_user_so') ?></div>
           </div>
 
           <div class="form-row">
@@ -1163,7 +1146,7 @@
                 <?= ($settings['show_ips_to_mods'] ?? '1') === '1' ? 'checked' : '' ?>>
               IP-Adressen für Moderatoren sichtbar
             </label>
-            <div class="form-hint">Wenn aus: nur Admins/Owner sehen IPs (z.B. im IP-Lookup).</div>
+            <div class="form-hint"><?= t('admin_wenn_aus_nur_admins') ?></div>
           </div>
 
           <div class="form-row">
@@ -1172,87 +1155,85 @@
                 <?= ($settings['notify_mods_on_report'] ?? '1') === '1' ? 'checked' : '' ?>>
               Mods bei neuer Meldung benachrichtigen
             </label>
-            <div class="form-hint">Sendet eine In-App-Benachrichtigung an alle Mods/Admins bei einem neuen Report.</div>
+            <div class="form-hint"><?= t('admin_sendet_eine_in_app') ?></div>
           </div>
 
-          <h3 style="margin-top:18px;font-size:14px;color:var(--text-muted)">Anti-Spam Rate-Limits</h3>
+          <h3 style="margin-top:18px;font-size:14px;color:var(--text-muted)"><?= t('admin_anti_spam_rate_limits') ?></h3>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
             <div class="form-row">
-              <label>Cooldown zwischen Beiträgen (Sek.)</label>
+              <label><?= t('admin_cooldown_zwischen_beitraegen_sek') ?></label>
               <input type="number" name="post_cooldown_seconds" min="0" max="600"
                      value="<?= e($settings['post_cooldown_seconds'] ?? '15') ?>">
             </div>
             <div class="form-row">
-              <label>Max. Login-Versuche / 15 Min.</label>
+              <label><?= t('admin_max_login_versuche_15') ?></label>
               <input type="number" name="rate_limit_login" min="1" max="100"
                      value="<?= e($settings['rate_limit_login'] ?? '5') ?>">
             </div>
             <div class="form-row">
-              <label>Max. Registrierungen / Std.</label>
+              <label><?= t('admin_max_registrierungen_std') ?></label>
               <input type="number" name="rate_limit_register" min="1" max="100"
                      value="<?= e($settings['rate_limit_register'] ?? '3') ?>">
             </div>
           </div>
 
-          <h3 style="margin-top:18px;font-size:14px;color:var(--text-muted)">🤖 CAPTCHA (Bot-Schutz)</h3>
+          <h3 style="margin-top:18px;font-size:14px;color:var(--text-muted)"><?= t('admin_captcha_bot_schutz') ?></h3>
           <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">
-            Adaptive Anti-Bot-Schicht. Versteckt im Hintergrund aktiv. Mathe-CAPTCHA erscheint
-            nur bei wiederholt fehlgeschlagenen Versuchen. Kein Google-reCAPTCHA – komplett DSGVO-konform.
+            <?= t('admin_adaptive_anti_bot_schicht') ?>
           </p>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
             <div class="form-row">
-              <label>CAPTCHA aktiv</label>
+              <label><?= t('admin_captcha_aktiv') ?></label>
               <select name="captcha_enabled">
                 <option value="1" <?= ($settings['captcha_enabled'] ?? '1') === '1' ? 'selected' : '' ?>>✅ An</option>
                 <option value="0" <?= ($settings['captcha_enabled'] ?? '1') === '0' ? 'selected' : '' ?>>❌ Aus</option>
               </select>
             </div>
             <div class="form-row">
-              <label>CAPTCHA nach … Fehlversuchen</label>
+              <label><?= t('admin_captcha_nach_fehlversuchen') ?></label>
               <input type="number" name="captcha_threshold" min="1" max="20"
                      value="<?= e($settings['captcha_threshold'] ?? '3') ?>">
-              <div class="form-hint">Mathe-Aufgabe wird ab dem N-ten Fehler gezeigt.</div>
+              <div class="form-hint"><?= t('admin_mathe_aufgabe_wird_ab') ?></div>
             </div>
             <div class="form-row">
-              <label>Min. Submit-Zeit (ms)</label>
+              <label><?= t('admin_min_submit_zeit_ms') ?></label>
               <input type="number" name="captcha_min_time" min="0" max="10000" step="100"
                      value="<?= e($settings['captcha_min_time'] ?? '1500') ?>">
-              <div class="form-hint">Formular schneller als X ms = Bot.</div>
+              <div class="form-hint"><?= t('admin_formular_schneller_als_x') ?></div>
             </div>
           </div>
         </div>
 
         <?php /* ═══ 4. RECHTLICHES & DATENSCHUTZ ═════════════════════ */ ?>
         <div class="form-card" style="margin-bottom:16px">
-          <h2>🍪 Cookie-Hinweis (optional)</h2>
+          <h2><?= t('admin_cookie_hinweis_optional') ?></h2>
           <div class="form-row">
             <label>
               <input type="checkbox" name="cookie_banner_enabled" value="1"
                 <?= ($settings['cookie_banner_enabled'] ?? '0') === '1' ? 'checked' : '' ?>>
               Cookie-Banner anzeigen
             </label>
-            <div class="form-hint">Zeigt Besuchern einen einmaligen Hinweis. Wird per Cookie/localStorage gemerkt.</div>
+            <div class="form-hint"><?= t('admin_zeigt_besuchern_einen_einmaligen') ?></div>
           </div>
           <div class="form-row">
-            <label>Banner-Text</label>
+            <label><?= t('admin_banner_text') ?></label>
             <textarea name="cookie_banner_text" style="min-height:60px"
                       placeholder="Diese Seite nutzt funktionale Cookies (z.B. für den Login). Mit der weiteren Nutzung erklärst du dich damit einverstanden."><?= e($settings['cookie_banner_text'] ?? '') ?></textarea>
-            <div class="form-hint">Wenn leer: Standard-Text wird verwendet.</div>
+            <div class="form-hint"><?= t('admin_wenn_leer_standard_text') ?></div>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">💾 Einstellungen speichern</button>
+        <button type="submit" class="btn btn-primary"><?= t('admin_einstellungen_speichern') ?></button>
       </form>
 
     <?php /* ════════════ IP-LOOKUP ════════════ */ ?>
     <?php /* ════════════ NEU v0.18.49: 📧 E-MAIL (SMTP) ════════════ */ ?>
     <?php elseif ($action === 'email'): ?>
-      <h2>📧 E-Mail-Versand (SMTP)</h2>
+      <h2><?= t('admin_e_mail_versand_smtp') ?></h2>
 
       <div class="form-card" style="margin-bottom:16px">
         <p style="color:var(--text-muted);font-size:14px;line-height:1.6">
-          Wird für Passwort-Reset, E-Mail-Verifikation und Benachrichtigungen benötigt.
-          Wenn kein SMTP-Server konfiguriert ist, fällt das System auf die PHP-mail()-Funktion zurück.
+          <?= t('admin_wird_fuer_passwort_reset') ?>
         </p>
 
         <form method="post" action="?action=save_settings">
@@ -1261,13 +1242,13 @@
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
             <div class="form-row">
-              <label>SMTP-Host</label>
+              <label><?= t('admin_smtp_host') ?></label>
               <input type="text" name="smtp_host" value="<?= e($settings['smtp_host'] ?? '') ?>"
                      placeholder="smtp-relay.brevo.com">
-              <div class="form-hint">Leer lassen für PHP-mail()-Fallback.</div>
+              <div class="form-hint"><?= t('admin_leer_lassen_fuer_php') ?></div>
             </div>
             <div class="form-row">
-              <label>Verbindung</label>
+              <label><?= t('admin_verbindung') ?></label>
               <select name="smtp_connection">
                 <?php
                   $port = (string) ($settings['smtp_port'] ?? '587');
@@ -1279,32 +1260,32 @@
                 <option value="tls2525" <?= $cur === 'tls2525' ? 'selected' : '' ?>>🔒 STARTTLS (Port 2525)</option>
                 <option value="none"    <?= $cur === 'none'    ? 'selected' : '' ?>>⚠️ Unverschlüsselt</option>
               </select>
-              <div class="form-hint">Falls 587 nicht funktioniert (Hoster-Firewall): Port 2525 probieren.</div>
+              <div class="form-hint"><?= t('admin_falls_587_nicht_funktioniert') ?></div>
             </div>
             <div class="form-row">
-              <label>SMTP-Benutzername</label>
+              <label><?= t('admin_smtp_benutzername') ?></label>
               <input type="text" name="smtp_user" value="<?= e($settings['smtp_user'] ?? '') ?>"
                      placeholder="dein@account.com">
             </div>
             <div class="form-row">
-              <label>SMTP-Passwort / API-Key</label>
+              <label><?= t('admin_smtp_passwort_api_key') ?></label>
               <input type="password" name="smtp_pass"
                      placeholder="<?= empty($settings['smtp_pass']) ? 'noch nicht gesetzt' : '••••••••••••' ?>">
               <div class="form-hint">
-                Leer lassen = bestehendes Passwort behalten.
+                <?= t('admin_leer_behaelt_passwort') ?>
                 <?php if (!empty($cryptReady)): ?>
-                  Wird verschlüsselt in der Datenbank abgelegt.
+                  <?= t('admin_wird_verschluesselt_abgelegt') ?>
                 <?php else: ?>
-                  <strong>Liegt unverschlüsselt in der Datenbank.</strong>
+                  <strong><?= t('admin_liegt_unverschluesselt_in_der') ?></strong>
                 <?php endif; ?>
               </div>
             </div>
             <div class="form-row">
-              <label>Absender-E-Mail</label>
+              <label><?= t('admin_absender_e_mail') ?></label>
               <?php if (defined('FORUM_MAIL_FROM')): ?>
                 <input type="email" value="<?= e(FORUM_MAIL_FROM) ?>" disabled>
                 <div class="form-hint">
-                  Diese Installation hat den Absender in der <code>config.php</code>
+                  <?= t('admin_diese_installation_hat_den') ?> <code>config.php</code>
                   festgelegt. Er lässt sich hier nicht ändern — der Versand läuft über
                   den Server des Betreibers, und dessen Zustellbarkeit hängt daran.
                 </div>
@@ -1312,20 +1293,16 @@
               <input type="email" name="smtp_from" value="<?= e($settings['smtp_from'] ?? '') ?>"
                      placeholder="noreply@deine-domain.de">
               <div class="form-hint">
-                <strong>Gilt auch ohne SMTP</strong>, also auch beim Versand über
-                <code>mail()</code>. Leer lassen baut eine Adresse aus der Forum-Adresse —
-                das geht schief, sobald das Forum auf einer Subdomain läuft: SPF und
-                DKIM hängen fast immer an der Domain ohne Vorsatz, und eine Mail von
-                einer Subdomain ohne eigene Einträge geht unbeglaubigt raus.
-                Nimm eine Adresse der Domain, für die Versand eingerichtet ist.
+                <?= t('admin_absender_hinweis', '<strong>' . e(t('admin_gilt_auch_ohne_smtp')) . '</strong>', '<code>mail()</code>') ?>
+                <?= t('admin_adresse_der_domain') ?>
               </div>
               <?php endif; ?>
             </div>
             <div class="form-row">
-              <label>Absender-Name</label>
+              <label><?= t('admin_absender_name') ?></label>
               <?php if (defined('FORUM_MAIL_FROM_NAME')): ?>
                 <input type="text" value="<?= e(FORUM_MAIL_FROM_NAME) ?>" disabled>
-                <div class="form-hint">In der <code>config.php</code> festgelegt.</div>
+                <div class="form-hint"><?= t('admin_in_der') ?> <code>config.php</code> festgelegt.</div>
               <?php else: ?>
               <input type="text" name="smtp_from_name" value="<?= e($settings['smtp_from_name'] ?? '') ?>"
                      placeholder="<?= e(FORUM_NAME) ?>">
@@ -1335,15 +1312,14 @@
 
           <?php if (empty($cryptReady) && !empty($cryptKeyVorschlag)): ?>
             <div class="note" style="margin-top:14px">
-              <strong>🔐 Passwort verschlüsselt ablegen</strong>
+              <strong><?= t('admin_passwort_verschluesselt_ablegen') ?></strong>
               <p style="margin:6px 0">
-                Diese Installation hat noch keinen Schlüssel, das SMTP-Passwort liegt
-                deshalb im Klartext in der Datenbank. Nimm diese Zeile in deine
+                <?= t('admin_diese_installation_hat_noch') ?>
                 <code>config.php</code> auf und speichere das Passwort danach einmal neu:
               </p>
               <pre style="white-space:pre-wrap;word-break:break-all;background:var(--bg-body);padding:10px;border-radius:6px;margin:0"><code>define('FORUM_CRYPT_KEY', '<?= e($cryptKeyVorschlag) ?>');</code></pre>
               <p style="margin:8px 0 0;font-size:13px">
-                Den Schlüssel danach <strong>nicht mehr ändern</strong> und beim Umzug
+                <?= t('admin_den_schluessel_danach') ?> <strong>nicht mehr ändern</strong> und beim Umzug
                 mitnehmen — sonst ist das Gespeicherte nicht mehr lesbar. Er schützt gegen
                 einen abhandengekommenen Datenbank-Abzug, nicht gegen jemanden, der den
                 Server hat: der liest die <code>config.php</code> mit.
@@ -1351,7 +1327,7 @@
             </div>
           <?php endif; ?>
 
-          <button type="submit" class="btn btn-primary" style="margin-top:14px">💾 SMTP-Einstellungen speichern</button>
+          <button type="submit" class="btn btn-primary" style="margin-top:14px"><?= t('admin_smtp_einstellungen_speichern') ?></button>
         </form>
       </div>
 
@@ -1360,16 +1336,16 @@
                darunter. Vorher stand hier ein Formular auf send_test_email —
                diese Aktion gibt es nicht, der Knopf lief also ins Leere. */ ?>
       <div class="form-card">
-        <h3 style="margin-top:0">🧪 Test-Mail senden</h3>
+        <h3 style="margin-top:0"><?= t('admin_test_mail_senden') ?></h3>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-          Sendet eine Test-Mail mit den aktuellen Einstellungen an die angegebene Adresse.
-          <strong>Speichere zuerst</strong> deine Änderungen.
+          <?= t('admin_sendet_eine_test_mail') ?>
+          <strong><?= t('admin_speichere_zuerst') ?></strong> deine Änderungen.
         </p>
         <div class="form-row">
-          <label>An welche Adresse?</label>
+          <label><?= t('admin_an_welche_adresse') ?></label>
           <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
             <input type="email" id="test-mail-to" placeholder="deine@email.de" style="flex:1;min-width:200px">
-            <button type="button" id="send-test-mail-btn" class="btn btn-ghost">📤 Test senden</button>
+            <button type="button" id="send-test-mail-btn" class="btn btn-ghost"><?= t('admin_test_senden') ?></button>
           </div>
           <div class="form-hint" id="test-mail-status"></div>
         </div>
@@ -1377,21 +1353,21 @@
 
     <?php /* ════════════ NEU v0.18.49: 📝 REGISTRIERUNG ════════════ */ ?>
     <?php elseif ($action === 'registration'): ?>
-      <h2>📝 Registrierungs-Einstellungen</h2>
+      <h2><?= t('admin_registrierungs_einstellungen') ?></h2>
 
       <form method="post" action="?action=save_settings">
         <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
         <input type="hidden" name="settings_section" value="registration">
 
         <div class="form-card" style="margin-bottom:16px">
-          <h3 style="margin-top:0">Registrierungs-Modus</h3>
+          <h3 style="margin-top:0"><?= t('admin_registrierungs_modus') ?></h3>
           <div class="form-row">
             <label>
               <input type="checkbox" name="registration_enabled" value="1"
                 <?= ($settings['registration_enabled'] ?? '1') === '1' ? 'checked' : '' ?>>
               Registrierungen erlauben
             </label>
-            <div class="form-hint">Wenn deaktiviert: nur bestehende User können sich einloggen.</div>
+            <div class="form-hint"><?= t('admin_wenn_deaktiviert_nur_bestehende') ?></div>
           </div>
           <div class="form-row">
             <label>
@@ -1399,7 +1375,7 @@
                 <?= ($settings['email_verification_required'] ?? '0') === '1' ? 'checked' : '' ?>>
               E-Mail-Bestätigung bei Registrierung erforderlich
             </label>
-            <div class="form-hint">User können sich erst einloggen, nachdem sie ihre E-Mail bestätigt haben. Benötigt funktionierende SMTP-Konfiguration (siehe 📧 E-Mail).</div>
+            <div class="form-hint"><?= t('admin_user_koennen_sich_erst') ?></div>
           </div>
           <div class="form-row">
             <label>
@@ -1407,15 +1383,15 @@
                 <?= ($settings['registration_approval_required'] ?? '0') === '1' ? 'checked' : '' ?>>
               Admin-Freigabe für neue Registrierungen erforderlich
             </label>
-            <div class="form-hint">Neue Accounts müssen vom Admin-Team freigeschaltet werden. Empfohlen für Test-/Privat-Foren.</div>
+            <div class="form-hint"><?= t('admin_neue_accounts_muessen_vom') ?></div>
           </div>
           <?php if (($settings['registration_approval_required'] ?? '0') === '1'): ?>
             <div style="background:rgba(74,157,74,0.06);padding:14px;border-radius:6px;border-left:3px solid #4a9d4a;margin:6px 0 14px">
-              <div style="font-weight:600;margin-bottom:6px">✉️ Einladungs-Codes</div>
+              <div style="font-weight:600;margin-bottom:6px"><?= t('admin_einladungs_codes') ?></div>
               <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px;line-height:1.5">
-                Du kannst Personen einladen die du persönlich kennst – sie umgehen die Admin-Freigabe-Pflicht.
+                <?= t('admin_du_kannst_personen_einladen') ?>
               </p>
-              <a href="?action=invitations" class="btn btn-ghost btn-sm">→ Einladungen verwalten</a>
+              <a href="?action=invitations" class="btn btn-ghost btn-sm"><?= t('admin_einladungen_verwalten') ?></a>
             </div>
           <?php endif; ?>
           <div class="form-row">
@@ -1424,32 +1400,32 @@
                 <?= ($settings['registration_terms_required'] ?? '1') === '1' ? 'checked' : '' ?>>
               Zustimmung zu Nutzungsbedingungen erforderlich
             </label>
-            <div class="form-hint">User müssen bei der Registrierung den <a href="?action=legal">Nutzungsbedingungen</a> aktiv zustimmen (DSGVO-konform).</div>
+            <div class="form-hint"><?= t('admin_user_muessen_bei_der') ?> <a href="?action=legal"><?= t('admin_nutzungsbedingungen') ?></a> aktiv zustimmen (DSGVO-konform).</div>
           </div>
         </div>
 
         <div class="form-card" style="margin-bottom:16px">
-          <h3 style="margin-top:0">Benutzername & Passwort</h3>
+          <h3 style="margin-top:0"><?= t('admin_benutzername_passwort') ?></h3>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
             <div class="form-row">
-              <label>Min. Benutzernamen-Länge</label>
+              <label><?= t('admin_min_benutzernamen_laenge') ?></label>
               <input type="number" name="min_username_length" min="2" max="50"
                      value="<?= e($settings['min_username_length'] ?? '3') ?>">
             </div>
             <div class="form-row">
-              <label>Min. Passwortlänge</label>
+              <label><?= t('admin_min_passwortlaenge') ?></label>
               <input type="number" name="min_password_length" min="4" max="100"
                      value="<?= e($settings['min_password_length'] ?? '6') ?>">
             </div>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">💾 Registrierungs-Einstellungen speichern</button>
+        <button type="submit" class="btn btn-primary"><?= t('admin_registrierungs_einstellungen_speichern') ?></button>
       </form>
 
     <?php /* ════════════ NEU v0.18.49: 🛠️ WARTUNGSMODUS ════════════ */ ?>
     <?php elseif ($action === 'maintenance_mode'): ?>
-      <h2>🛠️ Wartungsmodus</h2>
+      <h2><?= t('admin_wartungsmodus') ?></h2>
 
       <form method="post" action="?action=save_settings">
         <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
@@ -1457,8 +1433,7 @@
 
         <div class="form-card" style="margin-bottom:16px">
           <p style="color:var(--text-muted);font-size:14px;line-height:1.6;margin-bottom:14px">
-            Wenn der Wartungsmodus aktiv ist, sehen normale Besucher eine Wartungs-Seite.
-            Admins und Owner können das Forum weiterhin normal nutzen, um Updates oder Reparaturen durchzuführen.
+            <?= t('admin_wenn_der_wartungsmodus_aktiv') ?>
           </p>
 
           <div class="form-row">
@@ -1466,40 +1441,39 @@
               <input type="checkbox" name="maintenance_mode" value="1"
                 <?= ($settings['maintenance_mode'] ?? '0') === '1' ? 'checked' : '' ?>
                 style="transform:scale(1.3);margin-right:8px">
-              <strong>Wartungsmodus aktivieren</strong>
+              <strong><?= t('admin_wartungsmodus_aktivieren') ?></strong>
             </label>
             <div class="form-hint">
-              ⚠️ <strong>Wichtig:</strong> Bevor du den Wartungsmodus aktivierst, stelle sicher dass du als Admin eingeloggt bist
-              und bleibst — sonst sperrst du dich selbst aus. Notausgang: phpMyAdmin → SQL →
+              ⚠️ <strong><?= t('admin_wichtig') ?></strong> <?= t('admin_bevor_du_den_wartungsmodus') ?>
               <code>UPDATE settings SET setting_value='0' WHERE setting_key='maintenance_mode';</code>
             </div>
           </div>
 
           <div class="form-row">
-            <label>Wartungs-Nachricht</label>
+            <label><?= t('admin_wartungs_nachricht') ?></label>
             <textarea name="maintenance_message" style="min-height:80px"
                       placeholder="Wir sind kurz weg und basteln am Forum. Bis gleich!"><?= e($settings['maintenance_message'] ?? '') ?></textarea>
-            <div class="form-hint">Wird normalen Besuchern angezeigt. Wenn leer, kommt ein Standard-Text.</div>
+            <div class="form-hint"><?= t('admin_wird_normalen_besuchern_angezeigt') ?></div>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">💾 Wartungs-Einstellungen speichern</button>
+        <button type="submit" class="btn btn-primary"><?= t('admin_wartungs_einstellungen_speichern') ?></button>
       </form>
 
       <?php if (($settings['maintenance_mode'] ?? '0') === '1'): ?>
         <div class="form-card" style="margin-top:16px;border-left:3px solid var(--color-danger);background:rgba(220,38,38,0.05)">
-          <h3 style="margin-top:0;color:var(--color-danger)">🚨 Wartungsmodus ist AKTIV</h3>
+          <h3 style="margin-top:0;color:var(--color-danger)"><?= t('admin_wartungsmodus_ist_aktiv') ?></h3>
           <p style="line-height:1.6">
-            Normale Besucher sehen aktuell die Wartungs-Seite. Du bist als Admin eingeloggt und siehst das Forum normal.
-            <strong>Logge dich nicht aus, ohne den Wartungsmodus vorher zu deaktivieren!</strong>
+            <?= t('admin_normale_besucher_sehen_aktuell') ?>
+            <strong><?= t('admin_logge_dich_nicht_aus') ?></strong>
           </p>
         </div>
       <?php endif; ?>
 
     <?php elseif ($action === 'iplookup'): ?>
-      <h2>🌐 IP-Verwaltung</h2>
+      <h2><?= t('admin_ip_verwaltung') ?></h2>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-        Suche nach Benutzern und Beiträgen anhand einer IP, oder verwalte gesperrte IP-Adressen.
+        <?= t('admin_suche_nach_benutzern_und') ?>
       </p>
 
       <?php /* ─── Sub-Tabs: Lookup vs Banns ─── */ ?>
@@ -1524,7 +1498,7 @@
             <input type="text" name="ip" value="<?= e($lookupIP) ?>"
                    placeholder="z.B. 192.168.1.1"
                    style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg-surface);color:var(--text-base)">
-            <button type="submit" class="btn btn-primary">Suchen</button>
+            <button type="submit" class="btn btn-primary"><?= t('admin_suchen') ?></button>
           </div>
         </form>
 
@@ -1535,17 +1509,17 @@
           </div>
           <div class="card" style="margin-bottom:16px">
             <?php if (empty($lookupUsers)): ?>
-              <div style="padding:16px;text-align:center;color:var(--text-faint)">Keine Benutzer gefunden.</div>
+              <div style="padding:16px;text-align:center;color:var(--text-faint)"><?= t('admin_keine_benutzer_gefunden') ?></div>
             <?php else: ?>
             <table class="forum-table">
-              <thead><tr><th>Benutzer</th><th>E-Mail</th><th>Registriert</th><th>Status</th></tr></thead>
+              <thead><tr><th><?= t('admin_benutzer') ?></th><th><?= t('admin_e_mail') ?></th><th><?= t('admin_registriert') ?></th><th><?= t('admin_status') ?></th></tr></thead>
               <tbody>
                 <?php foreach ($lookupUsers as $u): ?>
                 <tr>
                   <td><a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $u['user_id'] ?>"><?= e($u['username']) ?></a></td>
                   <td style="font-size:12px"><?= e($u['email']) ?></td>
                   <td style="font-size:12px"><?= e(format_date($u['registered_at'])) ?></td>
-                  <td><?= $u['is_banned'] ? '<span style="color:var(--color-danger)">Gesperrt</span>' : 'Aktiv' ?></td>
+                  <td><?= $u['is_banned'] ? '<span style="color:var(--color-danger)">' . e(t('admin_x_gesperrt')) . '</span>' : e(t('admin_x_aktiv')) ?></td>
                 </tr>
                 <?php endforeach; ?>
               </tbody>
@@ -1556,10 +1530,10 @@
           <div class="section-heading">📝 Beiträge von dieser IP (<?= count($lookupPosts) ?>)</div>
           <div class="card">
             <?php if (empty($lookupPosts)): ?>
-              <div style="padding:16px;text-align:center;color:var(--text-faint)">Keine Beiträge gefunden.</div>
+              <div style="padding:16px;text-align:center;color:var(--text-faint)"><?= t('admin_keine_beitraege_gefunden') ?></div>
             <?php else: ?>
             <table class="forum-table">
-              <thead><tr><th>Thread</th><th>Autor</th><th>Datum</th></tr></thead>
+              <thead><tr><th><?= t('admin_thread') ?></th><th><?= t('admin_autor') ?></th><th><?= t('admin_datum') ?></th></tr></thead>
               <tbody>
                 <?php foreach ($lookupPosts as $p): ?>
                 <tr>
@@ -1576,33 +1550,33 @@
 
       <?php else: /* ─── BANNS-TAB ─── */ ?>
         <div class="form-card" style="margin-bottom:16px">
-          <h3 style="margin-top:0">➕ IP sperren</h3>
+          <h3 style="margin-top:0"><?= t('admin_ip_sperren') ?></h3>
           <form method="post" action="?action=ban_ip">
             <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
             <div class="form-row">
-              <label>IP-Adresse</label>
+              <label><?= t('admin_ip_adresse') ?></label>
               <input type="text" name="ip" value="<?= e($_GET['prefill'] ?? '') ?>" placeholder="z.B. 192.168.1.1" required>
             </div>
             <div class="form-row">
-              <label>Grund (optional)</label>
+              <label><?= t('admin_grund_optional') ?></label>
               <input type="text" name="reason" placeholder="z.B. Spam, Trolling…">
             </div>
             <div class="form-row">
-              <label>Läuft ab am (optional)</label>
+              <label><?= t('admin_laeuft_ab_am_optional') ?></label>
               <input type="datetime-local" name="expires">
-              <div class="form-hint">Leer lassen für permanenten Bann.</div>
+              <div class="form-hint"><?= t('admin_leer_lassen_fuer_permanenten') ?></div>
             </div>
-            <button type="submit" class="btn btn-danger">🚫 Sperren</button>
+            <button type="submit" class="btn btn-danger"><?= t('admin_sperren') ?></button>
           </form>
         </div>
 
         <div class="section-heading">Aktive IP-Banns (<?= count($ipBans) ?>)</div>
         <div class="card">
           <?php if (empty($ipBans)): ?>
-            <div style="padding:20px;text-align:center;color:var(--text-faint)">Keine IP-Banns vorhanden.</div>
+            <div style="padding:20px;text-align:center;color:var(--text-faint)"><?= t('admin_keine_ip_banns_vorhanden') ?></div>
           <?php else: ?>
           <table class="forum-table">
-            <thead><tr><th>IP</th><th>Grund</th><th>Gesperrt von</th><th>Seit</th><th>Läuft ab</th><th>Aktion</th></tr></thead>
+            <thead><tr><th><?= t('admin_ip') ?></th><th><?= t('admin_grund') ?></th><th><?= t('admin_gesperrt_von') ?></th><th><?= t('admin_seit') ?></th><th><?= t('admin_laeuft_ab') ?></th><th><?= t('admin_aktion') ?></th></tr></thead>
             <tbody>
               <?php foreach ($ipBans as $b):
                 $expired = $b['expires_at'] && strtotime($b['expires_at']) < time();
@@ -1621,7 +1595,7 @@
                 </td>
                 <td>
                   <a href="?action=unban_ip&id=<?= (int) $b['ban_id'] ?>&csrf=<?= e($csrfToken) ?>"
-                     class="btn btn-ghost btn-xs" onclick="return confirm('Bann aufheben?')">Aufheben</a>
+                     class="btn btn-ghost btn-xs" onclick="return confirm('Bann aufheben?')"><?= t('admin_x_aufheben') ?></a>
                 </td>
               </tr>
               <?php endforeach; ?>
@@ -1633,35 +1607,35 @@
 
     <?php /* ════════════ IP-BANNS ════════════ */ ?>
     <?php elseif ($action === 'ipbans'): ?>
-      <h2>🚫 IP-Banns</h2>
+      <h2><?= t('admin_ip_banns') ?></h2>
       <div class="form-card" style="margin-bottom:16px">
-        <h2>➕ IP sperren</h2>
+        <h2><?= t('admin_ip_sperren') ?></h2>
         <form method="post" action="?action=ban_ip">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
           <div class="form-row">
-            <label>IP-Adresse</label>
+            <label><?= t('admin_ip_adresse') ?></label>
             <input type="text" name="ip" value="<?= e($_GET['prefill'] ?? '') ?>" placeholder="z.B. 192.168.1.1" required>
           </div>
           <div class="form-row">
-            <label>Grund (optional)</label>
+            <label><?= t('admin_grund_optional') ?></label>
             <input type="text" name="reason" placeholder="z.B. Spam, Trolling…">
           </div>
           <div class="form-row">
-            <label>Läuft ab am (optional)</label>
+            <label><?= t('admin_laeuft_ab_am_optional') ?></label>
             <input type="datetime-local" name="expires">
-            <div class="form-hint">Leer lassen für permanenten Bann.</div>
+            <div class="form-hint"><?= t('admin_leer_lassen_fuer_permanenten') ?></div>
           </div>
-          <button type="submit" class="btn btn-danger">🚫 Sperren</button>
+          <button type="submit" class="btn btn-danger"><?= t('admin_sperren') ?></button>
         </form>
       </div>
 
       <div class="section-heading">Aktive IP-Banns (<?= count($ipBans) ?>)</div>
       <div class="card">
         <?php if (empty($ipBans)): ?>
-          <div style="padding:20px;text-align:center;color:var(--text-faint)">Keine IP-Banns vorhanden.</div>
+          <div style="padding:20px;text-align:center;color:var(--text-faint)"><?= t('admin_keine_ip_banns_vorhanden') ?></div>
         <?php else: ?>
         <table class="forum-table">
-          <thead><tr><th>IP</th><th>Grund</th><th>Gesperrt von</th><th>Seit</th><th>Läuft ab</th><th>Aktion</th></tr></thead>
+          <thead><tr><th><?= t('admin_ip') ?></th><th><?= t('admin_grund') ?></th><th><?= t('admin_gesperrt_von') ?></th><th><?= t('admin_seit') ?></th><th><?= t('admin_laeuft_ab') ?></th><th><?= t('admin_aktion') ?></th></tr></thead>
           <tbody>
             <?php foreach ($ipBans as $b):
               $expired = $b['expires_at'] && strtotime($b['expires_at']) < time();
@@ -1680,7 +1654,7 @@
               </td>
               <td>
                 <a href="?action=unban_ip&id=<?= (int) $b['ban_id'] ?>&csrf=<?= e($csrfToken) ?>"
-                   class="btn btn-ghost btn-xs" onclick="return confirm('Bann aufheben?')">Aufheben</a>
+                   class="btn btn-ghost btn-xs" onclick="return confirm('Bann aufheben?')"><?= t('admin_x_aufheben') ?></a>
               </td>
             </tr>
             <?php endforeach; ?>
@@ -1691,25 +1665,25 @@
 
     <?php /* ════════════ STATISTIK ════════════ */ ?>
     <?php elseif ($action === 'statistics'): ?>
-      <h2>📈 Statistik</h2>
+      <h2><?= t('admin_statistik') ?></h2>
 
       <div class="stat-grid" style="margin-bottom:18px">
         <div class="stat-box">
           <div class="stat-icon">⌀</div>
           <div class="stat-num"><?= number_format($avgPostsPerUser, 1, ',', '.') ?></div>
-          <div class="stat-label">Ø Beiträge pro User</div>
+          <div class="stat-label"><?= t('admin_beitraege_pro_user') ?></div>
         </div>
         <div class="stat-box">
           <div class="stat-icon">🟢</div>
           <div class="stat-num"><?= (int) $activeLastWeek ?></div>
-          <div class="stat-label">Aktiv letzte 7 Tage</div>
+          <div class="stat-label"><?= t('admin_aktiv_letzte_7_tage') ?></div>
         </div>
       </div>
 
-      <div class="section-heading">📊 Registrierungen letzte 30 Tage</div>
+      <div class="section-heading"><?= t('admin_registrierungen_letzte_30_tage') ?></div>
       <div class="card" style="margin-bottom:16px">
         <?php if (empty($userRegs30d)): ?>
-          <div style="padding:16px;text-align:center;color:var(--text-faint)">Keine Daten.</div>
+          <div style="padding:16px;text-align:center;color:var(--text-faint)"><?= t('admin_keine_daten') ?></div>
         <?php else:
           $max = max(array_column($userRegs30d, 'n'));
         ?>
@@ -1729,10 +1703,10 @@
         <?php endif; ?>
       </div>
 
-      <div class="section-heading">📝 Beiträge letzte 30 Tage</div>
+      <div class="section-heading"><?= t('admin_beitraege_letzte_30_tage') ?></div>
       <div class="card" style="margin-bottom:16px">
         <?php if (empty($posts30d)): ?>
-          <div style="padding:16px;text-align:center;color:var(--text-faint)">Keine Daten.</div>
+          <div style="padding:16px;text-align:center;color:var(--text-faint)"><?= t('admin_keine_daten') ?></div>
         <?php else:
           $max = max(array_column($posts30d, 'n'));
         ?>
@@ -1752,10 +1726,10 @@
         <?php endif; ?>
       </div>
 
-      <div class="section-heading">🏆 Top 10 Poster</div>
+      <div class="section-heading"><?= t('admin_top_10_poster') ?></div>
       <div class="card" style="margin-bottom:16px">
         <table class="forum-table">
-          <thead><tr><th>#</th><th>Benutzer</th><th>Rang</th><th>Beiträge</th></tr></thead>
+          <thead><tr><th>#</th><th><?= t('admin_benutzer') ?></th><th><?= t('admin_rang') ?></th><th><?= t('admin_beitraege') ?></th></tr></thead>
           <tbody>
             <?php foreach ($topPosters as $i => $u): ?>
             <tr>
@@ -1769,10 +1743,10 @@
         </table>
       </div>
 
-      <div class="section-heading">🔥 Aktivste Foren</div>
+      <div class="section-heading"><?= t('admin_aktivste_foren') ?></div>
       <div class="card" style="margin-bottom:16px">
         <table class="forum-table">
-          <thead><tr><th>Forum</th><th>Threads</th><th>Posts</th></tr></thead>
+          <thead><tr><th><?= t('admin_forum') ?></th><th><?= t('admin_threads') ?></th><th><?= t('admin_posts') ?></th></tr></thead>
           <tbody>
             <?php foreach ($activeBoards as $b): ?>
             <tr>
@@ -1785,10 +1759,10 @@
         </table>
       </div>
 
-      <div class="section-heading">🌡️ Aktivitäts-Heatmap (letzte 60 Tage)</div>
+      <div class="section-heading"><?= t('admin_aktivitaets_heatmap_letzte_60') ?></div>
       <div class="card" style="padding:16px;margin-bottom:16px">
         <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px">
-          Wann wird im Forum gepostet? Dunklere Felder = mehr Aktivität.
+          <?= t('admin_wann_wird_im_forum') ?>
         </p>
         <div style="display:grid;grid-template-columns:auto repeat(24, 1fr);gap:2px;font-size:9px">
           <div></div>
@@ -1809,23 +1783,23 @@
         </div>
       </div>
 
-      <div class="section-heading">💎 Engagement-Stats</div>
+      <div class="section-heading"><?= t('admin_engagement_stats') ?></div>
       <div class="stat-grid" style="margin-bottom:0">
         <div class="stat-box">
           <div class="stat-icon">👍</div>
           <div class="stat-num"><?= number_format((int) ($totalReactions ?? 0), 0, ',', '.') ?></div>
-          <div class="stat-label">Reaktionen gesamt</div>
+          <div class="stat-label"><?= t('admin_reaktionen_gesamt') ?></div>
         </div>
         <div class="stat-box">
           <div class="stat-icon">🔖</div>
           <div class="stat-num"><?= number_format((int) ($totalBookmarks ?? 0), 0, ',', '.') ?></div>
-          <div class="stat-label">Lesezeichen</div>
+          <div class="stat-label"><?= t('admin_lesezeichen') ?></div>
         </div>
       </div>
 
     <?php /* ════════════ MELDUNGEN ════════════ */ ?>
     <?php elseif ($action === 'reports'): ?>
-      <h2>🚨 Meldungen</h2>
+      <h2><?= t('admin_meldungen') ?></h2>
 
       <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
         <a href="?action=reports&status=open"      class="btn btn-sm <?= $reportStatus === 'open' ? 'btn-primary' : 'btn-ghost' ?>">🔴 Offen (<?= (int) $counts['open'] ?>)</a>
@@ -1836,7 +1810,7 @@
 
       <?php if (empty($reports)): ?>
         <div class="card" style="padding:30px;text-align:center;color:var(--text-faint)">
-          Keine Meldungen in dieser Kategorie. 🎉
+          <?= t('admin_keine_meldungen_in_dieser') ?>
         </div>
       <?php endif; ?>
 
@@ -1898,11 +1872,10 @@
 
     <?php /* ════════════ WARNUNGEN ════════════ */ ?>
     <?php elseif ($action === 'warnings'): ?>
-      <h2>⚠️ Warnungen</h2>
+      <h2><?= t('admin_warnungen') ?></h2>
 
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-        Auto-Bann ab <strong><?= (int) $threshold ?></strong> Punkten
-        (änderbar in den <a href="?action=settings">Einstellungen</a>).
+        <?= t('admin_auto_bann_ab') ?> <strong><?= (int) $threshold ?></strong> <?= t('admin_punkten_aenderbar_in_den') ?> <a href="?action=settings"><?= t('admin_einstellungen') ?></a>).
       </p>
 
       <?php if ($warnUser): ?>
@@ -1924,30 +1897,30 @@
               <input type="hidden" name="user_id" value="<?= (int) $warnUser['user_id'] ?>">
               <div style="display:grid;grid-template-columns:80px 1fr;gap:10px;margin-bottom:10px">
                 <div class="form-row" style="margin:0">
-                  <label>Punkte</label>
+                  <label><?= t('admin_punkte') ?></label>
                   <input type="number" name="points" min="1" max="20" value="1" required>
                 </div>
                 <div class="form-row" style="margin:0">
-                  <label>Grund</label>
+                  <label><?= t('admin_grund') ?></label>
                   <input type="text" name="reason" required placeholder="z.B. Spam, Beleidigung, Trolling…">
                 </div>
               </div>
               <div class="form-row">
-                <label>Läuft ab (optional)</label>
+                <label><?= t('admin_laeuft_ab_optional') ?></label>
                 <input type="datetime-local" name="expires">
-                <div class="form-hint">Leer = Warnung gilt unbegrenzt.</div>
+                <div class="form-hint"><?= t('admin_leer_warnung_gilt_unbegrenzt') ?></div>
               </div>
-              <button type="submit" class="btn btn-danger">⚠️ Warnung aussprechen</button>
+              <button type="submit" class="btn btn-danger"><?= t('admin_warnung_aussprechen') ?></button>
             </form>
           </div>
         </div>
 
         <?php if (!empty($warningsList)): ?>
-          <div class="section-heading">Bisherige Warnungen</div>
+          <div class="section-heading"><?= t('admin_bisherige_warnungen') ?></div>
           <div class="card">
             <table class="forum-table">
               <thead>
-                <tr><th>Punkte</th><th>Grund</th><th>Von</th><th>Datum</th><th>Status</th><th></th></tr>
+                <tr><th><?= t('admin_punkte') ?></th><th><?= t('admin_grund') ?></th><th><?= t('admin_von') ?></th><th><?= t('admin_datum') ?></th><th><?= t('admin_status') ?></th><th></th></tr>
               </thead>
               <tbody>
                 <?php foreach ($warningsList as $w):
@@ -1971,7 +1944,7 @@
                     <td>
                       <?php if ($active): ?>
                         <a href="?action=revoke_warning&id=<?= (int) $w['warning_id'] ?>&user=<?= (int) $warnUser['user_id'] ?>&csrf=<?= e($csrfToken) ?>"
-                           class="btn btn-ghost btn-xs">Aufheben</a>
+                           class="btn btn-ghost btn-xs"><?= t('admin_x_aufheben') ?></a>
                       <?php endif; ?>
                     </td>
                   </tr>
@@ -1982,15 +1955,15 @@
         <?php endif; ?>
 
       <?php else: ?>
-        <div class="section-heading">Benutzer mit Warnungen</div>
+        <div class="section-heading"><?= t('admin_benutzer_mit_warnungen') ?></div>
         <div class="card">
           <?php if (empty($recentWarned)): ?>
             <div style="padding:30px;text-align:center;color:var(--text-faint)">
-              Keine User mit aktiven Warnungen. 🎉
+              <?= t('admin_keine_user_mit_aktiven') ?>
             </div>
           <?php else: ?>
             <table class="forum-table">
-              <thead><tr><th>Benutzer</th><th>Punkte</th><th>Letzte Warnung</th><th>Status</th><th></th></tr></thead>
+              <thead><tr><th><?= t('admin_benutzer') ?></th><th><?= t('admin_punkte') ?></th><th><?= t('admin_letzte_warnung') ?></th><th><?= t('admin_status') ?></th><th></th></tr></thead>
               <tbody>
                 <?php foreach ($recentWarned as $u): ?>
                   <tr>
@@ -1998,7 +1971,7 @@
                     <td><strong style="color:<?= (int) $u['warning_points'] >= $threshold ? 'var(--color-danger)' : 'var(--color-warning)' ?>"><?= (int) $u['warning_points'] ?></strong></td>
                     <td style="font-size:12px"><?= e(format_date($u['last_warning'])) ?></td>
                     <td><?= $u['is_banned'] ? '<span style="color:var(--color-danger)">🚫 Gesperrt</span>' : 'Aktiv' ?></td>
-                    <td><a href="?action=warnings&user=<?= (int) $u['user_id'] ?>" class="btn btn-ghost btn-xs">Details</a></td>
+                    <td><a href="?action=warnings&user=<?= (int) $u['user_id'] ?>" class="btn btn-ghost btn-xs"><?= t('admin_x_details') ?></a></td>
                   </tr>
                 <?php endforeach; ?>
               </tbody>
@@ -2007,20 +1980,20 @@
         </div>
 
         <p style="margin-top:14px;font-size:13px;color:var(--text-muted)">
-          💡 Um einen anderen User zu warnen, gehe zu seinem Profil oder Benutzer-Bereich → „Warnen".
+          <?= t('admin_um_einen_anderen_user') ?>
         </p>
       <?php endif; ?>
 
     <?php /* ════════════ TAGS ════════════ */ ?>
     <?php elseif ($action === 'tags'): ?>
-      <h2>🏷️ Tag-Verwaltung</h2>
+      <h2><?= t('admin_tag_verwaltung') ?></h2>
 
       <div class="card" style="margin-bottom:14px">
         <?php if (empty($tagsList)): ?>
-          <div style="padding:20px;text-align:center;color:var(--text-faint)">Keine Tags vorhanden.</div>
+          <div style="padding:20px;text-align:center;color:var(--text-faint)"><?= t('admin_keine_tags_vorhanden') ?></div>
         <?php else: ?>
           <table class="forum-table">
-            <thead><tr><th>Tag</th><th>Slug</th><th>Beschreibung</th><th>Verwendung</th><th></th></tr></thead>
+            <thead><tr><th><?= t('admin_tag') ?></th><th><?= t('admin_slug') ?></th><th><?= t('admin_beschreibung') ?></th><th><?= t('admin_verwendung') ?></th><th></th></tr></thead>
             <tbody>
               <?php foreach ($tagsList as $tg): ?>
                 <tr>
@@ -2031,7 +2004,7 @@
                   <td>
                     <a href="?action=delete_tag&id=<?= (int) $tg['tag_id'] ?>&csrf=<?= e($csrfToken) ?>"
                        class="btn btn-danger btn-xs"
-                       onclick="return confirm('Tag löschen? (Threads behalten Inhalt)')">Löschen</a>
+                       onclick="return confirm('Tag löschen? (Threads behalten Inhalt)')"><?= t('admin_x_loeschen') ?></a>
                   </td>
                 </tr>
               <?php endforeach; ?>
@@ -2041,41 +2014,41 @@
       </div>
 
       <div class="form-card">
-        <h2>➕ Neuer Tag</h2>
+        <h2><?= t('admin_neuer_tag') ?></h2>
         <form method="post" action="?action=add_tag">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div class="form-row" style="margin:0">
-              <label>Slug (URL)</label>
+              <label><?= t('admin_slug_url') ?></label>
               <input type="text" name="slug" required pattern="[a-z0-9]+" placeholder="z.B. tutorial">
-              <div class="form-hint">Nur Kleinbuchstaben + Ziffern.</div>
+              <div class="form-hint"><?= t('admin_nur_kleinbuchstaben_ziffern') ?></div>
             </div>
             <div class="form-row" style="margin:0">
-              <label>Name</label>
+              <label><?= t('admin_name') ?></label>
               <input type="text" name="name" required placeholder="z.B. Tutorial">
             </div>
           </div>
           <div class="form-row">
-            <label>Beschreibung / Emoji</label>
+            <label><?= t('admin_beschreibung_emoji') ?></label>
             <input type="text" name="description" placeholder="z.B. 📖">
           </div>
           <div class="form-row">
-            <label>Farbe</label>
+            <label><?= t('admin_farbe') ?></label>
             <input type="color" name="color" value="#888888">
           </div>
-          <button type="submit" class="btn btn-primary">Tag anlegen</button>
+          <button type="submit" class="btn btn-primary"><?= t('admin_tag_anlegen') ?></button>
         </form>
       </div>
 
     <?php /* ════════════ MOD-LOG ════════════ */ ?>
     <?php elseif ($action === 'modlog'): ?>
-      <h2>📜 Moderations-Log</h2>
+      <h2><?= t('admin_moderations_log') ?></h2>
       <div class="card">
         <table class="forum-table">
-          <thead><tr><th>Datum</th><th>Moderator</th><th>Aktion</th><th>Typ</th><th>Ziel</th><th>Grund</th></tr></thead>
+          <thead><tr><th><?= t('admin_datum') ?></th><th><?= t('admin_moderator') ?></th><th><?= t('admin_aktion') ?></th><th><?= t('admin_typ') ?></th><th><?= t('admin_ziel') ?></th><th><?= t('admin_grund') ?></th></tr></thead>
           <tbody>
             <?php if (empty($modLog)): ?>
-              <tr><td colspan="6" style="text-align:center;color:var(--text-faint);padding:20px">Keine Einträge.</td></tr>
+              <tr><td colspan="6" style="text-align:center;color:var(--text-faint);padding:20px"><?= t('admin_keine_eintraege') ?></td></tr>
             <?php endif; ?>
             <?php foreach ($modLog as $log): ?>
             <tr>
@@ -2093,48 +2066,46 @@
 
     <?php /* ════════════ FREIGABE-WARTESCHLANGE ════════════ */ ?>
     <?php elseif ($action === 'invitations'): ?>
-      <h2>✉️ Einladungen</h2>
+      <h2><?= t('admin_einladungen') ?></h2>
 
       <?php if (!user_approval_required()): ?>
         <div class="card" style="padding:16px;margin-bottom:14px;background:rgba(170,102,68,0.1);border-left:3px solid #aa6644">
-          <strong>⚠️ Hinweis:</strong> Admin-Freigabe für Registrierungen ist aktuell <strong>nicht aktiv</strong>.
-          Einladungen funktionieren weiterhin, aber sie sind nur dann nützlich wenn neue User normalerweise
-          in die Freigabe-Queue kämen.
-          <a href="?action=registration">→ Registrierungs-Einstellungen öffnen</a>
+          <strong><?= t('admin_hinweis_2') ?></strong>
+          <?= t('admin_freigabe_aus_hinweis', '<strong>' . e(t('admin_nicht_aktiv')) . '</strong>') ?>
+          <a href="?action=registration"><?= t('admin_registrierungs_einstellungen_oeffnen') ?></a>
         </div>
       <?php endif; ?>
 
       <div class="card" style="padding:18px 22px;margin-bottom:18px">
-        <h3 style="margin:0 0 12px;font-size:15px">➕ Neue Einladung erstellen</h3>
+        <h3 style="margin:0 0 12px;font-size:15px"><?= t('admin_neue_einladung_erstellen') ?></h3>
         <form method="post" action="?action=invitation_create">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
             <div class="form-row">
-              <label>E-Mail-Adresse (optional)</label>
+              <label><?= t('admin_e_mail_adresse_optional') ?></label>
               <input type="email" name="email" placeholder="freund@example.com">
               <div class="form-hint">
-                Wenn angegeben: Code ist nur für diese E-Mail-Adresse gültig.
-                Leer = universal (jeder mit dem Code kann ihn nutzen).
+                <?= t('admin_wenn_angegeben_code_ist') ?>
               </div>
             </div>
             <div class="form-row">
-              <label>Gültigkeit (Tage)</label>
+              <label><?= t('admin_gueltigkeit_tage') ?></label>
               <input type="number" name="valid_days" value="7" min="1" max="365">
-              <div class="form-hint">Standard: 7 Tage. Max. 365.</div>
+              <div class="form-hint"><?= t('admin_standard_7_tage_max') ?></div>
             </div>
           </div>
           <div class="form-row">
-            <label>Interne Notiz (optional)</label>
+            <label><?= t('admin_interne_notiz_optional') ?></label>
             <input type="text" name="note" maxlength="255" placeholder="z.B. „Schulfreund Markus"">
-            <div class="form-hint">Nur für dich – wird nicht versendet.</div>
+            <div class="form-hint"><?= t('admin_nur_fuer_dich_wird') ?></div>
           </div>
           <div class="form-row">
             <label style="display:flex;align-items:center;gap:8px">
               <input type="checkbox" name="send_mail" value="1" checked>
-              Einladungs-Mail direkt versenden (nur wenn E-Mail angegeben)
+              <?= t('admin_einladungs_mail_direkt_versenden') ?>
             </label>
           </div>
-          <button type="submit" class="btn btn-primary">✉️ Einladung erstellen</button>
+          <button type="submit" class="btn btn-primary"><?= t('admin_einladung_erstellen') ?></button>
         </form>
       </div>
 
@@ -2142,7 +2113,7 @@
 
       <?php if (empty($invitations)): ?>
         <div class="card" style="padding:30px;text-align:center;color:var(--text-muted)">
-          Noch keine Einladungen erstellt.
+          <?= t('admin_noch_keine_einladungen_erstellt') ?>
         </div>
       <?php else: ?>
         <div style="display:grid;gap:10px">
@@ -2150,7 +2121,7 @@
               $status = invitation_status($inv);
               $statusLabel = [
                   'valid'    => ['🟢 Aktiv',      '#4a9d4a'],
-                  'used'     => ['✓ Eingelöst',  '#888'],
+                  'used'     => [t('admin_y_eingeloest'),  '#888'],
                   'expired'  => ['⏰ Abgelaufen', '#aa6644'],
                   'revoked'  => ['🚫 Widerrufen', '#aa4444'],
               ][$status] ?? ['?', '#888'];
@@ -2198,14 +2169,14 @@
                       <form method="post" action="?action=invitation_resend" style="margin:0">
                         <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                         <input type="hidden" name="invitation_id" value="<?= (int) $inv['invitation_id'] ?>">
-                        <button type="submit" class="btn btn-ghost btn-sm" title="Einladungs-Mail erneut versenden">✉️ Resend</button>
+                        <button type="submit" class="btn btn-ghost btn-sm" title="Einladungs-Mail erneut versenden"><?= t('admin_resend') ?></button>
                       </form>
                     <?php endif; ?>
                     <form method="post" action="?action=invitation_revoke" style="margin:0"
                           onsubmit="return confirm('Diese Einladung widerrufen? Der Code wird ungültig.')">
                       <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                       <input type="hidden" name="invitation_id" value="<?= (int) $inv['invitation_id'] ?>">
-                      <button type="submit" class="btn btn-danger btn-sm">🚫 Widerrufen</button>
+                      <button type="submit" class="btn btn-danger btn-sm"><?= t('admin_widerrufen') ?></button>
                     </form>
                   </div>
                 <?php endif; ?>
@@ -2216,14 +2187,14 @@
       <?php endif; ?>
 
     <?php elseif ($action === 'approvals_users'): ?>
-      <h2>🆕 Wartende Registrierungs-Freigaben</h2>
+      <h2><?= t('admin_wartende_registrierungs_freigaben') ?></h2>
 
       <?php if (empty($pendingUsers)): ?>
         <div class="card" style="padding:40px;text-align:center">
           <div style="font-size:48px;margin-bottom:12px">✅</div>
-          <strong style="font-size:16px">Keine wartenden Registrierungen</strong>
+          <strong style="font-size:16px"><?= t('admin_keine_wartenden_registrierungen') ?></strong>
           <p style="font-size:13px;color:var(--text-muted);margin-top:8px">
-            Sobald sich jemand registriert (mit aktiver Admin-Freigabe-Pflicht), erscheint hier ein Eintrag.
+            <?= t('admin_sobald_sich_jemand_registriert') ?>
           </p>
           <p style="font-size:12px;color:var(--text-faint);margin-top:14px">
             Status: Admin-Freigabe ist
@@ -2231,7 +2202,7 @@
               <strong style="color:#4a9d4a">aktiv</strong>.
             <?php else: ?>
               <strong style="color:#aa6644">inaktiv</strong>.
-              <a href="?action=registration">→ Aktivieren</a>
+              <a href="?action=registration"><?= t('admin_aktivieren') ?></a>
             <?php endif; ?>
           </p>
         </div>
@@ -2249,12 +2220,12 @@
                 <div style="font-size:12px;color:var(--text-muted);line-height:1.7">
                   📧 <?= e($u['email']) ?>
                   <?php if (!empty($u['email_verified'])): ?>
-                    <span style="color:#4a9d4a">✓ verifiziert</span>
+                    <span style="color:#4a9d4a"><?= t('admin_verifiziert') ?></span>
                   <?php else: ?>
-                    <span style="color:#aa6644">⊘ unverifiziert</span>
+                    <span style="color:#aa6644"><?= t('admin_unverifiziert') ?></span>
                   <?php endif; ?>
                   <br>
-                  🌐 IP: <code style="font-size:11px"><?= e($u['registration_ip'] ?? '?') ?></code>
+                  <?= t('admin_ip') ?> <code style="font-size:11px"><?= e($u['registration_ip'] ?? '?') ?></code>
                   <br>
                   🕒 Registriert: <?= e(format_date($u['registered_at'])) ?>
                 </div>
@@ -2264,24 +2235,24 @@
                     onsubmit="return confirm('Diesen Account freigeben? Der User bekommt eine Bestätigungs-Mail.')">
                 <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                 <input type="hidden" name="user_id" value="<?= (int) $u['user_id'] ?>">
-                <button type="submit" class="btn btn-primary btn-sm">✓ Freigeben</button>
+                <button type="submit" class="btn btn-primary btn-sm"><?= t('admin_freigeben') ?></button>
               </form>
             </div>
 
             <details style="margin-top:8px">
               <summary style="cursor:pointer;font-size:12px;color:var(--text-muted)">
-                ❌ Account ablehnen (mit Begründung)
+                <?= t('admin_account_ablehnen_mit_begruendung') ?>
               </summary>
               <form method="post" action="?action=reject_user_action" style="margin-top:12px"
                     onsubmit="return confirm('Diesen Account ablehnen und löschen? Der User bekommt eine E-Mail mit der Begründung. Aktion kann nicht rückgängig gemacht werden.')">
                 <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                 <input type="hidden" name="user_id" value="<?= (int) $u['user_id'] ?>">
                 <div class="form-row">
-                  <label style="font-size:12px">Begründung (wird dem User per E-Mail mitgeteilt) <span style="color:#c44">*</span></label>
+                  <label style="font-size:12px"><?= t('admin_begruendung_wird_dem_user') ?> <span style="color:#c44">*</span></label>
                   <textarea name="reason" rows="3" required maxlength="500"
                             placeholder="z.B.: Account erscheint automatisiert (Bot). Wenn das ein Irrtum war, melde dich gerne über die Kontaktseite."></textarea>
                 </div>
-                <button type="submit" class="btn btn-danger btn-sm">❌ Ablehnen & löschen</button>
+                <button type="submit" class="btn btn-danger btn-sm"><?= t('admin_ablehnen_loeschen') ?></button>
               </form>
             </details>
           </div>
@@ -2289,14 +2260,14 @@
       <?php endif; ?>
 
     <?php elseif ($action === 'approval'): ?>
-      <h2>🚦 Freigabe-Warteschlange</h2>
+      <h2><?= t('admin_freigabe_warteschlange') ?></h2>
 
       <?php if (empty($pendingThreads) && empty($pendingPosts)): ?>
         <div class="card" style="padding:40px;text-align:center">
           <div style="font-size:48px;margin-bottom:12px">✅</div>
-          <strong style="font-size:16px">Alles freigegeben!</strong>
+          <strong style="font-size:16px"><?= t('admin_alles_freigegeben') ?></strong>
           <p style="font-size:13px;color:var(--text-muted);margin-top:8px">
-            Keine wartenden Beiträge.
+            <?= t('admin_keine_wartenden_beitraege') ?>
           </p>
         </div>
       <?php endif; ?>
@@ -2309,18 +2280,18 @@
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:10px">
               <div>
                 <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">
-                  In <strong><?= e($t['board_title']) ?></strong> · vor <?= e(format_date($t['created_at'])) ?>
+                  <?= t('admin_in') ?> <strong><?= e($t['board_title']) ?></strong> · vor <?= e(format_date($t['created_at'])) ?>
                 </div>
                 <h3 style="font-size:16px;margin-bottom:6px"><?= e($t['title']) ?></h3>
                 <div style="font-size:12px;color:var(--text-muted)">
-                  Von <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $t['user_id'] ?>"><strong><?= e($t['username']) ?></strong></a>
+                  <?= t('admin_von') ?> <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $t['user_id'] ?>"><strong><?= e($t['username']) ?></strong></a>
                 </div>
               </div>
               <div style="display:flex;gap:6px;flex-shrink:0">
                 <a href="?action=approve_thread&id=<?= (int) $t['thread_id'] ?>&csrf=<?= e($csrfToken) ?>"
                    class="btn btn-primary btn-sm"
                    onclick="return confirm('Thema freigeben?')">✅ Freigeben</a>
-                <a href="?action=reject_thread&id=<?= (int) $t['thread_id'] ?>&csrf=<?= e($csrfToken) ?>&reason=<?= urlencode('Verstoß gegen Forenregeln') ?>"
+                <a href="?action=reject_thread&id=<?= (int) $t['thread_id'] ?>&csrf=<?= e($csrfToken) ?>&reason=<?= urlencode(t('mod_verstoss_gegen_forenregeln')) ?>"
                    class="btn btn-danger btn-sm"
                    onclick="return confirm('Thema ablehnen und löschen?')">🗑️ Ablehnen</a>
               </div>
@@ -2343,19 +2314,19 @@
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:10px">
               <div>
                 <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">
-                  In <strong><?= e($p['board_title']) ?></strong> · Thread:
+                  <?= t('admin_in') ?> <strong><?= e($p['board_title']) ?></strong> · Thread:
                   <a href="<?= e(FORUM_URL) ?>/thread.php?id=<?= (int) $p['thread_id'] ?>"><?= e($p['thread_title']) ?></a>
                   · vor <?= e(format_date($p['created_at'])) ?>
                 </div>
                 <div style="font-size:12px;color:var(--text-muted)">
-                  Von <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $p['user_id'] ?>"><strong><?= e($p['username']) ?></strong></a>
+                  <?= t('admin_von') ?> <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $p['user_id'] ?>"><strong><?= e($p['username']) ?></strong></a>
                 </div>
               </div>
               <div style="display:flex;gap:6px;flex-shrink:0">
                 <a href="?action=approve_post&id=<?= (int) $p['post_id'] ?>&csrf=<?= e($csrfToken) ?>"
                    class="btn btn-primary btn-sm"
                    onclick="return confirm('Beitrag freigeben?')">✅ Freigeben</a>
-                <a href="?action=reject_post&id=<?= (int) $p['post_id'] ?>&csrf=<?= e($csrfToken) ?>&reason=<?= urlencode('Verstoß gegen Forenregeln') ?>"
+                <a href="?action=reject_post&id=<?= (int) $p['post_id'] ?>&csrf=<?= e($csrfToken) ?>&reason=<?= urlencode(t('mod_verstoss_gegen_forenregeln')) ?>"
                    class="btn btn-danger btn-sm"
                    onclick="return confirm('Beitrag ablehnen und löschen?')">🗑️ Ablehnen</a>
               </div>
@@ -2370,16 +2341,15 @@
 
     <?php /* ════════════ DESIGN ════════════ */ ?>
     <?php elseif ($action === 'design'): ?>
-      <h2>🎨 Design</h2>
+      <h2><?= t('admin_design') ?></h2>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-        Farben, Schriften und Form deines Forums. Änderungen werden links live in der Vorschau gezeigt.
-        Erst wenn du auf <strong>"💾 Speichern"</strong> klickst, werden sie für alle Nutzer wirksam.
+        <?= t('admin_design_hinweis', '<strong>' . e(t('admin_speichern')) . '</strong>') ?>
       </p>
 
       <?php if ($hasPreview ?? false): ?>
         <div class="alert alert-warning" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-          <span>⚠️ Du hast eine ungespeicherte Vorschau aktiv. Andere Admins sehen die jetzt auch (in deiner Session).</span>
-          <a href="?action=clear_preview&csrf=<?= e($csrfToken) ?>" class="btn btn-ghost btn-sm">Vorschau verwerfen</a>
+          <span><?= t('admin_du_hast_eine_ungespeicherte') ?></span>
+          <a href="?action=clear_preview&csrf=<?= e($csrfToken) ?>" class="btn btn-ghost btn-sm"><?= t('admin_x_vorschau_verwerfen') ?></a>
         </div>
       <?php endif; ?>
 
@@ -2389,40 +2359,40 @@
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
 
           <div class="design-tabs">
-            <button type="button" class="design-tab-btn active" data-tab="identity">🖼️ Identität</button>
-            <button type="button" class="design-tab-btn" data-tab="colors">🌈 Farben</button>
-            <button type="button" class="design-tab-btn" data-tab="fonts">✍️ Schrift</button>
-            <button type="button" class="design-tab-btn" data-tab="form">📐 Form</button>
-            <button type="button" class="design-tab-btn" data-tab="layout">📐 Layout</button>
-            <button type="button" class="design-tab-btn" data-tab="presets">🎁 Presets</button>
-            <button type="button" class="design-tab-btn" data-tab="advanced">🛠️ Erweitert</button>
+            <button type="button" class="design-tab-btn active" data-tab="identity"><?= t('admin_identitaet') ?></button>
+            <button type="button" class="design-tab-btn" data-tab="colors"><?= t('admin_farben') ?></button>
+            <button type="button" class="design-tab-btn" data-tab="fonts"><?= t('admin_schrift_2') ?></button>
+            <button type="button" class="design-tab-btn" data-tab="form"><?= t('admin_form') ?></button>
+            <button type="button" class="design-tab-btn" data-tab="layout"><?= t('admin_layout') ?></button>
+            <button type="button" class="design-tab-btn" data-tab="presets"><?= t('admin_presets') ?></button>
+            <button type="button" class="design-tab-btn" data-tab="advanced"><?= t('admin_erweitert') ?></button>
           </div>
 
           <?php /* ═══ TAB: IDENTITÄT (neu) ═══════════════════════ */ ?>
           <div class="design-tab-pane active" data-pane="identity">
-            <h3>Forum-Name & Slogan</h3>
+            <h3><?= t('admin_forum_name_slogan') ?></h3>
             <div class="form-row">
-              <label>Forum-Name</label>
+              <label><?= t('admin_forum_name') ?></label>
               <input type="text" name="forum_name" value="<?= e($branding['forum_name']) ?>"
                      placeholder="<?= e(defined('FORUM_NAME') ? FORUM_NAME : 'Forum') ?>" maxlength="100"
                      data-live="forum_name">
-              <div class="form-hint">Erscheint im Browser-Titel, Header, Footer und in E-Mails.</div>
+              <div class="form-hint"><?= t('admin_erscheint_im_browser_titel') ?></div>
             </div>
 
             <div class="form-row">
-              <label>Slogan / Tagline</label>
+              <label><?= t('admin_slogan_tagline') ?></label>
               <input type="text" name="forum_slogan" value="<?= e($branding['forum_slogan']) ?>"
                      placeholder="z.B. Die Community für Bastler &amp; Tüftler" maxlength="150"
                      data-live="forum_slogan">
-              <div class="form-hint">Erscheint rechts neben dem Logo im Banner.</div>
+              <div class="form-hint"><?= t('admin_erscheint_rechts_neben_dem') ?></div>
             </div>
 
-            <h3 style="margin-top:18px">Logo</h3>
+            <h3 style="margin-top:18px"><?= t('admin_logo') ?></h3>
             <div style="padding:14px;background:var(--bg-surface2);border-radius:var(--radius-sm);text-align:center;margin-bottom:10px">
               <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">
                 Aktuelle Vorschau
                 <?php if (function_exists('is_default_logo') && is_default_logo()): ?>
-                  <span style="color:var(--color-warning)">· Standard-Logo</span>
+                  <span style="color:var(--color-warning)"><?= t('admin_standard_logo') ?></span>
                 <?php endif; ?>
               </div>
               <?php // Dasselbe wie im Kopf der Seite, sonst zeigt die Vorschau etwas anderes als die Besucher sehen ?>
@@ -2431,16 +2401,15 @@
             </div>
             <style>.logo-preview svg, .logo-preview img { max-height:100px; max-width:100%; height:auto }</style>
             <div class="form-row">
-              <label>Logo-URL (optional)</label>
+              <label><?= t('admin_logo_url_optional') ?></label>
               <input type="text" name="forum_logo" value="<?= e($branding['forum_logo']) ?>"
                      placeholder="z.B. assets/logo.png oder https://example.com/logo.svg">
               <div class="form-hint">
-                Wenn leer: <code>assets/logo.png</code>, <code>assets/logo.svg</code> etc. wird probiert.
-                Empfohlene Höhe: ca. 100px.
+                <?= t('admin_logo_leer_hinweis', '<code>assets/logo.png</code>', '<code>assets/logo.svg</code>') ?>
               </div>
             </div>
 
-            <h3 style="margin-top:18px">Akzentfarbe</h3>
+            <h3 style="margin-top:18px"><?= t('admin_akzentfarbe') ?></h3>
             <div class="form-row">
               <?php
                 $currentAccent = $branding['forum_accent_color'];
@@ -2451,7 +2420,7 @@
                   ['dc2626', 'Rot'],
                   ['ea580c', 'Orange'],
                   ['ca8a04', 'Gold'],
-                  ['16a34a', 'Grün'],
+                  ['16a34a', t('admin_gruen')],
                   ['0891b2', 'Cyan'],
                   ['2563eb', 'Blau'],
                   ['475569', 'Schiefer'],
@@ -2469,35 +2438,34 @@
                   </label>
                 <?php endforeach; ?>
               </div>
-              <div class="form-hint">Bestimmt die Highlight-Farbe (Buttons, Links, Akzente).</div>
+              <div class="form-hint"><?= t('admin_bestimmt_die_highlight_farbe') ?></div>
             </div>
 
-            <h3 style="margin-top:18px">Standard-Theme</h3>
+            <h3 style="margin-top:18px"><?= t('admin_standard_theme') ?></h3>
             <div class="form-row">
               <select name="forum_default_theme" data-live="forum_default_theme">
-                <option value="dark"  <?= $branding['forum_default_theme'] === 'dark'  ? 'selected' : '' ?>>🌑 Dark Mode</option>
-                <option value="light" <?= $branding['forum_default_theme'] === 'light' ? 'selected' : '' ?>>☀️ Light Mode</option>
+                <option value="dark"  <?= $branding['forum_default_theme'] === 'dark'  ? 'selected' : '' ?>><?= t('admin_dark_mode') ?></option>
+                <option value="light" <?= $branding['forum_default_theme'] === 'light' ? 'selected' : '' ?>><?= t('admin_light_mode') ?></option>
               </select>
               <div class="form-hint">
-                Wird verwendet wenn ein User „Automatisch" als Theme gewählt hat.
-                Eingeloggte User können in ihrem Profil ein eigenes Theme festlegen.
+                <?= t('admin_wird_verwendet_wenn_ein') ?>
               </div>
             </div>
           </div>
 
           <?php /* ─── TAB: FARBEN ─── */ ?>
           <div class="design-tab-pane" data-pane="colors">
-            <h3>🌑 Dark Mode</h3>
+            <h3><?= t('admin_dark_mode') ?></h3>
             <?php
               $darkColors = [
-                'theme_color_bg_body'       => ['Body-Hintergrund',   'Hauptfarbe der Seite'],
-                'theme_color_bg_surface'    => ['Cards',              'Karten, Formularblöcke'],
-                'theme_color_bg_surface2'   => ['Tiefere Cards',      'Tabellen-Header, Code-Blöcke'],
+                'theme_color_bg_body'       => ['Body-Hintergrund',   t('admin_hauptfarbe_der_seite')],
+                'theme_color_bg_surface'    => ['Cards',              t('admin_karten_formularbloecke')],
+                'theme_color_bg_surface2'   => [t('admin_tiefere_cards'),      t('admin_tabellen_header_code_bloecke')],
                 'theme_color_text_base'     => ['Schrift',            'Haupttext'],
-                'theme_color_text_muted'    => ['Schrift dezent',     'Sekundärer Text'],
-                'theme_color_text_faint'    => ['Schrift verblasst',  'Metadaten, Zeitangaben'],
+                'theme_color_text_muted'    => [t('admin_schrift_dezent'),     t('admin_sekundaerer_text')],
+                'theme_color_text_faint'    => [t('admin_schrift_verblasst'),  'Metadaten, Zeitangaben'],
                 'theme_color_border'        => ['Border',             'Linien, Trennungen'],
-                'theme_color_border_strong' => ['Border kräftig',     'Hover-Borders'],
+                'theme_color_border_strong' => [t('admin_border_kraeftig'),     'Hover-Borders'],
               ];
               foreach ($darkColors as $key => [$label, $hint]):
                 $val = $theme[$key] ?? '';
@@ -2513,17 +2481,17 @@
               </div>
             <?php endforeach; ?>
 
-            <h3 style="margin-top:18px">☀️ Light Mode</h3>
+            <h3 style="margin-top:18px"><?= t('admin_light_mode') ?></h3>
             <?php
               $lightColors = [
                 'theme_color_bg_body_light'       => ['Body-Hintergrund',   ''],
                 'theme_color_bg_surface_light'    => ['Cards',              ''],
-                'theme_color_bg_surface2_light'   => ['Tiefere Cards',      ''],
+                'theme_color_bg_surface2_light'   => [t('admin_tiefere_cards'),      ''],
                 'theme_color_text_base_light'     => ['Schrift',            ''],
-                'theme_color_text_muted_light'    => ['Schrift dezent',     ''],
-                'theme_color_text_faint_light'    => ['Schrift verblasst',  ''],
+                'theme_color_text_muted_light'    => [t('admin_schrift_dezent'),     ''],
+                'theme_color_text_faint_light'    => [t('admin_schrift_verblasst'),  ''],
                 'theme_color_border_light'        => ['Border',             ''],
-                'theme_color_border_strong_light' => ['Border kräftig',     ''],
+                'theme_color_border_strong_light' => [t('admin_border_kraeftig'),     ''],
               ];
               foreach ($lightColors as $key => [$label, $hint]):
                 $val = $theme[$key] ?? '';
@@ -2537,12 +2505,12 @@
               </div>
             <?php endforeach; ?>
 
-            <h3 style="margin-top:18px">🚦 Status-Farben</h3>
+            <h3 style="margin-top:18px"><?= t('admin_status_farben') ?></h3>
             <?php
               $statusColors = [
-                'theme_color_success' => ['Erfolg',  'Bestätigungen'],
+                'theme_color_success' => ['Erfolg',  t('admin_bestaetigungen')],
                 'theme_color_warning' => ['Warnung', 'Hinweise'],
-                'theme_color_danger'  => ['Fehler',  'Lösch-Buttons, Fehler-Boxen'],
+                'theme_color_danger'  => ['Fehler',  t('admin_loesch_buttons_fehler_boxen')],
               ];
               foreach ($statusColors as $key => [$label, $hint]):
                 $val = $theme[$key] ?? '';
@@ -2561,7 +2529,7 @@
 
           <?php /* ─── TAB: SCHRIFT ─── */ ?>
           <div class="design-tab-pane" data-pane="fonts">
-            <h3>Schriftart</h3>
+            <h3><?= t('admin_schriftart') ?></h3>
             <div class="form-row">
               <select name="theme_font_family" id="theme_font_family" data-live="theme_font_family">
                 <?php
@@ -2569,11 +2537,11 @@
                     'inter'     => '✨ Inter (Standard) – modern, gut lesbar',
                     'system'    => '🖥️ System-Schrift (jeweilige OS-Schrift)',
                     'roboto'    => '🤖 Roboto – Google-Schrift, klar',
-                    'open-sans' => '📖 Open Sans – freundlich',
+                    'open-sans' => t('admin_y_open_sans_freundlich'),
                     'lato'      => '🎯 Lato – semi-rund',
                     'nunito'    => '🍩 Nunito – verspielt, runde Formen',
                     'poppins'   => '⭕ Poppins – geometrisch, modern',
-                    'chakra-petch' => '🎮 Chakra Petch – technisch, kantig',
+                    'chakra-petch' => t('admin_y_chakra_petch_technisch_kantig'),
                     'custom'    => '🛠️ Custom – eigene Schriftart',
                   ];
                   foreach ($fontOpts as $k => $lab):
@@ -2584,13 +2552,13 @@
             </div>
 
             <div class="form-row" id="custom-font-row" style="<?= ($theme['theme_font_family'] ?? '') === 'custom' ? '' : 'display:none' ?>">
-              <label>Custom Font-Stack</label>
+              <label><?= t('admin_custom_font_stack') ?></label>
               <input type="text" name="theme_font_custom" value="<?= e($theme['theme_font_custom'] ?? '') ?>"
                      placeholder="z.B. 'Comic Sans MS', cursive" data-live="theme_font_custom">
-              <div class="form-hint">CSS-Font-Stack (Komma-getrennt, mit Quotes wenn der Name Leerzeichen enthält)</div>
+              <div class="form-hint"><?= t('admin_css_font_stack_komma') ?></div>
             </div>
 
-            <h3 style="margin-top:18px">Schriftgröße (Basis)</h3>
+            <h3 style="margin-top:18px"><?= t('admin_schriftgroesse_basis') ?></h3>
             <div class="form-row">
               <select name="theme_font_size_base" data-live="theme_font_size_base">
                 <?php foreach ([12, 13, 14, 15, 16] as $sz): ?>
@@ -2599,13 +2567,13 @@
                   </option>
                 <?php endforeach; ?>
               </select>
-              <div class="form-hint">Beeinflusst die Größe aller Texte im Forum proportional.</div>
+              <div class="form-hint"><?= t('admin_beeinflusst_die_groesse_aller') ?></div>
             </div>
           </div>
 
           <?php /* ─── TAB: FORM ─── */ ?>
           <div class="design-tab-pane" data-pane="form">
-            <h3>Rundungen</h3>
+            <h3><?= t('admin_rundungen') ?></h3>
             <div class="form-row">
               <select name="theme_radius_preset" data-live="theme_radius_preset">
                 <option value="sharp"  <?= ($theme['theme_radius_preset'] ?? '') === 'sharp'  ? 'selected' : '' ?>>⬜ Eckig – ganz scharf</option>
@@ -2616,7 +2584,7 @@
               </select>
             </div>
 
-            <h3 style="margin-top:18px">Maximalbreite</h3>
+            <h3 style="margin-top:18px"><?= t('admin_maximalbreite') ?></h3>
             <div class="form-row">
               <select name="theme_max_width" data-live="theme_max_width">
                 <option value="980"  <?= (int) ($theme['theme_max_width'] ?? 1200) === 980  ? 'selected' : '' ?>>980px – schmal</option>
@@ -2625,23 +2593,23 @@
                 <option value="1400" <?= (int) ($theme['theme_max_width'] ?? 1200) === 1400 ? 'selected' : '' ?>>1400px</option>
                 <option value="1600" <?= (int) ($theme['theme_max_width'] ?? 1200) === 1600 ? 'selected' : '' ?>>1600px – breit</option>
               </select>
-              <div class="form-hint">Maximale Breite des Forum-Inhalts auf großen Bildschirmen.</div>
+              <div class="form-hint"><?= t('admin_maximale_breite_des_forum') ?></div>
             </div>
 
-            <h3 style="margin-top:18px">Dichte</h3>
+            <h3 style="margin-top:18px"><?= t('admin_dichte') ?></h3>
             <div class="form-row">
               <select name="theme_density" data-live="theme_density">
                 <option value="compact"     <?= ($theme['theme_density'] ?? '') === 'compact'     ? 'selected' : '' ?>>🤏 Kompakt</option>
                 <option value="normal"      <?= ($theme['theme_density'] ?? '') === 'normal'      ? 'selected' : '' ?>>👌 Normal (Standard)</option>
                 <option value="comfortable" <?= ($theme['theme_density'] ?? '') === 'comfortable' ? 'selected' : '' ?>>🛋️ Komfortabel</option>
               </select>
-              <div class="form-hint">Beeinflusst Abstände und Padding in der UI.</div>
+              <div class="form-hint"><?= t('admin_beeinflusst_abstaende_und_padding') ?></div>
             </div>
           </div>
 
           <?php /* ═══ TAB: LAYOUT ═══════════════════════════════ */ ?>
           <div class="design-tab-pane" data-pane="layout">
-            <h3>Header-Stil</h3>
+            <h3><?= t('admin_header_stil') ?></h3>
             <div class="form-row">
               <select name="theme_header_style" data-live="theme_header_style">
                 <option value="default"  <?= ($theme['theme_header_style'] ?? 'default') === 'default'  ? 'selected' : '' ?>>📋 Standard (Logo links, Suche + User-Menü rechts)</option>
@@ -2649,36 +2617,35 @@
                 <option value="compact"  <?= ($theme['theme_header_style'] ?? '') === 'compact'  ? 'selected' : '' ?>>🤏 Kompakt (kleineres Banner)</option>
                 <option value="inline"   <?= ($theme['theme_header_style'] ?? '') === 'inline'   ? 'selected' : '' ?>>📏 Eine Zeile (Logo, Menü und Suche nebeneinander)</option>
               </select>
-              <div class="form-hint">Bestimmt die Anordnung im Forum-Header.</div>
+              <div class="form-hint"><?= t('admin_bestimmt_die_anordnung_im') ?></div>
             </div>
 
-            <h3 style="margin-top:18px">📝 Footer-Text</h3>
+            <h3 style="margin-top:18px"><?= t('admin_footer_text') ?></h3>
             <div class="form-row">
-              <label>Footer-Text (Zeile 1)</label>
+              <label><?= t('admin_footer_text_zeile_1') ?></label>
               <input type="text" name="forum_footer_text" value="<?= e($branding['forum_footer_text']) ?>"
                      placeholder="© <?= date('Y') ?> &bull; Alle Rechte vorbehalten" maxlength="200">
               <div class="form-hint">
-                Wenn leer: Standard-Copyright-Text mit Forum-Name. HTML wird escaped (nur Plain-Text).
+                <?= t('admin_wenn_leer_standard_copyright') ?>
               </div>
             </div>
 
             <div class="form-row">
-              <label>Zusätzliche Footer-Links</label>
+              <label><?= t('admin_zusaetzliche_footer_links') ?></label>
               <input type="text" name="forum_footer_links" value="<?= e($branding['forum_footer_links']) ?>"
                      placeholder="Discord|https://discord.gg/xyz, GitHub|https://github.com/...">
               <div class="form-hint">
-                Format: <code>Label1|URL1, Label2|URL2</code> – kommagetrennt. Links öffnen in neuem Tab.
+                <?= t('admin_format') ?> <code><?= t('admin_label1_url1_label2_url2') ?></code> – kommagetrennt. Links öffnen in neuem Tab.
               </div>
             </div>
 
             <div class="form-row">
-              <label>Quelltext-URL</label>
+              <label><?= t('admin_quelltext_url') ?></label>
               <input type="url" name="source_url" value="<?= e($branding['source_url']) ?>"
                      placeholder="<?= e(FORUMIX_URL) ?>">
               <div class="form-hint">
-                Ziel des Forumix-Zeichens im Fußbereich. Leer zeigt auf
-                <code><?= e(FORUMIX_URL) ?></code>. <strong>Wenn du den Code geändert hast,
-                gehört hier dein eigenes Repository hin</strong> — die AGPLv3 verlangt in § 13,
+                <?= t('admin_ziel_des_forumix_zeichens') ?>
+                <code><?= e(FORUMIX_URL) ?></code>. <strong><?= t('admin_wenn_du_den_code') ?></strong> — die AGPLv3 verlangt in § 13,
                 dass Besucher an den Quelltext der laufenden Fassung kommen.
               </div>
             </div>
@@ -2686,10 +2653,9 @@
 
           <?php /* ═══ TAB: PRESETS ═════════════════════════════ */ ?>
           <div class="design-tab-pane" data-pane="presets">
-            <h3>Komplett-Themes mit einem Klick</h3>
+            <h3><?= t('admin_komplett_themes_mit_einem') ?></h3>
             <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">
-              Diese Presets überschreiben alle Farb-Einstellungen mit aufeinander abgestimmten Werten.
-              Schriftart, Form und Identität bleiben unberührt. Du kannst nachher noch einzelne Farben anpassen.
+              <?= t('admin_diese_presets_ueberschreiben_alle') ?>
             </p>
 
             <div class="theme-presets-grid">
@@ -2704,7 +2670,7 @@
                     'preview' => ['#36393f', '#2f3136', '#5865f2', '#dcddde'],
                   ],
                   'mintgrun' => [
-                    'name' => '🌿 Mintgrün', 'desc' => 'Frisch, ruhig, naturnah',
+                    'name' => t('admin_y_mintgruen'), 'desc' => 'Frisch, ruhig, naturnah',
                     'preview' => ['#0f1f1c', '#162a25', '#10b981', '#e8f5e9'],
                   ],
                   'sonne' => [
@@ -2712,11 +2678,11 @@
                     'preview' => ['#1a0f08', '#2a1a10', '#f97316', '#fef3c7'],
                   ],
                   'cyberpunk' => [
-                    'name' => '🌃 Cyberpunk', 'desc' => 'Knalliges Lila/Pink auf Schwarz',
+                    'name' => '🌃 Cyberpunk', 'desc' => t('admin_knalliges_lila_pink_auf'),
                     'preview' => ['#0a0014', '#15001f', '#ec4899', '#e0c3fc'],
                   ],
                   'softlight' => [
-                    'name' => '☀️ Soft Light', 'desc' => 'Helles, freundliches Theme',
+                    'name' => t('admin_y_soft_light'), 'desc' => 'Helles, freundliches Theme',
                     'preview' => ['#f7f7f8', '#ffffff', '#4f46e5', '#18181b'],
                   ],
                 ];
@@ -2732,35 +2698,33 @@
                     <strong><?= e($p['name']) ?></strong>
                     <span><?= e($p['desc']) ?></span>
                   </div>
-                  <button type="button" class="btn btn-primary btn-sm theme-preset-apply" data-preset="<?= e($id) ?>">Anwenden</button>
+                  <button type="button" class="btn btn-primary btn-sm theme-preset-apply" data-preset="<?= e($id) ?>"><?= t('admin_x_anwenden') ?></button>
                 </div>
               <?php endforeach; ?>
             </div>
             <div class="form-hint" style="margin-top:10px">
-              💡 Nach „Anwenden" werden die Felder im Farben-Tab überschrieben.
-              Schau dir die Vorschau an – wenn dir's gefällt, speichern. Sonst Tab wechseln und neu auswählen.
+              <?= t('admin_nach_anwenden_werden_die') ?>
             </div>
           </div>
 
           <?php /* ═══ TAB: ERWEITERT ═══════════════════════════ */ ?>
           <div class="design-tab-pane" data-pane="advanced">
-            <h3>🎨 Custom CSS <span style="font-size:11px;color:var(--color-warning);margin-left:6px">⚠️ Nur für Experten</span></h3>
+            <h3><?= t('admin_custom_css') ?> <span style="font-size:11px;color:var(--color-warning);margin-left:6px"><?= t('admin_nur_fuer_experten') ?></span></h3>
             <div class="form-row">
-              <label>Eigenes CSS (optional)</label>
+              <label><?= t('admin_eigenes_css_optional') ?></label>
               <textarea name="forum_custom_css" rows="12" style="font-family:var(--font-mono);font-size:12px"
                         placeholder=".thread-title-link { font-weight: 800 !important; }"><?= e($branding['forum_custom_css']) ?></textarea>
               <div class="form-hint">
-                Dieses CSS wird direkt im <code>&lt;head&gt;</code> jeder Seite eingebunden.
-                <strong>Vorsicht:</strong> Falsches CSS kann das Forum kaputt machen.
-                Bei Problemen: einfach leeren und speichern.
+                <?= t('admin_dieses_css_wird_direkt') ?> <code>&lt;head&gt;</code> jeder Seite eingebunden.
+                <strong><?= t('admin_vorsicht') ?></strong> <?= t('admin_falsches_css_kann_das') ?>
               </div>
             </div>
           </div>
 
           <div class="design-actions">
-            <button type="submit" class="btn btn-primary">💾 Speichern</button>
-            <button type="button" id="reload-preview" class="btn btn-ghost">🔄 Vorschau neu laden</button>
-            <button type="button" id="reset-design-btn" class="btn btn-ghost btn-sm" style="color:var(--color-warning);margin-left:auto">↺ Auf Standard zurücksetzen</button>
+            <button type="submit" class="btn btn-primary"><?= t('admin_speichern_2') ?></button>
+            <button type="button" id="reload-preview" class="btn btn-ghost"><?= t('admin_vorschau_neu_laden') ?></button>
+            <button type="button" id="reset-design-btn" class="btn btn-ghost btn-sm" style="color:var(--color-warning);margin-left:auto"><?= t('admin_auf_standard_zuruecksetzen') ?></button>
           </div>
         </form>
 
@@ -2772,7 +2736,7 @@
         <?php /* ─── Live-Vorschau (rechte Seite) ─── */ ?>
         <div class="design-preview">
           <div class="design-preview-label">
-            <span>👁️ Live-Vorschau</span>
+            <span><?= t('admin_live_vorschau') ?></span>
             <a href="<?= e(FORUM_URL) ?>/?preview=1" target="_blank" rel="noopener" title="In neuem Tab öffnen">↗ Großansicht</a>
           </div>
           <iframe id="design-preview-frame" src="<?= e(FORUM_URL) ?>/?preview=1"
@@ -2782,9 +2746,9 @@
 
     <?php /* ════════════ MODULE ════════════ */ ?>
     <?php elseif ($action === 'modules'): ?>
-      <h2>🧩 Module</h2>
+      <h2><?= t('admin_module') ?></h2>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
-        Aktivierbare Erweiterungen für dein Forum. Beim Deaktivieren bleiben alle Daten erhalten – das Modul ist nur „aus".
+        <?= t('admin_aktivierbare_erweiterungen_fuer_dein') ?>
       </p>
 
       <?php /* ── Beim Hersteller nachsehen ── */ ?>
@@ -2793,20 +2757,16 @@
               style="padding:14px 16px;margin-bottom:18px">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
           <input type="hidden" name="settings_section" value="module">
-          <strong style="font-size:14px">Module beim Hersteller nachschlagen</strong>
+          <strong style="font-size:14px"><?= t('admin_module_beim_hersteller_nachschlagen') ?></strong>
           <p style="font-size:13px;color:var(--text-muted);margin:6px 0 10px;line-height:1.6">
-            Forumix ruft von sich aus keinen fremden Server auf. Mit dieser
-            Einstellung kannst du auf Knopfdruck nachsehen, welche Module es bei
-            forumix.de gibt, und sie von dort holen — statt sie herunterzuladen
-            und wieder hochzuladen.<br>
-            Der Abruf geschieht nur, wenn du ihn auslöst. Es geht nichts über
-            dein Forum hinaus: keine Adresse, keine Fassung, keine Kennung.
+            <?= t('admin_forumix_ruft_von_sich') ?><br>
+            <?= t('admin_der_abruf_geschieht_nur_2') ?>
           </p>
           <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
             <input type="checkbox" name="module_quelle_an" value="1">
-            Nachschlagen erlauben
+            <?= t('admin_nachschlagen_erlauben') ?>
           </label>
-          <button type="submit" class="btn">Speichern</button>
+          <button type="submit" class="btn"><?= t('admin_speichern') ?></button>
         </form>
       <?php endif; ?>
 
@@ -2815,8 +2775,8 @@
           <form method="post" action="<?= e(FORUM_URL) ?>/admin/?action=module_quelle"
                 style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:0">
             <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
-            <strong style="font-size:14px">Module beim Hersteller</strong>
-            <button type="submit" name="suchen" value="1" class="btn">Nachsehen</button>
+            <strong style="font-size:14px"><?= t('admin_module_beim_hersteller') ?></strong>
+            <button type="submit" name="suchen" value="1" class="btn"><?= t('admin_nachsehen') ?></button>
             <?php if (!empty($quelleStand)): ?>
               <span style="font-size:12px;color:var(--text-faint)">
                 Stand: <?= e(date('d.m.Y H:i', (int) $quelleStand)) ?> Uhr
@@ -2862,14 +2822,13 @@
           <?php endif; ?>
 
           <p style="font-size:12px;color:var(--text-faint);margin:10px 0 0">
-            Der Abruf geschieht nur, wenn du ihn auslöst. Es geht dabei nichts
-            über dieses Forum hinaus — keine Adresse, keine Fassung, keine Kennung.
+            <?= t('admin_der_abruf_geschieht_nur') ?>
           </p>
           <form method="post" action="?action=save_settings" style="margin:6px 0 0">
             <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
             <input type="hidden" name="settings_section" value="module">
             <button type="submit" class="btn btn-link" style="font-size:12px;padding:0;background:none;border:0;color:var(--text-faint);text-decoration:none;cursor:pointer">
-              Nachschlagen wieder abschalten
+              <?= t('admin_nachschlagen_wieder_abschalten') ?>
             </button>
           </form>
         </div>
@@ -2881,16 +2840,15 @@
               action="<?= e(FORUM_URL) ?>/admin/?action=module_upload"
               class="card" style="padding:14px 16px;margin-bottom:18px">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
-          <strong style="font-size:14px">Modul einspielen</strong>
+          <strong style="font-size:14px"><?= t('admin_modul_einspielen') ?></strong>
           <p style="font-size:13px;color:var(--text-muted);margin:6px 0 10px">
-            Module gibt es einzeln zum Herunterladen. Das Paket ist eine ZIP-Datei
-            mit <code>module.json</code>; eingespielt wird es hier, eingeschaltet
+            <?= t('admin_module_gibt_es_einzeln') ?> <code>module.json</code>; eingespielt wird es hier, eingeschaltet
             danach von Hand. Ein vorhandenes Modul wird dabei aktualisiert,
             Einstellungen und Daten bleiben.
           </p>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
             <input type="file" name="modulpaket" accept=".zip" required>
-            <button type="submit" class="btn btn-primary">Einspielen</button>
+            <button type="submit" class="btn btn-primary"><?= t('admin_einspielen') ?></button>
           </div>
         </form>
       <?php endif; ?>
@@ -2898,9 +2856,9 @@
       <?php if (empty($modules)): ?>
         <div class="card" style="padding:40px;text-align:center">
           <div style="font-size:48px;margin-bottom:12px">📦</div>
-          <strong>Keine Module gefunden</strong>
+          <strong><?= t('admin_keine_module_gefunden') ?></strong>
           <p style="font-size:13px;color:var(--text-muted);margin-top:8px">
-            Module liegen unter <code>/modules/</code>. Stelle sicher dass dort mindestens ein gültiges Modul liegt.
+            <?= t('admin_module_liegen_unter') ?> <code>/modules/</code>. Stelle sicher dass dort mindestens ein gültiges Modul liegt.
           </p>
         </div>
       <?php else: ?>
@@ -2958,7 +2916,7 @@
                           onsubmit="return confirm(<?= e(json_encode($warnung, JSON_UNESCAPED_UNICODE)) ?>)">
                       <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                       <input type="hidden" name="code" value="<?= e($m['code']) ?>">
-                      <button type="submit" class="btn btn-danger btn-sm">🗑️ Entfernen</button>
+                      <button type="submit" class="btn btn-danger btn-sm"><?= t('admin_entfernen_2') ?></button>
                     </form>
                   <?php endif; ?>
                 <?php endif; ?>
@@ -2970,18 +2928,18 @@
 
     <?php /* ════════════ UPDATES (DB-MIGRATIONEN) ════════════ */ ?>
     <?php elseif ($action === 'import'): ?>
-      <h2>📦 Aus phpBB übernehmen</h2>
+      <h2><?= t('admin_aus_phpbb_uebernehmen') ?></h2>
 
       <?php $b = $importBericht ?? null; $o = $importOpt ?? null; ?>
 
       <?php if (!empty($importLaeuft)): ?>
         <?php /* ── Ein Import steht bereits ── */ ?>
         <div class="card" style="padding:18px 22px;margin-bottom:18px;border-left:3px solid var(--color-success)">
-          <h3 style="margin:0 0 10px">✅ Ein Import ist eingespielt</h3>
+          <h3 style="margin:0 0 10px"><?= t('admin_ein_import_ist_eingespielt') ?></h3>
           <div class="stat-grid" style="margin-bottom:14px">
             <?php foreach (['user' => ['👤','Konten'], 'board' => ['📁','Foren'],
-                            'thema' => ['💬','Themen'], 'beitrag' => ['✉️','Beiträge'],
-                            'anhang' => ['📎','Anhänge']] as $art => [$icon, $label]): ?>
+                            'thema' => ['💬','Themen'], 'beitrag' => ['✉️',t('mod_beitraege')],
+                            'anhang' => ['📎',t('admin_anhaenge')]] as $art => [$icon, $label]): ?>
               <?php if (($importStand[$art] ?? 0) > 0): ?>
               <div class="stat-box">
                 <div class="stat-icon"><?= $icon ?></div>
@@ -2992,14 +2950,12 @@
             <?php endforeach; ?>
           </div>
           <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin:0 0 14px">
-            Alles Übernommene ist als solches vermerkt. Ein zweiter Lauf ergänzt nur, was fehlt —
-            und das Zurücknehmen entfernt ausschließlich, was der Import angelegt hat.
-            Was du seither von Hand angelegt hast, bleibt.
+            <?= t('admin_alles_uebernommene_ist_als') ?>
           </p>
           <form method="post" action="?action=import_zurueck"
                 onsubmit="return confirm('Alles zurücknehmen, was der Import angelegt hat?')">
             <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
-            <button type="submit" class="btn btn-danger btn-sm">Import zurücknehmen</button>
+            <button type="submit" class="btn btn-danger btn-sm"><?= t('admin_import_zuruecknehmen') ?></button>
           </form>
         </div>
       <?php endif; ?>
@@ -3008,10 +2964,7 @@
         <?php /* ── Schritt 1: Zugangsdaten ── */ ?>
         <div class="card" style="padding:18px 22px;margin-bottom:18px">
           <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin:0">
-            Übernimmt Konten, Foren, Themen, Beiträge, Anhänge, Umfragen und private Nachrichten
-            aus einem phpBB der Fassungen 3.2 und 3.3. <strong>Die Passwörter kommen mit</strong> —
-            die Mitglieder melden sich hinterher mit ihrem gewohnten an.
-            Es wird nur gelesen; das alte Forum bleibt unverändert.
+            <?= t('admin_import_hinweis', '<strong>' . e(t('admin_die_passwoerter_kommen_mit')) . '</strong>') ?>
           </p>
         </div>
 
@@ -3019,57 +2972,56 @@
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
 
           <div class="form-card" style="margin-bottom:16px">
-            <h3 style="margin-top:0">Datenbank des alten Forums</h3>
+            <h3 style="margin-top:0"><?= t('admin_datenbank_des_alten_forums') ?></h3>
 
             <div class="form-row">
-              <label>Datenbank <span style="color:var(--color-danger)">*</span></label>
+              <label><?= t('admin_datenbank') ?> <span style="color:var(--color-danger)">*</span></label>
               <input type="text" name="db_name" placeholder="phpbb" required autofocus>
-              <div class="form-hint">Der Name der Datenbank, in der phpBB liegt.</div>
+              <div class="form-hint"><?= t('admin_der_name_der_datenbank') ?></div>
             </div>
 
             <div class="form-row">
-              <label>Benutzer <span style="color:var(--color-danger)">*</span></label>
+              <label><?= t('admin_benutzer') ?> <span style="color:var(--color-danger)">*</span></label>
               <input type="text" name="db_user" placeholder="phpbb_user" required>
             </div>
 
             <div class="form-row">
-              <label>Passwort</label>
+              <label><?= t('admin_passwort') ?></label>
               <input type="password" name="db_pass" autocomplete="new-password">
             </div>
 
             <div class="form-row">
-              <label>Server</label>
+              <label><?= t('admin_server') ?></label>
               <input type="text" name="db_host" value="localhost">
               <div class="form-hint">
-                Liegt das alte Forum auf demselben Server, bleibt es bei <code>localhost</code>.
+                <?= t('admin_liegt_das_alte_forum') ?> <code>localhost</code>.
               </div>
             </div>
 
             <div class="form-row">
-              <label>Tabellen-Präfix</label>
+              <label><?= t('admin_tabellen_praefix') ?></label>
               <input type="text" name="db_praefix" value="phpbb_">
               <div class="form-hint">
-                Steht in der <code>config.php</code> des alten Forums unter <code>$table_prefix</code>.
+                <?= t('admin_steht_in_der') ?> <code>config.php</code> des alten Forums unter <code>$table_prefix</code>.
               </div>
             </div>
           </div>
 
           <div class="form-card" style="margin-bottom:16px">
-            <h3 style="margin-top:0">Anhänge</h3>
+            <h3 style="margin-top:0"><?= t('admin_anhaenge') ?></h3>
             <div class="form-row">
-              <label>Ordner mit den Dateien</label>
+              <label><?= t('admin_ordner_mit_den_dateien') ?></label>
               <input type="text" name="dateien" placeholder="/pfad/zu/phpBB3/files">
               <div class="form-hint">
-                Der Ordner, den phpBB unter <em>Anhänge → Einstellungen</em> als Upload-Pfad führt —
-                meist <code>files</code> im phpBB-Verzeichnis. Bleibt das Feld leer, kommen die
-                Beiträge ohne ihre Dateien.
+                <?= t('admin_phpbb_upload_pfad', '<em>' . e(t('admin_anhaenge_einstellungen')) . '</em>') ?>
+                <?= t('admin_upload_pfad_leer', '<code>files</code>') ?>
               </div>
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary">Nachsehen, was da ist</button>
+          <button type="submit" class="btn btn-primary"><?= t('admin_nachsehen_was_da_ist') ?></button>
           <span style="font-size:12px;color:var(--text-faint);margin-left:10px">
-            Liest nur — schreibt noch nichts.
+            <?= t('admin_liest_nur_schreibt_noch') ?>
           </span>
         </form>
 
@@ -3084,7 +3036,7 @@
 
         <div class="card" style="padding:18px 22px;margin-bottom:18px">
           <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
-            <h3 style="margin:0">Gefunden in <code><?= e($o['db'] ?? '') ?></code></h3>
+            <h3 style="margin:0"><?= t('admin_gefunden_in') ?> <code><?= e($o['db'] ?? '') ?></code></h3>
             <span style="font-size:13px;color:var(--text-muted)">
               phpBB <?= $bs['fassung'] !== '' ? e($bs['fassung']) : 'unbekannter Fassung' ?>
             </span>
@@ -3097,13 +3049,12 @@
                     nachzubauen hiesse, einen gepflegten Weg zu verdoppeln. */ ?>
           <div class="card" style="padding:16px 20px;margin-bottom:16px;
                       background:rgba(229,83,75,0.1);border-left:3px solid var(--color-danger)">
-            <strong style="display:block;margin-bottom:6px">⛔ Diese Fassung ist zu alt</strong>
+            <strong style="display:block;margin-bottom:6px"><?= t('admin_diese_fassung_ist_zu') ?></strong>
             <p style="margin:0 0 10px;font-size:13px;line-height:1.7">
-              Ab 3.2 legt phpBB Beiträge in einem anderen Format ab. Bitte das alte Forum
-              zuerst <strong>mit phpBB selbst auf 3.3 bringen</strong> — dabei werden die
+              <?= t('admin_ab_3_2_legt') ?> <strong>mit phpBB selbst auf 3.3 bringen</strong> — dabei werden die
               Beiträge umgeschrieben. Danach läuft dieser Import ohne Verluste.
             </p>
-            <a href="?action=import_vergessen" class="btn btn-ghost btn-sm">Zurück</a>
+            <a href="?action=import_vergessen" class="btn btn-ghost btn-sm"><?= t('admin_zurueck') ?></a>
           </div>
         <?php endif; ?>
 
@@ -3113,8 +3064,8 @@
             ['📂', $bs['kategorien'], 'Kategorien'],
             ['📁', $bs['foren'],      'Foren'],
             ['💬', $bs['themen'],     'Themen'],
-            ['✉️', $bs['beitraege'],  'Beiträge'],
-            ['📎', $bs['anhaenge'],   'Anhänge'],
+            ['✉️', $bs['beitraege'],  t('mod_beitraege')],
+            ['📎', $bs['anhaenge'],   t('admin_anhaenge')],
             ['📊', $bs['umfragen'],   'Umfragen'],
             ['🔒', $bs['pn'],         'Nachrichten'],
           ] as [$icon, $zahl, $label]): ?>
@@ -3135,7 +3086,7 @@
 
         <?php /* ── Passwörter: die Zahl, nach der man den Umzug plant ── */ ?>
         <div class="card" style="padding:18px 22px;margin-bottom:16px">
-          <h3 style="margin:0 0 12px">🔑 Passwörter</h3>
+          <h3 style="margin:0 0 12px"><?= t('admin_passwoerter') ?></h3>
           <?php
             $gesamt = max(1, $pw['uebernehmbar'] + $pw['neu_noetig']);
             $anteil = round($pw['uebernehmbar'] / $gesamt * 100);
@@ -3171,18 +3122,18 @@
 
         <?php if ($bs['anhaenge'] > 0): ?>
           <div class="card" style="padding:16px 20px;margin-bottom:16px<?= $dat['fehlen'] > 0 || !$dat['ordner'] ? ';border-left:3px solid #aa6644' : '' ?>">
-            <h3 style="margin:0 0 8px">📎 Anhänge</h3>
+            <h3 style="margin:0 0 8px"><?= t('admin_anhaenge') ?></h3>
             <?php if (!$dat['ordner']): ?>
               <p style="margin:0;font-size:13px;color:var(--text-muted)">
                 Kein Ordner angegeben — die <?= number_format((int) $bs['anhaenge'], 0, ',', '.') ?>
-                Anhänge bleiben draußen. <a href="?action=import_vergessen">Nochmal eingeben</a>.
+                Anhänge bleiben draußen. <a href="?action=import_vergessen"><?= t('admin_nochmal_eingeben') ?></a>.
               </p>
             <?php elseif ($dat['fehlen'] > 0): ?>
               <p style="margin:0;font-size:13px">
                 <strong><?= number_format((int) $dat['fehlen'], 0, ',', '.') ?></strong> von
                 <?= number_format((int) $bs['anhaenge'], 0, ',', '.') ?> Dateien liegen nicht in
                 <code><?= e($o['dateien'] ?? '') ?></code>.
-                <a href="?action=import_vergessen">Pfad ändern</a>
+                <a href="?action=import_vergessen"><?= t('admin_pfad_aendern') ?></a>
               </p>
             <?php else: ?>
               <p style="margin:0;font-size:13px;color:var(--text-muted)">
@@ -3195,14 +3146,14 @@
         <?php /* ── Schritt 3: Der Lauf ── */ ?>
         <?php if (!$alt32): ?>
         <div class="card" style="padding:18px 22px" id="import-lauf">
-          <h3 style="margin:0 0 12px">Übernehmen</h3>
+          <h3 style="margin:0 0 12px"><?= t('admin_uebernehmen') ?></h3>
 
           <div id="import-fortschritt" hidden>
             <div style="height:10px;border-radius:5px;background:var(--bg-surface2);overflow:hidden;margin-bottom:12px">
               <div id="import-balken" style="height:100%;width:0;background:var(--color-accent);transition:width .3s"></div>
             </div>
             <table style="width:100%;border-collapse:collapse;font-size:13px">
-              <?php foreach (IMPORT_SCHRITTE as $sch => $label): ?>
+              <?php foreach (IMPORT_SCHRITTE as $sch => $labelKey): $label = t($labelKey); ?>
                 <tr data-schritt="<?= e($sch) ?>">
                   <td style="padding:5px 0;width:26px" class="import-zeichen">·</td>
                   <td style="padding:5px 0"><?= e($label) ?></td>
@@ -3223,12 +3174,12 @@
             <?php if ($vorhanden > 0): ?>
               <div style="border:1px solid #aa6644;background:rgba(170,102,68,0.08);border-radius:6px;
                           padding:14px 16px;margin-bottom:16px">
-                <strong style="display:block;margin-bottom:8px">⚠️ Hier steht schon etwas</strong>
+                <strong style="display:block;margin-bottom:8px"><?= t('admin_hier_steht_schon_etwas') ?></strong>
                 <div style="font-size:13px;line-height:1.8;color:var(--text-muted)">
                   <?php
                     $teile = [];
                     foreach ([['foren','Forum','Foren'], ['themen','Thema','Themen'],
-                              ['beitraege','Beitrag','Beiträge'], ['anhaenge','Anhang','Anhänge'],
+                              ['beitraege','Beitrag',t('mod_beitraege')], ['anhaenge','Anhang',t('admin_anhaenge')],
                               ['pn','Nachricht','Nachrichten']] as [$k, $ein, $viele]) {
                         $n = (int) ($h[$k] ?? 0);
                         if ($n > 0) $teile[] = number_format($n, 0, ',', '.') . ' ' . ($n === 1 ? $ein : $viele);
@@ -3241,29 +3192,26 @@
                 </div>
                 <label class="checkbox-line" style="margin-top:12px">
                   <input type="checkbox" id="import-leeren">
-                  <span><strong>Das alles vorher löschen.</strong>
-                    Dein eigenes Konto bleibt — sonst könntest du dich hinterher nicht anmelden.</span>
+                  <span><strong><?= t('admin_das_alles_vorher_loeschen') ?></strong>
+                    <?= t('admin_dein_eigenes_konto_bleibt') ?></span>
                 </label>
                 <div class="form-hint" style="margin-top:8px">
-                  Ohne Häkchen kommt das Übernommene zu dem hinzu, was schon da ist.
-                  Das Löschen lässt sich <strong>nicht</strong> zurücknehmen — der Import selbst schon.
+                  <?= t('admin_ohne_haekchen_kommt_das') ?> <strong>nicht</strong> zurücknehmen — der Import selbst schon.
                 </div>
               </div>
             <?php endif; ?>
             <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin:0 0 14px">
-              Der Import läuft in Runden und meldet, wie weit er ist. Das Fenster darf dabei nicht
-              geschlossen werden. Bricht er ab, setzt ein neuer Lauf dort an, wo er stehengeblieben
-              ist — und zurücknehmen lässt sich alles.
+              <?= t('admin_der_import_laeuft_in') ?>
             </p>
-            <button type="button" class="btn btn-primary" id="import-knopf">Import starten</button>
-            <a href="?action=import_vergessen" class="btn btn-ghost btn-sm" style="margin-left:8px">Abbrechen</a>
+            <button type="button" class="btn btn-primary" id="import-knopf"><?= t('admin_import_starten') ?></button>
+            <a href="?action=import_vergessen" class="btn btn-ghost btn-sm" style="margin-left:8px"><?= t('admin_abbrechen') ?></a>
           </div>
 
           <div id="import-fertig" hidden>
             <p style="margin:14px 0 0;font-size:14px">
-              <strong style="color:var(--color-success)">✅ Fertig.</strong>
-              <a href="<?= e(FORUM_URL) ?>/index.php">Zum Forum</a> ·
-              <a href="?action=boards">Rechte je Forum einrichten</a>
+              <strong style="color:var(--color-success)"><?= t('admin_fertig') ?></strong>
+              <a href="<?= e(FORUM_URL) ?>/index.php"><?= t('admin_x_zum_forum') ?></a> ·
+              <a href="?action=boards"><?= t('admin_rechte_je_forum_einrichten') ?></a>
             </p>
           </div>
         </div>
@@ -3373,19 +3321,17 @@
       <?php endif; ?>
 
     <?php elseif ($action === 'updates'): ?>
-      <h2>🚀 Forum-Updates</h2>
+      <h2><?= t('admin_forum_updates') ?></h2>
 
       <?php /* ── Von aussen betreut (v0.25.0) ── */ ?>
       <?php if (!empty($extern)): ?>
       <div class="card" style="margin-bottom:18px;padding:18px 22px;border-left:3px solid var(--color-accent)">
-        <h3 style="margin:0 0 8px">🛠️ Updates macht der Betreiber des Dienstes</h3>
+        <h3 style="margin:0 0 8px"><?= t('admin_updates_macht_der_betreiber') ?></h3>
         <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin:0">
-          Dieses Forum wird gehostet: Server, Datenbank und Zertifikat stellt der
-          Betreiber des Dienstes, und von dort kommen auch neue Forumix-Versionen.
-          Du musst dafür nichts tun, und hier lässt sich nichts einspielen.
+          <?= t('admin_dieses_forum_wird_gehostet') ?>
         </p>
         <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin:10px 0 0">
-          Installierte Version: <strong><?= e(forum_version()) ?></strong>.
+          <?= t('admin_installierte_version') ?> <strong><?= e(forum_version()) ?></strong>.
           Unten im Verlauf steht, was bisher eingespielt wurde.
         </p>
       </div>
@@ -3394,11 +3340,9 @@
       <?php /* ── Update-Paket hochladen (v0.18.54, nur Owner) ── */ ?>
       <?php if (!empty($canUpload)): ?>
       <div class="card" style="margin-bottom:18px;padding:20px 22px">
-        <h3 style="margin:0 0 10px">📦 Update-Paket einspielen</h3>
+        <h3 style="margin:0 0 10px"><?= t('admin_update_paket_einspielen') ?></h3>
         <p style="font-size:13px;color:var(--text-muted);line-height:1.6;margin:0 0 14px">
-          Lade ein Update-ZIP hoch. Es wird automatisch geprüft (nur erlaubte Datei-Typen),
-          die Dateien werden kopiert und enthaltenes SQL wird ausgeführt. Das Ergebnis
-          erscheint anschließend im Verlauf.
+          <?= t('admin_lade_ein_update_zip') ?>
         </p>
 
         <form method="post" action="?action=upload_update" enctype="multipart/form-data"
@@ -3407,23 +3351,23 @@
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
             <input type="file" name="update_zip" accept=".zip,application/zip" required
                    style="flex:1;min-width:240px">
-            <button type="submit" class="btn btn-primary">📦 Einspielen</button>
+            <button type="submit" class="btn btn-primary"><?= t('admin_einspielen') ?></button>
           </div>
         </form>
 
         <div style="margin-top:14px;padding:12px 14px;background:var(--bg-surface2);border-radius:6px;font-size:12px;color:var(--text-muted);line-height:1.7">
-          <strong>Aufbau des Pakets:</strong>
-          <code>update.json</code> (Pflicht: Version + Name) ·
-          <code>update.sql</code> (optional, wird ausgeführt) ·
-          <code>files/…</code> (wird ins Forum kopiert)<br>
-          <strong>Erlaubte Typen:</strong> php, css, js, sql, html, tpl, json, md, txt, Bilder, Fonts.
-          Alles andere → Abbruch. Pfad-Traversal (<code>..</code>) wird blockiert.
+          <strong><?= t('admin_aufbau_des_pakets') ?></strong>
+          <code>update.json</code> <?= t('admin_pflicht_version_name') ?>
+          <code>update.sql</code> <?= t('admin_optional_wird_ausgefuehrt') ?>
+          <code>files/…</code> <?= t('admin_wird_ins_forum_kopiert') ?><br>
+          <strong><?= t('admin_erlaubte_typen') ?></strong> php, css, js, sql, html, tpl, json, md, txt, Bilder, Fonts.
+          <?= t('admin_typen_abbruch', '<code>..</code>') ?>
         </div>
       </div>
       <?php elseif (empty($extern)): ?>
       <div class="card" style="margin-bottom:18px;padding:16px 20px;background:var(--bg-surface2);border-left:3px solid var(--color-warning)">
         <p style="font-size:13px;color:var(--text-muted);margin:0">
-          ℹ️ Update-Pakete können nur vom <strong>Owner</strong> eingespielt werden.
+          ℹ️ Update-Pakete können nur vom <strong><?= t('admin_owner') ?></strong> eingespielt werden.
         </p>
       </div>
       <?php endif; ?>
@@ -3456,15 +3400,15 @@
         $pendingMigs = array_filter($migrations, fn($m) => !$m['executed']);
       ?>
       <?php if (!empty($pendingMigs)): ?>
-      <div class="section-heading">Verfügbare Datei-Migrationen</div>
+      <div class="section-heading"><?= t('admin_verfuegbare_datei_migrationen') ?></div>
       <div class="card">
         <table class="forum-table">
           <thead>
             <tr>
-              <th style="width:80px">Version</th>
-              <th>Beschreibung</th>
-              <th style="width:160px">Status</th>
-              <th style="width:160px;text-align:right">Aktion</th>
+              <th style="width:80px"><?= t('admin_version') ?></th>
+              <th><?= t('admin_beschreibung') ?></th>
+              <th style="width:160px"><?= t('admin_status') ?></th>
+              <th style="width:160px;text-align:right"><?= t('admin_aktion') ?></th>
             </tr>
           </thead>
           <tbody>
@@ -3472,7 +3416,7 @@
               <tr>
                 <td><code style="font-weight:700"><?= e($m['version']) ?></code></td>
                 <td><?= e($m['name']) ?></td>
-                <td><span class="role-tag" style="background:#f59e0b">⏳ Ausstehend</span></td>
+                <td><span class="role-tag" style="background:#f59e0b"><?= t('admin_ausstehend') ?></span></td>
                 <td style="text-align:right">
                   <?php if (!empty($canMigrate)): ?>
                   <form method="post" action="?action=run_migration" style="display:inline">
@@ -3499,16 +3443,16 @@
       <?php /* ── Verlauf (begrenzt + ausklappbar) ── */ ?>
       <?php if (!empty($executed)): ?>
       <div class="section-heading" style="margin-top:24px">
-        Verlauf <span style="font-weight:400;color:var(--text-muted);font-size:13px">(<?= count($executed) ?> gesamt)</span>
+        <?= t('admin_verlauf') ?> <span style="font-weight:400;color:var(--text-muted);font-size:13px">(<?= count($executed) ?> gesamt)</span>
       </div>
       <div class="card">
         <table class="forum-table">
           <thead>
             <tr>
-              <th style="width:110px">Version</th>
-              <th>Beschreibung</th>
-              <th style="width:140px">Ausgeführt am</th>
-              <th style="width:120px">Durch</th>
+              <th style="width:110px"><?= t('admin_version') ?></th>
+              <th><?= t('admin_beschreibung') ?></th>
+              <th style="width:140px"><?= t('admin_ausgefuehrt_am') ?></th>
+              <th style="width:120px"><?= t('admin_durch') ?></th>
             </tr>
           </thead>
           <tbody>
@@ -3551,12 +3495,12 @@
              Zeilen unter dem Satz, dass sich der Betreiber kümmert. ── */ ?>
       <?php if (empty($extern)): ?>
       <div class="card" style="margin-top:18px;padding:16px 20px;background:var(--bg-surface2);border-left:3px solid var(--color-warning)">
-        <strong style="font-size:13px">⚠️ Wichtige Hinweise</strong>
+        <strong style="font-size:13px"><?= t('admin_wichtige_hinweise') ?></strong>
         <ul style="margin:8px 0 0 18px;font-size:12px;color:var(--text-muted);line-height:1.8">
-          <li>Vor jedem Update: <strong>Datenbank-Backup</strong> anlegen</li>
-          <li>SQL im Paket wird statement-weise ausgeführt; bereits vorhandene Spalten werden übersprungen (idempotenz-freundlich)</li>
-          <li>Nur der <strong>Owner</strong> kann Pakete einspielen (kann beliebigen Code installieren)</li>
-          <li>Bei Fehlern: Backup zurückspielen, Paket korrigieren, erneut einspielen</li>
+          <li><?= t('admin_vor_jedem_update') ?> <strong><?= t('admin_datenbank_backup') ?></strong> anlegen</li>
+          <li><?= t('admin_sql_im_paket_wird') ?></li>
+          <li><?= t('admin_nur_der') ?> <strong><?= t('admin_owner') ?></strong> kann Pakete einspielen (kann beliebigen Code installieren)</li>
+          <li><?= t('admin_bei_fehlern_backup_zurueckspielen') ?></li>
         </ul>
       </div>
       <?php endif; ?>
@@ -3564,28 +3508,28 @@
     <?php /* ════════════ WARTUNG ════════════ */ ?>
     <?php elseif ($action === 'smileys'): ?>
       <div class="admin-page-head">
-        <h1>😀 Smileys verwalten</h1>
-        <p>Bearbeite die Smileys die im Forum verwendet werden können. „Im Picker" bestimmt, ob das Smiley in der Schnellauswahl-Leiste über dem Eingabefeld erscheint.</p>
+        <h1><?= t('admin_smileys_verwalten') ?></h1>
+        <p><?= t('admin_bearbeite_die_smileys_die') ?></p>
       </div>
 
       <div class="form-card">
-        <h2>➕ Neues Smiley anlegen</h2>
+        <h2><?= t('admin_neues_smiley_anlegen') ?></h2>
         <form method="post" action="?action=add_smiley" class="smiley-add-form">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
-          <label>Code
+          <label><?= t('admin_code') ?>
             <input type="text" name="code" placeholder=":example:" required maxlength="30">
           </label>
-          <label>Emoji
+          <label><?= t('admin_emoji') ?>
             <input type="text" name="emoji" placeholder="🙂" required maxlength="10" class="smiley-emoji-input">
           </label>
-          <label>Beschreibung
+          <label><?= t('admin_beschreibung') ?>
             <input type="text" name="description" placeholder="z.B. Lächeln" maxlength="100">
           </label>
           <label class="smiley-picker-toggle">
             <input type="checkbox" name="is_in_picker" value="1">
-            <span>Im Picker</span>
+            <span><?= t('admin_im_picker') ?></span>
           </label>
-          <button type="submit" class="btn btn-primary">Anlegen</button>
+          <button type="submit" class="btn btn-primary"><?= t('admin_anlegen') ?></button>
         </form>
       </div>
 
@@ -3597,7 +3541,7 @@
       <div class="form-card">
         <h2>⭐ Im Picker (<?= count($smileysInPicker) ?>)</h2>
         <p class="form-hint">
-          Diese Smileys werden in der Schnellauswahl-Leiste über dem Eingabefeld angezeigt. Drag &amp; Drop zum Sortieren – die Reihenfolge wird automatisch gespeichert.
+          <?= t('admin_smileys_picker_hinweis') ?>
         </p>
 
         <div class="smiley-list" data-sortable="true">
@@ -3611,7 +3555,7 @@
               <input type="text" name="description" value="<?= e($s['description']) ?>" maxlength="100" class="smiley-desc-input">
               <label class="smiley-picker-toggle">
                 <input type="checkbox" name="is_in_picker" value="1" checked>
-                <span>Picker</span>
+                <span><?= t('admin_picker') ?></span>
               </label>
               <div class="smiley-actions">
                 <button type="submit" class="btn btn-sm" title="Speichern">💾</button>
@@ -3625,8 +3569,8 @@
       <div class="form-card">
         <h2>📋 Weitere Smileys (<?= count($smileysOther) ?>)</h2>
         <p class="form-hint">
-          Diese Smileys funktionieren als Codes (z.B. <code>:beer:</code>), erscheinen aber nicht in der Schnellauswahl. Häkchen bei „Picker" setzen und speichern, um ins Picker aufzunehmen.
-          Smileys mit dem Hinweis „<em>Alias von</em>" haben das gleiche Emoji wie ein Picker-Smiley – sie sind alternative Schreibweisen.
+          <?= t('admin_smileys_als_code', '<code>:beer:</code>') ?>
+          <?= t('admin_alias_hinweis', '<em>' . e(t('admin_alias_von')) . '</em>') ?><?= '' ?>
         </p>
 
         <?php
@@ -3647,13 +3591,13 @@
               <div class="smiley-code-wrap">
                 <input type="text" name="code" value="<?= e($s['code']) ?>" maxlength="30" required class="smiley-code-input">
                 <?php if ($aliasOf): ?>
-                  <small class="smiley-alias-hint">Alias von <code><?= e($aliasOf) ?></code></small>
+                  <small class="smiley-alias-hint"><?= t('admin_alias_von') ?> <code><?= e($aliasOf) ?></code></small>
                 <?php endif; ?>
               </div>
               <input type="text" name="description" value="<?= e($s['description']) ?>" maxlength="100" class="smiley-desc-input">
               <label class="smiley-picker-toggle">
                 <input type="checkbox" name="is_in_picker" value="1">
-                <span>Picker</span>
+                <span><?= t('admin_picker') ?></span>
               </label>
               <div class="smiley-actions">
                 <button type="submit" class="btn btn-sm" title="Speichern">💾</button>
@@ -3808,25 +3752,23 @@
 
     <?php elseif ($action === 'legal'): ?>
       <div class="admin-page-head">
-        <h1>📄 Rechtliches</h1>
+        <h1><?= t('admin_rechtliches') ?></h1>
         <p>
-          Hier verwaltest du <strong>Impressum</strong>, <strong>Datenschutzerklärung</strong> und <strong>Nutzungsbedingungen</strong>.
-          Daten wie Name oder Adresse werden zentral hier gepflegt und automatisch in alle Seiten eingesetzt.
+          <?= t('admin_rechtliches_hinweis', '<strong>' . e(t('admin_impressum')) . '</strong>', '<strong>' . e(t('admin_datenschutzerklaerung')) . '</strong>', '<strong>' . e(t('admin_nutzungsbedingungen')) . '</strong>') ?>
         </p>
       </div>
 
       <!-- ─── Daten-Felder (Settings für Platzhalter) ─── -->
       <div class="form-card">
-        <h2>👤 Kontaktdaten</h2>
+        <h2><?= t('admin_kontaktdaten') ?></h2>
         <p class="form-hint">
-          Diese Daten werden in den Seiten als Platzhalter eingesetzt: <code>{{name}}</code>, <code>{{street}}</code>, <code>{{city}}</code>, <code>{{email}}</code>.
-          Wenn du sie hier änderst, wirken sich die Änderungen sofort auf alle Seiten aus.
+          <?= t('admin_platzhalter_daten_hinweis', '<code>{{name}}</code>, <code>{{street}}</code>, <code>{{city}}</code>, <code>{{email}}</code>') ?>
         </p>
         <form method="post" action="?action=save_legal">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
 
           <div class="form-row">
-            <label for="imprint_name">Name / Verantwortliche Person</label>
+            <label for="imprint_name"><?= t('admin_name_verantwortliche_person') ?></label>
             <input type="text" id="imprint_name" name="imprint_name"
                    value="<?= e($imprint['name']) ?>"
                    placeholder="z.B. Max Mustermann oder Mustermann GmbH"
@@ -3834,7 +3776,7 @@
           </div>
 
           <div class="form-row">
-            <label for="imprint_street">Straße und Hausnummer</label>
+            <label for="imprint_street"><?= t('admin_strasse_und_hausnummer') ?></label>
             <input type="text" id="imprint_street" name="imprint_street"
                    value="<?= e($imprint['street']) ?>"
                    placeholder="z.B. Musterstraße 1"
@@ -3842,7 +3784,7 @@
           </div>
 
           <div class="form-row">
-            <label for="imprint_city">PLZ und Ort</label>
+            <label for="imprint_city"><?= t('admin_plz_und_ort') ?></label>
             <input type="text" id="imprint_city" name="imprint_city"
                    value="<?= e($imprint['city']) ?>"
                    placeholder="z.B. 12345 Musterstadt"
@@ -3850,14 +3792,14 @@
           </div>
 
           <div class="form-row">
-            <label for="imprint_email">E-Mail-Adresse</label>
+            <label for="imprint_email"><?= t('admin_e_mail_adresse') ?></label>
             <input type="email" id="imprint_email" name="imprint_email"
                    value="<?= e($imprint['email']) ?>"
                    placeholder="z.B. kontakt@example.com"
                    maxlength="200">
           </div>
 
-          <button type="submit" class="btn btn-primary">💾 Daten speichern</button>
+          <button type="submit" class="btn btn-primary"><?= t('admin_daten_speichern') ?></button>
         </form>
       </div>
 
@@ -3879,16 +3821,16 @@
 
             <?php
               $editorValue          = $pageData['content'];
-              $editorPlaceholder    = 'Seiten-Inhalt im BBCode-Format…';
+              $editorPlaceholder    = t('admin_seiten_inhalt_im_bbcode');
               $editorAllowHeadings  = true;
               $editorRequired       = true;
               include __DIR__ . '/../partials/editor.php';
             ?>
 
             <div style="display:flex;gap:8px;margin-top:14px">
-              <button type="submit" class="btn btn-primary">💾 Seite speichern</button>
+              <button type="submit" class="btn btn-primary"><?= t('admin_seite_speichern') ?></button>
               <a href="<?= e(FORUM_URL) ?>/<?= e($pageData['slug']) ?>.php" target="_blank" class="btn btn-ghost">👁️ Live-Vorschau (öffnet in neuem Tab)</a>
-              <a href="?action=legal" class="btn btn-ghost">↶ Zurück zur Übersicht</a>
+              <a href="?action=legal" class="btn btn-ghost"><?= t('admin_zurueck_zur_uebersicht') ?></a>
             </div>
           </form>
         </div>
@@ -3896,9 +3838,9 @@
       <?php else: ?>
         <!-- Page-Liste -->
         <div class="form-card">
-          <h2>📑 Verfügbare Seiten</h2>
+          <h2><?= t('admin_verfuegbare_seiten') ?></h2>
           <p class="form-hint">
-            Klick auf eine Seite, um sie zu bearbeiten.
+            <?= t('admin_klick_auf_eine_seite') ?>
           </p>
 
           <div style="display:flex;flex-direction:column;gap:8px">
@@ -3924,8 +3866,7 @@
 
           <?php if (empty($pages)): ?>
             <p style="color:var(--text-muted);font-style:italic;margin-top:14px">
-              ⚠️ Keine Pages in der Datenbank gefunden.
-              Wenn du gerade von v0.18.5 oder älter geupdatet hast, führe bitte die <a href="?action=updates">Migration v0.18.6</a> aus.
+              <?= t('admin_keine_pages_in_der') ?> <a href="?action=updates"><?= t('admin_migration_v0_18_6') ?></a> aus.
             </p>
           <?php endif; ?>
         </div>
@@ -3934,9 +3875,9 @@
       <div class="form-card" style="background:var(--bg-surface2)">
         <h3 style="margin-bottom:8px">ℹ️ Hinweise</h3>
         <ul style="margin-left:18px;line-height:1.7;color:var(--text-muted);font-size:14px">
-          <li>Die Texte sind in BBCode geschrieben. Verfügbare Tags: <code>[b]</code>, <code>[i]</code>, <code>[u]</code>, <code>[h2]</code>, <code>[h3]</code>, <code>[list]</code>/<code>[*]</code>, <code>[hr]</code>, <code>[url=...]</code> usw.</li>
-          <li>Platzhalter wie <code>{{name}}</code> werden beim Anzeigen automatisch ersetzt.</li>
-          <li>Bei rechtlichen Unsicherheiten bitte einen Anwalt konsultieren – diese Templates sind <strong>kein Rechtsrat</strong>.</li>
+          <li><?= t('admin_die_texte_sind_in') ?> <code>[b]</code>, <code>[i]</code>, <code>[u]</code>, <code>[h2]</code>, <code>[h3]</code>, <code>[list]</code>/<code>[*]</code>, <code>[hr]</code>, <code>[url=...]</code> usw.</li>
+          <li><?= t('admin_platzhalter_ersetzt', '<code>{{name}}</code>') ?></li>
+          <li><?= t('admin_bei_rechtlichen_unsicherheiten_bitte') ?> <strong>kein Rechtsrat</strong>.</li>
         </ul>
       </div>
 
@@ -3971,11 +3912,10 @@
 
     <?php elseif ($action === 'templates'): ?>
       <div class="admin-page-head">
-        <h1>🖼️ Template-Editor</h1>
+        <h1><?= t('admin_template_editor') ?></h1>
         <p>
-          Hier kannst du Templates der Forum-Oberfläche anpassen. Änderungen werden
-          <strong>als Override in der Datenbank</strong> gespeichert – die Original-Dateien
-          bleiben unverändert. So überstehen deine Anpassungen Updates.
+          <?= t('admin_hier_kannst_du_templates') ?>
+          <?= t('admin_als_override_gespeichert', '<strong>' . e(t('admin_override_in_der_datenbank')) . '</strong>') ?>
         </p>
       </div>
 
@@ -3985,13 +3925,13 @@
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
             <h2 style="margin:0">✏️ <?= e($editingTpl) ?>.tpl.html</h2>
             <div style="display:flex;gap:8px">
-              <a href="?action=templates" class="btn btn-ghost btn-sm">↶ Zurück</a>
+              <a href="?action=templates" class="btn btn-ghost btn-sm"><?= t('admin_zurueck') ?></a>
               <?php if (!empty($tplOverride)): ?>
                 <form method="post" action="?action=reset_template" style="display:inline"
                       onsubmit="return confirm('Wirklich auf Original zurücksetzen? Deine Anpassungen gehen verloren.');">
                   <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                   <input type="hidden" name="name" value="<?= e($editingTpl) ?>">
-                  <button type="submit" class="btn btn-ghost btn-sm">↩️ Auf Original zurücksetzen</button>
+                  <button type="submit" class="btn btn-ghost btn-sm"><?= t('admin_auf_original_zuruecksetzen') ?></button>
                 </form>
               <?php endif; ?>
             </div>
@@ -4000,34 +3940,33 @@
           <?php if (!empty($tplIsStale)): ?>
             <!-- ─── STALE-WARNUNG ─── -->
             <div class="flash flash-warning" style="margin-bottom:14px">
-              <strong>⚠️ Das Original wurde aktualisiert seit du dein Override gespeichert hast!</strong>
+              <strong><?= t('admin_das_original_wurde_aktualisiert') ?></strong>
               <p style="margin:8px 0 0;font-size:13px">
-                Möglicherweise enthält das neue Original Bugfixes oder Features die in deinem
-                Override nicht enthalten sind. Schau dir den Diff unten an und entscheide:
+                <?= t('admin_moeglicherweise_enthaelt_das_neue') ?>
               </p>
               <ul style="margin:8px 0 0 18px;font-size:13px;line-height:1.6">
-                <li><strong>Mein Override behalten</strong>: blendet den Hinweis aus, der Override bleibt aktiv</li>
-                <li><strong>Override neu starten</strong>: löscht den Override, zeigt das neue Original – dann kannst du deine Anpassungen neu einarbeiten</li>
-                <li><strong>Manuell mergen</strong>: bearbeite den Override unten und übernimm die Original-Änderungen die du brauchst</li>
+                <li><strong><?= t('admin_mein_override_behalten') ?></strong>: blendet den Hinweis aus, der Override bleibt aktiv</li>
+                <li><strong><?= t('admin_override_neu_starten') ?></strong>: löscht den Override, zeigt das neue Original – dann kannst du deine Anpassungen neu einarbeiten</li>
+                <li><strong><?= t('admin_manuell_mergen') ?></strong>: bearbeite den Override unten und übernimm die Original-Änderungen die du brauchst</li>
               </ul>
               <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
                 <form method="post" action="?action=ack_template_update" style="display:inline">
                   <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                   <input type="hidden" name="name" value="<?= e($editingTpl) ?>">
-                  <button type="submit" class="btn btn-ghost btn-sm">✓ Mein Override behalten</button>
+                  <button type="submit" class="btn btn-ghost btn-sm"><?= t('admin_mein_override_behalten') ?></button>
                 </form>
                 <form method="post" action="?action=reset_template" style="display:inline"
                       onsubmit="return confirm('Override löschen und mit neuem Original starten?');">
                   <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                   <input type="hidden" name="name" value="<?= e($editingTpl) ?>">
-                  <button type="submit" class="btn btn-ghost btn-sm">🔄 Override neu starten</button>
+                  <button type="submit" class="btn btn-ghost btn-sm"><?= t('admin_override_neu_starten') ?></button>
                 </form>
-                <button type="button" id="btn-show-diff" class="btn btn-ghost btn-sm">🔍 Original-Änderungen anzeigen</button>
+                <button type="button" id="btn-show-diff" class="btn btn-ghost btn-sm"><?= t('admin_original_aenderungen_anzeigen') ?></button>
               </div>
             </div>
 
             <div id="tpl-diff-view" hidden style="margin-bottom:14px">
-              <h3 style="margin-bottom:8px;font-size:14px">Diff: Original beim Save → Aktuelles Original</h3>
+              <h3 style="margin-bottom:8px;font-size:14px"><?= t('admin_diff_original_beim_save') ?></h3>
               <div class="tpl-diff">
                 <?php foreach ($tplDiff as $line): ?>
                   <div class="tpl-diff-line tpl-diff-<?= e($line['type']) ?>">
@@ -4045,7 +3984,7 @@
             </p>
           <?php else: ?>
             <p class="form-hint">
-              ✏️ Dieses Template ist <strong>angepasst</strong>. Beim Speichern wird der Override aktualisiert.
+              <?= t('admin_dieses_template_ist') ?> <strong>angepasst</strong>. Beim Speichern wird der Override aktualisiert.
             </p>
           <?php endif; ?>
 
@@ -4058,29 +3997,29 @@
             </div>
 
             <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button type="submit" class="btn btn-primary">💾 Speichern</button>
-              <button type="button" id="btn-show-original" class="btn btn-ghost">👁️ Original anzeigen</button>
+              <button type="submit" class="btn btn-primary"><?= t('admin_speichern_2') ?></button>
+              <button type="button" id="btn-show-original" class="btn btn-ghost"><?= t('admin_original_anzeigen') ?></button>
             </div>
           </form>
 
           <div id="tpl-original-view" hidden style="margin-top:14px">
-            <h3 style="margin-bottom:8px">📄 Original (read-only):</h3>
+            <h3 style="margin-bottom:8px"><?= t('admin_original_read_only') ?></h3>
             <pre style="background:var(--bg-surface2);padding:14px;border-radius:6px;overflow:auto;font-family:var(--font-mono);font-size:12px;max-height:400px"><?= e($tplOriginal) ?></pre>
           </div>
 
           <div class="form-card" style="margin-top:20px;background:var(--bg-surface2)">
-            <h3 style="margin-bottom:8px">📚 Template-Syntax (Twig-ähnlich)</h3>
+            <h3 style="margin-bottom:8px"><?= t('admin_template_syntax_twig_aehnlich') ?></h3>
             <ul style="margin-left:18px;line-height:1.8;color:var(--text-muted);font-size:13px">
               <li><code>{{ variable }}</code> – Variable ausgeben (HTML-escaped)</li>
               <li><code>{{ variable|raw }}</code> – ohne Escape (vorsicht!)</li>
               <li><code>{% if expr %}…{% else %}…{% endif %}</code> – Bedingung</li>
               <li><code>{% for item in list %}…{% endfor %}</code> – Schleife</li>
               <li><code>{% include 'partial' %}</code> – Anderes Template einbinden</li>
-              <li>Filter: <code>|upper</code>, <code>|lower</code>, <code>|trim</code>, <code>|length</code>, <code>|date('d.m.Y')</code>, <code>|truncate(50)</code>, <code>|nl2br</code>, <code>|default('-')</code></li>
-              <li>Funktionen: <code>url('/x')</code>, <code>asset('style.css')</code>, <code>t('key')</code>, <code>csrf_token()</code></li>
+              <li><?= t('admin_filter') ?> <code>|upper</code>, <code>|lower</code>, <code>|trim</code>, <code>|length</code>, <code>|date('d.m.Y')</code>, <code>|truncate(50)</code>, <code>|nl2br</code>, <code>|default('-')</code></li>
+              <li><?= t('admin_funktionen') ?> <code>url('/x')</code>, <code>asset('style.css')</code>, <code>t('key')</code>, <code>csrf_token()</code></li>
             </ul>
             <p style="margin-top:10px;color:var(--text-faint);font-size:12px">
-              ⚠️ <strong>PHP-Tags sind verboten</strong> (<code>&lt;?php</code>, <code>&lt;?=</code>) – das Forum lehnt das Speichern dann ab.
+              ⚠️ <strong><?= t('admin_php_tags_sind_verboten') ?></strong> (<code>&lt;?php</code>, <code>&lt;?=</code>) – das Forum lehnt das Speichern dann ab.
             </p>
           </div>
         </div>
@@ -4157,7 +4096,7 @@
         <?php if (empty($templates)): ?>
           <div class="form-card">
             <p style="color:var(--text-muted)">
-              Aktuell gibt es noch keine Templates im <code>views_new/</code>-Verzeichnis,
+              <?= t('admin_aktuell_gibt_es_noch') ?> <code>views_new/</code>-Verzeichnis,
               die hier editierbar wären. Im Laufe der Entwicklung werden mehr PHP-Views
               auf das Template-Format umgestellt.
             </p>
@@ -4166,9 +4105,9 @@
           <div class="form-card">
             <h2>📑 Verfügbare Templates (<?= count($templates) ?>)</h2>
             <p class="form-hint">
-              <span class="tpl-badge tpl-badge-original">📄 Original</span> = unverändert ·
-              <span class="tpl-badge tpl-badge-override">✏️ Angepasst</span> = vom Admin überschrieben ·
-              <span class="tpl-badge tpl-badge-stale">⚠️ Veraltet</span> = Original wurde seither aktualisiert
+              <span class="tpl-badge tpl-badge-original"><?= t('admin_original') ?></span> <?= t('admin_unveraendert') ?>
+              <span class="tpl-badge tpl-badge-override"><?= t('admin_angepasst') ?></span> <?= t('admin_vom_admin_ueberschrieben') ?>
+              <span class="tpl-badge tpl-badge-stale"><?= t('admin_veraltet') ?></span> <?= t('admin_original_wurde_seither_aktualisiert') ?>
             </p>
 
             <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
@@ -4177,15 +4116,15 @@
                   <span class="tpl-list-name"><?= e($t['name']) ?><code>.tpl.html</code></span>
                   <span class="tpl-list-meta">
                     <?php if (!empty($t['is_stale'])): ?>
-                      <span class="tpl-badge tpl-badge-stale">⚠️ Veraltet</span>
+                      <span class="tpl-badge tpl-badge-stale"><?= t('admin_veraltet') ?></span>
                     <?php endif; ?>
                     <?php if ($t['has_override']): ?>
-                      <span class="tpl-badge tpl-badge-override">✏️ Angepasst</span>
+                      <span class="tpl-badge tpl-badge-override"><?= t('admin_angepasst') ?></span>
                       <?php if (!empty($t['updated_at'])): ?>
                         · seit <?= e(date('d.m.Y H:i', strtotime($t['updated_at']))) ?>
                       <?php endif; ?>
                     <?php else: ?>
-                      <span class="tpl-badge tpl-badge-original">📄 Original</span>
+                      <span class="tpl-badge tpl-badge-original"><?= t('admin_original') ?></span>
                     <?php endif; ?>
                   </span>
                   <span class="tpl-list-arrow">→</span>
@@ -4196,13 +4135,13 @@
         <?php endif; ?>
 
         <div class="form-card" style="background:var(--bg-surface2)">
-          <h3 style="margin-bottom:8px">ℹ️ Wie funktioniert das?</h3>
+          <h3 style="margin-bottom:8px">ℹ️ <?= t('admin_wie_funktioniert_das') ?></h3>
           <ul style="margin-left:18px;line-height:1.7;color:var(--text-muted);font-size:14px">
-            <li>Originale liegen im Code (<code>views_new/*.tpl.html</code>) und kommen mit jedem Update mit</li>
-            <li>Deine Anpassungen werden als <strong>Override in der Datenbank</strong> gespeichert (Tabelle <code>template_overrides</code>)</li>
-            <li>Bei Updates bleiben deine Overrides erhalten – Originale werden aber aktualisiert</li>
-            <li>Mit „↩️ Auf Original zurücksetzen" wird der Override gelöscht, das Original wieder aktiv</li>
-            <li>PHP-Tags sind aus Sicherheitsgründen <strong>nicht erlaubt</strong> in Template-Inhalten</li>
+            <li><?= t('admin_originale_im_code', '<code>views_new/*.tpl.html</code>') ?></li>
+            <li><?= t('admin_deine_anpassungen_werden_als') ?> <strong><?= t('admin_override_in_der_datenbank') ?></strong> gespeichert (Tabelle <code>template_overrides</code>)</li>
+            <li><?= t('admin_bei_updates_bleiben_deine') ?></li>
+            <li><?= t('admin_mit_auf_original_zuruecksetzen') ?></li>
+            <li><?= t('admin_php_tags_verboten', '<strong>' . e(t('admin_nicht_erlaubt')) . '</strong>') ?></li>
           </ul>
         </div>
       <?php endif; ?>
@@ -4302,44 +4241,39 @@
 
     <?php elseif ($action === 'backups'): ?>
       <div class="admin-page-head">
-        <h1>💾 Backups</h1>
+        <h1><?= t('admin_backups') ?></h1>
         <p>
-          Erstellt Sicherungen der Datenbank und/oder Dateien. Backups landen
-          im geschützten <code>backup/</code>-Verzeichnis und können von hier
-          heruntergeladen werden. Lade sie regelmäßig auf einen anderen Speicherort.
+          <?= t('admin_backups_hinweis', '<code>backup/</code>') ?>
         </p>
       </div>
 
       <?php if (empty($zipAvailable)): ?>
         <div class="flash flash-warning" style="margin-bottom:14px">
-          ⚠️ <strong>PHP-Erweiterung „ZipArchive" fehlt!</strong>
-          Datei- und Komplett-Backups sind ohne diese Extension nicht möglich.
-          Frag deinen Hoster nach Aktivierung. DB-Backup funktioniert trotzdem.
+          ⚠️ <strong><?= t('admin_php_erweiterung_ziparchive_fehlt') ?></strong>
+          <?= t('admin_datei_und_komplett_backups') ?>
         </div>
       <?php endif; ?>
 
       <!-- ─── Erstellen ─── -->
       <div class="form-card">
-        <h2>📦 Neues Backup erstellen</h2>
+        <h2><?= t('admin_neues_backup_erstellen') ?></h2>
         <p class="form-hint">
-          Backups können je nach Forum-Größe einige Sekunden bis Minuten dauern.
-          Komplett-Backups sind besonders speicherintensiv – pack erst ein DB-Backup,
-          wenn du nur die Inhalte sichern willst.
+          <?= t('admin_backups_koennen_je_nach') ?>
         </p>
 
         <form method="post" action="?action=create_backup" id="backup-form">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
 
           <div class="form-row">
-            <label>Notiz (optional)</label>
+            <label><?= t('admin_notiz_optional') ?></label>
             <input type="text" name="note" maxlength="200"
                    placeholder="z.B. „vor v0.18.13 Update" oder „nach Smiley-Refactor">
-            <div class="form-hint">Hilft dir später beim Identifizieren des Backups.</div>
+            <div class="form-hint"><?= t('admin_hilft_dir_spaeter_beim') ?></div>
           </div>
 
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button type="submit" name="type" value="db" class="btn btn-primary">
-              💾 Nur Datenbank
+              <?= t('admin_nur_datenbank') ?>
             </button>
             <button type="submit" name="type" value="files" class="btn btn-ghost" <?= empty($zipAvailable) ? 'disabled' : '' ?>>
               📁 Nur Dateien
@@ -4363,7 +4297,7 @@
 
         <?php if (empty($backups)): ?>
           <p style="color:var(--text-muted);font-style:italic">
-            Noch keine Backups vorhanden. Erstell oben dein erstes Backup.
+            <?= t('admin_noch_keine_backups_vorhanden') ?>
           </p>
         <?php else: ?>
           <div style="display:flex;flex-direction:column;gap:8px">
@@ -4416,11 +4350,11 @@
       <div class="form-card" style="background:var(--bg-surface2)">
         <h3 style="margin-bottom:8px">ℹ️ Wichtige Hinweise</h3>
         <ul style="margin-left:18px;line-height:1.7;color:var(--text-muted);font-size:14px">
-          <li><strong>Backups gehören NICHT auf den gleichen Server</strong> – lade sie regelmäßig auf einen anderen Speicherort (lokaler Rechner, Cloud, etc.)</li>
-          <li>Das <code>backup/</code>-Verzeichnis ist per <code>.htaccess</code> vor Direktzugriff geschützt; Download nur über diese Seite</li>
-          <li><code>config.php</code> ist <strong>nicht</strong> im Dateien-Backup enthalten (Passwörter würden sonst exportiert)</li>
-          <li>Du kannst Backups bei Bedarf per phpMyAdmin / FTP wiederherstellen – Restore-Funktion direkt im Admin folgt evtl. später</li>
-          <li>Beim ersten Backup wird automatisch ein Schutz-<code>.htaccess</code> angelegt – aber prüf trotzdem dass dein Hoster <code>.htaccess</code> respektiert</li>
+          <li><strong><?= t('admin_backups_gehoeren_nicht_auf') ?></strong> – lade sie regelmäßig auf einen anderen Speicherort (lokaler Rechner, Cloud, etc.)</li>
+          <li><?= t('admin_das') ?> <code>backup/</code>-Verzeichnis ist per <code>.htaccess</code> vor Direktzugriff geschützt; Download nur über diese Seite</li>
+          <li><?= t('admin_config_nicht_im_backup', '<code>config.php</code>', '<strong>' . e(t('admin_nicht_erlaubt_kurz')) . '</strong>') ?></li>
+          <li><?= t('admin_du_kannst_backups_bei') ?></li>
+          <li><?= t('admin_beim_ersten_backup_wird') ?><code>.htaccess</code> angelegt – aber prüf trotzdem dass dein Hoster <code>.htaccess</code> respektiert</li>
         </ul>
       </div>
 
@@ -4472,73 +4406,69 @@
       </style>
 
     <?php elseif ($action === 'maintenance'): ?>
-      <h2>🛠️ Wartungs-Tools</h2>
+      <h2><?= t('admin_wartungs_tools') ?></h2>
 
       <div class="form-card" style="margin-bottom:14px">
-        <h2>📊 Statistiken neu berechnen</h2>
+        <h2><?= t('admin_statistiken_neu_berechnen') ?></h2>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">
-          Berechnet Thread-Counter, Post-Counter und Beitragsanzahlen der Nutzer aus den echten Daten neu.
-          Hilfreich, wenn Statistiken nicht stimmen.
+          <?= t('admin_berechnet_thread_counter_post') ?>
         </p>
         <form method="post" action="?action=maintenance_action">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
           <input type="hidden" name="task" value="recount_stats">
-          <button type="submit" class="btn btn-primary">🔄 Statistiken neu berechnen</button>
+          <button type="submit" class="btn btn-primary"><?= t('admin_statistiken_neu_berechnen_2') ?></button>
         </form>
       </div>
 
       <div class="form-card" style="margin-bottom:14px">
-        <h2>🗄️ Datenbank optimieren</h2>
+        <h2><?= t('admin_datenbank_optimieren') ?></h2>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">
-          Führt <code>OPTIMIZE TABLE</code> auf allen Tabellen aus. Sollte gelegentlich ausgeführt werden.
+          <?= t('admin_optimize_hinweis', '<code>OPTIMIZE TABLE</code>') ?>
         </p>
         <form method="post" action="?action=maintenance_action">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
           <input type="hidden" name="task" value="optimize_tables">
-          <button type="submit" class="btn btn-primary">⚡ Tabellen optimieren</button>
+          <button type="submit" class="btn btn-primary"><?= t('admin_tabellen_optimieren') ?></button>
         </form>
       </div>
 
       <div class="form-card" style="margin-bottom:14px">
-        <h2>🌐 IP-Logs aufräumen</h2>
+        <h2><?= t('admin_ip_logs_aufraeumen') ?></h2>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">
-          Aktuell <strong><?= number_format((int) $ipLogSize, 0, ',', '.') ?></strong> IP-Log-Einträge.
+          <?= t('admin_aktuell') ?> <strong><?= number_format((int) $ipLogSize, 0, ',', '.') ?></strong> <?= t('admin_ip_log_eintraege') ?>
         </p>
         <form method="post" action="?action=maintenance_action">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
           <input type="hidden" name="task" value="cleanup_ip_logs">
           <div class="form-row">
-            <label>Einträge älter als (Tage)</label>
+            <label><?= t('admin_eintraege_aelter_als_tage') ?></label>
             <input type="number" name="cleanup_days" value="90" min="7">
           </div>
-          <button type="submit" class="btn btn-danger" onclick="return confirm('Wirklich löschen?')">🗑️ IP-Logs löschen</button>
+          <button type="submit" class="btn btn-danger" onclick="return confirm('Wirklich löschen?')"><?= t('admin_ip_logs_loeschen') ?></button>
         </form>
       </div>
 
       <div class="form-card">
-        <h2>⏰ Abgelaufene IP-Banns entfernen</h2>
+        <h2><?= t('admin_abgelaufene_ip_banns_entfernen') ?></h2>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">
-          Aktuell <strong><?= (int) $expiredIpBans ?></strong> abgelaufene IP-Banns vorhanden.
+          <?= t('admin_aktuell') ?> <strong><?= (int) $expiredIpBans ?></strong> abgelaufene IP-Banns vorhanden.
         </p>
         <form method="post" action="?action=maintenance_action">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
           <input type="hidden" name="task" value="cleanup_expired_ipbans">
-          <button type="submit" class="btn btn-primary">🧹 Abgelaufene IP-Banns löschen</button>
+          <button type="submit" class="btn btn-primary"><?= t('admin_abgelaufene_ip_banns_loeschen') ?></button>
         </form>
       </div>
 
       <div class="form-card" style="margin-top:14px">
-        <h2>🗑️ Cache leeren</h2>
+        <h2><?= t('admin_cache_leeren') ?></h2>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">
-          Leert den Template-Compile-Cache. Nützlich nach manuellen Template-Änderungen
-          per FTP oder wenn nach einem Update neue Templates nicht erscheinen.
-          Normal nicht nötig – Templates werden automatisch neu kompiliert, wenn sich
-          die Source-Datei ändert.
+          <?= t('admin_leert_den_template_compile') ?>
         </p>
 
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px">
           <div class="cache-stat">
-            <div class="cache-stat-label">Template-Cache</div>
+            <div class="cache-stat-label"><?= t('admin_template_cache') ?></div>
             <div class="cache-stat-value">
               <?= (int) $cacheInfo['tpl_count'] ?>
               <span class="cache-stat-unit"><?= $cacheInfo['tpl_count'] === 1 ? 'Datei' : 'Dateien' ?></span>
@@ -4556,10 +4486,10 @@
         <form method="post" action="?action=clear_cache" style="display:inline-flex;gap:8px;flex-wrap:wrap">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
           <button type="submit" name="type" value="templates" class="btn btn-primary">
-            🗑️ Template-Cache leeren
+            <?= t('admin_template_cache_leeren') ?>
           </button>
           <button type="submit" name="type" value="all" class="btn btn-ghost">
-            🧹 Alle Caches leeren
+            <?= t('admin_alle_caches_leeren') ?>
           </button>
         </form>
       </div>
@@ -4595,10 +4525,9 @@
       </style>
 
     <?php elseif ($action === 'bot_log'): ?>
-      <h2>🤖 Bot-Verkehr</h2>
+      <h2><?= t('admin_bot_verkehr') ?></h2>
       <p style="color:var(--text-muted);margin-bottom:18px;line-height:1.6">
-        Diese Liste zeigt alle Bots (Suchmaschinen-Crawler, KI-Indexer, SEO-Tools, Social-Media-Crawler)
-        die das Forum besucht haben. Einträge älter als 90 Tage werden automatisch entfernt.
+        <?= t('admin_diese_liste_zeigt_alle') ?>
       </p>
 
       <!-- Tab-Filter -->
@@ -4608,7 +4537,7 @@
             'all'     => ['🌐 Alle',           $botStats['all']],
             'search'  => ['🔍 Suchmaschinen',  $botStats['search']],
             'ai'      => ['🤖 KI-Bots',        $botStats['ai']],
-            'suspect' => ['🕵️ Verdächtige',   $botStats['suspect']],
+            'suspect' => [t('admin_y_verdaechtige'),   $botStats['suspect']],
           ];
           foreach ($tabs as $key => [$label, $count]):
             $active = $botFilter === $key;
@@ -4643,13 +4572,13 @@
           <table class="forum-table">
             <thead>
               <tr>
-                <th>Bot</th>
-                <th>Kategorie</th>
-                <th>IP-Adresse</th>
-                <th style="text-align:right">Besuche</th>
-                <th>Letzter Besuch</th>
-                <th>Letzte Seite</th>
-                <th>Aktion</th>
+                <th><?= t('admin_bot') ?></th>
+                <th><?= t('admin_kategorie') ?></th>
+                <th><?= t('admin_ip_adresse') ?></th>
+                <th style="text-align:right"><?= t('admin_besuche') ?></th>
+                <th><?= t('admin_letzter_besuch') ?></th>
+                <th><?= t('admin_letzte_seite') ?></th>
+                <th><?= t('admin_aktion') ?></th>
               </tr>
             </thead>
             <tbody>
@@ -4661,7 +4590,7 @@
                   'social'     => '📱 Social',
                   'monitoring' => '🛡️ Monitor',
                   'archive'    => '📦 Archiv',
-                  'suspect'    => '🕵️ Verdächtig',
+                  'suspect'    => t('admin_y_verdaechtig'),
                   'generic'    => '🤖 Allgemein',
                 ];
               ?>
@@ -4686,7 +4615,7 @@
                 <?php if (!empty($b['user_agent']) && $b['category'] === 'suspect'): ?>
                   <tr>
                     <td colspan="7" style="background:var(--bg-surface2);font-size:11px;color:var(--text-muted);padding:6px 14px">
-                      <strong>User-Agent:</strong> <code><?= e(mb_substr($b['user_agent'], 0, 200)) ?></code>
+                      <strong><?= t('admin_user_agent') ?></strong> <code><?= e(mb_substr($b['user_agent'], 0, 200)) ?></code>
                     </td>
                   </tr>
                 <?php endif; ?>

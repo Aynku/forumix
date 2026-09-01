@@ -20,21 +20,21 @@ function ki_json(array $daten, int $code = 200): never {
 }
 
 if (!module_enabled('ki')) {
-    ki_json(['ok' => false, 'fehler' => 'Die KI-Funktionen sind nicht aktiv.'], 404);
+    ki_json(['ok' => false, 'fehler' => t('ki_disabled')], 404);
 }
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    ki_json(['ok' => false, 'fehler' => 'Nur POST.'], 405);
+    ki_json(['ok' => false, 'fehler' => t('error_post_only')], 405);
 }
 if (!verify_csrf($_POST['csrf'] ?? '')) {
-    ki_json(['ok' => false, 'fehler' => 'Sicherheits-Token ungültig. Bitte die Seite neu laden.'], 400);
+    ki_json(['ok' => false, 'fehler' => t('error_csrf_short')], 400);
 }
 
 $cu = current_user();
 if (!$cu) {
-    ki_json(['ok' => false, 'fehler' => 'Nicht angemeldet.'], 401);
+    ki_json(['ok' => false, 'fehler' => t('error_not_signed_in')], 401);
 }
 if (!ki_darf($cu)) {
-    ki_json(['ok' => false, 'fehler' => 'Deine Gruppe ist für die Schreibhilfe nicht freigegeben.'], 403);
+    ki_json(['ok' => false, 'fehler' => t('ki_group_denied')], 403);
 }
 
 $cfg    = ki_einstellungen();
@@ -43,15 +43,15 @@ $ziel   = (string) ($_POST['ziel'] ?? '');
 $text   = (string) ($_POST['text'] ?? '');
 
 if (!isset(ki_befehle()[$befehl])) {
-    ki_json(['ok' => false, 'fehler' => 'Unbekannter Befehl.'], 400);
+    ki_json(['ok' => false, 'fehler' => t('ki_unknown_command')], 400);
 }
 if (!ki_befehl_frei($befehl, $cfg)) {
-    ki_json(['ok' => false, 'fehler' => 'Dieser Befehl ist abgeschaltet.'], 403);
+    ki_json(['ok' => false, 'fehler' => t('ki_command_off')], 403);
 }
 
 $text = trim($text);
 if ($text === '') {
-    ki_json(['ok' => false, 'fehler' => 'Da ist noch kein Text.'], 400);
+    ki_json(['ok' => false, 'fehler' => t('ki_no_text')], 400);
 }
 
 // Obergrenze fuer die Eingabe. Sie schuetzt zwei Dinge: die Rechnung des
@@ -60,8 +60,7 @@ if ($text === '') {
 $grenze = (int) ($cfg['max_zeichen'] ?? 8000);
 if ($grenze < 500) $grenze = 8000;
 if (mb_strlen($text) > $grenze) {
-    ki_json(['ok' => false, 'fehler' => 'Der Text ist zu lang (' . number_format(mb_strlen($text), 0, ',', '.')
-        . ' Zeichen, erlaubt sind ' . number_format($grenze, 0, ',', '.') . '). Markiere einen Abschnitt.'], 400);
+    ki_json(['ok' => false, 'fehler' => t('ki_text_too_long', number_format(mb_strlen($text), 0, ',', '.'), number_format($grenze, 0, ',', '.'))], 400);
 }
 
 // ── Bremse ────────────────────────────────────────────────────────────
@@ -74,8 +73,7 @@ if ($proStunde > 0) {
         $zahl = db_count('SELECT COUNT(*) FROM ki_nutzung WHERE user_id = ? AND created_at > (NOW() - INTERVAL 1 HOUR)',
             [(int) $cu['user_id']]);
         if ($zahl >= $proStunde) {
-            ki_json(['ok' => false, 'fehler' => 'Du hast das Stundenlimit erreicht (' . $proStunde
-                . '). Bitte später weitermachen.'], 429);
+            ki_json(['ok' => false, 'fehler' => t('ki_hour_limit', $proStunde)], 429);
         }
     } catch (Exception $e) {
         // Tabelle fehlt (Modul nie aktiviert): dann greift die Bremse nicht,
@@ -120,7 +118,7 @@ try {
     ki_json(['ok' => false, 'fehler' => $e->getMessage()], 502);
 } catch (Throwable $e) {
     error_log('[ki] unerwartet: ' . $e->getMessage());
-    ki_json(['ok' => false, 'fehler' => 'Da ist etwas schiefgegangen.'], 500);
+    ki_json(['ok' => false, 'fehler' => t('error_something_went_wrong')], 500);
 }
 
 try {
@@ -159,9 +157,7 @@ $antwort = [
 // Wenn das Modell eine Marke verschluckt hat, steht der Block jetzt am Ende
 // statt an seiner Stelle. Das muss der Verfasser wissen, bevor er uebernimmt.
 if (!empty($verschluckt)) {
-    $antwort['hinweis'] = $verschluckt === 1
-        ? 'Ein Zitat oder Code-Block wurde ans Ende gesetzt — bitte vor dem Übernehmen prüfen.'
-        : $verschluckt . ' Zitate oder Code-Blöcke wurden ans Ende gesetzt — bitte vor dem Übernehmen prüfen.';
+    $antwort['hinweis'] = tn('ki_blocks_moved', (int) $verschluckt);
 }
 
 ki_json($antwort);

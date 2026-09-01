@@ -39,20 +39,20 @@ const MODULPAKET_MAX_BYTES = 10 * 1024 * 1024;   // 10 MB
  */
 function modulpaket_pruefen(string $zipPfad): array {
     if (!class_exists('ZipArchive')) {
-        return ['ok' => false, 'error' => 'Die ZIP-Erweiterung fehlt auf diesem Server.'];
+        return ['ok' => false, 'error' => t('sys_die_zip_erweiterung_fehlt')];
     }
     $groesse = @filesize($zipPfad);
     if ($groesse === false || $groesse <= 0) {
-        return ['ok' => false, 'error' => 'Die Datei ist leer oder nicht lesbar.'];
+        return ['ok' => false, 'error' => t('sys_die_datei_ist_leer')];
     }
     if ($groesse > MODULPAKET_MAX_BYTES) {
-        return ['ok' => false, 'error' => 'Das Paket ist größer als '
+        return ['ok' => false, 'error' => t('sys_das_paket_ist_groesser')
             . round(MODULPAKET_MAX_BYTES / 1024 / 1024) . ' MB.'];
     }
 
     $zip = new ZipArchive();
     if ($zip->open($zipPfad) !== true) {
-        return ['ok' => false, 'error' => 'Das Archiv lässt sich nicht öffnen.'];
+        return ['ok' => false, 'error' => t('sys_das_archiv_laesst_sich')];
     }
 
     $dateien = [];
@@ -78,11 +78,11 @@ function modulpaket_pruefen(string $zipPfad): array {
 
     if ($manifestRoh === null || $manifestRoh === false) {
         $zip->close();
-        return ['ok' => false, 'error' => 'Im Paket fehlt module.json.'];
+        return ['ok' => false, 'error' => t('sys_im_paket_fehlt_module')];
     }
     if (!$dateien) {
         $zip->close();
-        return ['ok' => false, 'error' => 'Das Paket enthält keine Dateien unter files/.'];
+        return ['ok' => false, 'error' => t('sys_das_paket_enthaelt_keine')];
     }
 
     $manifest = json_decode((string) $manifestRoh, true);
@@ -94,11 +94,11 @@ function modulpaket_pruefen(string $zipPfad): array {
     $code = (string) ($manifest['code'] ?? '');
     if (!function_exists('module_code_is_valid') || !module_code_is_valid($code)) {
         $zip->close();
-        return ['ok' => false, 'error' => 'Ungültiger Modulname in module.json.'];
+        return ['ok' => false, 'error' => t('sys_ungueltiger_modulname_in_module')];
     }
     if (trim((string) ($manifest['version'] ?? '')) === '') {
         $zip->close();
-        return ['ok' => false, 'error' => 'In module.json fehlt die Fassung.'];
+        return ['ok' => false, 'error' => t('sys_in_module_json_fehlt')];
     }
 
     // module.php muss dabei sein, sonst erkennt der Kern das Modul nicht.
@@ -108,7 +108,7 @@ function modulpaket_pruefen(string $zipPfad): array {
     }
     if (!$hatManifestDatei) {
         $zip->close();
-        return ['ok' => false, 'error' => 'Im Paket fehlt files/module.php.'];
+        return ['ok' => false, 'error' => t('sys_im_paket_fehlt_files')];
     }
 
     $verlangt = modulpaket_fassung_pruefen($manifest);
@@ -138,7 +138,7 @@ function modulpaket_fassung_pruefen(array $manifest): ?string {
     $sauber = static fn (string $v): string => preg_replace('/[^0-9.].*$/', '', trim($v)) ?: '0';
 
     if (version_compare($sauber($hier), $sauber($verlangt), '<')) {
-        return 'Dieses Modul verlangt Forumix ' . $verlangt . ', hier läuft ' . $hier . '.';
+        return t('sys_dieses_modul_verlangt_forumix') . $verlangt . ', hier läuft ' . $hier . '.';
     }
     return null;
 }
@@ -158,7 +158,7 @@ function modulpaket_einspielen(ZipArchive $zip, array $manifest, array $dateien)
     $ziel  = dirname(__DIR__) . '/modules/' . $code;
 
     if (!is_dir($ziel) && !@mkdir($ziel, 0755, true) && !is_dir($ziel)) {
-        return ['ok' => false, 'error' => 'Das Verzeichnis modules/' . $code . ' liess sich nicht anlegen.'];
+        return ['ok' => false, 'error' => t('sys_das_verzeichnis_modules') . $code . ' liess sich nicht anlegen.'];
     }
 
     $geschrieben = 0;
@@ -174,20 +174,20 @@ function modulpaket_einspielen(ZipArchive $zip, array $manifest, array $dateien)
         $echtZiel = realpath($ziel);
         $echtDir  = dirname($pfad);
         if (!is_dir($echtDir) && !@mkdir($echtDir, 0755, true) && !is_dir($echtDir)) {
-            return ['ok' => false, 'error' => 'Unterverzeichnis liess sich nicht anlegen: ' . $relativ];
+            return ['ok' => false, 'error' => t('sys_unterverzeichnis_liess_sich_nicht') . $relativ];
         }
         $echtVater = realpath(dirname($pfad));
         if ($echtZiel === false || $echtVater === false
             || !str_starts_with($echtVater . '/', $echtZiel . '/')) {
-            return ['ok' => false, 'error' => 'Pfad zeigt aus dem Modulverzeichnis heraus: ' . $relativ];
+            return ['ok' => false, 'error' => t('sys_pfad_zeigt_aus_dem') . $relativ];
         }
 
         $inhalt = $zip->getFromName($eintrag);
         if ($inhalt === false) {
-            return ['ok' => false, 'error' => 'Datei liess sich nicht lesen: ' . $relativ];
+            return ['ok' => false, 'error' => t('sys_datei_liess_sich_nicht') . $relativ];
         }
         if (file_put_contents($pfad, $inhalt) === false) {
-            return ['ok' => false, 'error' => 'Datei liess sich nicht schreiben: ' . $relativ];
+            return ['ok' => false, 'error' => t('sys_datei_liess_sich_nicht_2') . $relativ];
         }
         @chmod($pfad, 0644);
         $geschrieben++;

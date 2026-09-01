@@ -11,10 +11,10 @@ require_once __DIR__ . '/../bootstrap.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf(post_str('csrf'))) {
     try { remember_destroy_current(); } catch (Exception $e) {}
     logout_user();
-    flash('Du wurdest abgemeldet.', 'info');
+    flash(t('logout_done'), 'info');
     redirect(FORUM_URL . '/index.php');
 }
 
 if (!is_logged_in()) redirect(FORUM_URL . '/index.php');
 
-render('logout', ['title' => 'Abmelden']);
+render('logout', ['title' => t('logout')]);

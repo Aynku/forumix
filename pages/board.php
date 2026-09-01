@@ -12,7 +12,7 @@ $board = db_fetch('
 
 if (!$board) {
     http_response_code(404);
-    error_page(404, 'Forum nicht gefunden', 'Dieses Forum gibt es nicht.');
+    error_page(404, t('error_board_missing_title'), t('error_board_missing_text'));
 }
 
 // Kein Zugang? Dann haengt es am Passwort oder an der Gruppe.
@@ -22,7 +22,7 @@ if (!board_user_can_access($board)) {
     // ein Eingabefeld anbieten, das hier nichts oeffnen kann.
     if (board_zugangsgrund($board) === 'gruppe') {
         http_response_code(404);
-        error_page(404, 'Forum nicht gefunden', 'Dieses Forum gibt es nicht.');
+        error_page(404, t('error_board_missing_title'), t('error_board_missing_text'));
     }
     redirect(FORUM_URL . '/board_unlock.php?id=' . $boardId);
 }

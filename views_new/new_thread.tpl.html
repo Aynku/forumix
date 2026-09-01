@@ -4,11 +4,11 @@
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf" value="{{ csrfToken }}">
       <div class="form-row">
-        <label>Titel</label>
+        <label>{{ t('new_thread_titel') }}</label>
         <input type="text" name="title" maxlength="200" value="{{ formTitle ?? '' }}" required autofocus>
       </div>
       <div class="form-row">
-        <label>Beitrag</label>
+        <label>{{ t('new_thread_beitrag') }}</label>
         {{ render_editor('content', 'content', formContent ?? '', 'Schreibe etwas zum Thema… (BBCode unterstützt)', true, false)|raw }}
       </div>
       {% if darfAnhang %}
@@ -20,7 +20,7 @@
 
       {% if availableTags %}
       <div class="form-row">
-        <label>Tags (max. 5)</label>
+        <label>{{ t('new_thread_tags_max_5') }}</label>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           {% for tg in availableTags %}
             <label class="tag-checkbox" style="border-color:{{ tg.color }}">
@@ -38,25 +38,25 @@
         <div style="margin-top:12px">
           <div class="form-row">
             <label>{{ t('poll_question') }}</label>
-            <input type="text" name="poll_question" maxlength="255" placeholder="z.B. Welches Feature wünscht ihr euch?">
+            <input type="text" name="poll_question" maxlength="255" placeholder="{{ t('new_thread_poll_placeholder') }}">
           </div>
           <div class="form-row">
-            <label>Optionen (mindestens 2)</label>
+            <label>{{ t('new_thread_optionen_mindestens_2') }}</label>
             <input type="text" name="poll_options[]" placeholder="Option 1" maxlength="200" style="margin-bottom:6px">
             <input type="text" name="poll_options[]" placeholder="Option 2" maxlength="200" style="margin-bottom:6px">
             <input type="text" name="poll_options[]" placeholder="Option 3 (optional)" maxlength="200" style="margin-bottom:6px">
             <input type="text" name="poll_options[]" placeholder="Option 4 (optional)" maxlength="200">
           </div>
           <div class="form-row">
-            <label><input type="checkbox" name="poll_multi" value="1"> Mehrfachauswahl erlauben</label>
+            <label><input type="checkbox" name="poll_multi" value="1"> {{ t('new_thread_mehrfachauswahl_erlauben') }}</label>
           </div>
         </div>
       </details>
       {% endif %}
 
       <div style="display:flex;gap:8px">
-        <button type="submit" class="btn btn-primary">Thema erstellen</button>
-        <a href="{{ url('/board.php?id=') }}{{ board.board_id }}" class="btn btn-ghost">Abbrechen</a>
+        <button type="submit" class="btn btn-primary">{{ t('new_thread_thema_erstellen') }}</button>
+        <a href="{{ url('/board.php?id=') }}{{ board.board_id }}" class="btn btn-ghost">{{ t('new_thread_abbrechen') }}</a>
       </div>
     </form>
 </div>

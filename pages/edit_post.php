@@ -12,12 +12,12 @@ $post   = db_fetch('
 ', [$postId]);
 
 if (!$post) {
-    error_page(404, 'Beitrag nicht gefunden', 'Diesen Beitrag gibt es nicht oder er wurde entfernt.');
+    error_page(404, t('error_post_missing_title'), t('error_post_missing_text'));
 }
 
 $cu = current_user();
 if ($cu['user_id'] !== $post['user_id'] && !is_mod()) {
-    error_page(403, 'Keine Berechtigung', 'Bearbeiten darf nur der Autor selbst oder ein Moderator.');
+    error_page(403, t('error_denied_title_short'), t('edit_post_not_allowed'));
 }
 
 // Seit 1.5.0 laesst sich das nachtraegliche Aendern je Forum abschalten — in
@@ -26,8 +26,8 @@ if ($cu['user_id'] !== $post['user_id'] && !is_mod()) {
 // Aufraeumen, und board_darf() laesst sie ohnehin durch.
 if ((int) $cu['user_id'] === (int) $post['user_id']
     && !board_darf((int) $post['board_id'], 'bearbeiten')) {
-    error_page(403, 'Nicht änderbar',
-               'In diesem Forum lassen sich eigene Beiträge nachträglich nicht ändern.');
+    error_page(403, t('edit_post_locked_title'),
+               t('edit_post_locked_text'));
 }
 
 $error = '';
@@ -42,15 +42,15 @@ $erstesPost   = (int) db_count('SELECT COALESCE(MIN(post_id), 0) FROM posts WHER
 $tagsEditable = $erstesPost === (int) $postId;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
     $content    = post_str('content');
     $editReason = trim(post_str('edit_reason'));
 
     if (mb_strlen($content) < 3) {
-        $error = 'Beitrag zu kurz.';
+        $error = t('error_post_too_short');
     } elseif ($isModEdit && mb_strlen($editReason) < 3) {
         // Mod-Edit erfordert Grund-Pflicht
-        $error = 'Bei Bearbeitung eines fremden Beitrags ist ein Grund Pflicht.';
+        $error = t('edit_post_reason_required');
     } else {
         // Original-Inhalt im Edit-Log sichern
         record_post_edit((int) $postId, (int) $cu['user_id'], $post['content'], $content, $editReason);
@@ -80,12 +80,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
             } catch (Exception $e) {}
 
-            flash('Beitrag bearbeitet und der Autor wurde benachrichtigt.', 'success');
+            flash(t('edit_post_saved_notified'), 'success');
         } else {
             // Eigener Edit – wie gehabt
             db_execute('UPDATE posts SET content = ?, edited_at = NOW(), edited_by = ? WHERE post_id = ?',
                 [$content, $cu['user_id'], $postId]);
-            flash('Beitrag gespeichert.', 'success');
+            flash(t('edit_post_saved'), 'success');
         }
 
         if ($tagsEditable) {
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 render('edit_post', [
-    'title'         => 'Beitrag bearbeiten',
+    'title'         => t('edit_post_title'),
     'post'          => $post,
     'error'         => $error,
     'isModEdit'     => $isModEdit,

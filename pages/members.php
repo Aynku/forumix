@@ -30,7 +30,7 @@ $allMembers = db_fetchAll("
 ", [$perPage, $pag['offset']]);
 
 render('members', [
-    'title'      => 'Mitglieder',
+    'title'      => t('members'),
     'team'       => $team,
     'members'    => $allMembers,
     'pag'        => $pag,

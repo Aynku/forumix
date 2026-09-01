@@ -3,14 +3,14 @@
 
 {% if currentUser and savedSearches %}
   <div class="saved-searches-bar">
-    <div class="saved-searches-label">Deine gespeicherten Suchen:</div>
+    <div class="saved-searches-label">{{ t('search_deine_gespeicherten_suchen') }}</div>
     <div class="saved-searches-items">
       {% for s in savedSearches %}
         <span class="saved-search-chip">
           <a href="?saved=load&id={{ s.search_id }}">{{ s.name }}</a>
           <a href="?saved=delete&id={{ s.search_id }}&csrf={{ csrfToken }}"
              class="saved-search-x"
-             title="Löschen"
+             title="{{ t('delete') }}"
              onclick="return confirm('Diese gespeicherte Suche löschen?')">✕</a>
         </span>
       {% endfor %}
@@ -21,7 +21,7 @@
 <form method="get" action="{{ url('/search.php') }}" class="form-card search-form">
   <div class="search-main-row">
     <input type="text" name="q" value="{{ query }}" placeholder="Suchbegriff (min. 3 Zeichen)…" autofocus>
-    <button type="submit" class="btn btn-primary">Suchen</button>
+    <button type="submit" class="btn btn-primary">{{ t('search_suchen') }}</button>
     <button type="button" class="btn btn-ghost" id="toggle-filters">
       <span id="filter-toggle-label">Filter {{ isFiltered ? '(aktiv)' : '' }}</span>
     </button>
@@ -30,7 +30,7 @@
   <div class="search-filters {{ isFiltered ? 'open' : '' }}" id="search-filters">
     <div class="search-filter-grid">
       <div class="form-row">
-        <label>Forum</label>
+        <label>{{ t('search_forum') }}</label>
         <select name="board">
           <option value="0">– alle Foren –</option>
           {% for b in boards %}
@@ -42,49 +42,49 @@
       </div>
 
       <div class="form-row">
-        <label>Autor (Benutzername)</label>
+        <label>{{ t('search_autor_benutzername') }}</label>
         <input type="text" name="author_name" value="{{ author }}" placeholder="z.B. Mitgliedsname">
       </div>
 
       <div class="form-row">
-        <label>Datum von</label>
+        <label>{{ t('search_datum_von') }}</label>
         <input type="date" name="date_from" value="{{ dateFrom }}">
       </div>
 
       <div class="form-row">
-        <label>Datum bis</label>
+        <label>{{ t('search_datum_bis') }}</label>
         <input type="date" name="date_to" value="{{ dateTo }}">
       </div>
 
       <div class="form-row">
-        <label>Sortierung</label>
+        <label>{{ t('search_sortierung') }}</label>
         <select name="sort">
-          <option value="relevanz"  {{ sortBy == 'relevanz'  ? 'selected' : '' }}>Beste Treffer</option>
-          <option value="date_desc" {{ sortBy == 'date_desc' ? 'selected' : '' }}>Neueste zuerst</option>
-          <option value="date_asc"  {{ sortBy == 'date_asc'  ? 'selected' : '' }}>Älteste zuerst</option>
-          <option value="reactions" {{ sortBy == 'reactions' ? 'selected' : '' }}>Meiste Reaktionen</option>
-          <option value="replies"   {{ sortBy == 'replies'   ? 'selected' : '' }}>Meiste Antworten</option>
-          <option value="views"     {{ sortBy == 'views'     ? 'selected' : '' }}>Meiste Aufrufe</option>
+          <option value="relevanz"  {{ sortBy == 'relevanz'  ? 'selected' : '' }}>{{ t('search_beste_treffer') }}</option>
+          <option value="date_desc" {{ sortBy == 'date_desc' ? 'selected' : '' }}>{{ t('search_neueste_zuerst') }}</option>
+          <option value="date_asc"  {{ sortBy == 'date_asc'  ? 'selected' : '' }}>{{ t('search_aelteste_zuerst') }}</option>
+          <option value="reactions" {{ sortBy == 'reactions' ? 'selected' : '' }}>{{ t('search_meiste_reaktionen') }}</option>
+          <option value="replies"   {{ sortBy == 'replies'   ? 'selected' : '' }}>{{ t('search_meiste_antworten') }}</option>
+          <option value="views"     {{ sortBy == 'views'     ? 'selected' : '' }}>{{ t('search_meiste_aufrufe') }}</option>
         </select>
       </div>
 
       <div class="form-row search-filter-checkboxes">
-        <label>Erweitert</label>
+        <label>{{ t('search_erweitert') }}</label>
         <label class="search-chk">
           <input type="checkbox" name="has_reactions" value="1" {{ hasReactions ? 'checked' : '' }}>
-          Mit Reaktionen
+          {{ t('search_mit_reaktionen') }}
         </label>
         <label class="search-chk">
           <input type="checkbox" name="has_attachments" value="1" {{ hasAttachments ? 'checked' : '' }}>
-          Mit Anhängen
+          {{ t('search_mit_anhaengen') }}
         </label>
       </div>
     </div>
 
     {% if currentUser and hasQuery %}
       <div class="search-save-row">
-        <input type="text" id="save_name" placeholder="Name für diese Suche, z.B. „Neuess News"" maxlength="100" style="max-width:280px">
-        <button type="button" class="btn btn-ghost btn-sm" id="save-search-btn">Diese Suche speichern</button>
+        <input type="text" id="save_name" placeholder="{{ t('search_name_placeholder') }}"" maxlength="100" style="max-width:280px">
+        <button type="button" class="btn btn-ghost btn-sm" id="save-search-btn">{{ t('search_diese_suche_speichern') }}</button>
       </div>
     {% endif %}
   </div>
@@ -93,7 +93,7 @@
 {% if hasQuery %}
   {% if not results %}
     <div class="card" style="padding:30px;text-align:center;color:var(--text-faint)">
-      Keine Treffer. Versuche andere Suchbegriffe oder weniger Filter.
+      {{ t('search_keine_treffer_versuche_andere') }}
     </div>
   {% else %}
     <div style="margin-bottom:8px;color:var(--text-muted);font-size:13px">

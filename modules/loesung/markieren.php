@@ -8,13 +8,13 @@ require_once __DIR__ . '/../../bootstrap.php';
 require_once __DIR__ . '/lib.php';
 
 if (!module_enabled('loesung')) {
-    error_page(404, 'Nicht gefunden', 'Das Modul ist nicht aktiv.');
+    error_page(404, t('error_not_found_title'), t('loesung_disabled'));
 }
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    error_page(405, 'Falscher Weg', 'Diese Adresse nimmt nur Formulare an.');
+    error_page(405, t('error_wrong_method_title'), t('error_wrong_method_text'));
 }
 if (!verify_csrf($_POST['csrf'] ?? '')) {
-    error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    error_page(400, t('error_csrf_title'), t('error_csrf_text'));
 }
 
 $threadId = (int) ($_POST['thread_id'] ?? 0);
@@ -30,16 +30,16 @@ $row = db_fetch(
     [$postId, $threadId]
 );
 if (!$row) {
-    error_page(404, 'Nicht gefunden', 'Diesen Beitrag gibt es in diesem Thema nicht.');
+    error_page(404, t('error_not_found_title'), t('loesung_post_missing'));
 }
 if (!loesung_darf_markieren($row)) {
-    error_page(403, 'Kein Zugriff', 'Das darf nur der Fragesteller oder die Moderation.');
+    error_page(403, t('error_denied_title'), t('loesung_denied'));
 }
 
 try {
     if (($_POST['tun'] ?? '') === 'aufheben') {
         db_execute('DELETE FROM loesungen WHERE thread_id = ?', [$threadId]);
-        flash('Markierung aufgehoben.', 'success');
+        flash(t('loesung_unmarked'), 'success');
     } else {
         // Ein Thema, eine Loesung: eine zweite Markierung ersetzt die erste.
         db_execute(
@@ -47,11 +47,11 @@ try {
              ON DUPLICATE KEY UPDATE post_id = VALUES(post_id), gesetzt_von = VALUES(gesetzt_von)',
             [$threadId, $postId, (int) current_user()['user_id']]
         );
-        flash('Beitrag als Lösung markiert.', 'success');
+        flash(t('loesung_marked'), 'success');
     }
 } catch (Exception $e) {
     error_log('loesung: ' . $e->getMessage());
-    flash('Das hat nicht geklappt.', 'error');
+    flash(t('loesung_failed'), 'error');
 }
 
 redirect(FORUM_URL . '/thread.php?id=' . $threadId . '#post' . $postId);

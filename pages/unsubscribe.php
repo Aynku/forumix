@@ -40,7 +40,7 @@ if ($token !== '') {
 }
 
 render('unsubscribe', [
-    'title'       => 'Abo-Benachrichtigung entfernt',
+    'title'       => t('unsubscribe_done_title'),
     'status'      => $status,
     'threadTitle' => $threadTitle,
     'breadcrumb'  => [],

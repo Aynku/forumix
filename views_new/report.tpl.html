@@ -1,4 +1,4 @@
-<div class="section-heading">Beitrag melden</div>
+<div class="section-heading">{{ t('report_beitrag_melden') }}</div>
 
 <div class="form-card">
   {% if error %}
@@ -6,12 +6,12 @@
   {% endif %}
 
   <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
-    Du meldest <strong>Beitrag #{{ post.post_id }}</strong>.
+    {{ t('report_du_meldest') }} <strong>Beitrag #{{ post.post_id }}</strong>.
     Die Moderatoren prüfen die Meldung schnellstmöglich.
   </p>
 
   <div class="card" style="margin-bottom:16px;padding:12px 14px;background:var(--bg-surface2)">
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">Auszug aus dem Beitrag:</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">{{ t('report_auszug_aus_dem_beitrag') }}</div>
     <div style="font-size:13px;font-style:italic;color:var(--text-muted)">
       {{ strip_tags(post.content)|truncate(200) }}
     </div>
@@ -21,7 +21,7 @@
     <input type="hidden" name="csrf" value="{{ csrfToken }}">
 
     <div class="form-row">
-      <label>Grund</label>
+      <label>{{ t('report_grund') }}</label>
       <select name="reason" required>
         <option value="">– Bitte auswählen –</option>
         {% for r in reasons %}
@@ -31,13 +31,13 @@
     </div>
 
     <div class="form-row">
-      <label>Anmerkung (optional)</label>
-      <textarea name="comment" maxlength="1000" placeholder="Zusätzliche Informationen für die Moderation…" style="min-height:90px"></textarea>
+      <label>{{ t('report_anmerkung_optional') }}</label>
+      <textarea name="comment" maxlength="1000" placeholder="{{ t('report_note_placeholder') }}" style="min-height:90px"></textarea>
     </div>
 
     <div style="display:flex;gap:8px">
-      <button type="submit" class="btn btn-danger">Meldung absenden</button>
-      <a href="{{ url('/thread.php?id=') }}{{ post.thread_id }}" class="btn btn-ghost">Abbrechen</a>
+      <button type="submit" class="btn btn-danger">{{ t('report_meldung_absenden') }}</button>
+      <a href="{{ url('/thread.php?id=') }}{{ post.thread_id }}" class="btn btn-ghost">{{ t('report_abbrechen') }}</a>
     </div>
   </form>
 </div>

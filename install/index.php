@@ -21,12 +21,34 @@ session_start();
 define('FORUM_INSTALLER', 'web');
 require __DIR__ . '/lib.php';
 
+/*
+ * Sprache des Installers.
+ *
+ * Hier gibt es noch kein Konto und keine Datenbank — die Wahl steht deshalb
+ * in der Adresse (?lang=en) und wird im Cookie gemerkt, damit sie ueber die
+ * fuenf Schritte haelt. current_language() kommt damit zurecht: Es holt das
+ * Konto nur, wenn es eines gibt.
+ *
+ * FORUM_RUNNING braucht lib/lang.php als Riegel gegen direkten Aufruf; der
+ * Installer laeuft, also ist er hier gesetzt.
+ */
+if (!defined('FORUM_RUNNING')) define('FORUM_RUNNING', true);
+
+if (isset($_GET['lang'])) {
+    $gewaehlt = preg_replace('/[^a-z]/', '', (string) $_GET['lang']);
+    if (in_array($gewaehlt, ['de', 'en'], true)) {
+        setcookie('forum_lang', $gewaehlt, ['expires' => 0, 'path' => '/', 'samesite' => 'Lax']);
+        $_COOKIE['forum_lang'] = $gewaehlt;
+    }
+}
+
+
 /* ── Self-Destruct: bereits installiert? ──────────────────────────────── */
 if (install_already_done()) {
     http_response_code(403);
-    render_page('Bereits installiert', '
+    render_page(t('inst_bereits_installiert'), '
         <div class="card">
-            <h2>Forum ist bereits installiert</h2>
+            <h2>' . t('inst_already_done') . '</h2>
             <p>Dieser Installer wurde gesperrt, weil das Forum schon eingerichtet ist.</p>
             <p class="hint">Aus Sicherheitsgründen sollte im Ordner <code>install/</code>
             jetzt alles gelöscht werden — <strong>außer</strong> dem Unterordner
@@ -57,7 +79,7 @@ $errors = [];
 // Schritt 2: DB-Verbindung testen
 if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrf_ok()) {
-        $errors[] = 'Sicherheits-Token ungültig. Bitte Formular erneut absenden.';
+        $errors[] = t('inst_sicherheits_token_ungueltig_bitte');
     } else {
         $c = [
             'host'       => trim($_POST['db_host'] ?? ''),
@@ -69,11 +91,11 @@ if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
             'forum_url'  => rtrim(trim($_POST['forum_url'] ?? ''), '/'),
         ];
         if ($c['host'] === '' || $c['name'] === '' || $c['user'] === '') {
-            $errors[] = 'Host, Datenbankname und Benutzer sind Pflichtfelder.';
+            $errors[] = t('inst_host_datenbankname_und_benutzer');
         }
-        if ($c['forum_name'] === '') { $errors[] = 'Bitte einen Forum-Namen angeben.'; }
+        if ($c['forum_name'] === '') { $errors[] = t('inst_bitte_einen_forum_namen'); }
         if (!filter_var($c['forum_url'], FILTER_VALIDATE_URL)) {
-            $errors[] = 'Bitte eine gültige Forum-URL angeben (inkl. https://).';
+            $errors[] = t('inst_bitte_eine_gueltige_forum');
         }
         if (!$errors) {
             try {
@@ -82,7 +104,7 @@ if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: ?step=3');
                 exit;
             } catch (Throwable $e) {
-                $errors[] = 'Verbindung fehlgeschlagen: ' . $e->getMessage();
+                $errors[] = t('inst_verbindung_fehlgeschlagen') . $e->getMessage();
             }
         }
         $_SESSION['install_db_form'] = $c; // Eingaben für Re-Render merken
@@ -95,7 +117,7 @@ if ($step === 3) {
     if (empty($_SESSION['install_db'])) { header('Location: ?step=2'); exit; }
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!csrf_ok()) {
-            $errors[] = 'Sicherheits-Token ungültig.';
+            $errors[] = t('inst_sicherheits_token_ungueltig');
         } else {
             try {
                 $pdo = pdo_connect($_SESSION['install_db']);
@@ -110,7 +132,7 @@ if ($step === 3) {
                 header('Location: ?step=4');
                 exit;
             } catch (Throwable $e) {
-                $errors[] = 'Schema-Import fehlgeschlagen: ' . $e->getMessage();
+                $errors[] = t('inst_schema_import_fehlgeschlagen') . $e->getMessage();
             }
         }
     }
@@ -123,7 +145,7 @@ if ($step === 4) {
     }
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!csrf_ok()) {
-            $errors[] = 'Sicherheits-Token ungültig.';
+            $errors[] = t('inst_sicherheits_token_ungueltig');
         } else {
             $user  = trim($_POST['owner_user'] ?? '');
             $email = trim($_POST['owner_email'] ?? '');
@@ -132,7 +154,7 @@ if ($step === 4) {
 
             $errors = array_merge($errors, validate_owner($user, $email, $pass));
             if ($pass !== $pass2) {
-                $errors[] = 'Die beiden Passwörter stimmen nicht überein.';
+                $errors[] = t('inst_die_beiden_passwoerter_stimmen');
             }
             if (!$errors) {
                 try {
@@ -142,7 +164,7 @@ if ($step === 4) {
                     // Owner bereits vorhanden? (z.B. Re-Run nach Teilabbruch)
                     $exists = $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
                     if ((int) $exists > 0) {
-                        $errors[] = 'Es existiert bereits ein Benutzer. Bitte die '
+                        $errors[] = t('inst_es_existiert_bereits_ein')
                                   . 'users-Tabelle leeren oder den Schema-Schritt erneut ausführen.';
                     } else {
                         create_owner($pdo, $user, $email, $pass,
@@ -154,11 +176,11 @@ if ($step === 4) {
 
                         if (!write_config($c)) {
                             $errors[] = 'config.php konnte nicht geschrieben werden. '
-                                      . 'Schreibrechte im Forum-Root prüfen.';
+                                      . t('inst_schreibrechte_im_forum_root');
                         } elseif (file_put_contents(LOCK_FILE, "installed " . date('c') . "\n") === false) {
-                            $errors[] = 'Installation abgeschlossen, aber die Sperrdatei '
+                            $errors[] = t('inst_installation_abgeschlossen_aber_die')
                                       . 'install/.installed konnte nicht geschrieben werden. '
-                                      . 'Bitte den Ordner install/ jetzt von Hand löschen.';
+                                      . t('inst_bitte_den_ordner_install');
                         } else {
                             // Session-Reste aufräumen
                             unset($_SESSION['install_db'], $_SESSION['install_db_form'],
@@ -169,7 +191,7 @@ if ($step === 4) {
                         }
                     }
                 } catch (Throwable $e) {
-                    $errors[] = 'Owner-Anlage fehlgeschlagen: ' . $e->getMessage();
+                    $errors[] = t('inst_owner_anlage_fehlgeschlagen') . $e->getMessage();
                 }
             }
         }
@@ -192,7 +214,7 @@ function steps_nav(int $cur): string {
 
 function err_box(array $errors): string {
     if (!$errors) return '';
-    $h = '<div class="errors"><strong>Bitte korrigieren:</strong><ul>';
+    $h = '<div class="errors"><strong>' . t('inst_please_fix') . '</strong><ul>';
     foreach ($errors as $e) { $h .= '<li>' . htmlspecialchars($e) . '</li>'; }
     return $h . '</ul></div>';
 }
@@ -268,7 +290,7 @@ if ($step === 1) {
     $hard = array_slice($reqs, 0, count($reqs) - 1); // letzte (uploads) ist weich
     $blocked = false;
     foreach ($hard as $r) { if (!$r[1]) { $blocked = true; break; } }
-    echo '<div class="card"><h2>Voraussetzungen</h2><ul class="reqs">';
+    echo '<div class="card"><h2>' . t('inst_requirements') . '</h2><ul class="reqs">';
     foreach ($reqs as [$label, $ok, $det]) {
         $icon = $ok ? '<span class="pass">✓ OK</span>' : '<span class="fail">✗ fehlt</span>';
         $d = $det ? '<span class="det">' . htmlspecialchars($det) . '</span>' : '';
@@ -276,9 +298,9 @@ if ($step === 1) {
     }
     echo '</ul>';
     if ($blocked) {
-        echo '<div class="warn">Es fehlen Voraussetzungen. Bitte beheben und neu laden.</div>';
+        echo '<div class="warn">' . t('inst_requirements_missing') . '</div>';
     } else {
-        echo '<a class="btn" href="?step=2">Weiter zur Datenbank →</a>';
+        echo '<a class="btn" href="?step=2">' . t('inst_next_db') . '</a>';
     }
     echo '</div>';
 }
@@ -287,28 +309,28 @@ if ($step === 2) {
     $f = $_SESSION['install_db_form'] ?? $_SESSION['install_db'] ?? [];
     $val = static fn($k, $d = '') => htmlspecialchars((string) ($f[$k] ?? $d));
     echo err_box($errors);
-    echo '<div class="card"><h2>Datenbank-Verbindung</h2>
+    echo '<div class="card"><h2>' . t('inst_db_connection') . '</h2>
     <form method="post" action="?step=2">' . csrf_field() . '
       <div class="row">
-        <div><label>Host</label><input type="text" name="db_host" value="' . $val('host', 'localhost') . '" required></div>
-        <div><label>Zeichensatz</label><input type="text" name="db_charset" value="' . $val('charset', 'utf8mb4') . '"></div>
+        <div><label>' . t('inst_host') . '</label><input type="text" name="db_host" value="' . $val('host', 'localhost') . '" required></div>
+        <div><label>' . t('inst_charset') . '</label><input type="text" name="db_charset" value="' . $val('charset', 'utf8mb4') . '"></div>
       </div>
-      <label>Datenbank-Name</label><input type="text" name="db_name" value="' . $val('name') . '" required>
+      <label>' . t('inst_db_name') . '</label><input type="text" name="db_name" value="' . $val('name') . '" required>
       <div class="row">
-        <div><label>Benutzer</label><input type="text" name="db_user" value="' . $val('user') . '" required></div>
-        <div><label>Passwort</label><input type="password" name="db_pass" value=""></div>
+        <div><label>' . t('inst_db_user') . '</label><input type="text" name="db_user" value="' . $val('user') . '" required></div>
+        <div><label>' . t('inst_password') . '</label><input type="password" name="db_pass" value=""></div>
       </div>
       <hr style="border:0;border-top:1px solid var(--bd);margin:22px 0">
-      <label>Forum-Name</label><input type="text" name="forum_name" value="' . $val('forum_name', 'Mein Forum') . '" required>
-      <label>Forum-URL</label><input type="url" name="forum_url" value="' . $val('forum_url', ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . ($_SERVER['HTTP_HOST'] ?? '')) . '" required>
-      <button type="submit">Verbindung testen →</button>
+      <label>' . t('inst_forum_name') . '</label><input type="text" name="forum_name" value="' . $val('forum_name', t('inst_mein_forum')) . '" required>
+      <label>' . t('inst_forum_url') . '</label><input type="url" name="forum_url" value="' . $val('forum_url', ($_SERVER['REQUEST_SCHEME'] ?? 'https') . '://' . ($_SERVER['HTTP_HOST'] ?? '')) . '" required>
+      <button type="submit">' . t('inst_test_connection') . '</button>
     </form></div>';
 }
 
 if ($step === 3) {
     echo err_box($errors);
-    echo '<div class="card"><h2>Schema anlegen</h2>
-    <div class="warn">⚠ <strong>Achtung:</strong> Dieser Schritt führt
+    echo '<div class="card"><h2>' . t('inst_schema') . '</h2>
+    <div class="warn">⚠ <strong>' . t('inst_warning') . '</strong> Dieser Schritt führt
       <code>DROP TABLE IF EXISTS</code> für alle Forum-Tabellen aus.
       Eine eventuell vorhandene Forum-Datenbank wird dabei <strong>überschrieben</strong>.
       Nur fortfahren, wenn die Datenbank leer ist oder neu aufgesetzt werden soll.</div>
@@ -326,24 +348,24 @@ if ($step === 3) {
         Wer eigene Foren anlegen oder ein bestehendes Forum übernehmen will,
         lässt das Häkchen weg und fängt mit einer leeren Übersicht an.
       </p>
-      <button type="submit">Schema jetzt anlegen →</button>
+      <button type="submit">' . t('inst_create_schema') . '</button>
     </form></div>';
 }
 
 if ($step === 4) {
     echo err_box($errors);
     $f = static fn($k) => htmlspecialchars((string) ($_POST[$k] ?? ''));
-    echo '<div class="card"><h2>Owner-Konto anlegen</h2>
+    echo '<div class="card"><h2>' . t('inst_owner') . '</h2>
     <p class="hint">Dieses Konto erhält volle Rechte (Inhaber). Es wird als
       <code>user_id = 1</code> angelegt.</p>
     <form method="post" action="?step=4">' . csrf_field() . '
-      <label>Benutzername</label><input type="text" name="owner_user" value="' . $f('owner_user') . '" required>
-      <label>E-Mail</label><input type="email" name="owner_email" value="' . $f('owner_email') . '" required>
+      <label>' . t('inst_username') . '</label><input type="text" name="owner_user" value="' . $f('owner_user') . '" required>
+      <label>' . t('inst_email') . '</label><input type="email" name="owner_email" value="' . $f('owner_email') . '" required>
       <div class="row">
-        <div><label>Passwort (min. 8 Zeichen)</label><input type="password" name="owner_pass" required></div>
-        <div><label>Passwort wiederholen</label><input type="password" name="owner_pass2" required></div>
+        <div><label>' . t('inst_password_min') . '</label><input type="password" name="owner_pass" required></div>
+        <div><label>' . t('inst_password_repeat') . '</label><input type="password" name="owner_pass2" required></div>
       </div>
-      <button type="submit">Owner anlegen & abschließen →</button>
+      <button type="submit">' . t('inst_create_owner') . '</button>
     </form></div>';
 }
 
@@ -352,15 +374,15 @@ if ($step === 5) {
     echo '<div class="card"><h2 class="ok-big">✓ Installation abgeschlossen</h2>
     <p>Das Forum ist eingerichtet. <code>config.php</code> wurde geschrieben und der
        Installer ist ab jetzt gesperrt.'
-       . ($anz > 0 ? ' Dabei wurden ' . $anz . ' Datenbank-Anpassungen mitgefahren —
+       . ($anz > 0 ? t('inst_dabei_wurden') . $anz . ' Datenbank-Anpassungen mitgefahren —
        im Adminbereich unter <em>Forum-Updates</em> steht die Liste.' : '')
        . '</p>
-    <div class="warn">🔒 <strong>Letzter Schritt:</strong> Bitte im Ordner
+    <div class="warn">🔒 <strong>' . t('inst_last_step') . '</strong> Bitte im Ordner
        <code>install/</code> die Dateien <code>index.php</code>, <code>cli.php</code>,
        <code>lib.php</code> und <code>install.sql</code> löschen.<br>
        Den Unterordner <code>install/migrations/</code> <strong>stehen lassen</strong> —
        daraus holt sich der Adminbereich die Datenbank-Anpassungen späterer Updates.</div>
-    <a class="btn" href="' . htmlspecialchars(rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '', 2), '/') . '/') . '">Zum Forum →</a>
+    <a class="btn" href="' . htmlspecialchars(rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '', 2), '/') . '/') . '">' . t('inst_to_forum') . '</a>
     </div>';
 }
 

@@ -17,6 +17,20 @@ declare(strict_types=1);
 
 if (!defined('FORUM_INSTALLER')) { http_response_code(403); exit('Forbidden'); }
 
+/*
+ * Das Sprachsystem gehoert HIERHER und nicht in die Entry Points.
+ *
+ * Diese Datei laedt sowohl der Browser-Installer als auch cli.php. Stand das
+ * require nur im einen, lief der andere in "Call to undefined function t()" —
+ * und zwar erst beim Aufsetzen eines Forums, nicht beim Bearbeiten. Genau
+ * dieselbe Falle wie beim doppelten Weg durch install/lib.php selbst.
+ *
+ * lib/lang.php braucht kein bootstrap.php und keine Datenbank:
+ * current_language() holt das Konto nur, wenn es eines gibt.
+ */
+if (!defined('FORUM_RUNNING')) define('FORUM_RUNNING', true);
+require_once dirname(__DIR__) . '/lib/lang.php';
+
 define('INSTALL_DIR', __DIR__);
 define('FORUM_ROOT',  dirname(__DIR__));
 define('CONFIG_FILE', FORUM_ROOT . '/config.php');
@@ -47,7 +61,7 @@ function check_requirements(): array {
         $r[] = ['Erweiterung ' . $ext, extension_loaded($ext), ''];
     }
     $r[] = ['install.sql vorhanden', is_readable(SQL_FILE), SQL_FILE];
-    $r[] = ['Forum-Root beschreibbar (für config.php)', is_writable(FORUM_ROOT), FORUM_ROOT];
+    $r[] = [t('inst_forum_root_beschreibbar_fuer'), is_writable(FORUM_ROOT), FORUM_ROOT];
     // uploads/ ist optional vorhanden – nur warnen, nicht blockieren
     $up = FORUM_ROOT . '/uploads';
     $r[] = ['uploads/ beschreibbar', !is_dir($up) || is_writable($up),
@@ -262,11 +276,11 @@ function validate_owner(string $user, string $email, string $pass): array {
     if (mb_strlen($user) < 3 || mb_strlen($user) > 30) {
         $errors[] = 'Benutzername: 3 bis 30 Zeichen.';
     } elseif (!preg_match('/^[\p{L}\p{N} ._-]+$/u', $user)) {
-        $errors[] = 'Benutzername darf nur Buchstaben, Ziffern, Leerzeichen, '
-                  . 'Punkt, Unterstrich und Bindestrich enthalten.';
+        $errors[] = t('inst_benutzername_darf_nur_buchstaben')
+                  . t('inst_punkt_unterstrich_und_bindestrich');
     }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'Bitte eine gültige E-Mail-Adresse angeben.';
+        $errors[] = t('inst_bitte_eine_gueltige_e');
     }
     if (mb_strlen($pass) < 8) {
         $errors[] = 'Passwort: mindestens 8 Zeichen.';
@@ -322,7 +336,7 @@ PHP;
         // Nur echte Konstantennamen – sonst schreibt ein Tippfehler in der
         // Bereitstellung eine config.php, die PHP nicht mehr parst.
         if (!preg_match('/^[A-Z][A-Z0-9_]*$/', (string) $name)) {
-            throw new InvalidArgumentException('Ungültiger Konstantenname: ' . $name);
+            throw new InvalidArgumentException(t('inst_ungueltiger_konstantenname') . $name);
         }
         $extra .= sprintf("define(%-22s %s);\n", "'$name',", $v($wert));
     }

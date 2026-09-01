@@ -35,7 +35,7 @@ function consume_reset_token(string $token): void {
 
 function send_password_reset_email(array $user, string $token): bool {
     $link = FORUM_URL . '/reset.php?token=' . $token;
-    $body = email_template('Passwort zurücksetzen', '
+    $body = email_template(t('sys_passwort_zuruecksetzen'), '
         <p>Hallo ' . e($user['username']) . ',</p>
         <p>du hast einen Link angefordert, um dein Passwort zurückzusetzen.</p>
         <p>Klicke innerhalb der nächsten 2 Stunden auf folgenden Link:</p>
@@ -51,7 +51,7 @@ function send_password_reset_email(array $user, string $token): bool {
             ℹ️ Falls du keine Anfrage gestellt hast, ignoriere diese E-Mail einfach.
         </p>
     ');
-    return send_email($user['email'], 'Passwort zurücksetzen', $body);
+    return send_email($user['email'], t('sys_passwort_zuruecksetzen'), $body);
 }
 
 /**
@@ -68,7 +68,7 @@ function melde_ruecksetzung_ohne_postfach(int $userId, string $weg): void {
         if (!$u || empty($u['email'])) return;
 
         $bezeichnung = $weg === 'backup' ? 'einen Ersatzcode' : 'den Zwei-Faktor-Code';
-        $betreff = 'Passwort-Ruecksetzung angefordert';
+        $betreff = t('sys_passwort_ruecksetzung_angefordert');
         $text = '<p>Hallo ' . e($u['username']) . ',</p>'
               . '<p>fuer dein Konto wurde soeben eine Passwort-Ruecksetzung ueber '
               . $bezeichnung . ' angefordert. Warst du das, kannst du diese '

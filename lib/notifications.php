@@ -240,7 +240,7 @@ function _send_reply_notification_email(
         </p>
     ';
 
-    $body = email_template('Neue Antwort: ' . $threadTitle, $bodyInner);
+    $body = email_template(t('notif_mail_subject', $threadTitle), $bodyInner);
     send_email($email, $subject, $body, true);
 }
 
@@ -280,11 +280,15 @@ function notification_text(array $n): string {
         'reply'    => t('notif_reply',   $from, $tt),
         'mention'  => t('notif_mention', $from, $tt),
         'pm'       => t('notif_pm',      $from, $ps),
-        'warning'  => '⚠️ Du hast eine Verwarnung von <strong>' . $from . '</strong> erhalten',
-        'report'   => '🚨 Neue Meldung von <strong>' . $from . '</strong>' . ($tt ? ' in „' . $tt . '"' : ''),
-        'approved' => '✅ Dein Beitrag' . ($tt ? ' in „' . $tt . '"' : '') . ' wurde <strong>freigegeben</strong>',
-        'rejected' => '🚫 Dein Beitrag' . ($tt ? ' in „' . $tt . '"' : '') . ' wurde leider <strong>abgelehnt</strong>',
-        'mod_edit' => '✏️ Dein Beitrag' . ($tt ? ' in „' . $tt . '"' : '') . ' wurde von <strong>' . $from . '</strong> bearbeitet',
-        default    => 'Neue Benachrichtigung',
+        'warning'  => t('notif_warning', '<strong>' . $from . '</strong>'),
+        'report'   => $tt
+            ? t('notif_report_in', '<strong>' . $from . '</strong>', $tt)
+            : t('notif_report', '<strong>' . $from . '</strong>'),
+        'approved' => $tt ? t('notif_approved_in', $tt) : t('notif_approved'),
+        'rejected' => $tt ? t('notif_rejected_in', $tt) : t('notif_rejected'),
+        'mod_edit' => $tt
+            ? t('notif_mod_edit_in', $tt, '<strong>' . $from . '</strong>')
+            : t('notif_mod_edit', '<strong>' . $from . '</strong>'),
+        default    => t('notif_generic'),
     };
 }

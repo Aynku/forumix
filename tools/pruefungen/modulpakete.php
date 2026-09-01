@@ -18,6 +18,8 @@ if (!defined('FORUM_VERSION_CODE')) {
     preg_match("/FORUM_VERSION_CODE\s*=\s*'([^']+)'/", (string) file_get_contents($wurzel . '/bootstrap.php'), $t);
     define('FORUM_VERSION_CODE', $t[1] ?? '0');
 }
+// Die Meldungen kommen aus dem Sprachpaket — ohne lang.php gibt es kein t().
+require_once $wurzel . '/lib/lang.php';
 require_once $wurzel . '/lib/update_package.php';
 require_once $wurzel . '/lib/module_package.php';
 
@@ -235,8 +237,22 @@ return [
         $pos = strpos($quelle, 'function module_entfernen');
         $koerper = substr($quelle, $pos, 2200);
 
-        if (!str_contains($koerper, 'noch aktiv')) {
-            throw new RuntimeException('Ein laufendes Modul lässt sich entfernen');
+        /*
+         * Geprueft wird die Bedingung, nicht der Satz.
+         *
+         * Vorher stand hier str_contains($koerper, 'noch aktiv') — der Text
+         * der Meldung. Seit der Umstellung aufs Sprachpaket steht dort ein
+         * Schluessel, und die Pruefung fiel um, obwohl der Riegel unveraendert
+         * ist. Ein Wortlaut ist der falsche Anker: Er aendert sich, der Riegel
+         * nicht.
+         */
+        if (!preg_match("/enabled['\"]?\]\s*===\s*1/", $koerper)
+            && !str_contains($koerper, "(int) \$zeile['enabled'] === 1")) {
+            throw new RuntimeException('Ein laufendes Modul lässt sich entfernen: die Abfrage auf enabled fehlt');
+        }
+
+        if (!str_contains($koerper, "t('sys_das_modul_ist_noch')")) {
+            throw new RuntimeException('Der Riegel meldet nichts zurueck');
         }
         // Und nicht ueber den Anfrage-Cache: der merkt sich seine Antwort.
         // Gesucht wird nur in Code-Zeilen — im Kommentar darueber steht der

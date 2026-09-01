@@ -89,7 +89,7 @@ $onlineList  = online_users();
 $namedOnline = array_values(array_filter($onlineList, fn($u) => !empty($u['user_id'])));
 
 render('index', [
-    'title'         => 'Startseite',
+    'title'         => t('home'),
     'categories'    => $categories,
     'boardMods'     => $boardMods,
     'showStatsBox'  => true,

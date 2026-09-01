@@ -12,4 +12,4 @@
 if (!defined('FORUM_RUNNING')) return;
 if (!(is_admin() || is_owner())) return;
 ?>
-<a href="<?= FORUM_URL ?>/modules/ki/ki.php" class="admin-nav-item">✨ KI-Funktionen</a>
+<a href="<?= FORUM_URL ?>/modules/ki/ki.php" class="admin-nav-item">✨ <?= t('ki_nav') ?></a>

@@ -4,7 +4,7 @@ if (!defined('FORUM_RUNNING')) define('FORUM_RUNNING', true);
 require_once __DIR__ . '/../../bootstrap.php';
 
 if (!module_enabled('kontakt')) {
-    error_page(404, 'Nicht gefunden', 'Das Kontakt-Modul ist nicht aktiv.');
+    error_page(404, t('error_not_found_title'), t('kontakt_disabled'));
 }
 
 $cu       = current_user();
@@ -36,7 +36,7 @@ $werte      = [
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf($_POST['csrf'] ?? '')) {
-        error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+        error_page(400, t('error_csrf_title'), t('error_csrf_text'));
     }
 
     $werte = [
@@ -47,18 +47,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
 
     if ($empfaenger === '') {
-        $fehler = 'Es ist keine Empfängeradresse hinterlegt. Bitte wende dich anders an uns.';
+        $fehler = t('kontakt_no_recipient');
     } elseif (!rate_limit_check('kontakt', 3, 3600)) {
         // Drei Nachrichten je Stunde und IP. Wer mehr braucht, schreibt im Forum.
-        $fehler = 'Zu viele Nachrichten in kurzer Zeit. Bitte versuche es später noch einmal.';
+        $fehler = t('kontakt_too_many');
     } elseif (!empty($_POST['website'])) {
         // Honigtopf: das Feld ist im Formular versteckt. Wer es ausfuellt, ist
         // kein Mensch. Nach aussen sieht es aus wie ein normaler Fehler.
-        $fehler = 'Die Nachricht konnte nicht gesendet werden.';
+        $fehler = t('kontakt_send_failed');
     } elseif ($werte['absender'] === '' || $werte['betreff'] === '' || $werte['nachricht'] === '') {
-        $fehler = 'Bitte Name, Betreff und Nachricht ausfüllen.';
+        $fehler = t('kontakt_fields_required');
     } elseif (!filter_var($werte['email'], FILTER_VALIDATE_EMAIL)) {
-        $fehler = 'Die E-Mail-Adresse sieht nicht richtig aus.';
+        $fehler = t('kontakt_bad_email');
     } else {
         // Erst ablegen, dann senden — in dieser Reihenfolge. Faellt der
         // Mailversand aus, ist die Nachricht trotzdem da.
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             error_log('kontakt: ' . $e->getMessage());
         }
 
-        $body = email_template('Neue Nachricht über das Kontaktformular',
+        $body = email_template(t('kontakt_mail_subject'),
               '<p><strong>Von:</strong> ' . e($werte['absender']) . ' &lt;' . e($werte['email']) . '&gt;</p>'
             . '<p><strong>Betreff:</strong> ' . e($werte['betreff']) . '</p>'
             . '<hr><p>' . nl2br(e($werte['nachricht'])) . '</p>');
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Schreiber hat also nichts umsonst getippt.
         $gesendet = ($ok || $id > 0);
         if (!$gesendet) {
-            $fehler = 'Die Nachricht konnte nicht zugestellt werden. Bitte versuche es später noch einmal.';
+            $fehler = t('kontakt_deliver_failed');
         }
     }
 }

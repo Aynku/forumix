@@ -13,7 +13,7 @@ if (!isset($csrfToken))   $csrfToken   = $_SESSION['csrf_token'] ?? '';
   </div>
   <div class="shoutbox-body" id="shoutbox-body">
     <div class="shoutbox-list" id="shoutbox-list">
-      <div class="shoutbox-empty">Lade Nachrichten…</div>
+      <div class="shoutbox-empty"><?= t('shoutbox_loading') ?></div>
     </div>
     <?php if ($currentUser): ?>
       <form class="shoutbox-form" id="shoutbox-form" autocomplete="off">
@@ -79,7 +79,7 @@ if (!isset($csrfToken))   $csrfToken   = $_SESSION['csrf_token'] ?? '';
   function renderMessages(msgs, append = false) {
     if (!append) list.innerHTML = '';
     if (msgs.length === 0 && !append) {
-      list.innerHTML = '<div class="shoutbox-empty">Noch keine Nachrichten. Sei der/die Erste! 🚀</div>';
+      list.innerHTML = '<div class="shoutbox-empty"><?= e(t('shoutbox_empty')) ?></div>';
       return;
     }
     for (const m of msgs) {

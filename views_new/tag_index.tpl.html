@@ -1,8 +1,8 @@
-<div class="section-heading">Alle Tags</div>
+<div class="section-heading">{{ t('tag_index_alle_tags') }}</div>
 
 <div class="card" style="padding:18px">
   {% if count(tags) == 0 %}
-    <p style="color:var(--text-faint);text-align:center">Noch keine Tags vorhanden.</p>
+    <p style="color:var(--text-faint);text-align:center">{{ t('tag_index_noch_keine_tags_vorhanden') }}</p>
   {% else %}
     <div style="display:flex;flex-wrap:wrap;gap:8px">
       {% for t in tags %}

@@ -242,7 +242,7 @@ function remember_format_user_agent(string $ua): string {
     elseif(stripos($ua, 'Firefox') !== false)      $browser = 'Firefox';
     elseif(stripos($ua, 'Safari') !== false)       $browser = 'Safari';
 
-    $os = 'Unbekanntes OS';
+    $os = t('unknown_os');
     if    (stripos($ua, 'Windows') !== false) $os = 'Windows';
     elseif(stripos($ua, 'Mac OS X') !== false || stripos($ua, 'Macintosh') !== false) $os = 'macOS';
     elseif(stripos($ua, 'Android') !== false) $os = 'Android';

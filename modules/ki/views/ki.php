@@ -7,12 +7,12 @@
 
 <?php if ($probe !== null): ?>
   <div class="flash <?= $probe === '' ? 'flash-success' : 'flash-error' ?>" style="margin-bottom:16px">
-    <?= $probe === '' ? 'Verbindung steht — Schlüssel und Modell wurden angenommen.' : e($probe) ?>
+    <?= $probe === '' ? t('ki_connection_ok') : e($probe) ?>
   </div>
 <?php endif; ?>
 
 <div class="card" style="margin-bottom:16px;padding:14px 16px;font-size:13px;line-height:1.7">
-  <strong>Wer zahlt:</strong> der Betreiber dieses Forums. Jeder Klick auf einen
+  <strong><?= t('ki_wer_zahlt') ?></strong> der Betreiber dieses Forums. Jeder Klick auf einen
   KI-Knopf ist eine Anfrage an den gewählten Anbieter und erscheint auf dessen
   Rechnung. Deshalb gibt es weiter unten zwei Bremsen — Zeichenzahl je Anfrage
   und Anfragen je Stunde und Person. Wer nichts einträgt, gibt nichts frei:
@@ -21,26 +21,22 @@
 
 <?php if (!empty($nachgezogen)): ?>
   <div class="flash flash-success" style="margin-bottom:16px">
-    Dein API-Schlüssel lag noch im Klartext in der Datenbank und ist jetzt
-    verschlüsselt. Falls davon schon eine Sicherung gemacht wurde, steht er dort
-    weiter im Klartext — dann erzeuge beim Anbieter besser einen neuen.
+    <?= t('ki_dein_api_schluessel_lag') ?>
   </div>
 <?php endif; ?>
 
 <?php if (!$crypt_da): ?>
   <div class="card" style="margin-bottom:16px;padding:14px 16px;
        border-left:3px solid var(--color-warning)">
-    <strong>🔐 Erst einen Schlüssel in die config.php</strong>
+    <strong><?= t('ki_key_first') ?></strong>
     <p style="margin:6px 0;font-size:13px;line-height:1.6">
-      Ohne ihn liegt dein API-Schlüssel im Klartext in der Datenbank — und damit
-      auch in jeder Sicherung. Diese Installation hat noch keinen: Der Installer
-      legt ihn erst seit Version 0.23.0 an. Nimm diese Zeile in deine
+      <?= t('ki_ohne_ihn_liegt_dein') ?>
       <code>config.php</code> auf:
     </p>
     <pre style="white-space:pre-wrap;word-break:break-all;background:var(--bg-body);
          padding:10px;border-radius:6px;margin:0"><code>define('FORUM_CRYPT_KEY', '<?= e($crypt_vorschlag) ?>');</code></pre>
     <p style="margin:8px 0 0;font-size:13px;line-height:1.6">
-      Danach <strong>nicht mehr ändern</strong> und beim Umzug mitnehmen — sonst ist
+      <?= t('ki_danach') ?> <strong>nicht mehr ändern</strong> und beim Umzug mitnehmen — sonst ist
       nicht mehr lesbar, was damit gespeichert wurde. Der Schlüssel hilft gegen einen
       abhandengekommenen Datenbank-Abzug, nicht gegen jemanden, der den Server hat:
       der liest die <code>config.php</code> mit.
@@ -52,7 +48,7 @@
   <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
 
   <div class="form-row">
-    <label>Anbieter</label>
+    <label><?= t('ki_anbieter') ?></label>
     <select name="anbieter">
       <?php foreach ($anbieter as $code => $a): ?>
         <option value="<?= e($code) ?>" <?= ($cfg['anbieter'] ?? 'anthropic') === $code ? 'selected' : '' ?>>
@@ -61,7 +57,7 @@
       <?php endforeach; ?>
     </select>
     <div class="form-hint">
-      Den Schlüssel gibt es beim jeweiligen Anbieter:
+      <?= t('ki_den_schluessel_gibt_es') ?>
       <?php foreach ($anbieter as $a): ?>
         <?= e($a['name']) ?> → <code><?= e($a['hilfe']) ?></code>&nbsp;&nbsp;
       <?php endforeach; ?>
@@ -69,11 +65,11 @@
   </div>
 
   <div class="form-row">
-    <label>API-Schlüssel</label>
+    <label><?= t('ki_api_schluessel') ?></label>
     <input type="password" name="schluessel" autocomplete="off"
            placeholder="<?= $hat_schluessel ? '•••••••• (hinterlegt — leer lassen, um ihn zu behalten)' : 'noch keiner hinterlegt' ?>">
     <div class="form-hint">
-      Wird verschlüsselt gespeichert und danach nie wieder angezeigt.
+      <?= t('ki_wird_verschluesselt_gespeichert_und') ?>
       <?php if ($hat_schluessel): ?>
         <label style="display:inline-block;margin-left:8px">
           <input type="checkbox" name="schluessel_weg" value="1"> hinterlegten Schlüssel entfernen
@@ -83,18 +79,17 @@
   </div>
 
   <div class="form-row">
-    <label>Modell</label>
+    <label><?= t('ki_modell') ?></label>
     <input type="text" name="modell" value="<?= e((string) ($cfg['modell'] ?? '')) ?>"
            placeholder="<?= e($anbieter[$cfg['anbieter'] ?? 'anthropic']['vorgabe'] ?? '') ?>">
     <div class="form-hint">
-      Leer lassen für die Vorgabe. Ein kleines, schnelles Modell reicht für
-      Rechtschreibung und Kürzen und kostet einen Bruchteil.
+      <?= t('ki_leer_lassen_fuer_die') ?>
     </div>
   </div>
 
-  <div class="section-heading" style="margin-top:24px">Befehle</div>
+  <div class="section-heading" style="margin-top:24px"><?= t('ki_befehle') ?></div>
   <div class="form-hint" style="margin-bottom:10px">
-    <strong>Kennzeichnen</strong> heißt: der Beitrag trägt sichtbar den Hinweis, dass
+    <strong><?= t('ki_kennzeichnen') ?></strong> heißt: der Beitrag trägt sichtbar den Hinweis, dass
     ein Sprachmodell mitgeschrieben hat. Bei einer reinen Rechtschreibkorrektur ist
     das übertrieben — beim Zusammenfassen nicht, denn dabei entscheidet das Modell,
     was wegfällt.
@@ -103,10 +98,10 @@
   <table class="forum-table" style="margin-bottom:8px">
     <thead>
       <tr>
-        <th>Befehl</th>
-        <th style="width:200px">Modell</th>
-        <th style="width:90px;text-align:center">Freigegeben</th>
-        <th style="width:110px;text-align:center">Kennzeichnen</th>
+        <th><?= t('ki_befehl') ?></th>
+        <th style="width:200px"><?= t('ki_modell') ?></th>
+        <th style="width:90px;text-align:center"><?= t('ki_freigegeben') ?></th>
+        <th style="width:110px;text-align:center"><?= t('ki_kennzeichnen') ?></th>
       </tr>
     </thead>
     <tbody>
@@ -119,8 +114,8 @@
         ?>
         <tr>
           <td>
-            <strong><?= e($b['name']) ?></strong>
-            <div style="font-size:12px;color:var(--text-muted)"><?= e($b['hinweis']) ?></div>
+            <strong><?= e(t($b['name'])) ?></strong>
+            <div style="font-size:12px;color:var(--text-muted)"><?= e(t($b['hinweis'])) ?></div>
           </td>
           <td>
             <input type="text" name="modell_je[<?= e($code) ?>]" value="<?= e($eigenes) ?>"
@@ -142,17 +137,17 @@
     </tbody>
   </table>
   <div class="form-hint" style="margin-bottom:8px">
-    <strong>Modell je Befehl:</strong> leer heißt „das oben eingetragene". Sinnvoll ist
+    <strong><?= t('ki_modell_je_befehl') ?></strong> leer heißt „das oben eingetragene". Sinnvoll ist
     der Unterschied dort, wo <em>entscheidet mit, was wegfällt</em> steht — beim Kürzen
     und Zusammenfassen wählt das Modell aus, was im Beitrag bleibt. Bei Rechtschreibung
     und Übersetzen macht ein größeres Modell messbar keinen Unterschied, kostet aber
     ein Vielfaches.
   </div>
 
-  <div class="section-heading" style="margin-top:24px">Wer darf</div>
+  <div class="section-heading" style="margin-top:24px"><?= t('ki_wer_darf') ?></div>
   <div class="form-row">
     <?php if (!$gruppen): ?>
-      <div class="form-hint">Es gibt noch keine Gruppen. Inhaber und Administratoren dürfen immer.</div>
+      <div class="form-hint"><?= t('ki_es_gibt_noch_keine') ?></div>
     <?php else: ?>
       <div style="display:flex;flex-wrap:wrap;gap:14px">
         <?php foreach ($gruppen as $g): ?>
@@ -164,32 +159,28 @@
         <?php endforeach; ?>
       </div>
       <div class="form-hint">
-        Ohne Haken dürfen nur Inhaber und Administratoren. Das ist Absicht: eine
-        Funktion, die Geld kostet, soll nicht versehentlich für alle offen stehen.
+        <?= t('ki_ohne_haken_duerfen_nur') ?>
       </div>
     <?php endif; ?>
   </div>
 
-  <div class="section-heading" style="margin-top:24px">Bremsen</div>
+  <div class="section-heading" style="margin-top:24px"><?= t('ki_bremsen') ?></div>
   <div class="form-row">
-    <label>Höchstens Zeichen je Anfrage</label>
+    <label><?= t('ki_hoechstens_zeichen_je_anfrage') ?></label>
     <input type="number" name="max_zeichen" min="500" max="40000"
            value="<?= (int) ($cfg['max_zeichen'] ?? 8000) ?>">
-    <div class="form-hint">Längere Texte weist der Server ab, mit dem Hinweis, einen Abschnitt zu markieren.</div>
+    <div class="form-hint"><?= t('ki_laengere_texte_weist_der') ?></div>
   </div>
   <div class="form-row">
-    <label>Anfragen je Stunde und Person</label>
+    <label><?= t('ki_anfragen_je_stunde_und') ?></label>
     <input type="number" name="pro_stunde" min="0" max="500"
            value="<?= (int) ($cfg['pro_stunde'] ?? 30) ?>">
-    <div class="form-hint">0 schaltet die Bremse ab. Das ist nur sinnvoll, wenn du der einzige Benutzer bist.</div>
+    <div class="form-hint"><?= t('ki_0_schaltet_die_bremse') ?></div>
   </div>
 
-  <div class="section-heading" style="margin-top:24px">Beiträge vorsortieren</div>
+  <div class="section-heading" style="margin-top:24px"><?= t('ki_beitraege_vorsortieren') ?></div>
   <div class="form-hint" style="margin-bottom:10px">
-    Neue Beiträge werden nach dem Absenden auf Werbung und Beleidigungen geprüft.
-    Der Beitrag bleibt dabei sichtbar und wird nicht zurückgehalten — bei einem
-    Verdacht entsteht eine Meldung, der ein Moderator nachgeht. Gelöscht oder
-    gesperrt wird nichts automatisch.
+    <?= t('ki_neue_beitraege_werden_nach') ?>
   </div>
 
   <div class="form-row">
@@ -198,13 +189,12 @@
       Vorsortierung einschalten
     </label>
     <div class="form-hint">
-      Im Auslieferungszustand aus. Sobald sie läuft, steht am Editor ein Hinweis
-      darauf und in der Datenschutzerklärung ein Absatz dazu.
+      <?= t('ki_im_auslieferungszustand_aus_sobald') ?>
     </div>
   </div>
 
   <div class="form-row">
-    <label>Meldendes Konto</label>
+    <label><?= t('ki_meldendes_konto') ?></label>
     <input type="text" name="mod_melder" list="ki-melder-vorschlaege" autocomplete="off"
            value="<?= e($melder_name) ?>" placeholder="Benutzername">
     <datalist id="ki-melder-vorschlaege">
@@ -213,40 +203,35 @@
       <?php endforeach; ?>
     </datalist>
     <div class="form-hint">
-      Unter diesem Namen erscheinen die Meldungen. Am besten ein Konto, das
-      sonst wenig schreibt — dann ist auf einen Blick klar, woher die Meldung
-      kommt. Die Vorschläge sind nur eine Hilfe; eintragen lässt sich jedes
-      Konto. Ohne Eintrag entsteht keine Meldung.
+      <?= t('ki_unter_diesem_namen_erscheinen') ?>
     </div>
   </div>
 
   <div class="form-row">
-    <label>Nur bis zu dieser Beitragszahl prüfen</label>
+    <label><?= t('ki_nur_bis_zu_dieser') ?></label>
     <input type="number" name="mod_bis" min="0" max="10000"
            value="<?= (int) ($cfg['mod_bis'] ?? 20) ?>">
     <div class="form-hint">
-      Wer schon länger dabei ist, fängt selten mit Werbung an. 0 prüft jeden
-      Beitrag — das kostet ein Vielfaches. Die Moderation selbst wird nie geprüft.
+      <?= t('ki_wer_schon_laenger_dabei') ?>
     </div>
   </div>
 
   <div class="form-row">
-    <label>Modell für die Vorprüfung</label>
+    <label><?= t('ki_modell_fuer_die_vorpruefung') ?></label>
     <input type="text" name="mod_modell" value="<?= e((string) ($cfg['mod_modell'] ?? '')) ?>"
            placeholder="wie oben">
     <div class="form-hint">
-      Hier reicht das kleinste Modell: Die Frage ist „Werbung, Beleidigung oder
-      in Ordnung", nicht das Umschreiben eines Textes.
+      <?= t('ki_hier_reicht_das_kleinste') ?>
     </div>
   </div>
 
   <?php if (!empty($mod_offen) || !empty($mod_befunde)): ?>
     <div class="form-hint" style="margin-bottom:14px">
       <?php if (!empty($mod_offen)): ?>
-        <strong><?= (int) $mod_offen ?></strong> Beiträge warten noch auf die Prüfung.
+        <strong><?= (int) $mod_offen ?></strong> <?= t('ki_beitraege_warten_noch_auf') ?>
       <?php endif; ?>
       <?php if (!empty($mod_befunde)): ?>
-        Sieben Tage:
+        <?= t('ki_sieben_tage') ?>
         <?php foreach ($mod_befunde as $b): ?>
           <?= e((string) $b['befund']) ?> <strong><?= (int) $b['anzahl'] ?></strong><?= $b === end($mod_befunde) ? '' : ' ·' ?>
         <?php endforeach; ?>
@@ -255,16 +240,16 @@
   <?php endif; ?>
 
   <div class="form-actions" style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
-    <button type="submit" class="btn btn-primary">Speichern</button>
-    <button type="submit" name="probe" value="1" class="btn">Speichern und Verbindung prüfen</button>
+    <button type="submit" class="btn btn-primary"><?= t('ki_speichern') ?></button>
+    <button type="submit" name="probe" value="1" class="btn"><?= t('ki_speichern_und_verbindung_pruefen') ?></button>
   </div>
 </form>
 
 <?php if ($gesamt > 0): ?>
-  <div class="section-heading" style="margin-top:28px">Die letzten sieben Tage</div>
+  <div class="section-heading" style="margin-top:28px"><?= t('ki_die_letzten_sieben_tage') ?></div>
   <table class="forum-table">
     <thead>
-      <tr><th>Befehl</th><th style="width:110px;text-align:right">Anfragen</th><th style="width:140px;text-align:right">Zeichen gesendet</th></tr>
+      <tr><th><?= t('ki_befehl') ?></th><th style="width:110px;text-align:right"><?= t('ki_anfragen') ?></th><th style="width:140px;text-align:right"><?= t('ki_zeichen_gesendet') ?></th></tr>
     </thead>
     <tbody>
       <?php foreach ($verbrauch as $v): ?>
@@ -275,14 +260,13 @@
         </tr>
       <?php endforeach; ?>
       <tr>
-        <td><strong>Zusammen</strong></td>
+        <td><strong><?= t('ki_zusammen') ?></strong></td>
         <td style="text-align:right"><strong><?= number_format($gesamt, 0, ',', '.') ?></strong></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   <div class="form-hint" style="margin-top:8px">
-    Gezählt werden Anfragen, nicht Kosten — was eine Anfrage kostet, hängt vom
-    Modell ab und steht beim Anbieter.
+    <?= t('ki_gezaehlt_werden_anfragen_nicht') ?>
   </div>
 <?php endif; ?>

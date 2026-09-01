@@ -200,7 +200,7 @@ $forumName = forum_name();
               </button>
               <div class="user-menu-dropdown">
                 <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $currentUser['user_id'] ?>">Mein Profil</a>
-                <a href="<?= e(FORUM_URL) ?>/settings.php">Einstellungen</a>
+                <a href="<?= e(FORUM_URL) ?>/settings.php"><?= t('settings') ?></a>
                 <div class="user-menu-divider"></div>
                 <?php
                   // Mod-Link: für Admins, Mods, Owner und Board-Mods
@@ -221,7 +221,7 @@ $forumName = forum_name();
                   <div class="user-menu-divider"></div>
                 <?php endif; ?>
                 <button type="button" onclick="toggleTheme(); document.querySelector('.user-menu')?.classList.remove('open');" class="user-menu-theme-btn">
-                  <span id="theme-icon">🌙</span> <span>Theme wechseln</span>
+                  <span id="theme-icon">🌙</span> <span><?= t('theme_switch') ?></span>
                 </button>
                 <div class="user-menu-divider"></div>
                 <?php /* Abmelden aendert etwas — deshalb ein Formular mit Token,
@@ -246,7 +246,7 @@ $forumName = forum_name();
       <div class="header-inner">
         <button type="button" id="mobile-nav-toggle" class="mobile-nav-toggle" aria-label="Menü">
           <span class="hamburger-icon">☰</span>
-          <span class="hamburger-label">Menü</span>
+          <span class="hamburger-label"><?= t('menu') ?></span>
         </button>
         <div class="header-nav-items" id="header-nav-items">
           <?php
@@ -264,24 +264,24 @@ $forumName = forum_name();
                 && in_array($script, ['home', 'index', 'board', 'thread', 'new_thread', 'edit_post', 'tag'], true);
           ?>
           <a href="<?= e(FORUM_URL) ?>/index.php" class="<?= $isHome ? 'active' : '' ?>">
-            Forum
+            <?= t('forum') ?>
           </a>
           <a href="<?= e(FORUM_URL) ?>/members.php" class="<?= ($script === 'members' || $script === 'online') ? 'active' : '' ?>">
-            Mitglieder
+            <?= t('members') ?>
           </a>
           <?php if ($currentUser): ?>
             <a href="<?= e(FORUM_URL) ?>/dashboard.php" class="<?= $script === 'dashboard' ? 'active' : '' ?>">
-              Dashboard
+              <?= t('dashboard') ?>
             </a>
             <a href="<?= e(FORUM_URL) ?>/bookmarks.php" class="<?= $script === 'bookmarks' ? 'active' : '' ?>">
-              Lesezeichen
+              <?= t('bookmarks') ?>
             </a>
             <a href="<?= e(FORUM_URL) ?>/achievements.php" class="<?= $script === 'achievements' ? 'active' : '' ?>">
-              Achievements
+              <?= t('achievements') ?>
             </a>
           <?php else: ?>
             <a href="<?= e(FORUM_URL) ?>/search.php?recent=1" class="<?= $script === 'search' ? 'active' : '' ?>">
-              Aktuelles
+              <?= t('recent') ?>
             </a>
           <?php endif; ?>
           <?php /* Ohne Suchfeld im Kopfband muss die Suche hier stehen —
@@ -347,7 +347,7 @@ $forumName = forum_name();
       <?php if ($footerText): ?>
         <?= e($footerText) ?>
       <?php else: ?>
-        © <?= date('Y') ?> <?= e($forumName) ?> &bull; Alle Rechte vorbehalten
+        © <?= date('Y') ?> <?= e($forumName) ?> &bull; <?= t('all_rights_reserved') ?>
       <?php endif; ?>
     </p>
 
@@ -357,14 +357,14 @@ $forumName = forum_name();
                denen steht, wer das hier betreibt und wie man ihn erreicht,
                dann das Rechtliche. Die Tastenkuerzel sind eine Bequemlichkeit
                und stehen deshalb am Ende. */ ?>
-      <a href="<?= e(FORUM_URL) ?>/imprint.php">Impressum</a>
+      <a href="<?= e(FORUM_URL) ?>/imprint.php"><?= t('imprint') ?></a>
       <?php if (function_exists('module_menu_links_fuer')): ?>
         <?php foreach (module_menu_links_fuer('fuss') as $ml): ?>
           &bull; <a href="<?= e($ml['url']) ?>"><?= e($ml['label']) ?></a>
         <?php endforeach; ?>
       <?php endif; ?>
-      &bull; <a href="<?= e(FORUM_URL) ?>/privacy.php">Datenschutz</a>
-      &bull; <a href="<?= e(FORUM_URL) ?>/terms.php">Nutzungsbedingungen</a>
+      &bull; <a href="<?= e(FORUM_URL) ?>/privacy.php"><?= t('privacy') ?></a>
+      &bull; <a href="<?= e(FORUM_URL) ?>/terms.php"><?= t('terms') ?></a>
       &bull; <a href="#" onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'?'}));return false;" title="Tastatur-Shortcuts anzeigen">Shortcuts</a>
       <?php if ($footerLinks):
         // Format: "Label1|URL1, Label2|URL2"
@@ -425,33 +425,35 @@ $forumName = forum_name();
   if ($cookieEnabled === '1'):
     $cookieText = trim((string) get_setting('cookie_banner_text'));
     if ($cookieText === '') {
-      $cookieText = 'Diese Seite nutzt funktionale Cookies (z.B. für den Login). Mit der weiteren Nutzung erklärst du dich damit einverstanden.';
+      $cookieText = t('cookie_notice');
     }
 ?>
 <div id="cookie-banner" class="cookie-banner" hidden>
   <div class="cookie-banner-inner">
     <div class="cookie-banner-text"><?= e($cookieText) ?></div>
-    <button type="button" id="cookie-banner-accept" class="btn btn-primary btn-sm">Verstanden</button>
+    <button type="button" id="cookie-banner-accept" class="btn btn-primary btn-sm"><?= t('understood') ?></button>
   </div>
 </div>
 <?php endif; ?>
 
 <!-- ── AVATAR-LIGHTBOX ─────────────────────────────────────── -->
 <div id="avatar-lightbox" class="avatar-lightbox" aria-hidden="true">
-  <button type="button" class="avatar-lightbox-close" aria-label="Schließen" title="Schließen (Esc)">✕</button>
+  <button type="button" class="avatar-lightbox-close" aria-label="<?= e(t('close')) ?>" title="<?= e(t('close_esc')) ?>">✕</button>
   <div class="avatar-lightbox-inner">
     <img id="avatar-lightbox-img" src="" alt="">
     <div class="avatar-lightbox-meta">
       <div id="avatar-lightbox-name"></div>
-      <a id="avatar-lightbox-link" href="#" class="btn btn-primary btn-sm">→ Profil ansehen</a>
+      <a id="avatar-lightbox-link" href="#" class="btn btn-primary btn-sm"><?= t('view_profile_arrow') ?></a>
     </div>
-    <div class="avatar-lightbox-hint">ESC zum Schließen · Klick außerhalb</div>
+    <div class="avatar-lightbox-hint"><?= t('lightbox_hint') ?></div>
   </div>
 </div>
 
 <script>
 window.FORUM_URL = <?= json_encode(FORUM_URL) ?>;
 window.FORUM_CSRF = <?= json_encode($csrfToken) ?>;
+// Die Saetze, die das JavaScript zeigt — siehe js_texte() in lib/lang.php.
+window.FORUM_T = <?= json_encode(js_texte(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 window.FORUM_SMILEYS = <?= json_encode(smileys_picker(), JSON_UNESCAPED_UNICODE) ?>;
 </script>
 <script src="<?= e(FORUM_URL) ?>/assets/forum.js?v=<?= e(forum_version()) ?>"></script>

@@ -9,26 +9,26 @@ $action = $_GET['action'] ?? 'dashboard';
 // ─── AKTIONEN ─────────────────────────────────────────────────────
 
 if ($action === 'add_cat' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     db_execute('INSERT INTO categories (title, position) VALUES (?, ?)',
         [post_str('title'), post_int('position')]);
-    flash('Kategorie angelegt.', 'success');
+    flash(t('adm_kategorie_angelegt'), 'success');
     redirect(FORUM_URL . '/admin/?action=categories');
 }
 
 if ($action === 'update_cat' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $catId = post_int('cat_id');
     if ($catId > 0) {
         db_execute('UPDATE categories SET title = ?, position = ? WHERE cat_id = ?',
             [post_str('title'), post_int('position'), $catId]);
-        flash('Kategorie aktualisiert.', 'success');
+        flash(t('adm_kategorie_aktualisiert'), 'success');
     }
     redirect(FORUM_URL . '/admin/?action=categories');
 }
 
 if ($action === 'delete_cat') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $cid = get_int('id');
 
     // An der Kategorie haengen die Foren, an denen wiederum die Rechte je
@@ -40,13 +40,13 @@ if ($action === 'delete_cat') {
     } catch (Exception $e) {}
 
     $weg = db_affected('DELETE FROM categories WHERE cat_id = ?', [$cid]);
-    flash($weg > 0 ? 'Kategorie gelöscht.' : 'Diese Kategorie gibt es nicht mehr.',
+    flash($weg > 0 ? t('adm_kategorie_geloescht') : t('adm_diese_kategorie_gibt_es'),
           $weg > 0 ? 'success' : 'info');
     redirect(FORUM_URL . '/admin/?action=categories');
 }
 
 if ($action === 'add_board' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
 
     // Optional: Passwort beim Anlegen direkt setzen
     $newPw = (string) ($_POST['new_password'] ?? '');
@@ -55,12 +55,12 @@ if ($action === 'add_board' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     db_execute('INSERT INTO boards (cat_id, title, description, position, password_hash) VALUES (?, ?, ?, ?, ?)',
         [post_int('cat_id'), post_str('title'), post_str('description'), post_int('position'), $passwordHash]);
 
-    flash($passwordHash ? 'Forum angelegt – mit Passwort-Schutz.' : 'Forum angelegt.', 'success');
+    flash($passwordHash ? t('adm_forum_angelegt_mit_passwort') : t('adm_forum_angelegt'), 'success');
     redirect(FORUM_URL . '/admin/?action=boards');
 }
 
 if ($action === 'delete_board') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $bid = get_int('id');
 
     // Die Rechte je Gruppe haengen an keinem Fremdschluessel und bleiben
@@ -70,7 +70,7 @@ if ($action === 'delete_board') {
     catch (Exception $e) {}
 
     $weg = db_affected('DELETE FROM boards WHERE board_id = ?', [$bid]);
-    flash($weg > 0 ? 'Forum gelöscht.' : 'Dieses Forum gibt es nicht mehr.',
+    flash($weg > 0 ? t('adm_forum_geloescht') : t('adm_dieses_forum_gibt_es'),
           $weg > 0 ? 'success' : 'info');
     redirect(FORUM_URL . '/admin/?action=boards');
 }
@@ -80,10 +80,10 @@ if ($action === 'delete_board') {
    nur fuer Admins — die Rechtepruefung des Adminbereichs gilt fuer die ganze
    Datei. */
 if ($action === 'create_group' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     try {
         group_create(post_str('name'), !empty($_POST['show_badge']));
-        flash('Gruppe angelegt.', 'success');
+        flash(t('adm_gruppe_angelegt'), 'success');
     } catch (Exception $e) {
         flash($e->getMessage(), 'error');
     }
@@ -91,11 +91,11 @@ if ($action === 'create_group' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'update_group' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     try {
         group_rename(post_int('group_id'), post_str('name'),
                      !empty($_POST['show_badge']), !empty($_POST['hide_rank']));
-        flash('Gruppe gespeichert.', 'success');
+        flash(t('adm_gruppe_gespeichert'), 'success');
     } catch (Exception $e) {
         flash($e->getMessage(), 'error');
     }
@@ -103,10 +103,10 @@ if ($action === 'update_group' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete_group') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     try {
         group_delete(get_int('id'));
-        flash('Gruppe gelöscht. Die Rechte, die daran hingen, sind mit weg.', 'success');
+        flash(t('adm_gruppe_geloescht_die_rechte'), 'success');
     } catch (Exception $e) {
         flash($e->getMessage(), 'error');
     }
@@ -114,11 +114,11 @@ if ($action === 'delete_group') {
 }
 
 if ($action === 'group_member_add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $gid = post_int('group_id');
     try {
         group_member_add($gid, post_int('user_id'));
-        flash('Mitglied eingetragen.', 'success');
+        flash(t('adm_mitglied_eingetragen'), 'success');
     } catch (Exception $e) {
         flash($e->getMessage(), 'error');
     }
@@ -126,7 +126,7 @@ if ($action === 'group_member_add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'group_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $gid = post_int('group_id');
     $ziel = FORUM_URL . '/admin/?action=groups&group=' . $gid;
 
@@ -139,12 +139,12 @@ if ($action === 'group_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         try { db_execute('UPDATE user_groups SET avatar = NULL WHERE group_id = ?', [$gid]); }
         catch (Exception $e) {}
-        flash('Bild entfernt.', 'success');
+        flash(t('adm_bild_entfernt'), 'success');
         redirect($ziel);
     }
 
     if (empty($_FILES['bild']) || $_FILES['bild']['error'] !== UPLOAD_ERR_OK) {
-        flash('Keine Datei angekommen.', 'error');
+        flash(t('adm_keine_datei_angekommen'), 'error');
         redirect($ziel);
     }
     $datei = $_FILES['bild'];
@@ -160,11 +160,11 @@ if ($action === 'group_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $erlaubt = ['image/png' => 'png', 'image/jpeg' => 'jpg', 'image/webp' => 'webp'];
     $mime = mime_content_type($datei['tmp_name']) ?: '';
     if (!isset($erlaubt[$mime])) {
-        flash('Nur PNG, JPG oder WEBP.', 'error');
+        flash(t('adm_nur_png_jpg_oder_2'), 'error');
         redirect($ziel);
     }
     if ($datei['size'] > 512 * 1024) {
-        flash('Datei zu groß (höchstens 512 KB).', 'error');
+        flash(t('adm_datei_zu_gross_hoechstens'), 'error');
         redirect($ziel);
     }
 
@@ -180,31 +180,31 @@ if ($action === 'group_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $name = 'gruppe_' . $gid . '_' . bin2hex(random_bytes(5)) . '.' . $erlaubt[$mime];
     if (!move_uploaded_file($datei['tmp_name'], $ordner . $name)) {
-        flash('Konnte die Datei nicht speichern. Schreibrechte prüfen.', 'error');
+        flash(t('adm_konnte_die_datei_nicht'), 'error');
         redirect($ziel);
     }
     @chmod($ordner . $name, 0644);
 
     try {
         db_execute('UPDATE user_groups SET avatar = ? WHERE group_id = ?', [$name, $gid]);
-        flash('Bild gespeichert.', 'success');
+        flash(t('adm_bild_gespeichert'), 'success');
     } catch (Exception $e) {
         @unlink($ordner . $name);
-        flash('Die Spalte fehlt — bitte zuerst die Anpassung v1.6.2 fahren.', 'error');
+        flash(t('adm_die_spalte_fehlt_bitte'), 'error');
     }
     redirect($ziel);
 }
 
 if ($action === 'group_member_remove') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $gid = get_int('group');
     group_member_remove($gid, get_int('user'));
-    flash('Mitglied entfernt.', 'success');
+    flash(t('adm_mitglied_entfernt'), 'success');
     redirect(FORUM_URL . '/admin/?action=groups&group=' . $gid);
 }
 
 if ($action === 'update_board' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $bid = post_int('board_id');
     try {
         db_execute(
@@ -248,14 +248,14 @@ if ($action === 'update_board' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         //   - Eingabefeld gefüllt = neues Passwort setzen
         if (!empty($_POST['remove_password'])) {
             board_set_password($bid, '');
-            flash('Forum aktualisiert. Passwort-Schutz entfernt.', 'success');
+            flash(t('adm_forum_aktualisiert_passwort_schutz'), 'success');
         } else {
             $newPw = (string) ($_POST['new_password'] ?? '');
             if ($newPw !== '') {
                 board_set_password($bid, $newPw);
-                flash('Forum aktualisiert. Neues Passwort gesetzt.', 'success');
+                flash(t('adm_forum_aktualisiert_neues_passwort'), 'success');
             } else {
-                flash('Forum aktualisiert.', 'success');
+                flash(t('adm_forum_aktualisiert'), 'success');
             }
         }
     } catch (Exception $e) {
@@ -265,14 +265,14 @@ if ($action === 'update_board' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'update_board_approval' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $bid = post_int('board_id');
     $reqThreads = isset($_POST['require_approval_threads']) ? 1 : 0;
     $reqReplies = isset($_POST['require_approval_replies']) ? 1 : 0;
     try {
         db_execute('UPDATE boards SET require_approval_threads = ?, require_approval_replies = ? WHERE board_id = ?',
             [$reqThreads, $reqReplies, $bid]);
-        flash('Freigabe-Einstellungen gespeichert.', 'success');
+        flash(t('adm_freigabe_einstellungen_gespeichert'), 'success');
     } catch (Exception $e) {
         flash('Fehler: ' . $e->getMessage(), 'error');
     }
@@ -280,15 +280,15 @@ if ($action === 'update_board_approval' && $_SERVER['REQUEST_METHOD'] === 'POST'
 }
 
 if ($action === 'recalc_ranks') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $n = recalculate_all_ranks();
-    flash($n . ' Ränge neu berechnet.', 'success');
+    flash($n . t('adm_raenge_neu_berechnet'), 'success');
     redirect(FORUM_URL . '/admin/?action=ranks');
 }
 
 // ─── EINSTELLUNGEN SPEICHERN ──────────────────────────────────────
 if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
 
     // v0.18.49: Sub-Sektion-Marker — welche Settings-Sektion wurde abgesendet?
     // Ohne Marker = altes Verhalten (alle Felder). Mit Marker = nur die Felder dieser Sektion.
@@ -383,7 +383,7 @@ if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             // lib/email.php saeubert ebenfalls; hier wird es abgewiesen, damit
             // gar nichts Unbrauchbares in den Einstellungen landet.
             if (str_starts_with($key, 'smtp_') && preg_match('/[\r\n\0]/', $val)) {
-                flash('Zeilenumbrueche sind in Mail-Feldern nicht erlaubt.', 'error');
+                flash(t('adm_zeilenumbrueche_sind_in_mail'), 'error');
                 continue;
             }
             if ($val === '' && in_array($key, $keepIfEmpty, true)) continue;
@@ -420,7 +420,7 @@ if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $cu = current_user();
     db_execute('INSERT INTO mod_log (mod_id, action, target_type, target_id) VALUES (?, ?, ?, ?)',
         [$cu['user_id'], 'update_settings', 'setting', 0]);
-    flash('Einstellungen gespeichert.', 'success');
+    flash(t('adm_einstellungen_gespeichert'), 'success');
     // v0.18.49: Zurück zur richtigen Sektion redirecten
     $redirectAction = ($section === '' || !isset($sectionFields[$section])) ? 'settings' : $section;
     redirect(FORUM_URL . '/admin/?action=' . $redirectAction);
@@ -429,14 +429,14 @@ if ($action === 'save_settings' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 // ─── IP-BANN ──────────────────────────────────────────────────────
 if ($action === 'ban_ip') {
     $csrf = $_GET['csrf'] ?? post_str('csrf');
-    if (!verify_csrf($csrf)) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($csrf)) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
 
     $ip      = trim($_GET['ip'] ?? post_str('ip'));
     $reason  = post_str('reason');
     $expires = post_str('expires');
 
     if (!filter_var($ip, FILTER_VALIDATE_IP)) {
-        flash('Ungültige IP-Adresse: ' . $ip, 'error');
+        flash(t('adm_ungueltige_ip_adresse') . $ip, 'error');
     } else {
         $expiresAt = null;
         if ($expires) {
@@ -459,15 +459,15 @@ if ($action === 'ban_ip') {
 }
 
 if ($action === 'unban_ip') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     db_execute('DELETE FROM ip_bans WHERE ban_id = ?', [get_int('id')]);
-    flash('IP-Bann aufgehoben.', 'success');
+    flash(t('adm_ip_bann_aufgehoben'), 'success');
     redirect(FORUM_URL . '/admin/?action=ipbans');
 }
 
 // ─── WARTUNGS-TOOLS ───────────────────────────────────────────────
 if ($action === 'maintenance_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $task = post_str('task');
 
     if ($task === 'recount_stats') {
@@ -486,7 +486,7 @@ if ($action === 'maintenance_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $pc = db_count('SELECT COUNT(*) FROM posts WHERE user_id = ?', [$u['user_id']]);
             db_execute('UPDATE users SET post_count = ? WHERE user_id = ?', [$pc, $u['user_id']]);
         }
-        flash('Alle Statistiken neu berechnet.', 'success');
+        flash(t('adm_alle_statistiken_neu_berechnet'), 'success');
 
     } elseif ($task === 'optimize_tables') {
         try {
@@ -512,9 +512,9 @@ if ($action === 'maintenance_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if (empty($failed)) {
-                flash($optimized . ' Tabellen optimiert.', 'success');
+                flash($optimized . t('adm_tabellen_optimiert'), 'success');
             } else {
-                flash($optimized . ' Tabellen optimiert. Fehlgeschlagen: ' . implode(', ', $failed), 'warning');
+                flash($optimized . t('adm_tabellen_optimiert_fehlgeschlagen') . implode(', ', $failed), 'warning');
             }
         } catch (Exception $e) {
             flash('Fehler: ' . $e->getMessage(), 'error');
@@ -524,7 +524,7 @@ if ($action === 'maintenance_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $days = max(7, post_int('cleanup_days', 90));
         $n = db_count('SELECT COUNT(*) FROM user_ip_log WHERE created_at < DATE_SUB(NOW(), INTERVAL ? DAY)', [$days]);
         db_execute('DELETE FROM user_ip_log WHERE created_at < DATE_SUB(NOW(), INTERVAL ? DAY)', [$days]);
-        flash($n . ' IP-Log-Einträge gelöscht.', 'success');
+        flash($n . t('adm_ip_log_eintraege_geloescht'), 'success');
 
     } elseif ($task === 'cleanup_expired_ipbans') {
         $n = db_count('SELECT COUNT(*) FROM ip_bans WHERE expires_at IS NOT NULL AND expires_at < NOW()');
@@ -536,7 +536,7 @@ if ($action === 'maintenance_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── DESIGN: SPEICHERN ────────────────────────────────────────────
 if ($action === 'save_design' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
 
     $themeKeys = [
         'theme_color_bg_body', 'theme_color_bg_surface', 'theme_color_bg_surface2',
@@ -589,7 +589,7 @@ if ($action === 'save_design' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Preview-Session leeren – Settings sind jetzt persistent
     unset($_SESSION['theme_preview']);
 
-    flash('Design gespeichert.', 'success');
+    flash(t('adm_design_gespeichert'), 'success');
     redirect(FORUM_URL . '/admin/?action=design');
 }
 
@@ -606,7 +606,7 @@ if ($action === 'preview_design' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── DESIGN: PREVIEW LÖSCHEN ──────────────────────────────────────
 if ($action === 'clear_preview') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     unset($_SESSION['theme_preview']);
     redirect(FORUM_URL . '/admin/?action=design');
 }
@@ -619,51 +619,51 @@ if ($action === 'send_test_mail' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $to = trim((string) ($_POST['to'] ?? ''));
     if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
-        echo json_encode(['ok' => false, 'error' => 'Ungültige E-Mail-Adresse']); exit;
+        echo json_encode(['ok' => false, 'error' => t('adm_ungueltige_e_mail_adresse')]); exit;
     }
     $forum  = forum_name();
-    $body   = email_template('🧪 Test-Mail von ' . $forum,
+    $body   = email_template(t('adm_test_mail_von') . $forum,
         '<p>Hallo!</p>'
       . '<p>Diese Mail wurde aus dem Admin-Bereich als <strong>Test</strong> gesendet, '
       . 'um deine SMTP-Einstellungen zu prüfen.</p>'
       . '<p>Wenn du das hier liest, funktioniert alles. 🎉</p>'
       . '<p style="color:#888;font-size:12px;margin-top:20px">'
-      . 'Gesendet am ' . date('d.m.Y H:i:s') . ' Uhr.</p>'
+      . t('adm_gesendet_am') . date('d.m.Y H:i:s') . ' Uhr.</p>'
     );
-    $ok = send_email($to, '🧪 Test-Mail von ' . $forum, $body);
+    $ok = send_email($to, t('adm_test_mail_von') . $forum, $body);
     if ($ok) {
         echo json_encode([
             'ok'  => true,
-            'msg' => 'Server hat die Mail an ' . $to . ' angenommen. Wenn sie nicht ankommt: Spam-Ordner prüfen, '
+            'msg' => t('adm_server_hat_die_mail') . $to . ' angenommen. Wenn sie nicht ankommt: Spam-Ordner prüfen, '
                    . 'sonst evtl. Bounce-Mail im Postfach des Absenders ansehen (zeigt den genauen Fehler).'
         ]);
     } else {
-        echo json_encode(['ok' => false, 'error' => 'Versand fehlgeschlagen. Prüfe SMTP-Host, Port, Login. Details im PHP-Error-Log.']);
+        echo json_encode(['ok' => false, 'error' => t('adm_versand_fehlgeschlagen_pruefe_smtp')]);
     }
     exit;
 }
 
 // ─── DESIGN: AUF DEFAULTS ZURÜCKSETZEN ───────────────────────────
 if ($action === 'reset_design' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     // Dieselbe Liste, die auch ein frisches Forum bekommt — sonst stellt
     // "Zuruecksetzen" irgendwann eine Palette her, die es nirgends sonst gibt.
     foreach (theme_defaults() as $k => $v) set_setting($k, $v);
     unset($_SESSION['theme_preview']);
-    flash('Design auf Standardwerte zurückgesetzt.', 'success');
+    flash(t('adm_design_auf_standardwerte_zurueckgesetzt'), 'success');
     redirect(FORUM_URL . '/admin/?action=design');
 }
 
 // ─── ROLLEN-AVATARE: UPLOAD / DELETE ──────────────────────────────
 if ($action === 'upload_role_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $role = post_str('role');
     if (!in_array($role, ['owner', 'admin', 'mod'], true)) {
-        flash('Ungültige Rolle.', 'error');
+        flash(t('adm_ungueltige_rolle'), 'error');
         redirect(FORUM_URL . '/admin/?action=settings');
     }
     if (empty($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
-        flash('Datei-Upload fehlgeschlagen.', 'error');
+        flash(t('adm_datei_upload_fehlgeschlagen'), 'error');
         redirect(FORUM_URL . '/admin/?action=settings');
     }
     $file = $_FILES['image'];
@@ -675,11 +675,11 @@ if ($action === 'upload_role_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $allowed = ['image/png' => 'png', 'image/jpeg' => 'jpg', 'image/webp' => 'webp'];
     $mime = mime_content_type($file['tmp_name']) ?: '';
     if (!isset($allowed[$mime])) {
-        flash('Nur PNG, JPG oder WEBP erlaubt — SVG nicht, siehe Hinweis darunter.', 'error');
+        flash(t('adm_nur_png_jpg_oder'), 'error');
         redirect(FORUM_URL . '/admin/?action=settings');
     }
     if ($file['size'] > 2 * 1024 * 1024) {
-        flash('Datei zu groß (max 2 MB).', 'error');
+        flash(t('adm_datei_zu_gross_max'), 'error');
         redirect(FORUM_URL . '/admin/?action=settings');
     }
     $assetsDir = __DIR__ . '/../assets/';
@@ -690,15 +690,15 @@ if ($action === 'upload_role_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $target = $assetsDir . 'role_' . $role . '_custom.' . $allowed[$mime];
     if (move_uploaded_file($file['tmp_name'], $target)) {
-        flash('Rollen-Avatar gespeichert.', 'success');
+        flash(t('adm_rollen_avatar_gespeichert'), 'success');
     } else {
-        flash('Konnte Datei nicht speichern. Schreibrechte prüfen!', 'error');
+        flash(t('adm_konnte_datei_nicht_speichern'), 'error');
     }
     redirect(FORUM_URL . '/admin/?action=settings');
 }
 
 if ($action === 'delete_role_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $role = post_str('role');
     if (!in_array($role, ['owner', 'admin', 'mod'], true)) {
         redirect(FORUM_URL . '/admin/?action=settings');
@@ -709,22 +709,22 @@ if ($action === 'delete_role_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $f = $assetsDir . 'role_' . $role . '_custom.' . $ext;
         if (file_exists($f)) { @unlink($f); $removed = true; }
     }
-    flash($removed ? 'Eigenes Bild entfernt – Standard wiederhergestellt.' : 'Kein eigenes Bild gefunden.',
+    flash($removed ? t('adm_eigenes_bild_entfernt_standard') : t('adm_kein_eigenes_bild_gefunden'),
         $removed ? 'success' : 'info');
     redirect(FORUM_URL . '/admin/?action=settings');
 }
 
 // ─── MODUL-VERWALTUNG ─────────────────────────────────────────────
 if ($action === 'module_toggle') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $code = $_GET['code'] ?? '';
     $turnOn = ($_GET['enable'] ?? '0') === '1';
     if ($turnOn) {
         $r = enable_module($code);
-        flash($r['ok'] ? 'Modul aktiviert.' : 'Fehler: ' . ($r['error'] ?? '?'), $r['ok'] ? 'success' : 'error');
+        flash($r['ok'] ? t('adm_modul_aktiviert') : 'Fehler: ' . ($r['error'] ?? '?'), $r['ok'] ? 'success' : 'error');
     } else {
         $r = disable_module($code);
-        flash($r['ok'] ? 'Modul deaktiviert.' : 'Fehler: ' . ($r['error'] ?? '?'), $r['ok'] ? 'success' : 'error');
+        flash($r['ok'] ? t('adm_modul_deaktiviert') : 'Fehler: ' . ($r['error'] ?? '?'), $r['ok'] ? 'success' : 'error');
     }
     redirect(FORUM_URL . '/admin/?action=modules');
 }
@@ -735,10 +735,10 @@ if ($action === 'module_toggle') {
 // unangetastet — siehe module_entfernen().
 if ($action === 'module_entfernen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf($_POST['csrf'] ?? '')) {
-        error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+        error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     }
     if (!is_owner()) {
-        error_page(403, 'Kein Zugriff', 'Module darf nur der Inhaber entfernen.');
+        error_page(403, t('adm_kein_zugriff'), t('adm_module_darf_nur_der_3'));
     }
 
     $code = (string) ($_POST['code'] ?? '');
@@ -751,7 +751,7 @@ if ($action === 'module_entfernen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
           . ($tabellen ? ' und ' . count($tabellen) . ' '
              . (count($tabellen) === 1 ? 'Tabelle' : 'Tabellen') . ' (' . implode(', ', $tabellen) . ')' : '')
           . '.'
-        : 'Nicht entfernt: ' . ($r['error'] ?? '?'),
+        : t('adm_nicht_entfernt') . ($r['error'] ?? '?'),
         $r['ok'] ? 'success' : 'error');
     redirect(FORUM_URL . '/admin/?action=modules');
 }
@@ -763,27 +763,27 @@ if ($action === 'module_entfernen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 // Updatepaket, und aus demselben Grund.
 if ($action === 'module_upload' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf($_POST['csrf'] ?? '')) {
-        error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+        error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     }
     if (!is_owner()) {
-        error_page(403, 'Kein Zugriff', 'Module darf nur der Inhaber einspielen.');
+        error_page(403, t('adm_kein_zugriff'), t('adm_module_darf_nur_der_2'));
     }
 
     require_once __DIR__ . '/../lib/module_package.php';
 
     $datei = $_FILES['modulpaket'] ?? null;
     if (!$datei || ($datei['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-        flash('Es wurde keine Datei hochgeladen.', 'error');
+        flash(t('adm_es_wurde_keine_datei'), 'error');
         redirect(FORUM_URL . '/admin/?action=modules');
     }
     if (!is_uploaded_file($datei['tmp_name'])) {
-        flash('Die Datei kam nicht über den Upload.', 'error');
+        flash(t('adm_die_datei_kam_nicht'), 'error');
         redirect(FORUM_URL . '/admin/?action=modules');
     }
 
     $ergebnis = modulpaket_pruefen($datei['tmp_name']);
     if (empty($ergebnis['ok'])) {
-        flash('Paket abgelehnt: ' . ($ergebnis['error'] ?? 'unbekannter Grund'), 'error');
+        flash(t('adm_paket_abgelehnt') . ($ergebnis['error'] ?? 'unbekannter Grund'), 'error');
         redirect(FORUM_URL . '/admin/?action=modules');
     }
 
@@ -791,11 +791,11 @@ if ($action === 'module_upload' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $ergebnis['zip']->close();
 
     if (empty($eingespielt['ok'])) {
-        flash('Einspielen fehlgeschlagen: ' . ($eingespielt['error'] ?? '?'), 'error');
+        flash(t('adm_einspielen_fehlgeschlagen') . ($eingespielt['error'] ?? '?'), 'error');
     } else {
         flash('Modul „' . ($ergebnis['manifest']['name'] ?? $eingespielt['code']) . '" '
             . ($ergebnis['manifest']['version'] ?? '') . ' eingespielt ('
-            . (int) $eingespielt['geschrieben'] . ' Dateien). Es ist noch nicht aktiv.', 'success');
+            . (int) $eingespielt['geschrieben'] . t('adm_dateien_es_ist_noch'), 'success');
     }
     redirect(FORUM_URL . '/admin/?action=modules');
 }
@@ -807,10 +807,10 @@ if ($action === 'module_upload' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 // ausgeloest sein.
 if ($action === 'module_quelle' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf($_POST['csrf'] ?? '')) {
-        error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+        error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     }
     if (!is_owner()) {
-        error_page(403, 'Kein Zugriff', 'Module darf nur der Inhaber beziehen.');
+        error_page(403, t('adm_kein_zugriff'), t('adm_module_darf_nur_der'));
     }
 
     require_once __DIR__ . '/../lib/module_quelle.php';
@@ -819,8 +819,8 @@ if ($action === 'module_quelle' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['suchen'])) {
         $liste = modulquelle_liste(true);
         flash($liste['ok']
-            ? 'Liste abgerufen: ' . count($liste['module']) . ' Module verfügbar.'
-            : 'Abruf fehlgeschlagen: ' . ($liste['error'] ?? '?'),
+            ? t('adm_liste_abgerufen') . count($liste['module']) . t('adm_module_verfuegbar')
+            : t('adm_abruf_fehlgeschlagen') . ($liste['error'] ?? '?'),
             $liste['ok'] ? 'success' : 'error');
         redirect(FORUM_URL . '/admin/?action=modules');
     }
@@ -829,7 +829,7 @@ if ($action === 'module_quelle' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $code = (string) ($_POST['code'] ?? '');
     $liste = modulquelle_liste();
     if (!$liste['ok']) {
-        flash('Abruf fehlgeschlagen: ' . ($liste['error'] ?? '?'), 'error');
+        flash(t('adm_abruf_fehlgeschlagen') . ($liste['error'] ?? '?'), 'error');
         redirect(FORUM_URL . '/admin/?action=modules');
     }
 
@@ -838,13 +838,13 @@ if ($action === 'module_quelle' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if (($m['code'] ?? '') === $code) { $eintrag = $m; break; }
     }
     if ($eintrag === null) {
-        flash('Dieses Modul steht beim Hersteller nicht (mehr) bereit.', 'error');
+        flash(t('adm_dieses_modul_steht_beim'), 'error');
         redirect(FORUM_URL . '/admin/?action=modules');
     }
 
     $geladen = modulquelle_paket_laden($eintrag);
     if (!$geladen['ok']) {
-        flash('Laden fehlgeschlagen: ' . ($geladen['error'] ?? '?'), 'error');
+        flash(t('adm_laden_fehlgeschlagen') . ($geladen['error'] ?? '?'), 'error');
         redirect(FORUM_URL . '/admin/?action=modules');
     }
 
@@ -853,7 +853,7 @@ if ($action === 'module_quelle' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $geprueft = modulpaket_pruefen($geladen['datei']);
     if (empty($geprueft['ok'])) {
         @unlink($geladen['datei']);
-        flash('Paket abgelehnt: ' . ($geprueft['error'] ?? '?'), 'error');
+        flash(t('adm_paket_abgelehnt') . ($geprueft['error'] ?? '?'), 'error');
         redirect(FORUM_URL . '/admin/?action=modules');
     }
 
@@ -862,7 +862,7 @@ if ($action === 'module_quelle' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     @unlink($geladen['datei']);
 
     flash(empty($eingespielt['ok'])
-        ? 'Einspielen fehlgeschlagen: ' . ($eingespielt['error'] ?? '?')
+        ? t('adm_einspielen_fehlgeschlagen') . ($eingespielt['error'] ?? '?')
         : 'Modul „' . ($geprueft['manifest']['name'] ?? $code) . '" '
           . ($geprueft['manifest']['version'] ?? '') . ' eingespielt.',
         empty($eingespielt['ok']) ? 'error' : 'success');
@@ -871,14 +871,14 @@ if ($action === 'module_quelle' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── SMILEY-VERWALTUNG ───────────────────────────────────────
 if ($action === 'add_smiley' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $code  = trim($_POST['code']  ?? '');
     $emoji = trim($_POST['emoji'] ?? '');
     $desc  = trim($_POST['description'] ?? '');
     $picker = isset($_POST['is_in_picker']) ? 1 : 0;
 
     if ($code === '' || $emoji === '') {
-        flash('Code und Emoji müssen ausgefüllt sein.', 'error');
+        flash(t('adm_code_und_emoji_muessen'), 'error');
     } else {
         // Position bestimmen: nächste freie Stelle im Picker
         $pos = 0;
@@ -900,7 +900,7 @@ if ($action === 'add_smiley' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'update_smiley' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $id    = (int) ($_POST['smiley_id'] ?? 0);
     $code  = trim($_POST['code']  ?? '');
     $emoji = trim($_POST['emoji'] ?? '');
@@ -923,7 +923,7 @@ if ($action === 'update_smiley' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 [$code, $emoji, $desc, $picker, $pos, $id]
             );
             smileys_cache_clear();
-            flash('Smiley aktualisiert.', 'success');
+            flash(t('adm_smiley_aktualisiert'), 'success');
         } catch (Exception $e) {
             flash('Fehler: ' . $e->getMessage(), 'error');
         }
@@ -932,13 +932,13 @@ if ($action === 'update_smiley' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete_smiley') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $id = (int) ($_GET['id'] ?? 0);
     if ($id) {
         try {
             db_execute('DELETE FROM smileys WHERE smiley_id = ?', [$id]);
             smileys_cache_clear();
-            flash('Smiley gelöscht.', 'success');
+            flash(t('adm_smiley_geloescht'), 'success');
         } catch (Exception $e) {
             flash('Fehler: ' . $e->getMessage(), 'error');
         }
@@ -947,7 +947,7 @@ if ($action === 'delete_smiley') {
 }
 
 if ($action === 'reorder_smileys' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $ids = $_POST['order'] ?? [];
     if (is_array($ids)) {
         $pos = 0;
@@ -970,33 +970,33 @@ if ($action === 'reorder_smileys' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ─── RECHTLICHES (Impressum / Datenschutz) ──────────────────────
 if ($action === 'save_legal' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     set_setting('imprint_name',   trim($_POST['imprint_name']   ?? ''));
     set_setting('imprint_street', trim($_POST['imprint_street'] ?? ''));
     set_setting('imprint_city',   trim($_POST['imprint_city']   ?? ''));
     set_setting('imprint_email',  trim($_POST['imprint_email']  ?? ''));
-    flash('Impressum-Daten gespeichert.', 'success');
+    flash(t('adm_impressum_daten_gespeichert'), 'success');
     redirect(FORUM_URL . '/admin/?action=legal');
 }
 
 if ($action === 'save_page' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $slug    = $_POST['slug'] ?? '';
     $content = $_POST['content'] ?? '';
     if (!in_array($slug, ['imprint', 'privacy', 'terms'], true)) {
-        flash('Unbekannte Seite.', 'error');
+        flash(t('adm_unbekannte_seite'), 'error');
     } else {
         if (save_page($slug, $content)) {
-            flash('Seite gespeichert.', 'success');
+            flash(t('adm_seite_gespeichert'), 'success');
         } else {
-            flash('Speichern fehlgeschlagen.', 'error');
+            flash(t('adm_speichern_fehlgeschlagen'), 'error');
         }
     }
     redirect(FORUM_URL . '/admin/?action=legal&page=' . urlencode($slug));
 }
 
 if ($action === 'save_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $name    = trim($_POST['name'] ?? '');
     $content = $_POST['content'] ?? '';
     $cu      = current_user();
@@ -1006,7 +1006,7 @@ if ($action === 'save_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // blockt nur wörtliche <?php-Tags und kann das nicht verhindern. Ein
     // Template-Override läuft danach bei jedem Besucher.
     if (empty($cu['is_owner'])) {
-        flash('Nur der Owner darf Templates bearbeiten.', 'error');
+        flash(t('adm_nur_der_owner_darf_2'), 'error');
         redirect(FORUM_URL . '/admin/?action=templates');
     }
 
@@ -1015,73 +1015,73 @@ if ($action === 'save_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // aufgeloeste Pfad wirklich in views_new/ liegt — file_exists() allein
     // laesst "../../etwas" durch, wenn es die Datei dort gibt.
     if (!template_name_gueltig($name)) {
-        flash('Unbekanntes Template.', 'error');
+        flash(t('adm_unbekanntes_template'), 'error');
     } elseif (!template_content_is_safe($content)) {
-        flash('Template enthält PHP-Tags und wurde nicht gespeichert (Sicherheit).', 'error');
+        flash(t('adm_template_enthaelt_php_tags'), 'error');
     } else {
         if (save_template_override($name, $content, $cu ? (int) $cu['user_id'] : null)) {
-            flash('Template gespeichert.', 'success');
+            flash(t('adm_template_gespeichert'), 'success');
         } else {
-            flash('Speichern fehlgeschlagen.', 'error');
+            flash(t('adm_speichern_fehlgeschlagen'), 'error');
         }
     }
     redirect(FORUM_URL . '/admin/?action=templates&edit=' . urlencode($name));
 }
 
 if ($action === 'reset_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $name = trim($_POST['name'] ?? '');
     if ($name && delete_template_override($name)) {
-        flash('Template auf Original zurückgesetzt.', 'success');
+        flash(t('adm_template_auf_original_zurueckgesetzt'), 'success');
     } else {
-        flash('Zurücksetzen fehlgeschlagen.', 'error');
+        flash(t('adm_zuruecksetzen_fehlgeschlagen'), 'error');
     }
     redirect(FORUM_URL . '/admin/?action=templates&edit=' . urlencode($name));
 }
 
 if ($action === 'ack_template_update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $name = trim($_POST['name'] ?? '');
     if ($name && acknowledge_template_override_update($name)) {
         flash('Update-Hinweis ausgeblendet. Dein Override bleibt aktiv.', 'success');
     } else {
-        flash('Aktion fehlgeschlagen.', 'error');
+        flash(t('adm_aktion_fehlgeschlagen'), 'error');
     }
     redirect(FORUM_URL . '/admin/?action=templates&edit=' . urlencode($name));
 }
 
 if ($action === 'approve_user_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $uid = (int) ($_POST['user_id'] ?? 0);
     $cu  = current_user();
     if ($uid > 0 && $cu && approve_user($uid, (int) $cu['user_id'])) {
-        flash('Benutzer freigegeben. Eine Benachrichtigungs-Mail wurde versendet.', 'success');
+        flash(t('adm_benutzer_freigegeben_eine_benachrichtigungs'), 'success');
     } else {
-        flash('Freigabe fehlgeschlagen.', 'error');
+        flash(t('adm_freigabe_fehlgeschlagen'), 'error');
     }
     redirect(FORUM_URL . '/admin/?action=approvals_users');
 }
 
 if ($action === 'reject_user_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $uid    = (int) ($_POST['user_id'] ?? 0);
     $reason = trim((string) ($_POST['reason'] ?? ''));
     $cu     = current_user();
     if ($reason === '') {
-        flash('Bitte eine Begründung angeben (wird per E-Mail an den User gesendet).', 'error');
+        flash(t('adm_bitte_eine_begruendung_angeben'), 'error');
         redirect(FORUM_URL . '/admin/?action=approvals_users');
     }
     if ($uid > 0 && $cu && reject_user($uid, (int) $cu['user_id'], $reason)) {
-        flash('Benutzer abgelehnt. Eine Begründungs-Mail wurde versendet, der Account wurde gelöscht.', 'success');
+        flash(t('adm_benutzer_abgelehnt_eine_begruendungs'), 'success');
     } else {
-        flash('Ablehnung fehlgeschlagen.', 'error');
+        flash(t('adm_ablehnung_fehlgeschlagen'), 'error');
     }
     redirect(FORUM_URL . '/admin/?action=approvals_users');
 }
 
 // ─── EINLADUNGEN ──────────────────────────────────────────────────
 if ($action === 'invitation_create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $cu = current_user();
     if (!$cu) redirect(FORUM_URL . '/admin/');
 
@@ -1095,58 +1095,58 @@ if ($action === 'invitation_create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                              $note  !== '' ? $note  : null,
                              $days);
     if (!$inv) {
-        flash('Einladung konnte nicht erstellt werden. (Ungültige E-Mail?)', 'error');
+        flash(t('adm_einladung_konnte_nicht_erstellt'), 'error');
         redirect(FORUM_URL . '/admin/?action=invitations');
     }
 
     if ($sendMail && $email !== '') {
         $ok = invitation_send_email($inv, $email);
         if ($ok) {
-            flash('Einladung erstellt und Mail an ' . $email . ' versendet. Code: ' . $inv['code'], 'success');
+            flash(t('adm_einladung_erstellt_und_mail') . $email . ' versendet. Code: ' . $inv['code'], 'success');
         } else {
-            flash('Einladung erstellt, aber Mail-Versand fehlgeschlagen. Code: ' . $inv['code'] . ' (manuell weitergeben)', 'warning');
+            flash(t('adm_einladung_erstellt_aber_mail') . $inv['code'] . ' (manuell weitergeben)', 'warning');
         }
     } else {
-        flash('Einladung erstellt. Code: ' . $inv['code'], 'success');
+        flash(t('adm_einladung_erstellt_code') . $inv['code'], 'success');
     }
     redirect(FORUM_URL . '/admin/?action=invitations');
 }
 
 if ($action === 'invitation_resend' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $iid = (int) ($_POST['invitation_id'] ?? 0);
     $override = trim((string) ($_POST['email_override'] ?? ''));
     $inv = db_fetch('SELECT * FROM invitations WHERE invitation_id = ?', [$iid]);
     if (!$inv) {
-        flash('Einladung nicht gefunden.', 'error');
+        flash(t('adm_einladung_nicht_gefunden'), 'error');
     } elseif (!empty($inv['used_by']) || !empty($inv['revoked_at']) || strtotime($inv['expires_at']) < time()) {
-        flash('Einladung ist nicht mehr aktiv.', 'error');
+        flash(t('adm_einladung_ist_nicht_mehr'), 'error');
     } else {
         $targetEmail = $override !== '' ? $override : ($inv['email'] ?? '');
         if ($targetEmail === '') {
-            flash('Keine E-Mail-Adresse zum Versand angegeben.', 'error');
+            flash(t('adm_keine_e_mail_adresse'), 'error');
         } else {
             $ok = invitation_send_email($inv, $targetEmail);
-            flash($ok ? 'Mail erneut versendet an ' . $targetEmail : 'Mail-Versand fehlgeschlagen.', $ok ? 'success' : 'error');
+            flash($ok ? t('adm_mail_erneut_versendet_an') . $targetEmail : t('adm_mail_versand_fehlgeschlagen'), $ok ? 'success' : 'error');
         }
     }
     redirect(FORUM_URL . '/admin/?action=invitations');
 }
 
 if ($action === 'invitation_revoke' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $iid = (int) ($_POST['invitation_id'] ?? 0);
     $cu  = current_user();
     if ($iid > 0 && $cu && invitation_revoke($iid, (int) $cu['user_id'])) {
-        flash('Einladung widerrufen. Der Code kann nicht mehr verwendet werden.', 'success');
+        flash(t('adm_einladung_widerrufen_der_code'), 'success');
     } else {
-        flash('Widerruf fehlgeschlagen (Einladung schon verbraucht oder nicht gefunden).', 'error');
+        flash(t('adm_widerruf_fehlgeschlagen_einladung_schon'), 'error');
     }
     redirect(FORUM_URL . '/admin/?action=invitations');
 }
 
 if ($action === 'create_backup' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $type = $_POST['type'] ?? 'db';
     $note = trim($_POST['note'] ?? '');
 
@@ -1160,18 +1160,18 @@ if ($action === 'create_backup' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result) {
         flash("Backup erstellt: {$result}", 'success');
     } else {
-        flash('Backup-Erstellung fehlgeschlagen. Schau in die PHP-Logs.', 'error');
+        flash(t('adm_backup_erstellung_fehlgeschlagen_schau'), 'error');
     }
     redirect(FORUM_URL . '/admin/?action=backups');
 }
 
 if ($action === 'delete_backup' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $filename = $_POST['filename'] ?? '';
     if (delete_backup($filename)) {
         flash("Backup gelöscht: {$filename}", 'success');
     } else {
-        flash('Löschen fehlgeschlagen (ungültiger Name oder Datei nicht da).', 'error');
+        flash(t('adm_loeschen_fehlgeschlagen_ungueltiger_name'), 'error');
     }
     redirect(FORUM_URL . '/admin/?action=backups');
 }
@@ -1179,13 +1179,13 @@ if ($action === 'delete_backup' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($action === 'download_backup') {
     if (!is_admin(current_user())) {
         http_response_code(403);
-        error_page(403, 'Zugriff verweigert', 'Dieser Bereich ist Administratoren vorbehalten.');
+        error_page(403, t('adm_zugriff_verweigert'), t('adm_dieser_bereich_ist_administratoren'));
     }
     $filename = $_GET['file'] ?? '';
     $path = backup_path($filename);
     if (!$path) {
         http_response_code(404);
-        error_page(404, 'Backup nicht gefunden', 'Diese Sicherung gibt es nicht, oder der Name ist ungültig.');
+        error_page(404, t('adm_backup_nicht_gefunden'), t('adm_diese_sicherung_gibt_es'));
     }
     // Force-Download
     $mime = str_ends_with($filename, '.sql') ? 'application/sql' : 'application/zip';
@@ -1198,7 +1198,7 @@ if ($action === 'download_backup') {
 }
 
 if ($action === 'clear_cache' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $type = $_POST['type'] ?? 'all';
 
     $cleared = [];
@@ -1215,13 +1215,13 @@ if ($action === 'clear_cache' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    flash('Cache geleert: ' . implode(', ', $cleared), 'success');
+    flash(t('adm_cache_geleert') . implode(', ', $cleared), 'success');
     redirect(FORUM_URL . '/admin/?action=maintenance');
 }
 
 // ─── FREIGABE-WARTESCHLANGE ───────────────────────────────────────
 if (in_array($action, ['approve_thread', 'approve_post', 'reject_thread', 'reject_post'], true)) {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
 
     $id = get_int('id');
     $reason = $_GET['reason'] ?? '';
@@ -1236,9 +1236,9 @@ if (in_array($action, ['approve_thread', 'approve_post', 'reject_thread', 'rejec
 
     if ($ok) {
         $verb = str_contains($action, 'approve') ? 'freigegeben' : 'abgelehnt';
-        flash('Beitrag erfolgreich ' . $verb . '.', 'success');
+        flash(t('adm_beitrag_erfolgreich') . $verb . '.', 'success');
     } else {
-        flash('Aktion fehlgeschlagen.', 'error');
+        flash(t('adm_aktion_fehlgeschlagen'), 'error');
     }
     redirect(FORUM_URL . '/admin/?action=approval');
 }
@@ -1257,7 +1257,7 @@ if (str_starts_with($action, 'import_')) {
 }
 
 if ($action === 'import_pruefen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
 
     $opt = [
         'host'    => post_str('db_host') ?: 'localhost',
@@ -1270,14 +1270,14 @@ if ($action === 'import_pruefen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
 
     if ($opt['db'] === '' || $opt['user'] === '') {
-        flash('Datenbank und Benutzer sind Pflicht.', 'error');
+        flash(t('adm_datenbank_und_benutzer_sind'), 'error');
         redirect(FORUM_URL . '/admin/?action=import');
     }
 
     try {
         $alt = import_verbindung($opt);
     } catch (Throwable $e) {
-        flash('Keine Verbindung: ' . $e->getMessage(), 'error');
+        flash(t('adm_keine_verbindung') . $e->getMessage(), 'error');
         redirect(FORUM_URL . '/admin/?action=import');
     }
 
@@ -1300,14 +1300,14 @@ if ($action === 'import_pruefen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($action === 'import_leeren' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json; charset=utf-8');
     if (!verify_csrf(post_str('csrf'))) {
-        echo json_encode(['fehler' => 'Sicherheits-Token ungültig. Bitte die Seite neu laden.']);
+        echo json_encode(['fehler' => t('adm_sicherheits_token_ungueltig_bitte')]);
         exit;
     }
     // Das eigene Konto bleibt — wer sich selbst mitloescht, kann hinterher
     // nicht einmal nachsehen, ob der Import geklappt hat.
     $ich = (int) (current_user()['user_id'] ?? 0);
     if ($ich <= 0) {
-        echo json_encode(['fehler' => 'Kein angemeldetes Konto — abgebrochen.']);
+        echo json_encode(['fehler' => t('adm_kein_angemeldetes_konto_abgebrochen')]);
         exit;
     }
     @set_time_limit(300);
@@ -1323,18 +1323,18 @@ if ($action === 'import_leeren' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($action === 'import_runde' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json; charset=utf-8');
     if (!verify_csrf(post_str('csrf'))) {
-        echo json_encode(['fehler' => 'Sicherheits-Token ungültig. Bitte die Seite neu laden.']);
+        echo json_encode(['fehler' => t('adm_sicherheits_token_ungueltig_bitte')]);
         exit;
     }
     $opt = $_SESSION['import_opt'] ?? null;
     if (!$opt) {
-        echo json_encode(['fehler' => 'Die Zugangsdaten sind nicht mehr da. Bitte von vorn beginnen.']);
+        echo json_encode(['fehler' => t('adm_die_zugangsdaten_sind_nicht')]);
         exit;
     }
 
     $schritt = post_str('schritt');
     if (!isset(IMPORT_SCHRITTE[$schritt])) {
-        echo json_encode(['fehler' => 'Unbekannter Schritt.']);
+        echo json_encode(['fehler' => t('adm_unbekannter_schritt')]);
         exit;
     }
 
@@ -1358,13 +1358,13 @@ if ($action === 'import_runde' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'import_zurueck' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $bericht = import_zuruecknehmen();
     unset($_SESSION['import_bericht']);
     $summe = array_sum($bericht);
     flash($summe > 0
-        ? 'Der Import wurde zurückgenommen — ' . number_format($summe, 0, ',', '.') . ' Einträge entfernt.'
-        : 'Es gab nichts zurückzunehmen.', 'success');
+        ? t('adm_der_import_wurde_zurueckgenommen') . number_format($summe, 0, ',', '.') . t('adm_eintraege_entfernt')
+        : t('adm_es_gab_nichts_zurueckzunehmen'), 'success');
     redirect(FORUM_URL . '/admin/?action=import');
 }
 
@@ -1375,13 +1375,13 @@ if ($action === 'import_vergessen') {
 
 // ─── DATENBANK-MIGRATIONEN ────────────────────────────────────────
 if ($action === 'run_migration' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
 
     // Von aussen betreute Installation: der Betreiber des Dienstes faehrt die
     // Migrationen, hier ist der Weg zu. Riegel im Handler, nicht nur in der
     // Ansicht — eine ausgeblendete Schaltflaeche ist keine Sicherung.
     if (update_extern()) {
-        flash('Diese Installation aktualisiert der Betreiber des Dienstes. Migrationen laufen dort.', 'error');
+        flash(t('adm_diese_installation_aktualisiert_der_2'), 'error');
         redirect(FORUM_URL . '/admin/?action=updates');
     }
 
@@ -1389,7 +1389,7 @@ if ($action === 'run_migration' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // das ist Sache des Inhabers, nicht jedes Admins, den er ernannt hat.
     $cu = current_user();
     if (empty($cu['is_owner'])) {
-        flash('Nur der Owner darf Migrationen ausführen.', 'error');
+        flash(t('adm_nur_der_owner_darf'), 'error');
         redirect(FORUM_URL . '/admin/?action=updates');
     }
 
@@ -1399,31 +1399,31 @@ if ($action === 'run_migration' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result['success']) {
         flash('Migration ' . htmlspecialchars($version) . ' erfolgreich ausgeführt.', 'success');
     } else {
-        flash('Migration fehlgeschlagen: ' . htmlspecialchars($result['error'] ?? 'unbekannt'), 'error');
+        flash(t('adm_migration_fehlgeschlagen') . htmlspecialchars($result['error'] ?? 'unbekannt'), 'error');
     }
     redirect(FORUM_URL . '/admin/?action=updates');
 }
 
 // ─── UPDATE-PAKET HOCHLADEN (v0.18.54) ────────────────────────────
 if ($action === 'upload_update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
 
     // Von aussen betreute Installation: hier wird nichts eingespielt.
     if (update_extern()) {
-        flash('Diese Installation aktualisiert der Betreiber des Dienstes. Hier lassen sich keine Pakete einspielen.', 'error');
+        flash(t('adm_diese_installation_aktualisiert_der'), 'error');
         redirect(FORUM_URL . '/admin/?action=updates');
     }
 
     // STRENG: Nur der Owner darf Pakete einspielen (RCE-Vektor)
     $cu = current_user();
     if (empty($cu['is_owner'])) {
-        flash('Nur der Owner darf Update-Pakete einspielen.', 'error');
+        flash(t('adm_nur_der_owner_darf_3'), 'error');
         redirect(FORUM_URL . '/admin/?action=updates');
     }
 
     // Upload prüfen
     if (empty($_FILES['update_zip']) || $_FILES['update_zip']['error'] !== UPLOAD_ERR_OK) {
-        flash('Kein gültiges ZIP hochgeladen (Upload-Fehler).', 'error');
+        flash(t('adm_kein_gueltiges_zip_hochgeladen'), 'error');
         redirect(FORUM_URL . '/admin/?action=updates');
     }
 
@@ -1436,7 +1436,7 @@ if ($action === 'upload_update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validieren (schreibt noch nichts)
     $val = update_validate_zip($tmpPath);
     if (empty($val['ok'])) {
-        flash('Paket abgelehnt: ' . htmlspecialchars($val['error']), 'error');
+        flash(t('adm_paket_abgelehnt') . htmlspecialchars($val['error']), 'error');
         redirect(FORUM_URL . '/admin/?action=updates');
     }
 
@@ -1457,21 +1457,21 @@ if ($action === 'upload_update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         flash('✅ Update "' . htmlspecialchars($val['manifest']['name'])
             . '" (v' . htmlspecialchars($val['manifest']['version']) . ') installiert. Details unten.', 'success');
     } else {
-        flash('⚠️ Installation abgebrochen: ' . htmlspecialchars($install['error']), 'error');
+        flash(t('adm_installation_abgebrochen') . htmlspecialchars($install['error']), 'error');
     }
     redirect(FORUM_URL . '/admin/?action=updates');
 }
 
 // ─── BENUTZER-AKTIONEN ────────────────────────────────────────────
 if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', 'ban_user', 'unban_user', 'delete_user', 'make_owner', 'remove_owner'], true)) {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
 
     $targetId = get_int('id');
     $target   = db_fetch('SELECT * FROM users WHERE user_id = ?', [$targetId]);
     $cu       = current_user();
 
     if (!$target) {
-        flash('Benutzer nicht gefunden.', 'error');
+        flash(t('adm_benutzer_nicht_gefunden'), 'error');
         redirect(FORUM_URL . '/admin/?action=users');
     }
 
@@ -1480,26 +1480,26 @@ if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', '
 
     // Nur der Founder (User-ID 1) darf Owner ernennen/entlassen
     if (in_array($action, $ownerActions, true) && !$isFounderActor) {
-        flash('🔒 Nur der Forum-Gründer (User-ID 1) kann Inhaber ernennen oder entlassen.', 'error');
+        flash(t('adm_nur_der_forum_gruender'), 'error');
         redirect(FORUM_URL . '/admin/?action=users');
     }
 
     // OWNER-SCHUTZ: Owner sind tabu für alle Aktionen AUSSER remove_owner durch den Founder
     if (!empty($target['is_owner']) && !($action === 'remove_owner' && $isFounderActor)) {
-        flash('🛡️ Forum-Inhaber können nicht verändert werden.', 'error');
+        flash(t('adm_forum_inhaber_koennen_nicht'), 'error');
         redirect(FORUM_URL . '/admin/?action=users');
     }
 
     // Founder (User-ID 1) kann sich selbst NICHT degradieren/sperren (Lock-Out-Schutz)
     if ((int) $target['user_id'] === 1
         && in_array($action, ['remove_owner', 'remove_admin', 'ban_user', 'delete_user'], true)) {
-        flash('🔒 Der Forum-Gründer (User-ID 1) kann sich nicht selbst entfernen.', 'error');
+        flash(t('adm_der_forum_gruender_user'), 'error');
         redirect(FORUM_URL . '/admin/?action=users');
     }
 
     // Sich selbst kann man nicht degradieren/sperren (Mehrfach-Check)
     if ($target['user_id'] == $cu['user_id'] && in_array($action, ['remove_admin', 'ban_user', 'delete_user', 'remove_owner'], true)) {
-        flash('Du kannst dich nicht selbst entfernen/sperren.', 'error');
+        flash(t('adm_du_kannst_dich_nicht'), 'error');
         redirect(FORUM_URL . '/admin/?action=users');
     }
 
@@ -1554,7 +1554,7 @@ if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', '
                 break;
 
             case 'ban_user':
-                $reason = $_GET['reason'] ?? 'Vom Admin gesperrt';
+                $reason = $_GET['reason'] ?? t('adm_vom_admin_gesperrt');
                 db_execute('UPDATE users SET is_banned = 1, is_admin = 0, is_mod = 0, ban_reason = ? WHERE user_id = ?',
                     [$reason, $targetId]);
                 flash($target['username'] . ' wurde gesperrt.', 'success');
@@ -1572,7 +1572,7 @@ if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', '
             case 'delete_user':
                 // Owner und Admin dürfen User-Account löschen (Soft-Delete: anonymisiert)
                 if (empty($cu['is_owner']) && empty($cu['is_admin'])) {
-                    flash('Nur Inhaber und Administratoren dürfen User löschen.', 'error');
+                    flash(t('adm_nur_inhaber_und_administratoren'), 'error');
                     redirect(FORUM_URL . '/admin/?action=users');
                 }
 
@@ -1583,7 +1583,7 @@ if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', '
                 $delResult = delete_user_account($targetId);
 
                 if (!$delResult['ok']) {
-                    flash($delResult['error'] ?? 'Account konnte nicht gelöscht werden.', 'error');
+                    flash($delResult['error'] ?? t('adm_account_konnte_nicht_geloescht'), 'error');
                 } else {
                     flash($target['username'] . ' wurde gelöscht (anonymisiert). Beiträge bleiben erhalten.', 'success');
                     db_execute('INSERT INTO mod_log (mod_id, action, target_type, target_id) VALUES (?, ?, ?, ?)',
@@ -1600,18 +1600,18 @@ if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', '
 
 // ─── MELDUNGEN ────────────────────────────────────────────────────
 if ($action === 'resolve_report') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $rid    = get_int('id');
     $newSt  = $_GET['status'] ?? 'reviewed';
     $cu     = current_user();
     resolve_report($rid, (int) $cu['user_id'], $newSt);
-    flash('Meldung als „' . $newSt . '" markiert.', 'success');
+    flash(t('adm_meldung_als') . $newSt . '" markiert.', 'success');
     redirect(FORUM_URL . '/admin/?action=reports');
 }
 
 // ─── WARNUNGEN ────────────────────────────────────────────────────
 if ($action === 'issue_warning' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $cu = current_user();
     $uid = post_int('user_id');
     $pts = post_int('points', 1);
@@ -1622,53 +1622,53 @@ if ($action === 'issue_warning' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         // Sonst laesst sich der Inhaber ueber die Warn-Schwelle automatisch
         // sperren — make_owner setzt is_admin = 0, und check_warning_threshold
         // prueft nur auf is_admin.
-        flash('Dieser Benutzer darf nicht verwarnt werden.', 'error');
+        flash(t('adm_dieser_benutzer_darf_nicht'), 'error');
         redirect(FORUM_URL . '/admin/?action=warnings&user=' . $uid);
     }
     if ($uid > 0 && $pts > 0 && mb_strlen($rsn) >= 3) {
         issue_warning($uid, (int) $cu['user_id'], $pts, $rsn, $exp ?: null);
-        flash('Warnung ausgesprochen (' . $pts . ' Pkt).', 'success');
+        flash(t('adm_warnung_ausgesprochen') . $pts . ' Pkt).', 'success');
     } else {
-        flash('Ungültige Eingaben.', 'error');
+        flash(t('adm_ungueltige_eingaben'), 'error');
     }
     redirect(FORUM_URL . '/admin/?action=warnings&user=' . $uid);
 }
 
 if ($action === 'revoke_warning') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $cu = current_user();
     revoke_warning(get_int('id'), (int) $cu['user_id']);
-    flash('Warnung aufgehoben.', 'success');
+    flash(t('adm_warnung_aufgehoben'), 'success');
     redirect(FORUM_URL . '/admin/?action=warnings&user=' . get_int('user'));
 }
 
 // ─── FORUM-MODERATOREN ────────────────────────────────────────────
 if ($action === 'add_board_mod' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $cu  = current_user();
     $bid = post_int('board_id');
     $uid = post_int('user_id');
     if ($bid > 0 && $uid > 0) {
         add_board_moderator($bid, $uid, (int) $cu['user_id']);
-        flash('Moderator zugeordnet.', 'success');
+        flash(t('adm_moderator_zugeordnet'), 'success');
     }
     redirect(FORUM_URL . '/admin/?action=boards&board=' . $bid);
 }
 
 if ($action === 'remove_board_mod') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $bid = get_int('board');
     $uid = get_int('user');
     if ($bid > 0 && $uid > 0) {
         remove_board_moderator($bid, $uid);
-        flash('Moderator entfernt.', 'success');
+        flash(t('adm_moderator_entfernt'), 'success');
     }
     redirect(FORUM_URL . '/admin/?action=boards&board=' . $bid);
 }
 
 // ─── TAGS ─────────────────────────────────────────────────────────
 if ($action === 'add_tag' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $slug = preg_replace('/[^a-z0-9]/', '', strtolower(post_str('slug')));
     $name = post_str('name');
     $desc = post_str('description');
@@ -1681,7 +1681,7 @@ if ($action === 'add_tag' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             db_execute('INSERT INTO tags (slug, name, description, color) VALUES (?, ?, ?, ?)',
                 [$slug, $name, $desc, $col]);
-            flash('Tag angelegt.', 'success');
+            flash(t('adm_tag_angelegt'), 'success');
         } catch (Exception $e) {
             flash('Fehler: ' . $e->getMessage(), 'error');
         }
@@ -1690,9 +1690,9 @@ if ($action === 'add_tag' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete_tag') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     db_execute('DELETE FROM tags WHERE tag_id = ?', [get_int('id')]);
-    flash('Tag gelöscht.', 'success');
+    flash(t('adm_tag_geloescht'), 'success');
     redirect(FORUM_URL . '/admin/?action=tags');
 }
 
@@ -1708,10 +1708,10 @@ switch ($action) {
             // groesser als die auf der Startseite.
             ['icon' => '👥', 'label' => 'Mitglieder', 'value' => db_count('SELECT COUNT(*) FROM users WHERE COALESCE(is_deleted, 0) = 0')],
             ['icon' => '💬', 'label' => 'Threads',    'value' => db_count('SELECT COUNT(*) FROM threads')],
-            ['icon' => '📝', 'label' => 'Beiträge',   'value' => db_count('SELECT COUNT(*) FROM posts')],
-            ['icon' => '🚨', 'label' => 'Offene Meldungen', 'value' => open_reports_count()],
+            ['icon' => '📝', 'label' => t('adm_beitraege'),   'value' => db_count('SELECT COUNT(*) FROM posts')],
+            ['icon' => '🚨', 'label' => t('adm_offene_meldungen'), 'value' => open_reports_count()],
             ['icon' => '🚫', 'label' => 'IP-Banns',   'value' => db_count('SELECT COUNT(*) FROM ip_bans WHERE expires_at IS NULL OR expires_at > NOW()')],
-            ['icon' => '🟢', 'label' => 'Online jetzt', 'value' => online_stats()['total']],
+            ['icon' => '🟢', 'label' => t('adm_online_jetzt'), 'value' => online_stats()['total']],
         ];
         $vars['newestUsers']  = db_fetchAll('
             SELECT * FROM users WHERE COALESCE(is_deleted, 0) = 0

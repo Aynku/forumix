@@ -12,7 +12,7 @@ $step  = 'credentials';
 if (!empty($_SESSION['pending_2fa_user'])) $step = 'twofa';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
 
     // „Angemeldet bleiben" – wird durch beide Steps mitgeführt
     $rememberMe = !empty($_POST['remember_me']);
@@ -29,10 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!rate_limit_check('login_2fa', 5, 900, 'user:' . $pendingId)) {
             unset($_SESSION['pending_2fa_user']);
             $step  = 'credentials';
-            $error = 'Zu viele Code-Versuche. Bitte melde dich erneut an.';
+            $error = t('login_2fa_too_many');
         } elseif (!$row) {
             unset($_SESSION['pending_2fa_user']);
-            $error = 'Sitzung abgelaufen.';
+            $error = t('session_expired');
         } else {
             // verify_totp_for_user() vermerkt den Verbrauch — sonst gilt derselbe
             // Code bis zu 90 Sekunden lang immer wieder.
@@ -64,17 +64,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     try { remember_create($pendingId); } catch (Exception $e) {}
                 }
 
-                flash('Willkommen zurück!', 'success');
+                flash(t('login_welcome_back'), 'success');
                 redirect(FORUM_URL . '/index.php');
             }
-            $error = 'Ungültiger Code.';
+            $error = t('login_2fa_invalid');
         }
     } else {
         // ─── Credential-Step ──────────────────────────────────
 
         // CAPTCHA-Schicht 2: Verhaltens-Token
         if (!behavior_verify(post_str('_bt'))) {
-            $error = 'Sicherheits-Prüfung fehlgeschlagen. Bitte versuche es erneut.';
+            $error = t('captcha_behavior_failed');
             captcha_failed_attempt('login');
         }
         // CAPTCHA-Schicht 3: Sichtbares CAPTCHA wenn erforderlich
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $captchaToken  = post_str('_captcha_token');
             $captchaAnswer = post_str('_captcha_answer');
             if (!captcha_verify($captchaToken, $captchaAnswer)) {
-                $error = 'Sicherheitsfrage falsch beantwortet.';
+                $error = t('captcha_wrong');
                 captcha_failed_attempt('login');
             }
         }
@@ -104,10 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $kontoName  = post_str('username');
         $kontoBremse = 'konto:' . mb_strtolower(trim($kontoName));
         if (!rate_limit_check('login', $maxAttempts, 900)) {
-            $error = 'Zu viele Login-Versuche. Bitte warte ' . ceil(rate_limit_remaining('login') / 60) . ' Minuten.';
+            $error = tn('login_too_many', (int) ceil(rate_limit_remaining('login') / 60));
         } elseif ($kontoName !== '' && !rate_limit_check('login_konto', $maxAttempts, 900, $kontoBremse)) {
-            $error = 'Zu viele Login-Versuche für dieses Konto. Bitte warte '
-                   . ceil(rate_limit_remaining('login_konto', $kontoBremse) / 60) . ' Minuten.';
+            $error = tn('login_too_many_account', (int) ceil(rate_limit_remaining('login_konto', $kontoBremse) / 60));
         } else {
             $u = db_fetch('SELECT * FROM users WHERE username = ? AND is_banned = 0 AND COALESCE(is_deleted, 0) = 0', [post_str('username')]);
             if ($u && !empty($u['password']) && password_verify(post_str('password'), $u['password'])) {
@@ -116,11 +115,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // bestätigt haben" — geprüft wurde es bisher nirgends.
                 if ((string) get_setting('email_verification_required', '0') === '1'
                     && (int) ($u['email_verified'] ?? 1) === 0) {
-                    $error = 'Bitte bestätige zuerst deine E-Mail-Adresse. Den Link findest du in der Mail von der Registrierung.';
+                    $error = t('login_email_unverified');
                 }
                 // Admin-Approval-Check: noch nicht freigegebene Accounts können sich nicht einloggen
                 elseif ((int) ($u['is_approved'] ?? 1) === 0) {
-                    $error = 'Dein Konto wartet noch auf Freigabe durch das Admin-Team. Du erhältst eine E-Mail sobald freigeschaltet.';
+                    $error = t('login_not_approved');
                     // KEIN captcha_failed_attempt – legitimer Fall, nicht verdächtig
                 }
                 // 2FA erforderlich?
@@ -142,12 +141,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             try { remember_create((int) $user['user_id']); } catch (Exception $e) {}
                         }
 
-                        flash('Willkommen zurück, ' . $user['username'] . '!', 'success');
+                        flash(t('login_welcome_back_user', $user['username']), 'success');
                         redirect(FORUM_URL . '/index.php');
                     }
                 }
             } else {
-                $error = 'Benutzername oder Passwort falsch.';
+                $error = t('login_bad_credentials');
                 captcha_failed_attempt('login');
             }
         }
@@ -156,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 render('login', [
-    'title'        => 'Anmelden',
+    'title'        => t('login'),
     'error'        => $error,
     'step'         => $step,
     'rememberMe'   => $rememberMe ?? false,

@@ -2,25 +2,25 @@
 
 <div class="section-heading">
   <span>
-    {% if thread.is_sticky %}<span class="badge badge-sticky">Angepinnt</span>{% endif %}
-    {% if thread.is_closed %}<span class="badge badge-closed">Geschlossen</span>{% endif %}
-    {% if thread.deleted_at %}<span class="badge badge-geloescht">Im Papierkorb</span>{% endif %}
+    {% if thread.is_sticky %}<span class="badge badge-sticky">{{ t('thread_angepinnt') }}</span>{% endif %}
+    {% if thread.is_closed %}<span class="badge badge-closed">{{ t('thread_geschlossen') }}</span>{% endif %}
+    {% if thread.deleted_at %}<span class="badge badge-geloescht">{{ t('thread_im_papierkorb') }}</span>{% endif %}
     {{ thread.title }}
   </span>
   <span style="display:inline-flex;gap:6px;align-items:center">
     {% if canModThis %}
       <div class="action-dropdown">
-        <button type="button" class="action-dropdown-toggle btn btn-ghost btn-sm">Mod-Tools ▾</button>
+        <button type="button" class="action-dropdown-toggle btn btn-ghost btn-sm">{{ t('thread_mod_tools') }}</button>
         <div class="action-dropdown-menu" style="left:auto;right:0">
           {% if not thread.is_sticky %}
-            <a href="{{ url('/mod_action.php?action=sticky&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">Anpinnen</a>
+            <a href="{{ url('/mod_action.php?action=sticky&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">{{ t('thread_anpinnen') }}</a>
           {% else %}
-            <a href="{{ url('/mod_action.php?action=unsticky&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">Loslösen</a>
+            <a href="{{ url('/mod_action.php?action=unsticky&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">{{ t('thread_losloesen') }}</a>
           {% endif %}
           {% if not thread.is_closed %}
-            <a href="{{ url('/mod_action.php?action=close&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">Schließen</a>
+            <a href="{{ url('/mod_action.php?action=close&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">{{ t('thread_schliessen') }}</a>
           {% else %}
-            <a href="{{ url('/mod_action.php?action=open&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">Öffnen</a>
+            <a href="{{ url('/mod_action.php?action=open&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">{{ t('thread_oeffnen') }}</a>
           {% endif %}
           {% if moveBoards %}
             <div class="action-dropdown-divider"></div>
@@ -34,28 +34,28 @@
                   <option value="{{ b.board_id }}">{{ b.cat }} &rsaquo; {{ b.title }}</option>
                 {% endfor %}
               </select>
-              <button type="submit" class="btn btn-ghost btn-sm">Verschieben</button>
+              <button type="submit" class="btn btn-ghost btn-sm">{{ t('thread_verschieben') }}</button>
             </form>
           {% endif %}
           <div class="action-dropdown-divider"></div>
           <form method="post" action="{{ url('/mod_action.php?action=merge&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}"
                 style="display:flex;gap:6px;align-items:center;padding:6px 10px">
             <input type="number" name="ziel" min="1" placeholder="Ziel-Thema-Nr."
-                   aria-label="Nummer des Themas, in das zusammengeführt wird"
+                   aria-label="{{ t('thread_merge_id_label') }}"
                    style="flex:1;min-width:0" required>
             <button type="submit" class="btn btn-ghost btn-sm"
-                    onclick="return confirm('Alle Beiträge dieses Themas in das andere verschieben? Dieses Thema verschwindet dabei.')">Zusammenführen</button>
+                    onclick="return confirm('Alle Beiträge dieses Themas in das andere verschieben? Dieses Thema verschwindet dabei.')">{{ t('thread_zusammenfuehren') }}</button>
           </form>
           <div class="action-dropdown-divider"></div>
           {% if thread.deleted_at %}
-            <a href="{{ url('/mod_action.php?action=restore_thread&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">Thema wiederherstellen</a>
+            <a href="{{ url('/mod_action.php?action=restore_thread&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">{{ t('thread_thema_wiederherstellen') }}</a>
             <a href="{{ url('/mod_action.php?action=purge_thread&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}"
                class="action-danger"
-               onclick="return confirm('Endgültig löschen? Das lässt sich nicht rückgängig machen.')">Endgültig löschen</a>
+               onclick="return confirm('Endgültig löschen? Das lässt sich nicht rückgängig machen.')">{{ t('thread_endgueltig_loeschen') }}</a>
           {% else %}
             <a href="{{ url('/mod_action.php?action=delete_thread&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}"
                class="action-danger"
-               onclick="return confirm('Thema in den Papierkorb legen?')">Thema löschen</a>
+               onclick="return confirm('Thema in den Papierkorb legen?')">{{ t('thread_thema_loeschen') }}</a>
           {% endif %}
         </div>
       </div>
@@ -134,7 +134,7 @@
 {% for post in posts %}
 <div class="post-card{{ post.is_approved ? '' : ' post-pending' }}{{ post.deleted_at ? ' post-geloescht' : '' }}" id="post{{ post.post_id }}">
   {% if not post.is_approved %}
-    <div class="post-pending-bar">Dieser Beitrag wartet auf Freigabe</div>
+    <div class="post-pending-bar">{{ t('thread_dieser_beitrag_wartet_auf') }}</div>
   {% endif %}
   <div class="post-header">
     <span>{{ format_date(post.created_at) }}</span>
@@ -150,13 +150,13 @@
         <a href="{{ url('/profile.php?id=') }}{{ post.user_id }}">{{ zeigename(post.username) }}</a>
       </div>
       {% if post.is_owner %}
-        <div class="post-admin-badge" style="background:#7c3aed !important">Owner</div>
+        <div class="post-admin-badge" style="background:#7c3aed !important">{{ t('thread_owner') }}</div>
       {% elseif post.is_banned %}
-        <div class="post-banned-badge">Gesperrt</div>
+        <div class="post-banned-badge">{{ t('thread_gesperrt') }}</div>
       {% elseif post.is_admin %}
-        <div class="post-admin-badge">Admin</div>
+        <div class="post-admin-badge">{{ t('thread_admin') }}</div>
       {% elseif post.is_mod %}
-        <div class="post-mod-badge">Mod</div>
+        <div class="post-mod-badge">{{ t('thread_mod') }}</div>
       {% elseif post.ohne_rang %}
         {# Nichts. Die Gruppe unten tritt an die Stelle des Rangs — so wie
            bei Admins und Moderatoren ihr Abzeichen. Fuer ein Konto, das
@@ -264,7 +264,7 @@
     {% endif %}
     {% if currentUser and currentUser.user_id != post.user_id %}
       <a class="post-action" href="{{ url('/report.php?post=') }}{{ post.post_id }}"
-         title="Beitrag melden">Melden</a>
+         title="Beitrag melden">{{ t('thread_melden') }}</a>
     {% endif %}
     {% set editCount = post_edit_count(post.post_id) %}
     {% set canSeeHistory = canModThis or (currentUser and currentUser.user_id == post.user_id) %}
@@ -277,15 +277,15 @@
     {% endif %}
     {% if canModThis %}
       {% if post.deleted_at %}
-        <a class="post-action" href="{{ url('/mod_action.php?action=restore_post&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}">Wiederherstellen</a>
+        <a class="post-action" href="{{ url('/mod_action.php?action=restore_post&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}">{{ t('thread_wiederherstellen') }}</a>
         <a class="post-action" href="{{ url('/mod_action.php?action=purge_post&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}"
-           onclick="return confirm('Endgültig löschen? Das lässt sich nicht rückgängig machen.')">Endgültig löschen</a>
+           onclick="return confirm('Endgültig löschen? Das lässt sich nicht rückgängig machen.')">{{ t('thread_endgueltig_loeschen') }}</a>
       {% else %}
         <a class="post-action" href="{{ url('/mod_action.php?action=delete_post&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}"
            onclick="return confirm('Beitrag in den Papierkorb legen?')">{{ t('delete') }}</a>
         <a class="post-action" href="{{ url('/mod_action.php?action=split&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}"
            onclick="return abtrennen(this)"
-           title="Diesen und alle folgenden Beiträge in ein neues Thema abtrennen">Ab hier abtrennen</a>
+           title="{{ t('thread_split_hint') }}">{{ t('thread_ab_hier_abtrennen') }}</a>
       {% endif %}
     {% endif %}
   </div>
@@ -313,13 +313,13 @@
   </form>
 </div>
 {% elseif thread.is_closed %}
-  <p style="margin-top:16px;color:var(--text-muted);font-style:italic">Dieser Thread ist geschlossen.</p>
+  <p style="margin-top:16px;color:var(--text-muted);font-style:italic">{{ t('thread_dieser_thread_ist_geschlossen') }}</p>
 {% elseif currentUser and not darfSchreiben %}
 <div class="form-card" style="margin-top:20px;text-align:center;color:var(--text-muted)">
-  In diesem Forum darfst du mitlesen, aber nicht antworten.
+  {{ t('thread_in_diesem_forum_darfst') }}
 </div>
 {% elseif not currentUser %}
   <p style="margin-top:16px">
-    <a href="{{ url('/login.php') }}" class="btn btn-primary">Anmelden, um zu antworten</a>
+    <a href="{{ url('/login.php') }}" class="btn btn-primary">{{ t('thread_anmelden_um_zu_antworten') }}</a>
   </p>
 {% endif %}

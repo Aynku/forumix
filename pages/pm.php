@@ -18,7 +18,7 @@ if ($action === 'new' || isset($_GET['new'])) {
     $formContent  = '';
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+        if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
 
         $recv    = db_fetch('SELECT * FROM users WHERE username = ?', [post_str('receiver')]);
         $subject = post_str('subject');
@@ -29,17 +29,17 @@ if ($action === 'new' || isset($_GET['new'])) {
         $formContent  = $content;
 
         if (!$recv) {
-            $error = 'Empfänger nicht gefunden.';
+            $error = t('pm_recipient_missing');
         } elseif (!empty($recv['is_deleted'])) {
-            $error = 'Dieser Account wurde gelöscht und ist nicht mehr erreichbar.';
+            $error = t('pm_recipient_deleted');
         } elseif (!empty($recv['is_banned'])) {
-            $error = 'Dieser Account ist gesperrt.';
+            $error = t('pm_recipient_banned');
         } elseif ($recv['user_id'] == $cu['user_id']) {
-            $error = 'Du kannst dir nicht selbst schreiben.';
+            $error = t('pm_self');
         } elseif (mb_strlen($subject) < 1) {
-            $error = 'Betreff fehlt.';
+            $error = t('pm_subject_missing');
         } elseif (mb_strlen($content) < 2) {
-            $error = 'Nachricht zu kurz.';
+            $error = t('pm_too_short');
         } else {
             $pmId = db_execute('INSERT INTO private_messages (sender_id, receiver_id, subject, content) VALUES (?, ?, ?, ?)',
                 [$cu['user_id'], $recv['user_id'], $subject, $content]);
@@ -48,13 +48,13 @@ if ($action === 'new' || isset($_GET['new'])) {
                 'pm_id'        => (int) $pmId,
             ]);
             try { check_achievements((int) $cu['user_id']); } catch (Exception $e) {}
-            flash('Nachricht gesendet!', 'success');
+            flash(t('pm_sent'), 'success');
             redirect(FORUM_URL . '/pm.php?action=sent');
         }
     }
 
     render('pm', [
-        'title'        => 'Neue Nachricht',
+        'title'        => t('pm_new_title'),
         'pmView'       => 'new',
         'error'        => $error,
         'formReceiver' => $formReceiver,
@@ -86,7 +86,7 @@ if ($action === 'read') {
 
     if (!$pm) {
         http_response_code(403);
-        error_page(404, 'Nachricht nicht gefunden', 'Diese Nachricht gibt es nicht, oder sie gehört nicht dir.');
+        error_page(404, t('pm_missing_title'), t('pm_missing_text'));
     }
 
     // is_read nur setzen wenn der aktuelle User der Empfänger ist
@@ -95,7 +95,7 @@ if ($action === 'read') {
     }
 
     render('pm', [
-        'title'    => 'PN: ' . $pm['subject'],
+        'title'    => t('pm_read_title', $pm['subject']),
         'pmView'   => 'read',
         'pm'       => $pm,
         'messages' => [],
@@ -106,13 +106,13 @@ if ($action === 'read') {
 
 // ── LÖSCHEN ───────────────────────────────────────────────────────
 if ($action === 'delete') {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
 
     $pmId = get_int('id');
     $pm = db_fetch('SELECT sender_id, receiver_id FROM private_messages WHERE pm_id = ?', [$pmId]);
 
     if (!$pm) {
-        flash('Nachricht nicht gefunden.', 'error');
+        flash(t('pm_missing_flash'), 'error');
         redirect(FORUM_URL . '/pm.php');
     }
 
@@ -122,7 +122,7 @@ if ($action === 'delete') {
     } elseif ((int) $pm['sender_id'] === (int) $cu['user_id']) {
         db_execute('UPDATE private_messages SET deleted_by_sender = 1 WHERE pm_id = ?', [$pmId]);
     } else {
-        flash('Keine Berechtigung.', 'error');
+        flash(t('error_denied_flash'), 'error');
         redirect(FORUM_URL . '/pm.php');
     }
 
@@ -134,7 +134,7 @@ if ($action === 'delete') {
         );
     } catch (Exception $e) {}
 
-    flash('Nachricht gelöscht.', 'success');
+    flash(t('pm_deleted'), 'success');
 
     // Zurück wohin (Inbox oder Gesendet)?
     $back = $_GET['from'] ?? '';
@@ -160,7 +160,7 @@ if ($isSent) {
 }
 
 render('pm', [
-    'title'    => $isSent ? 'Gesendet' : 'Posteingang',
+    'title'    => $isSent ? t('pm_sent_title') : t('pm_inbox'),
     'pmView'   => $isSent ? 'sent' : 'inbox',
     'messages' => $messages,
     'pm'       => null,

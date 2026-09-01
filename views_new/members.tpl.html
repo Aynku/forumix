@@ -1,5 +1,5 @@
 <div class="section-heading">
-  Mitglieder
+  {{ t('members_mitglieder') }}
   <span style="font-size:12px;color:var(--text-muted);font-weight:400;text-transform:none">
     {{ number_format(totalUsers, 0, ',', '.') }} registriert
   </span>
@@ -8,7 +8,7 @@
 {% if team.owners or team.admins or team.mods or team.board_mods %}
 <div class="card" style="margin-bottom:18px">
   <div class="card-header">
-    <span class="card-title">Das Team</span>
+    <span class="card-title">{{ t('members_das_team') }}</span>
   </div>
 
   {% if team.owners %}
@@ -40,7 +40,7 @@
 
   {% if team.admins %}
     <div class="team-section">
-      <div class="team-section-label" style="color:#dc2626">Administratoren</div>
+      <div class="team-section-label" style="color:#dc2626">{{ t('members_administratoren') }}</div>
       <div class="team-grid">
         {% for u in team.admins %}
           <a href="{{ url('/profile.php?id=') }}{{ u.user_id }}" class="team-card">
@@ -63,7 +63,7 @@
 
   {% if team.mods %}
     <div class="team-section">
-      <div class="team-section-label" style="color:#f59e0b">Globale Moderatoren</div>
+      <div class="team-section-label" style="color:#f59e0b">{{ t('members_globale_moderatoren') }}</div>
       <div class="team-grid">
         {% for u in team.mods %}
           <a href="{{ url('/profile.php?id=') }}{{ u.user_id }}" class="team-card">
@@ -86,7 +86,7 @@
 
   {% if team.board_mods %}
     <div class="team-section">
-      <div class="team-section-label" style="color:#f59e0b">Forum-Moderatoren</div>
+      <div class="team-section-label" style="color:#f59e0b">{{ t('members_forum_moderatoren') }}</div>
       <div class="team-grid">
         {% for u in team.board_mods %}
           <a href="{{ url('/profile.php?id=') }}{{ u.user_id }}" class="team-card">
@@ -109,13 +109,13 @@
 {% endif %}
 
 <div class="section-heading">
-  Alle Mitglieder
+  {{ t('members_alle_mitglieder') }}
   <span>
-    <a href="?sort=posts" class="btn btn-ghost btn-xs {{ sort == 'posts' ? 'btn-primary' : '' }}">Aktivste</a>
-    <a href="?sort=newest" class="btn btn-ghost btn-xs {{ sort == 'newest' ? 'btn-primary' : '' }}">Neueste</a>
-    <a href="?sort=oldest" class="btn btn-ghost btn-xs {{ sort == 'oldest' ? 'btn-primary' : '' }}">Älteste</a>
-    <a href="?sort=name" class="btn btn-ghost btn-xs {{ sort == 'name' ? 'btn-primary' : '' }}">Name</a>
-    <a href="?sort=active" class="btn btn-ghost btn-xs {{ sort == 'active' ? 'btn-primary' : '' }}">Zuletzt aktiv</a>
+    <a href="?sort=posts" class="btn btn-ghost btn-xs {{ sort == 'posts' ? 'btn-primary' : '' }}">{{ t('members_aktivste') }}</a>
+    <a href="?sort=newest" class="btn btn-ghost btn-xs {{ sort == 'newest' ? 'btn-primary' : '' }}">{{ t('members_neueste') }}</a>
+    <a href="?sort=oldest" class="btn btn-ghost btn-xs {{ sort == 'oldest' ? 'btn-primary' : '' }}">{{ t('members_aelteste') }}</a>
+    <a href="?sort=name" class="btn btn-ghost btn-xs {{ sort == 'name' ? 'btn-primary' : '' }}">{{ t('members_name') }}</a>
+    <a href="?sort=active" class="btn btn-ghost btn-xs {{ sort == 'active' ? 'btn-primary' : '' }}">{{ t('members_zuletzt_aktiv') }}</a>
   </span>
 </div>
 
@@ -123,11 +123,11 @@
   <table class="forum-table">
     <thead>
       <tr>
-        <th>Mitglied</th>
-        <th>Rang</th>
-        <th style="text-align:center;width:90px">Beiträge</th>
-        <th style="width:120px">Dabei seit</th>
-        <th style="width:140px">Zuletzt aktiv</th>
+        <th>{{ t('members_mitglied') }}</th>
+        <th>{{ t('members_rang') }}</th>
+        <th style="text-align:center;width:90px">{{ t('members_beitraege') }}</th>
+        <th style="width:120px">{{ t('members_dabei_seit') }}</th>
+        <th style="width:140px">{{ t('members_zuletzt_aktiv') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -142,11 +142,11 @@
                   {{ zeigename(u.username) }}
                 </a>
                 {% if u.is_owner %}
-                  <span class="member-role-tag" style="background:#7c3aed">Owner</span>
+                  <span class="member-role-tag" style="background:#7c3aed">{{ t('members_owner') }}</span>
                 {% elseif u.is_admin %}
-                  <span class="member-role-tag" style="background:#dc2626">Admin</span>
+                  <span class="member-role-tag" style="background:#dc2626">{{ t('members_admin') }}</span>
                 {% elseif u.is_mod %}
-                  <span class="member-role-tag" style="background:#f59e0b">Mod</span>
+                  <span class="member-role-tag" style="background:#f59e0b">{{ t('members_mod') }}</span>
                 {% endif %}
               </div>
             </div>

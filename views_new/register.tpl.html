@@ -1,6 +1,6 @@
 <div style="max-width:460px;margin:0 auto">
   <div class="form-card">
-    <h2>Registrieren</h2>
+    <h2>{{ t('register_registrieren') }}</h2>
     {% if error %}
       <div class="flash flash-error">{{ error }}</div>
     {% endif %}
@@ -11,20 +11,20 @@
       <input type="text" name="website" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off">
 
       <div class="form-row">
-        <label>Benutzername</label>
+        <label>{{ t('register_benutzername') }}</label>
         <input type="text" name="username" maxlength="50"
                value="{{ formData.username|default('') }}" required autofocus
                minlength="3">
-        <div class="form-hint">Mindestens 3 Zeichen · keine Leerzeichen am Anfang/Ende</div>
+        <div class="form-hint">{{ t('register_mindestens_3_zeichen_keine') }}</div>
       </div>
 
       <div class="form-row">
-        <label>E-Mail-Adresse</label>
+        <label>{{ t('register_e_mail_adresse') }}</label>
         <input type="email" name="email" value="{{ formData.email|default('') }}" required>
       </div>
 
       <div class="form-row">
-        <label>Passwort</label>
+        <label>{{ t('register_passwort') }}</label>
         <div class="password-input-wrap">
           <input type="password" name="password" id="reg_pw" required minlength="6" autocomplete="new-password">
           <button type="button" class="password-toggle-btn" onclick="
@@ -37,13 +37,13 @@
         </div>
         <div class="password-strength-wrap" id="reg_pw_strength" hidden>
           <div class="password-strength-bar"><div class="password-strength-fill" id="reg_pw_fill"></div></div>
-          <div class="password-strength-label" id="reg_pw_label">Passwort-Stärke</div>
+          <div class="password-strength-label" id="reg_pw_label">{{ t('register_passwort_staerke') }}</div>
         </div>
-        <div class="form-hint">Mindestens 6 Zeichen · empfohlen mindestens 10 mit Zahlen + Sonderzeichen</div>
+        <div class="form-hint">{{ t('register_mindestens_6_zeichen_empfohlen') }}</div>
       </div>
 
       <div class="form-row">
-        <label>Passwort wiederholen</label>
+        <label>{{ t('register_passwort_wiederholen') }}</label>
         <div class="password-input-wrap">
           <input type="password" name="password2" id="reg_pw2" required minlength="6" autocomplete="new-password">
           <button type="button" class="password-toggle-btn" onclick="
@@ -59,14 +59,13 @@
 
       {% if approvalRequired %}
         <div class="form-row" style="background:rgba(74,157,74,0.08);padding:12px;border-radius:6px;border-left:3px solid #4a9d4a">
-          <label>Einladungs-Code <span style="color:var(--text-faint);font-weight:normal">(optional)</span></label>
+          <label>{{ t('register_einladungs_code') }} <span style="color:var(--text-faint);font-weight:normal">(optional)</span></label>
           <input type="text" name="invite_code" value="{{ inviteCode|default('') }}"
                  maxlength="20"
                  style="font-family:var(--font-mono);font-size:16px;letter-spacing:2px;text-transform:uppercase"
                  placeholder="XXXX-XXXX">
           <div class="form-hint">
-            Mit gültigem Einladungs-Code wirst du sofort freigeschaltet.
-            Ohne Code wartet dein Account auf Admin-Freigabe.
+            {{ t('register_mit_gueltigem_einladungs_code') }}
           </div>
         </div>
       {% endif %}
@@ -74,7 +73,7 @@
       {% if showCaptcha %}
         <div class="form-row captcha-row">
           <label>
-            Sicherheitsfrage:
+            {{ t('register_sicherheitsfrage') }}
             <strong style="font-size:18px;font-family:var(--font-mono)">{{ captcha.question }} = ?</strong>
           </label>
           <input type="number" name="_captcha_answer" required autocomplete="off"
@@ -82,7 +81,7 @@
                  style="max-width:120px;text-align:center;font-size:18px">
           <input type="hidden" name="_captcha_token" value="{{ captcha.token }}">
           <div class="form-hint">
-            Diese Frage erscheint, weil zu viele fehlgeschlagene Versuche von deiner IP kamen.
+            {{ t('register_diese_frage_erscheint_weil') }}
           </div>
         </div>
       {% endif %}
@@ -92,18 +91,18 @@
           <label class="checkbox-line">
             <input type="checkbox" name="accept_terms" value="1" required {% if acceptTerms %}checked{% endif %}>
             <span>
-              Ich habe die <a href="{{ url('/terms.php') }}" target="_blank" rel="noopener">Nutzungsbedingungen</a>
+              {{ t('register_ich_habe_die') }} <a href="{{ url('/terms.php') }}" target="_blank" rel="noopener">{{ t('register_nutzungsbedingungen') }}</a>
               gelesen und akzeptiere sie.
             </span>
           </label>
         </div>
       {% endif %}
 
-      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">Konto erstellen</button>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">{{ t('register_konto_erstellen') }}</button>
     </form>
 
     <p style="margin-top:16px;font-size:13px;text-align:center;color:var(--text-muted)">
-      Schon registriert? <a href="{{ url('/login.php') }}">Anmelden</a>
+      {{ t('register_schon_registriert') }} <a href="{{ url('/login.php') }}">{{ t('register_anmelden') }}</a>
     </p>
   </div>
 </div>

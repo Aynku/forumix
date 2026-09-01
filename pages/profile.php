@@ -8,7 +8,7 @@ $userId  = get_int('id');
 $profile = db_fetch('SELECT * FROM users WHERE user_id = ?', [$userId]);
 if (!$profile) {
     http_response_code(404);
-    error_page(404, 'Benutzer nicht gefunden', 'Dieses Konto gibt es nicht.');
+    error_page(404, t('error_user_missing_title'), t('error_user_missing_text'));
 }
 
 // Gelöschte User: minimale Profilseite
@@ -59,7 +59,7 @@ $extendedStats = [
 $topThreads = user_top_threads($userId, 3);
 
 render('profile', [
-    'title'            => 'Profil: ' . $profile['username'],
+    'title'            => t('profile_title', $profile['username']),
     'profile'          => $profile,
     'latestPosts'      => $latestPosts,
     'extendedStats'    => $extendedStats,

@@ -1,22 +1,22 @@
 <div class="section-heading">
-  Achievements von <a href="{{ url('/profile.php?id=') }}{{ profile.user_id }}">{{ zeigename(profile.username) }}</a>
+  {{ t('achievements_achievements_von') }} <a href="{{ url('/profile.php?id=') }}{{ profile.user_id }}">{{ zeigename(profile.username) }}</a>
 </div>
 
 <div class="stat-grid" style="margin-bottom:18px">
   <div class="stat-box">
     <div class="stat-icon">🏅</div>
     <div class="stat-num">{{ count(earned) }} / {{ total }}</div>
-    <div class="stat-label">Trophäen</div>
+    <div class="stat-label">{{ t('achievements_trophaeen') }}</div>
   </div>
   <div class="stat-box">
     <div class="stat-icon">⭐</div>
     <div class="stat-num">{{ number_format(points, 0, ',', '.') }}</div>
-    <div class="stat-label">Punkte</div>
+    <div class="stat-label">{{ t('achievements_punkte') }}</div>
   </div>
   <div class="stat-box">
     <div class="stat-icon">📊</div>
     <div class="stat-num">{{ total > 0 ? round(count(earned) / total * 100) : 0 }}%</div>
-    <div class="stat-label">Fortschritt</div>
+    <div class="stat-label">{{ t('achievements_fortschritt') }}</div>
   </div>
 </div>
 
@@ -32,7 +32,7 @@
         {% if isEarned %}
           <span class="achievement-earned">{{ format_date(a.earned_at) }}</span>
         {% else %}
-          <span class="achievement-locked">Noch nicht</span>
+          <span class="achievement-locked">{{ t('achievements_noch_nicht') }}</span>
         {% endif %}
       </div>
     </div>

@@ -50,13 +50,13 @@ class KiFehler extends RuntimeException {}
 function ki_anfrage(string $system, string $text, array $cfg, int $max = 1500): string {
     $code = (string) ($cfg['anbieter'] ?? 'anthropic');
     if (!isset(KI_ANBIETER[$code])) {
-        throw new KiFehler('Kein gültiger Anbieter eingestellt.');
+        throw new KiFehler(t('ki_no_provider'));
     }
     $anbieter = KI_ANBIETER[$code];
 
     $schluessel = (string) ($cfg['schluessel'] ?? '');
     if ($schluessel === '') {
-        throw new KiFehler('Es ist kein API-Schlüssel hinterlegt.');
+        throw new KiFehler(t('ki_no_key'));
     }
     $modell = (string) ($cfg['modell'] ?? '') ?: $anbieter['vorgabe'];
 
@@ -104,7 +104,7 @@ function ki_anfrage(string $system, string $text, array $cfg, int $max = 1500): 
 
     $ergebnis = trim($ergebnis);
     if ($ergebnis === '') {
-        throw new KiFehler('Es kam nichts zurück.');
+        throw new KiFehler(t('ki_empty_answer'));
     }
     return $ergebnis;
 }
@@ -116,7 +116,7 @@ function ki_anfrage(string $system, string $text, array $cfg, int $max = 1500): 
  */
 function ki_post(string $url, array $kopf, array $rumpf): array {
     if (!function_exists('curl_init')) {
-        throw new KiFehler('Auf diesem Server fehlt die PHP-Erweiterung curl.');
+        throw new KiFehler(t('ki_no_curl'));
     }
 
     $ch = curl_init($url);
@@ -140,13 +140,13 @@ function ki_post(string $url, array $kopf, array $rumpf): array {
         // Der curl-Text nennt Adresse und Grund, keinen Inhalt — der darf ins
         // Protokoll.
         error_log('[ki] Verbindung fehlgeschlagen: ' . $netz);
-        throw new KiFehler('Der Dienst war nicht erreichbar.');
+        throw new KiFehler(t('ki_unreachable'));
     }
 
     $daten = json_decode((string) $roh, true);
     if (!is_array($daten)) {
         error_log('[ki] Antwort war kein JSON (HTTP ' . $code . ')');
-        throw new KiFehler('Die Antwort war nicht lesbar.');
+        throw new KiFehler(t('ki_unreadable'));
     }
 
     if ($code >= 400) {
@@ -155,10 +155,10 @@ function ki_post(string $url, array $kopf, array $rumpf): array {
         $art = (string) ($daten['error']['type'] ?? $daten['error']['code'] ?? 'unbekannt');
         error_log('[ki] HTTP ' . $code . ' (' . $art . ')');
         throw new KiFehler(match (true) {
-            $code === 401 || $code === 403 => 'Der API-Schlüssel wurde abgelehnt.',
-            $code === 429                  => 'Zu viele Anfragen — bitte gleich noch einmal versuchen.',
-            $code >= 500                   => 'Beim Anbieter ist gerade etwas kaputt.',
-            default                        => 'Die Anfrage wurde abgelehnt (HTTP ' . $code . ').',
+            $code === 401 || $code === 403 => t('ki_key_rejected'),
+            $code === 429                  => t('ki_too_many'),
+            $code >= 500                   => t('ki_provider_broken'),
+            default                        => t('ki_request_rejected', $code),
         });
     }
 

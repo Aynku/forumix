@@ -9,21 +9,21 @@ $error = '';
 $done  = false;
 
 if (!$reset) {
-    render('reset', ['title' => 'Link ungültig', 'invalid' => true, 'error' => '', 'done' => false, 'token' => '']);
+    render('reset', ['title' => t('reset_link_invalid'), 'invalid' => true, 'error' => '', 'done' => false, 'token' => '']);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
 
     $pw  = post_str('password');
     $pw2 = post_str('password2');
     $min = (int) get_setting('min_password_length', 6);
 
     if (mb_strlen($pw) < $min) {
-        $error = 'Passwort mindestens ' . $min . ' Zeichen.';
+        $error = tn('register_password_min', (int) $min);
     } elseif ($pw !== $pw2) {
-        $error = 'Passwörter stimmen nicht überein.';
+        $error = t('error_passwords_differ');
     } else {
         $hash = password_hash($pw, PASSWORD_BCRYPT, ['cost' => HASH_COST]);
         db_execute('UPDATE users SET password = ? WHERE user_id = ?', [$hash, $reset['user_id']]);
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 render('reset', [
-    'title'   => 'Passwort zurücksetzen',
+    'title'   => t('reset_title'),
     'invalid' => false,
     'error'   => $error,
     'done'    => $done,

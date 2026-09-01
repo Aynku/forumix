@@ -19,9 +19,9 @@ $ki_befehl = $ki_marken[(int) $post['post_id']] ?? '';
 if ($ki_befehl === '') return;
 
 $ki_alle = ki_befehle();
-$ki_name = $ki_alle[$ki_befehl]['name'] ?? $ki_befehl;
+$ki_name = isset($ki_alle[$ki_befehl]['name']) ? t($ki_alle[$ki_befehl]['name']) : $ki_befehl;
 ?>
 <div class="ki-marke" title="Der Verfasser hat für diesen Beitrag die Schreibhilfe benutzt und das Ergebnis übernommen.">
   <span aria-hidden="true">✨</span>
-  <span>KI-unterstützt · <?= e($ki_name) ?></span>
+  <span><?= e(t('ki_assisted', $ki_name)) ?></span>
 </div>

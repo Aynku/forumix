@@ -25,14 +25,15 @@ require_once __DIR__ . '/../install/import_text.php';
 
 /** Die Schritte des Imports, in dieser Reihenfolge. */
 const IMPORT_SCHRITTE = [
-    'user'      => 'Konten',
-    'struktur'  => 'Kategorien und Foren',
-    'thema'     => 'Themen',
-    'beitrag'   => 'Beiträge',
-    'anhang'    => 'Anhänge',
-    'umfrage'   => 'Umfragen',
-    'pn'        => 'Private Nachrichten',
-    'zaehler'   => 'Zähler',
+    'user'      => 'sys_konten',
+    'struktur'  => 'sys_kategorien_und_foren',
+    'thema'     => 'sys_themen',
+    'beitrag'   => 'sys_beitraege',
+    'anhang'    => 'sys_anhaenge',
+    'umfrage'   => 'sys_umfragen',
+
+    'pn'        => 'sys_private_nachrichten',
+    'zaehler'   => 'sys_zaehler',
 ];
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -209,13 +210,13 @@ function import_platzhalter(): int
     static $id = null;
     if ($id !== null) return $id;
 
-    $da = db_fetch('SELECT user_id FROM users WHERE username = ?', ['Übernommener Beitrag']);
+    $da = db_fetch('SELECT user_id FROM users WHERE username = ?', [t('sys_uebernommener_beitrag')]);
     if ($da) return $id = (int) $da['user_id'];
 
     return $id = (int) db_execute(
         "INSERT INTO users (username, password, email, `rank`, is_deleted, email_verified, registered_at)
          VALUES (?, ?, ?, ?, 1, 1, NOW())",
-        ['Übernommener Beitrag', '', 'uebernommen@localhost.invalid', 'Archiv']
+        [t('sys_uebernommener_beitrag'), '', 'uebernommen@localhost.invalid', 'Archiv']
     );
 }
 
@@ -343,7 +344,7 @@ function import_struktur(PDO $alt, string $p): array
                 $da = db_fetch('SELECT cat_id FROM categories ORDER BY position, cat_id LIMIT 1');
                 $sammel = $da ? (int) $da['cat_id']
                     : (int) db_execute('INSERT INTO categories (title, position) VALUES (?, ?)',
-                                       ['Übernommen', 99]);
+                                       [t('sys_uebernommen'), 99]);
             }
             $kat = $sammel;
         }
@@ -522,7 +523,7 @@ function import_anhaenge(PDO $alt, string $p, string $ordner, int $menge): array
 
         $name = 'att_' . $beitrag . '_' . bin2hex(random_bytes(6)) . '.' . $endung;
         if (!@copy($von, $ziel . '/' . $name)) {
-            import_merken('anhang_weg', $altId, 0, 'Kopie fehlgeschlagen');
+            import_merken('anhang_weg', $altId, 0, t('sys_kopie_fehlgeschlagen'));
             continue;
         }
         @chmod($ziel . '/' . $name, 0644);

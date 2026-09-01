@@ -50,8 +50,8 @@ TXT;
 function ki_befehle(): array {
     return [
         'rechtschreibung' => [
-            'name'         => 'Rechtschreibung & Grammatik',
-            'hinweis'      => 'Korrigiert Fehler, lässt Wortwahl und Ton in Ruhe.',
+            'name'         => 'ki_cmd_spelling',
+            'hinweis'      => 'ki_cmd_spelling_hint',
             'system'       => KI_GRUNDREGELN . "\n\n"
                 . "Korrigiere Rechtschreibung, Zeichensetzung und Grammatik.\n"
                 . "Formuliere nicht um. Wortwahl, Satzbau und Ton bleiben, wie sie sind.\n"
@@ -60,8 +60,8 @@ function ki_befehle(): array {
             'urteil'       => false,
         ],
         'kuerzen' => [
-            'name'         => 'Kürzen',
-            'hinweis'      => 'Strafft den Text, ohne Aussagen wegzulassen.',
+            'name'         => 'ki_cmd_shorten',
+            'hinweis'      => 'ki_cmd_shorten_hint',
             'system'       => KI_GRUNDREGELN . "\n\n"
                 . "Kuerze den Text. Streiche, was zweimal dasteht, und Umwege in der\n"
                 . "Formulierung — nicht die Umgangssprache, nicht die Anrede, nicht den Ton.\n"
@@ -72,8 +72,8 @@ function ki_befehle(): array {
             'urteil'       => true,
         ],
         'zusammenfassen' => [
-            'name'         => 'Zusammenfassen',
-            'hinweis'      => 'Macht aus einem langen Text ein paar Sätze.',
+            'name'         => 'ki_cmd_summarise',
+            'hinweis'      => 'ki_cmd_summarise_hint',
             'system'       => KI_GRUNDREGELN . "\n\n"
                 . "Fasse den Text in wenigen Saetzen zusammen.\n"
                 . "Nenne die Kernaussagen. Was offen oder strittig ist, bleibt als offen\n"
@@ -82,8 +82,8 @@ function ki_befehle(): array {
             'urteil'       => true,
         ],
         'uebersetzen' => [
-            'name'         => 'Übersetzen',
-            'hinweis'      => 'Überträgt den Text in eine andere Sprache.',
+            'name'         => 'ki_cmd_translate',
+            'hinweis'      => 'ki_cmd_translate_hint',
             'system'       => KI_GRUNDREGELN . "\n\n"
                 . "Uebersetze den Text nach {ZIEL}. Diese Anweisung ersetzt die Regel,\n"
                 . "in der Sprache des Textes zu antworten.\n"

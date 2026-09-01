@@ -1,14 +1,14 @@
 <div style="max-width:560px;margin:0 auto">
-  <div class="section-heading">Zwei-Faktor-Authentifizierung</div>
+  <div class="section-heading">{{ t('twofactor_setup_zwei_faktor_authentifizierung') }}</div>
 
   {% if error %}<div class="flash flash-error">{{ error }}</div>{% endif %}
   {% if success %}<div class="flash flash-success">{{ success }}</div>{% endif %}
 
   {% if backupCodes %}
     <div class="card" style="margin-bottom:16px;padding:18px">
-      <h3 style="font-size:14px;margin-bottom:10px">Deine Backup-Codes</h3>
+      <h3 style="font-size:14px;margin-bottom:10px">{{ t('twofactor_setup_deine_backup_codes') }}</h3>
       <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">
-        Bewahre diese Codes sicher auf! Wenn du deine Authenticator-App verlierst, kannst du dich damit einloggen. Jeder Code ist nur einmal verwendbar.
+        {{ t('twofactor_setup_bewahre_diese_codes_sicher') }}
       </p>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;font-family:var(--font-mono)">
         {% for bc in backupCodes %}
@@ -20,38 +20,38 @@
 
   <div class="form-card">
     {% if has2fa %}
-      <h2>2FA ist aktiv</h2>
+      <h2>{{ t('twofactor_setup_2fa_ist_aktiv') }}</h2>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-        Dein Konto ist durch 2-Faktor-Authentifizierung geschützt.
+        {{ t('twofactor_setup_dein_konto_ist_durch') }}
       </p>
 
       <form method="post">
         <input type="hidden" name="csrf" value="{{ csrfToken }}">
         <input type="hidden" name="action" value="disable">
         <div class="form-row">
-          <label>Passwort zur Bestätigung</label>
+          <label>{{ t('twofactor_setup_passwort_zur_bestaetigung') }}</label>
           <input type="password" name="password" required>
         </div>
-        <button type="submit" class="btn btn-danger" onclick="return confirm('2FA wirklich deaktivieren?')">2FA deaktivieren</button>
+        <button type="submit" class="btn btn-danger" onclick="return confirm('2FA wirklich deaktivieren?')">{{ t('twofactor_setup_2fa_deaktivieren') }}</button>
       </form>
 
     {% else %}
-      <h2>2FA einrichten</h2>
+      <h2>{{ t('twofactor_setup_2fa_einrichten') }}</h2>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
-        Scanne den QR-Code mit einer Authenticator-App (Google Authenticator, Authy, 1Password, …) oder gib den Secret-Code manuell ein.
+        {{ t('twofactor_setup_scanne_den_qr_code') }}
       </p>
 
       <div style="text-align:center;margin:20px 0">
         {# Kein QR-Bild von einem fremden Dienst — die URL enthaelt den
            2FA-Schluessel im Klartext. Eintragen ueber den Secret-Code. #}
         <div style="text-align:center;margin:18px 0;padding:14px;border:1px dashed var(--border);border-radius:8px;color:var(--text-muted);font-size:13px">
-          Trage den Code unten in deiner Authenticator-App unter
+          {{ t('twofactor_setup_trage_den_code_unten') }}
           <strong>„Schl&uuml;ssel manuell eingeben"</strong> ein.
         </div>
       </div>
 
       <div style="background:var(--bg-surface2);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:16px;text-align:center">
-        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Secret-Code (manuell):</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">{{ t('twofactor_setup_secret_code_manuell') }}</div>
         <code style="font-size:14px;font-weight:600;letter-spacing:1px;word-break:break-all">{{ newSecret }}</code>
       </div>
 
@@ -60,14 +60,14 @@
         <input type="hidden" name="action" value="enable">
         <input type="hidden" name="secret" value="{{ newSecret }}">
         <div class="form-row">
-          <label>6-stelligen Code zur Bestätigung eingeben</label>
+          <label>{{ t('twofactor_setup_6_stelligen_code_zur') }}</label>
           <input type="text" name="code" required autofocus inputmode="numeric"
                  maxlength="6" pattern="[0-9]{6}"
                  style="font-family:var(--font-mono);font-size:18px;letter-spacing:3px;text-align:center"
                  placeholder="000000">
         </div>
-        <button type="submit" class="btn btn-primary">2FA aktivieren</button>
-        <a href="{{ url('/profile.php?id=') }}{{ currentUser.user_id }}" class="btn btn-ghost">Abbrechen</a>
+        <button type="submit" class="btn btn-primary">{{ t('twofactor_setup_2fa_aktivieren') }}</button>
+        <a href="{{ url('/profile.php?id=') }}{{ currentUser.user_id }}" class="btn btn-ghost">{{ t('twofactor_setup_abbrechen') }}</a>
       </form>
     {% endif %}
   </div>

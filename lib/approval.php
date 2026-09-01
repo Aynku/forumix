@@ -247,7 +247,7 @@ function approve_user(int $userId, int $adminId): bool {
             db_execute(
                 'INSERT INTO mod_log (mod_id, action, target_type, target_id, reason)
                  VALUES (?, ?, ?, ?, ?)',
-                [$adminId, 'approve_user', 'user', $userId, 'Registrierung freigegeben']
+                [$adminId, 'approve_user', 'user', $userId, t('sys_registrierung_freigegeben')]
             );
         } catch (Exception $e) {}
 

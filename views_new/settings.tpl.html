@@ -2,36 +2,36 @@
    Wichtig: Filter (|raw, |length etc) nur in {{ }}, NIE in {% %}
    Funktionsaufrufe wie profile_field_schema() laufen direkt #}
 
-<div class="section-heading">Einstellungen</div>
+<div class="section-heading">{{ t('settings_einstellungen') }}</div>
 
 {# ──── Tab-Navigation ──── #}
 <div class="settings-tabs">
   <a href="{{ url('/settings.php?tab=profile') }}"
      class="settings-tab {% if activeTab == 'profile' %}active{% endif %}">
-    Profil
+    {{ t('settings_profil') }}
   </a>
   <a href="{{ url('/settings.php?tab=security') }}"
      class="settings-tab {% if activeTab == 'security' %}active{% endif %}">
-    Sicherheit
+    {{ t('settings_sicherheit') }}
   </a>
   <a href="{{ url('/settings.php?tab=sessions') }}"
      class="settings-tab {% if activeTab == 'sessions' %}active{% endif %}">
-    Sitzungen
+    {{ t('settings_sessions') }}
     {% if count(sessions) > 0 %}
       <span class="settings-tab-badge">{{ count(sessions) }}</span>
     {% endif %}
   </a>
   <a href="{{ url('/settings.php?tab=notifications') }}"
      class="settings-tab {% if activeTab == 'notifications' %}active{% endif %}">
-    Benachrichtigungen
+    {{ t('settings_benachrichtigungen') }}
   </a>
   <a href="{{ url('/settings.php?tab=preferences') }}"
      class="settings-tab {% if activeTab == 'preferences' %}active{% endif %}">
-    Darstellung
+    {{ t('settings_darstellung') }}
   </a>
   <a href="{{ url('/settings.php?tab=danger') }}"
      class="settings-tab {% if activeTab == 'danger' %}active{% endif %}">
-    Konto
+    {{ t('settings_konto') }}
   </a>
 </div>
 
@@ -43,10 +43,10 @@
 {% if activeTab == 'profile' %}
 <div class="form-card">
   <p style="font-size:13px;color:var(--text-muted);margin-bottom:18px">
-    So sehen andere User dein Profil. Änderungen werden sofort wirksam.
+    {{ t('settings_so_sehen_andere_user') }}
     <br>
     <a href="{{ url('/profile.php?id=') }}{{ profile.user_id }}" style="color:var(--color-accent)">
-      → Mein öffentliches Profil anschauen
+      {{ t('settings_mein_oeffentliches_profil_anschauen') }}
     </a>
   </p>
 
@@ -55,18 +55,18 @@
     <input type="hidden" name="action" value="save_profile">
 
     <div class="form-row">
-      <label>Avatar</label>
+      <label>{{ t('settings_avatar') }}</label>
       <div class="media-edit-row">
         <img src="{{ avatar_url(profile) }}" alt="Aktuelles Avatar"
              class="media-edit-preview avatar-preview zoomable-avatar"
              data-username="{{ profile.username }}">
         <div class="media-edit-controls">
           <input type="file" name="avatar" accept="image/*">
-          <div class="form-hint">Max. 512 KB · JPEG/PNG/GIF/WebP</div>
+          <div class="form-hint">{{ t('settings_max_512_kb_jpeg') }}</div>
           {% if profile.avatar %}
             <label class="checkbox-line" style="margin-top:6px">
               <input type="checkbox" name="delete_avatar" value="1">
-              <span>Aktuelles Avatar entfernen (zurück zum Standard-Bild)</span>
+              <span>{{ t('settings_aktuelles_avatar_entfernen_zurueck') }}</span>
             </label>
           {% endif %}
         </div>
@@ -74,21 +74,21 @@
     </div>
 
     <div class="form-row">
-      <label>Profilbanner</label>
+      <label>{{ t('settings_profilbanner') }}</label>
       <div class="media-edit-row">
         {% if profile.profile_banner %}
           <img src="{{ url('/uploads/avatars/') }}{{ profile.profile_banner | escape }}"
                alt="Aktueller Banner" class="media-edit-preview banner-preview">
         {% else %}
-          <div class="media-edit-preview banner-preview media-empty">Kein Banner</div>
+          <div class="media-edit-preview banner-preview media-empty">{{ t('settings_kein_banner') }}</div>
         {% endif %}
         <div class="media-edit-controls">
           <input type="file" name="banner" accept="image/*">
-          <div class="form-hint">Max. 2 MB · ideal 1200×300px</div>
+          <div class="form-hint">{{ t('settings_max_2_mb_ideal') }}</div>
           {% if profile.profile_banner %}
             <label class="checkbox-line" style="margin-top:6px">
               <input type="checkbox" name="delete_banner" value="1">
-              <span>Aktuellen Banner entfernen</span>
+              <span>{{ t('settings_aktuellen_banner_entfernen') }}</span>
             </label>
           {% endif %}
         </div>
@@ -96,20 +96,20 @@
     </div>
 
     <div class="form-row">
-      <label>Signatur (BBCode erlaubt)</label>
-      {{ render_editor('sig_editor', 'signature', profile.signature, 'Deine Signatur mit BBCode…', false, false) | raw }}
-      <div class="form-hint">Wird unter deinen Beiträgen angezeigt.</div>
+      <label>{{ t('settings_signatur_bbcode_erlaubt') }}</label>
+      {{ render_editor('sig_editor', 'signature', profile.signature, t('settings_signature_placeholder'), false, false) | raw }}
+      <div class="form-hint">{{ t('settings_wird_unter_deinen_beitraegen') }}</div>
     </div>
 
     <hr style="border:none;border-top:1px solid var(--border);margin:24px 0">
     <h3 style="font-size:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin:0 0 6px">
-      Persönliche Angaben
+      {{ t('settings_persoenliche_angaben') }}
     </h3>
     <p style="font-size:12px;color:var(--text-muted);margin:0 0 18px;line-height:1.6">
-      Alle Felder sind optional. Pro Feld kannst du wählen wer es sehen darf:
-      <span style="white-space:nowrap">Öffentlich</span> ·
-      <span style="white-space:nowrap">Nur Mitglieder</span> ·
-      <span style="white-space:nowrap">Nur ich</span>
+      {{ t('settings_alle_felder_sind_optional') }}
+      <span style="white-space:nowrap">{{ t('settings_oeffentlich') }}</span> ·
+      <span style="white-space:nowrap">{{ t('settings_nur_mitglieder') }}</span> ·
+      <span style="white-space:nowrap">{{ t('settings_nur_ich') }}</span>
     </p>
 
     {# Da Engine kein loop.key hat, rendern wir die Felder mit einem Helper-Aufruf
@@ -117,7 +117,7 @@
     {% set privacy = profile_privacy_settings(profile) %}
     {{ render_profile_field_inputs(profile, privacy) | raw }}
 
-    <button type="submit" class="btn btn-primary">Profil speichern</button>
+    <button type="submit" class="btn btn-primary">{{ t('settings_profil_speichern') }}</button>
   </form>
 </div>
 {% endif %}
@@ -127,21 +127,20 @@
 
 {# ─── E-Mail-Adresse ─── #}
 <div class="form-card">
-  <h3 style="margin-top:0">E-Mail-Adresse</h3>
+  <h3 style="margin-top:0">{{ t('settings_e_mail_adresse') }}</h3>
 
   {% if profile.pending_email %}
     {# Aktive Änderungs-Anfrage → Status anzeigen #}
     <div style="padding:14px;background:var(--bg-surface2);border-radius:6px;margin-bottom:14px">
       <div style="margin-bottom:8px">
-        <span style="color:var(--text-muted)">Aktuelle Adresse (noch aktiv):</span><br>
+        <span style="color:var(--text-muted)">{{ t('settings_aktuelle_adresse_noch_aktiv') }}</span><br>
         <strong>{{ profile.email }}</strong>
       </div>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-        <span style="color:var(--text-muted)">Ausstehende Änderung auf:</span><br>
+        <span style="color:var(--text-muted)">{{ t('settings_ausstehende_aenderung_auf') }}</span><br>
         <strong>{{ profile.pending_email }}</strong>
         <div style="margin-top:8px;font-size:13px;color:var(--text-muted)">
-          Bitte den Bestätigungs-Link in der Mail an die neue Adresse klicken.
-          Der Link ist 24 Stunden gültig.
+          {{ t('settings_bitte_den_bestaetigungs_link') }}
         </div>
       </div>
     </div>
@@ -149,25 +148,25 @@
     <form method="post" onsubmit="return confirm('E-Mail-Änderungs-Anfrage wirklich abbrechen?')">
       <input type="hidden" name="csrf" value="{{ csrfToken }}">
       <input type="hidden" name="action" value="cancel_email_change">
-      <button type="submit" class="btn btn-ghost btn-sm">Änderung abbrechen</button>
+      <button type="submit" class="btn btn-ghost btn-sm">{{ t('settings_aenderung_abbrechen') }}</button>
     </form>
 
   {% else %}
     {# Normaler Zustand → aktuelle Mail read-only + Button "Ändern" #}
     <div class="form-row">
-      <label>Aktuelle E-Mail-Adresse</label>
+      <label>{{ t('settings_aktuelle_e_mail_adresse') }}</label>
       <div style="padding:10px 12px;background:var(--bg-surface2);border:1px solid var(--border);border-radius:6px;font-family:var(--font-mono);font-size:14px;display:flex;align-items:center;gap:8px">
         <span style="color:var(--text-muted)">🔒</span>
         <span style="color:var(--text-base);font-weight:500">{{ profile.email | default('— nicht gesetzt —') }}</span>
       </div>
       <div class="form-hint">
-        Wird für Passwort-Reset und Benachrichtigungen verwendet.
+        {{ t('settings_wird_fuer_passwort_reset') }}
       </div>
     </div>
 
     <details style="margin-top:8px">
       <summary style="cursor:pointer;color:var(--color-accent);font-weight:500;padding:8px 0">
-        E-Mail-Adresse ändern
+        {{ t('settings_e_mail_adresse_aendern') }}
       </summary>
 
       <form method="post" style="margin-top:14px;padding:14px;background:var(--bg-surface2);border-radius:6px">
@@ -175,24 +174,22 @@
         <input type="hidden" name="action" value="request_email_change">
 
         <div class="form-row">
-          <label>Neue E-Mail-Adresse</label>
+          <label>{{ t('settings_neue_e_mail_adresse') }}</label>
           <input type="email" name="new_email" required autocomplete="email"
                  placeholder="neue@adresse.de">
         </div>
 
         <div class="form-row">
-          <label>Dein aktuelles Passwort (zur Bestätigung)</label>
+          <label>{{ t('settings_dein_aktuelles_passwort_zur') }}</label>
           <input type="password" name="current_password_for_email" required
                  autocomplete="current-password">
         </div>
 
         <div style="padding:10px 12px;background:rgba(245,158,11,0.1);border-left:3px solid #f59e0b;border-radius:4px;margin:14px 0;font-size:13px;line-height:1.6">
-          Wir senden einen Bestätigungs-Link an die neue Adresse. Erst nach
-          Klick auf den Link wird sie aktiv. Deine bisherige Adresse bleibt
-          bis dahin gültig.
+          {{ t('settings_wir_senden_einen_bestaetigungs') }}
         </div>
 
-        <button type="submit" class="btn btn-primary">Bestätigungs-Mail senden</button>
+        <button type="submit" class="btn btn-primary">{{ t('settings_bestaetigungs_mail_senden') }}</button>
       </form>
     </details>
   {% endif %}
@@ -200,40 +197,40 @@
 
 {# ─── Passwort ändern ─── #}
 <div class="form-card" style="margin-top:16px">
-  <h3 style="margin-top:0">Passwort ändern</h3>
+  <h3 style="margin-top:0">{{ t('settings_passwort_aendern') }}</h3>
 
   <form method="post">
     <input type="hidden" name="csrf" value="{{ csrfToken }}">
     <input type="hidden" name="action" value="change_password">
 
     <div class="form-row">
-      <label>Aktuelles Passwort</label>
+      <label>{{ t('settings_aktuelles_passwort') }}</label>
       <input type="password" name="current_password" required
              autocomplete="current-password">
       <div class="form-hint">
-        Zur Bestätigung deiner Identität.
+        {{ t('settings_zur_bestaetigung_deiner_identitaet') }}
       </div>
     </div>
 
     <div class="form-row">
-      <label>Neues Passwort</label>
+      <label>{{ t('settings_neues_passwort') }}</label>
       <input type="password" name="new_password" required minlength="6"
              autocomplete="new-password" id="newPw">
-      <div class="form-hint">Mindestens 6 Zeichen.</div>
+      <div class="form-hint">{{ t('settings_mindestens_6_zeichen') }}</div>
     </div>
 
     <div class="form-row">
-      <label>Neues Passwort wiederholen</label>
+      <label>{{ t('settings_neues_passwort_wiederholen') }}</label>
       <input type="password" name="new_password_confirm" required minlength="6"
              autocomplete="new-password" id="newPwConfirm">
       <div class="form-hint" id="newPwMatch" style="font-size:13px"></div>
     </div>
 
     <div style="padding:10px 12px;background:rgba(245,158,11,0.1);border-left:3px solid #f59e0b;border-radius:4px;margin:14px 0;font-size:13px;line-height:1.6">
-      Bei Passwort-Änderung werden alle anderen Geräte abgemeldet.
+      {{ t('settings_bei_passwort_aenderung_werden') }}
     </div>
 
-    <button type="submit" class="btn btn-primary">Passwort ändern</button>
+    <button type="submit" class="btn btn-primary">{{ t('settings_passwort_aendern') }}</button>
   </form>
 </div>
 
@@ -255,16 +252,16 @@
 </script>
 
 <div class="form-card" style="margin-top:16px">
-  <h3 style="margin-top:0">Zwei-Faktor-Authentifizierung</h3>
+  <h3 style="margin-top:0">{{ t('settings_zwei_faktor_authentifizierung') }}</h3>
 
   {% if newBackupCodes %}
     {# Frisch aktiviert: Backup-Codes EINMALIG zeigen #}
     <div class="card" style="margin-bottom:16px;padding:16px;border:2px solid #4a9d4a;background:rgba(74,157,74,0.06)">
-      <h4 style="font-size:14px;margin:0 0 10px;color:#4a9d4a">Deine Backup-Codes — JETZT speichern!</h4>
+      <h4 style="font-size:14px;margin:0 0 10px;color:#4a9d4a">{{ t('settings_deine_backup_codes_jetzt') }}</h4>
       <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6">
-        Bewahre diese Codes <strong>sicher</strong> auf (Passwort-Manager, ausdrucken).
+        {{ t('settings_bewahre_diese_codes') }} <strong>sicher</strong> auf (Passwort-Manager, ausdrucken).
         Wenn du deine Authenticator-App verlierst, kannst du dich damit einloggen.
-        <strong>Jeder Code ist nur einmal verwendbar.</strong> Diese Liste wird nicht erneut angezeigt!
+        <strong>{{ t('settings_jeder_code_ist_nur') }}</strong> {{ t('settings_diese_liste_wird_nicht') }}
       </p>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;font-family:var(--font-mono)">
         {% for bc in newBackupCodes %}
@@ -282,41 +279,39 @@
   {% if has2fa %}
     {# 2FA ist aktiv → Deaktivieren-Form #}
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-      2FA ist <strong>aktiv</strong>. Du wirst bei jedem Login nach einem 6-stelligen Code gefragt.
+      {{ t('settings_2fa_ist') }} <strong>aktiv</strong>. Du wirst bei jedem Login nach einem 6-stelligen Code gefragt.
       Falls du die Authenticator-App verlierst, kannst du dich mit einem Backup-Code einloggen.
     </p>
     <details>
       <summary style="cursor:pointer;font-size:13px;color:var(--text-muted);padding:8px 0">
-        2FA deaktivieren (mit Passwort-Bestätigung)
+        {{ t('settings_2fa_deaktivieren_mit_passwort') }}
       </summary>
       <form method="post" style="margin-top:12px"
             onsubmit="return confirm('2FA wirklich deaktivieren? Dein Konto ist danach nur noch durch das Passwort geschützt.')">
         <input type="hidden" name="csrf" value="{{ csrfToken }}">
         <input type="hidden" name="action" value="disable_2fa">
         <div class="form-row">
-          <label>Dein aktuelles Passwort zur Bestätigung</label>
+          <label>{{ t('settings_dein_aktuelles_passwort_zur_2') }}</label>
           <input type="password" name="password_confirm" required autocomplete="current-password">
         </div>
-        <button type="submit" class="btn btn-danger btn-sm">2FA deaktivieren</button>
+        <button type="submit" class="btn btn-danger btn-sm">{{ t('settings_2fa_deaktivieren') }}</button>
       </form>
     </details>
 
   {% else %}
     {# 2FA noch nicht aktiv → Setup-UI #}
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-      Mit 2FA ist dein Konto deutlich besser geschützt. Bei jedem Login wird zusätzlich
-      ein 6-stelliger Code aus einer Authenticator-App auf deinem Handy abgefragt.
+      {{ t('settings_mit_2fa_ist_dein') }}
     </p>
 
     <details>
       <summary style="cursor:pointer;font-size:14px;color:var(--color-accent);font-weight:600;padding:8px 0">
-        2FA jetzt einrichten
+        {{ t('settings_2fa_jetzt_einrichten') }}
       </summary>
 
       <div style="padding:14px 0">
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-          <strong>Schritt 1:</strong> Scanne den QR-Code mit einer Authenticator-App
-          (Google Authenticator, Authy, 1Password, …) oder gib den Secret-Code manuell ein.
+          <strong>{{ t('settings_schritt_1') }}</strong> {{ t('settings_scanne_den_qr_code') }}
         </p>
 
         {# QR wird auf dem eigenen Server erzeugt (lib/qrcode.php) — der
@@ -328,12 +323,12 @@
         </div>
 
         <div style="background:var(--bg-surface2);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:16px;text-align:center">
-          <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Secret-Code (für manuelle Eingabe):</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">{{ t('settings_secret_code_fuer_manuelle') }}</div>
           <code style="font-size:14px;font-weight:600;letter-spacing:1px;word-break:break-all">{{ newSecret }}</code>
         </div>
 
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px">
-          <strong>Schritt 2:</strong> Gib den 6-stelligen Code aus der App ein, um zu bestätigen.
+          <strong>{{ t('settings_schritt_2') }}</strong> {{ t('settings_gib_den_6_stelligen') }}
         </p>
 
         <form method="post">
@@ -341,13 +336,13 @@
           <input type="hidden" name="action" value="enable_2fa">
           <input type="hidden" name="secret" value="{{ newSecret }}">
           <div class="form-row">
-            <label>6-stelliger Code zur Bestätigung</label>
+            <label>{{ t('settings_6_stelliger_code_zur') }}</label>
             <input type="text" name="code" required autofocus inputmode="numeric"
                    maxlength="6" pattern="[0-9]{6}"
                    style="font-family:var(--font-mono);font-size:18px;letter-spacing:3px;text-align:center;max-width:180px"
                    placeholder="000000">
           </div>
-          <button type="submit" class="btn btn-primary">2FA aktivieren</button>
+          <button type="submit" class="btn btn-primary">{{ t('settings_2fa_aktivieren') }}</button>
         </form>
       </div>
     </details>
@@ -361,13 +356,12 @@
   <h3 style="margin-top:0">Aktive Sitzungen ({{ count(sessions) }})</h3>
   {% if not sessions %}
     <p style="font-size:13px;color:var(--text-muted);text-align:center;padding:30px">
-      Keine aktiven „Angemeldet bleiben"-Sitzungen.<br>
-      Du wirst beim nächsten Browser-Schließen ausgeloggt.
+      {{ t('settings_keine_aktiven_angemeldet_bleiben') }}<br>
+      {{ t('settings_du_wirst_beim_naechsten') }}
     </p>
   {% else %}
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-      Diese Geräte sind aktuell mit „Angemeldet bleiben" eingeloggt. Wenn dir eine Sitzung
-      nicht bekannt vorkommt – sofort abmelden!
+      {{ t('settings_diese_geraete_sind_aktuell') }}
     </p>
 
     <div class="sessions-list">
@@ -377,10 +371,10 @@
           <div class="session-info">
             <strong>{{ remember_format_user_agent(s.user_agent) }}</strong>
             {% if isCurrent %}
-              <span class="session-badge">Diese Sitzung</span>
+              <span class="session-badge">{{ t('settings_diese_sitzung') }}</span>
             {% endif %}
             <div class="session-meta">
-              IP: <code>{{ s.ip_address | default('–') }}</code>
+              {{ t('settings_ip') }} <code>{{ s.ip_address | default('–') }}</code>
               · Erstellt: {{ s.created_at | date('d.m.Y') }}
               · Zuletzt: {{ s.last_used | date('d.m.Y H:i') }}
               · Läuft ab: {{ s.expires_at | date('d.m.Y') }}
@@ -391,7 +385,7 @@
               <input type="hidden" name="csrf" value="{{ csrfToken }}">
               <input type="hidden" name="session_action" value="revoke_one">
               <input type="hidden" name="token_id" value="{{ s.token_id }}">
-              <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--color-danger)">Abmelden</button>
+              <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--color-danger)">{{ t('settings_abmelden') }}</button>
             </form>
           {% endif %}
         </div>
@@ -404,7 +398,7 @@
           <input type="hidden" name="csrf" value="{{ csrfToken }}">
           <input type="hidden" name="session_action" value="revoke_others">
           <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--color-warning)">
-            Alle anderen Geräte abmelden
+            {{ t('settings_alle_anderen_geraete_abmelden') }}
           </button>
         </form>
       </div>
@@ -416,7 +410,7 @@
 {# TAB: Benachrichtigungen #}
 {% if activeTab == 'notifications' %}
 <div class="form-card">
-  <h3 style="margin-top:0">Benachrichtigungen</h3>
+  <h3 style="margin-top:0">{{ t('settings_benachrichtigungen') }}</h3>
   <form method="post">
     <input type="hidden" name="csrf" value="{{ csrfToken }}">
     <input type="hidden" name="action" value="save_profile">
@@ -425,22 +419,20 @@
     <div class="form-row">
       <label>
         <input type="checkbox" name="notify_email" value="1" {% if profile.notify_email %}checked{% endif %}>
-        E-Mail-Benachrichtigungen aktivieren
+        {{ t('settings_e_mail_benachrichtigungen_aktivieren') }}
       </label>
       <div class="form-hint">
-        Wenn aktiviert, bekommst du zusätzlich zur In-App-Benachrichtigung
-        (Glocke) auch eine E-Mail bei Antworten in abonnierten Threads.
-        Jede E-Mail enthält einen 1-Klick-Abmelde-Link für den jeweiligen Thread.
+        {{ t('settings_wenn_aktiviert_bekommst_du') }}
       </div>
     </div>
 
     <div class="form-hint" style="margin:14px 0;padding:10px 12px;background:var(--bg-surface2);border-radius:6px">
-      Voraussetzung: Eine gültige E-Mail-Adresse ist im
-      <a href="{{ url('/settings.php?tab=security') }}">Sicherheit-Tab</a> hinterlegt.
+      {{ t('settings_voraussetzung_eine_gueltige_e') }}
+      <a href="{{ url('/settings.php?tab=security') }}">{{ t('settings_sicherheit_tab') }}</a> hinterlegt.
       Aktuell: <strong>{{ profile.email | default('—') }}</strong>
     </div>
 
-    <button type="submit" class="btn btn-primary">Benachrichtigungen speichern</button>
+    <button type="submit" class="btn btn-primary">{{ t('settings_benachrichtigungen_speichern') }}</button>
   </form>
 </div>
 {% endif %}
@@ -448,24 +440,35 @@
 {# TAB: Darstellung #}
 {% if activeTab == 'preferences' %}
 <div class="form-card">
-  <h3 style="margin-top:0">Darstellung</h3>
+  <h3 style="margin-top:0">{{ t('settings_darstellung') }}</h3>
   <form method="post">
     <input type="hidden" name="csrf" value="{{ csrfToken }}">
     <input type="hidden" name="action" value="save_profile">
 
     <div class="form-row">
-      <label>Theme</label>
+      <label>{{ t('settings_theme') }}</label>
       {% set currentTheme = profile.theme %}
       {% if not currentTheme %}{% set currentTheme = 'auto' %}{% endif %}
       <select name="theme">
-        <option value="auto"  {% if currentTheme == 'auto' %}selected{% endif %}>Automatisch</option>
-        <option value="dark"  {% if currentTheme == 'dark' %}selected{% endif %}>Dark</option>
-        <option value="light" {% if currentTheme == 'light' %}selected{% endif %}>Light</option>
+        <option value="auto"  {% if currentTheme == 'auto' %}selected{% endif %}>{{ t('settings_automatisch') }}</option>
+        <option value="dark"  {% if currentTheme == 'dark' %}selected{% endif %}>{{ t('settings_dark') }}</option>
+        <option value="light" {% if currentTheme == 'light' %}selected{% endif %}>{{ t('settings_light') }}</option>
       </select>
-      <div class="form-hint">"Automatisch" folgt deiner System-Einstellung (Hell/Dunkel).</div>
+      <div class="form-hint">{{ t('settings_theme_hinweis') }}</div>
     </div>
 
-    <button type="submit" class="btn btn-primary">Darstellung speichern</button>
+    <div class="form-row">
+      <label>{{ t('settings_sprache') }}</label>
+      {% set currentLang = profile.language %}
+      {% if not currentLang %}{% set currentLang = 'de' %}{% endif %}
+      <select name="language">
+        <option value="de" {% if currentLang == 'de' %}selected{% endif %}>Deutsch</option>
+        <option value="en" {% if currentLang == 'en' %}selected{% endif %}>English</option>
+      </select>
+      <div class="form-hint">{{ t('settings_sprache_hinweis') }}</div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">{{ t('settings_darstellung_speichern') }}</button>
   </form>
 </div>
 {% endif %}
@@ -473,21 +476,18 @@
 {# TAB: Konto / Danger #}
 {% if activeTab == 'danger' %}
 <div class="form-card" style="border:1px solid #dc262640" id="danger-zone">
-  <h3 style="margin-top:0;color:#dc2626">Account löschen</h3>
+  <h3 style="margin-top:0;color:#dc2626">{{ t('settings_account_loeschen') }}</h3>
   {% if can_user_delete_self_ok(profile.user_id) %}
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6">
-      Wenn du dein Konto nicht mehr nutzen möchtest, kannst du es endgültig löschen. Deine Beiträge
-      bleiben erhalten (sonst würden Diskussionen unverständlich), erscheinen aber unter
-      „Gelöschter Benutzer". Persönliche Daten (E-Mail, Avatar, Bio, Signatur) werden entfernt.
-      <strong>Diese Aktion ist unwiderruflich.</strong>
+      {{ t('settings_wenn_du_dein_konto') }}
+      <strong>{{ t('settings_diese_aktion_ist_unwiderruflich') }}</strong>
     </p>
     <a href="{{ url('/delete_account.php') }}" class="btn btn-danger btn-sm">
-      Meinen Account löschen…
+      {{ t('settings_meinen_account_loeschen') }}
     </a>
   {% else %}
     <p style="font-size:13px;color:var(--text-muted);line-height:1.6">
-      Dein Konto kann momentan nicht gelöscht werden (z.B. weil du der einzige Owner bist
-      oder ein geschützter Account-Typ vorliegt). Wende dich bei Fragen an die Admins.
+      {{ t('settings_dein_konto_kann_momentan') }}
     </p>
   {% endif %}
 </div>

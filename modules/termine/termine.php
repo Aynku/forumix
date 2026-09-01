@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../bootstrap.php';
 
 // Aus heisst aus: sonst bliebe die Seite auch im abgeschalteten Zustand erreichbar.
 if (!module_enabled('termine')) {
-    error_page(404, 'Nicht gefunden', 'Das Termin-Modul ist nicht aktiv.');
+    error_page(404, t('error_not_found_title'), t('termine_disabled'));
 }
 
 $cu       = current_user();
@@ -22,8 +22,8 @@ function termin_pruefen(array $post): array {
     $beginn = trim($post['beginn'] ?? '');
     $ende   = trim($post['ende'] ?? '');
 
-    if ($titel === '')                 $fehler[] = 'Ohne Titel geht es nicht.';
-    if ($beginn === '')                $fehler[] = 'Ohne Beginn geht es nicht.';
+    if ($titel === '')                 $fehler[] = t('error_title_required');
+    if ($beginn === '')                $fehler[] = t('termine_start_required');
 
     // Das Feld liefert "2026-08-20T19:30". Alles andere kommt nicht aus dem
     // Formular, sondern von jemandem, der daran vorbei sendet.
@@ -35,10 +35,10 @@ function termin_pruefen(array $post): array {
     $beginnDb = $beginn !== '' ? $zuDatum($beginn) : null;
     $endeDb   = $ende   !== '' ? $zuDatum($ende)   : null;
 
-    if ($beginn !== '' && $beginnDb === null) $fehler[] = 'Der Beginn ist kein gültiges Datum.';
-    if ($ende   !== '' && $endeDb   === null) $fehler[] = 'Das Ende ist kein gültiges Datum.';
+    if ($beginn !== '' && $beginnDb === null) $fehler[] = t('termine_start_invalid');
+    if ($ende   !== '' && $endeDb   === null) $fehler[] = t('termine_end_invalid');
     if ($beginnDb && $endeDb && $endeDb < $beginnDb) {
-        $fehler[] = 'Das Ende liegt vor dem Beginn.';
+        $fehler[] = t('termine_end_before_start');
     }
 
     return [$fehler, [
@@ -53,10 +53,10 @@ function termin_pruefen(array $post): array {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Token gegen fremde Formulare, Rechte gegen neugierige Besucher — beides.
     if (!verify_csrf($_POST['csrf'] ?? '')) {
-        error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+        error_page(400, t('error_csrf_title'), t('error_csrf_text'));
     }
     if (!$canAdmin) {
-        error_page(403, 'Kein Zugriff', 'Termine dürfen nur Inhaber und Administratoren pflegen.');
+        error_page(403, t('error_denied_title'), t('termine_denied'));
     }
 
     $tun = $_POST['tun'] ?? '';
@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                  VALUES (?, ?, ?, ?, ?, ?)',
                 [$w['titel'], $w['beschreibung'], $w['beginn'], $w['ende'], $w['ort'], (int) $cu['user_id']]
             );
-            flash('Termin angelegt.', 'success');
+            flash(t('termine_added'), 'success');
         } else {
             db_execute(
                 'UPDATE termine SET titel = ?, beschreibung = ?, beginn = ?, ende = ?, ort = ?
@@ -80,13 +80,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 [$w['titel'], $w['beschreibung'], $w['beginn'], $w['ende'], $w['ort'],
                  (int) ($_POST['id'] ?? 0)]
             );
-            flash('Termin geändert.', 'success');
+            flash(t('termine_updated'), 'success');
         }
     }
 
     if ($tun === 'loeschen') {
         db_execute('DELETE FROM termine WHERE termin_id = ?', [(int) ($_POST['id'] ?? 0)]);
-        flash('Termin gelöscht.', 'success');
+        flash(t('termine_deleted'), 'success');
     }
 
     // Nach dem Schreiben umleiten, sonst legt ein Neuladen alles noch einmal an.

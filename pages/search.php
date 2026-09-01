@@ -11,10 +11,10 @@ $cu = current_user();
 $savedAction = $_GET['saved'] ?? '';
 
 if ($savedAction === 'save' && $cu) {
-    if (!verify_csrf($_POST['csrf'] ?? $_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_POST['csrf'] ?? $_GET['csrf'] ?? '')) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
     $name = trim($_POST['save_name'] ?? '');
     if ($name === '') {
-        flash('Bitte einen Namen für die Suche angeben.', 'error');
+        flash(t('search_name_required'), 'error');
     } else {
         $params = [
             'q'           => trim($_POST['q'] ?? ''),
@@ -31,19 +31,19 @@ if ($savedAction === 'save' && $cu) {
                 'INSERT INTO saved_searches (user_id, name, params) VALUES (?, ?, ?)',
                 [$cu['user_id'], mb_substr($name, 0, 100), json_encode($params)]
             );
-            flash('Suche gespeichert!', 'success');
+            flash(t('search_saved'), 'success');
         } catch (Exception $e) {
-            flash('Fehler beim Speichern: ' . $e->getMessage(), 'error');
+            flash(t('search_save_failed', $e->getMessage()), 'error');
         }
     }
     redirect(FORUM_URL . '/search.php?' . http_build_query($_POST));
 }
 
 if ($savedAction === 'delete' && $cu) {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
     db_execute('DELETE FROM saved_searches WHERE search_id = ? AND user_id = ?',
         [get_int('id'), $cu['user_id']]);
-    flash('Gespeicherte Suche gelöscht.', 'success');
+    flash(t('search_deleted'), 'success');
     redirect(FORUM_URL . '/search.php');
 }
 

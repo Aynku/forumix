@@ -1,11 +1,10 @@
-<div class="section-heading">Beitrag bearbeiten</div>
+<div class="section-heading">{{ t('edit_post_beitrag_bearbeiten') }}</div>
 <div class="form-card">
     {% if error %}<div class="flash flash-error">{{ error }}</div>{% endif %}
 
     {% if isModEdit %}
       <div class="flash" style="background:rgba(220,38,38,.12);border:1px solid var(--color-danger);color:var(--color-danger);margin-bottom:16px">
-        Du bearbeitest den Beitrag eines anderen Benutzers.
-        Der Grund ist Pflicht und wird sichtbar unter dem Beitrag angezeigt.
+        {{ t('edit_post_du_bearbeitest_den_beitrag') }}
       </div>
     {% endif %}
 
@@ -16,7 +15,7 @@
       </div>
       {% if tagsEditable and availableTags %}
       <div class="form-row">
-        <label>Tags (max. 5)</label>
+        <label>{{ t('edit_post_tags_max_5') }}</label>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           {% for tg in availableTags %}
             <label class="tag-checkbox" style="border-color:{{ tg.color }}">
@@ -26,7 +25,7 @@
             </label>
           {% endfor %}
         </div>
-        <div class="form-hint">Gelten für das ganze Thema, nicht für diesen Beitrag.</div>
+        <div class="form-hint">{{ t('edit_post_gelten_fuer_das_ganze') }}</div>
       </div>
       {% endif %}
 
@@ -40,7 +39,7 @@
           {% endif %}
         </label>
         <input type="text" name="edit_reason" maxlength="500"
-               placeholder="{{ isModEdit ? 'z.B. Beleidigender Inhalt entfernt, Bildgröße reduziert' : 'z.B. Tippfehler korrigiert' }}"
+               placeholder="{{ isModEdit ? t('edit_post_reason_mod_placeholder') : t('edit_post_reason_placeholder') }}"
                {{ (isModEdit ? 'required minlength="3"' : '')|raw }}>
         <div class="form-hint">
           {% if isModEdit %}
@@ -51,9 +50,9 @@
         </div>
       </div>
       <div style="display:flex;gap:8px">
-        <button type="submit" class="btn btn-primary">Speichern</button>
+        <button type="submit" class="btn btn-primary">{{ t('edit_post_speichern') }}</button>
         <a href="{{ url('/thread.php?id=') }}{{ post.thread_id }}#post{{ post.post_id }}"
-           class="btn btn-ghost">Abbrechen</a>
+           class="btn btn-ghost">{{ t('edit_post_abbrechen') }}</a>
       </div>
     </form>
 </div>

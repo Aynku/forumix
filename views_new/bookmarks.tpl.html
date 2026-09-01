@@ -4,13 +4,13 @@
   {% if not bookmarks %}
     <div style="padding:40px;text-align:center;color:var(--text-faint)">
       <div style="font-size:48px;margin-bottom:8px">🔖</div>
-      <p>Noch keine Lesezeichen.</p>
-      <p style="font-size:12px;margin-top:8px">Klicke in einem Thread auf 🔖, um ihn hier zu speichern.</p>
+      <p>{{ t('bookmarks_noch_keine_lesezeichen') }}</p>
+      <p style="font-size:12px;margin-top:8px">{{ t('bookmarks_klicke_in_einem_thread') }}</p>
     </div>
   {% else %}
     <table class="forum-table">
       <thead>
-        <tr><th>Thread</th><th>Autor</th><th>Antworten</th><th>Gespeichert</th></tr>
+        <tr><th>{{ t('bookmarks_thread') }}</th><th>{{ t('bookmarks_autor') }}</th><th>{{ t('bookmarks_antworten') }}</th><th>{{ t('bookmarks_gespeichert') }}</th></tr>
       </thead>
       <tbody>
         {% for b in bookmarks %}

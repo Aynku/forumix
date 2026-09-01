@@ -6,13 +6,13 @@ require_login();
 
 $boardId = get_int('board');
 $board   = db_fetch('SELECT * FROM boards WHERE board_id = ?', [$boardId]);
-if (!$board) error_page(404, 'Forum nicht gefunden', 'Dieses Forum gibt es nicht.');
+if (!$board) error_page(404, t('error_board_missing_title'), t('error_board_missing_text'));
 
 // Passwort-Schutz: kein neuer Thread ohne Zugang
 if (!board_user_can_access($board)) {
     if (board_zugangsgrund($board) === 'gruppe') {
         http_response_code(404);
-        error_page(404, 'Forum nicht gefunden', 'Dieses Forum gibt es nicht.');
+        error_page(404, t('error_board_missing_title'), t('error_board_missing_text'));
     }
     redirect(FORUM_URL . '/board_unlock.php?id=' . $boardId);
 }
@@ -22,7 +22,7 @@ if (!board_user_can_access($board)) {
 // antworten, aber nicht jeder ein Thema aufmachen.
 if (!board_darf($boardId, 'thema')) {
     http_response_code(403);
-    error_page(403, 'Nur zum Lesen', 'In diesem Forum darfst du keine neuen Themen anlegen.');
+    error_page(403, t('error_readonly_title'), t('new_thread_no_right'));
 }
 
 $darfAnhang  = board_darf($boardId, 'anhang');
@@ -30,15 +30,15 @@ $darfUmfrage = board_darf($boardId, 'umfrage');
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
 
     $title   = post_str('title');
     $content = post_str('content');
 
     $cu = current_user();
 
-    if (mb_strlen($title) < 3) $error = 'Titel mindestens 3 Zeichen.';
-    elseif (mb_strlen($content) < 3) $error = 'Beitragstext zu kurz.';
+    if (mb_strlen($title) < 3) $error = t('new_thread_title_short');
+    elseif (mb_strlen($content) < 3) $error = t('new_thread_text_short');
 
     // Cooldown
     if (!$error) {
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
             if ($lastPost && (time() - strtotime($lastPost['created_at'])) < $cooldown) {
                 $diff = $cooldown - (time() - strtotime($lastPost['created_at']));
-                $error = 'Bitte warte noch ' . $diff . ' Sekunden.';
+                $error = tn('new_thread_cooldown', (int) $diff);
             }
         }
     }
@@ -93,16 +93,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $threadId = $neu['thread_id'];
 
         if ($isApproved) {
-            flash('Thema erfolgreich erstellt!', 'success');
+            flash(t('new_thread_created'), 'success');
             redirect(FORUM_URL . '/thread.php?id=' . $threadId);
         } else {
-            flash('⏳ Dein Thema wartet auf Freigabe durch einen Moderator. Du bekommst eine Benachrichtigung sobald es geprüft wurde.', 'info');
+            flash(t('new_thread_pending'), 'info');
             redirect(FORUM_URL . '/board.php?id=' . $boardId);
         }
     }
 }
 render('new_thread', [
-    'title'       => 'Neues Thema',
+    'title'       => t('new_thread'),
     'board'       => $board,
     'error'       => $error,
     'formTitle'   => post_str('title'),

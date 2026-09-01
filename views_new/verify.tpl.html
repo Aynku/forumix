@@ -2,18 +2,18 @@
   <div class="form-card">
     {% if ok %}
       <div style="font-size:48px;margin-bottom:10px">✅</div>
-      <h2 style="font-size:18px;margin-bottom:8px">E-Mail bestätigt!</h2>
+      <h2 style="font-size:18px;margin-bottom:8px">{{ t('verify_e_mail_bestaetigt') }}</h2>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">
-        Dein Konto ist jetzt aktiv. Du kannst dich anmelden.
+        {{ t('verify_dein_konto_ist_jetzt') }}
       </p>
-      <a href="{{ url('/login.php') }}" class="btn btn-primary">→ Zum Login</a>
+      <a href="{{ url('/login.php') }}" class="btn btn-primary">{{ t('verify_zum_login') }}</a>
     {% else %}
       <div style="font-size:48px;margin-bottom:10px">❌</div>
-      <h2 style="font-size:18px;margin-bottom:8px">Link ungültig oder abgelaufen</h2>
+      <h2 style="font-size:18px;margin-bottom:8px">{{ t('verify_link_ungueltig_oder_abgelaufen') }}</h2>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">
-        Der Bestätigungslink konnte nicht verifiziert werden. Er war vielleicht schon einmal verwendet oder ist abgelaufen.
+        {{ t('verify_der_bestaetigungslink_konnte_nicht') }}
       </p>
-      <a href="{{ url('/index.php') }}" class="btn btn-ghost">Zur Startseite</a>
+      <a href="{{ url('/index.php') }}" class="btn btn-ghost">{{ t('verify_zur_startseite') }}</a>
     {% endif %}
   </div>
 </div>

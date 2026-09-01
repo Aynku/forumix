@@ -14,17 +14,17 @@ $method = $_POST['method'] ?? $_GET['method'] ?? 'email';
 if (!in_array($method, ['email', '2fa', 'backup'], true)) $method = 'email';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
 
     // CAPTCHA-Schicht 2: Verhaltens-Token
     if (!behavior_verify(post_str('_bt'))) {
-        $error = 'Sicherheits-Prüfung fehlgeschlagen. Bitte versuche es erneut.';
+        $error = t('captcha_behavior_failed');
         captcha_failed_attempt('forgot');
     }
     // CAPTCHA-Schicht 3: Sichtbares CAPTCHA wenn erforderlich
     elseif (captcha_required('forgot')) {
         if (!captcha_verify(post_str('_captcha_token'), post_str('_captcha_answer'))) {
-            $error = 'Sicherheitsfrage falsch beantwortet.';
+            $error = t('captcha_wrong');
             captcha_failed_attempt('forgot');
         }
     }
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($method === 'email') {
             // ─── Methode 1: E-Mail-Link (wie bisher) ────────────
             if (!rate_limit_check('forgot', 3, 3600)) {
-                $error = 'Zu viele Versuche. Bitte warte eine Stunde.';
+                $error = t('forgot_too_many');
             } elseif (!empty($_POST['website'])) {
                 // Honeypot
                 $sent = true;
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         elseif ($method === '2fa') {
             // ─── Methode 2: 2FA-Token ──────────────────────────
             if (!rate_limit_check('forgot_2fa', 3, 3600)) {
-                $error = 'Zu viele Versuche. Bitte warte eine Stunde.';
+                $error = t('forgot_too_many');
             } else {
                 $username = post_str('username');
                 $code     = trim(post_str('code'));
@@ -88,13 +88,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // sich selbst nicht mehr anmelden kann.
                     passwort_ruecksetzung_melden((int) $user['user_id'], $method);
                     if ($token) {
-                        flash('Identität bestätigt. Lege jetzt ein neues Passwort fest.', 'success');
+                        flash(t('forgot_verified'), 'success');
                         redirect(FORUM_URL . '/reset.php?token=' . urlencode($token));
                     }
-                    $error = 'Token konnte nicht erstellt werden.';
+                    $error = t('forgot_token_failed');
                 } else {
                     // Generische Fehlermeldung — kein User-Enumeration
-                    $error = 'Benutzername oder Code nicht korrekt.';
+                    $error = t('forgot_code_wrong');
                     captcha_failed_attempt('forgot');
                 }
             }
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         elseif ($method === 'backup') {
             // ─── Methode 3: Backup-Code ────────────────────────
             if (!rate_limit_check('forgot_backup', 3, 3600)) {
-                $error = 'Zu viele Versuche. Bitte warte eine Stunde.';
+                $error = t('forgot_too_many');
             } else {
                 $username = post_str('username');
                 $code     = trim(post_str('code'));
@@ -125,12 +125,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // sich selbst nicht mehr anmelden kann.
                     passwort_ruecksetzung_melden((int) $user['user_id'], $method);
                     if ($token) {
-                        flash('Backup-Code akzeptiert. Lege jetzt ein neues Passwort fest. Hinweis: Der verwendete Backup-Code wurde verbraucht.', 'success');
+                        flash(t('forgot_backup_accepted'), 'success');
                         redirect(FORUM_URL . '/reset.php?token=' . urlencode($token));
                     }
-                    $error = 'Token konnte nicht erstellt werden.';
+                    $error = t('forgot_token_failed');
                 } else {
-                    $error = 'Benutzername oder Backup-Code nicht korrekt.';
+                    $error = t('forgot_backup_wrong');
                     captcha_failed_attempt('forgot');
                 }
             }
@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 render('forgot', [
-    'title'         => 'Passwort vergessen',
+    'title'         => t('forgot_title'),
     'error'         => $error,
     'sent'          => $sent,
     'method'        => $method,

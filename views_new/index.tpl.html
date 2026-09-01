@@ -11,7 +11,7 @@
         {% if not cat.boards %}
           <tr>
             <td colspan="4" style="text-align:center;color:var(--text-faint);padding:20px">
-              Noch keine Foren in dieser Kategorie.
+              {{ t('index_noch_keine_foren_in') }}
             </td>
           </tr>
         {% endif %}
@@ -28,7 +28,7 @@
           <td class="forum-main-cell">
             <a href="{{ url('/board.php?id=') }}{{ b.board_id }}" class="board-title-link">
               {% if b.password_hash %}
-                <span title="Passwort-geschützt" style="color:var(--color-accent);font-size:12px">🔒</span>
+                <span title="{{ t('board_protected') }}" style="color:var(--color-accent);font-size:12px">🔒</span>
               {% endif %}
               {{ b.title }}
             </a>
@@ -69,7 +69,7 @@
                 · {{ format_date(b.last_post_date) }}
               </span>
             {% else %}
-              <span style="color:var(--text-faint)">Noch kein Beitrag</span>
+              <span style="color:var(--text-faint)">{{ t('index_noch_kein_beitrag') }}</span>
             {% endif %}
           </td>
         </tr>
@@ -85,7 +85,7 @@
   <div class="card info-box">
     <div class="card-header">
       <span class="card-title">
-        <a href="{{ url('/online.php') }}" style="color:inherit">Wer ist online?</a>
+        <a href="{{ url('/online.php') }}" style="color:inherit">{{ t('index_wer_ist_online') }}</a>
       </span>
       <span style="font-size:11px;color:var(--text-muted)">
         <a href="{{ url('/online.php') }}" style="color:var(--text-muted)">{{ onlineStats.total }} insgesamt →</a>
@@ -98,7 +98,7 @@
         {{ onlineStats.bots }} Bots{% endif %}
       </div>
       {% if not onlineList %}
-        <p style="color:var(--text-faint);font-size:12px;font-style:italic">Niemand online.</p>
+        <p style="color:var(--text-faint);font-size:12px;font-style:italic">{{ t('index_niemand_online') }}</p>
       {% else %}
         <div class="online-users">
           {% for u in namedOnline %}
@@ -109,9 +109,9 @@
           {% endfor %}
         </div>
         <p style="font-size:11px;color:var(--text-faint);margin-top:10px;border-top:1px dashed var(--border);padding-top:8px">
-          <span style="color:#7c3aed;font-weight:600">Inhaber</span>,
-          <span style="color:#dc2626;font-weight:600">Administrator</span>,
-          <span style="color:#f59e0b;font-weight:600">Moderator</span>,
+          <span style="color:#7c3aed;font-weight:600">{{ t('index_inhaber') }}</span>,
+          <span style="color:#dc2626;font-weight:600">{{ t('index_administrator') }}</span>,
+          <span style="color:#f59e0b;font-weight:600">{{ t('index_moderator') }}</span>,
           Mitglied
         </p>
       {% endif %}
@@ -120,7 +120,7 @@
 
   <div class="card info-box">
     <div class="card-header">
-      <span class="card-title">Forum-Statistik</span>
+      <span class="card-title">{{ t('index_forum_statistik') }}</span>
     </div>
     <div style="padding:12px 16px;font-size:13px;line-height:1.9">
       <div>
@@ -135,7 +135,7 @@
       </div>
       {% if forumStats.newest %}
         <div>
-          Neuestes Mitglied:
+          {{ t('index_neuestes_mitglied') }}
           <a href="{{ url('/profile.php?id=') }}{{ forumStats.newest.user_id }}">
             <strong>{{ zeigename(forumStats.newest.username) }}</strong>
           </a>

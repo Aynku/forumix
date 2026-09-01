@@ -7,7 +7,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 if (!is_logged_in()) {
     http_response_code(401);
-    echo json_encode(['error' => 'Login erforderlich']);
+    echo json_encode(['error' => t('api_login_erforderlich')]);
     exit;
 }
 
@@ -22,7 +22,7 @@ $type   = $_POST['type'] ?? '';
 
 if ($postId <= 0 || !isset(reaction_types()[$type])) {
     http_response_code(400);
-    echo json_encode(['error' => 'Ungültige Parameter']);
+    echo json_encode(['error' => t('api_ungueltige_parameter')]);
     exit;
 }
 
@@ -44,17 +44,17 @@ $brett = db_fetch(
 );
 if (!$brett) {
     http_response_code(404);
-    echo json_encode(['error' => 'Beitrag nicht gefunden']);
+    echo json_encode(['error' => t('api_beitrag_nicht_gefunden')]);
     exit;
 }
 if (!board_user_can_access($brett)) {
     http_response_code(403);
-    echo json_encode(['error' => 'Kein Zugriff auf dieses Forum']);
+    echo json_encode(['error' => t('api_kein_zugriff_auf_dieses')]);
     exit;
 }
 if (!empty($brett['is_closed']) && !board_has_privileged_access((int) $brett['board_id'])) {
     http_response_code(403);
-    echo json_encode(['error' => 'Thema ist geschlossen']);
+    echo json_encode(['error' => t('api_thema_ist_geschlossen')]);
     exit;
 }
 
@@ -62,7 +62,7 @@ $result = toggle_reaction($postId, (int) $cu['user_id'], $type);
 
 if ($result === 'invalid') {
     http_response_code(400);
-    echo json_encode(['error' => 'Reaktion fehlgeschlagen']);
+    echo json_encode(['error' => t('api_reaktion_fehlgeschlagen')]);
     exit;
 }
 

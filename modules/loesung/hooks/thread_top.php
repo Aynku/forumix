@@ -20,12 +20,12 @@ try {
 <div class="card" style="margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
             border-left:3px solid var(--color-success)">
   <div style="flex:1;min-width:200px">
-    <strong style="color:var(--color-success)">Dieses Thema ist gelöst</strong>
+    <strong style="color:var(--color-success)"><?= t('loesung_thread_solved') ?></strong>
     <div style="font-size:13px;color:var(--text-muted);margin-top:2px">
       <?php if ($autor): ?>
-        Die Lösung kam von <?= e($autor['username']) ?>.
+        <?= e(t('loesung_by', $autor['username'])) ?>
       <?php else: ?>
-        Der markierte Beitrag steht weiter unten.
+        <?= t('loesung_see_below') ?>
       <?php endif; ?>
     </div>
   </div>

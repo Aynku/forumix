@@ -269,8 +269,8 @@ function imprint_data(): array {
     $isDefault = ($name === '' && $street === '' && $city === '' && $email === '');
 
     return [
-        'name'       => $name !== '' ? $name : '[Name des Forenbetreibers]',
-        'street'     => $street !== '' ? $street : '[Straße und Hausnummer]',
+        'name'       => $name !== '' ? $name : t('imprint_placeholder_name'),
+        'street'     => $street !== '' ? $street : t('imprint_placeholder_street'),
         'city'       => $city !== '' ? $city : '[PLZ und Ort]',
         'email'      => $email !== '' ? $email : 'admin@example.com',
         'is_default' => $isDefault,

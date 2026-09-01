@@ -1,11 +1,11 @@
 <div style="max-width:520px;margin:0 auto">
-  <div class="section-heading">Passwort vergessen</div>
+  <div class="section-heading">{{ t('forgot_passwort_vergessen') }}</div>
 
   <div class="form-card">
     {% if sent %}
-      <div class="flash flash-success">Falls die E-Mail-Adresse bei uns hinterlegt ist, wurde dir ein Link geschickt. Schau auch im Spam-Ordner nach.</div>
+      <div class="flash flash-success">{{ t('forgot_falls_die_e_mail') }}</div>
       <p style="margin-top:14px;text-align:center">
-        <a href="{{ url('/login.php') }}" class="btn btn-ghost btn-sm">← Zum Login</a>
+        <a href="{{ url('/login.php') }}" class="btn btn-ghost btn-sm">{{ t('forgot_zum_login') }}</a>
       </p>
     {% else %}
 
@@ -17,15 +17,15 @@
       <div class="recovery-tabs">
         <a href="{{ url('/forgot.php') }}?method=email"
            class="recovery-tab {% if method == 'email' %}active{% endif %}">
-          E-Mail
+          {{ t('forgot_e_mail') }}
         </a>
         <a href="{{ url('/forgot.php') }}?method=2fa"
            class="recovery-tab {% if method == '2fa' %}active{% endif %}">
-          2FA-Code
+          {{ t('forgot_2fa_code') }}
         </a>
         <a href="{{ url('/forgot.php') }}?method=backup"
            class="recovery-tab {% if method == 'backup' %}active{% endif %}">
-          Backup-Code
+          {{ t('forgot_backup_code') }}
         </a>
       </div>
 
@@ -39,24 +39,23 @@
           <input type="text" name="website" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off">
 
           <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-            Gib deine E-Mail-Adresse ein. Wir senden dir einen Link zum Zurücksetzen.
+            {{ t('forgot_gib_deine_e_mail') }}
           </p>
           <div class="form-row">
-            <label>E-Mail-Adresse</label>
+            <label>{{ t('forgot_e_mail_adresse') }}</label>
             <input type="email" name="email" required autofocus>
           </div>
 
         {% elseif method == '2fa' %}
           <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-            Wenn du 2FA aktiv hast: Gib deinen Benutzernamen und den aktuellen
-            6-stelligen Code aus deiner Authenticator-App ein.
+            {{ t('forgot_wenn_du_2fa_aktiv') }}
           </p>
           <div class="form-row">
-            <label>Benutzername</label>
+            <label>{{ t('forgot_benutzername') }}</label>
             <input type="text" name="username" required autofocus>
           </div>
           <div class="form-row">
-            <label>2FA-Code</label>
+            <label>{{ t('forgot_2fa_code') }}</label>
             <input type="text" name="code" required inputmode="numeric" maxlength="6"
                    pattern="[0-9]{6}"
                    style="font-family:var(--font-mono);font-size:18px;letter-spacing:3px;text-align:center"
@@ -65,27 +64,25 @@
 
         {% elseif method == 'backup' %}
           <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-            Wenn du beim 2FA-Setup Backup-Codes erhalten hast: Gib deinen Benutzernamen
-            und einen unverbrauchten Backup-Code ein. Der Code wird danach verbraucht
-            und kann nicht erneut verwendet werden.
+            {{ t('forgot_wenn_du_beim_2fa') }}
           </p>
           <div class="form-row">
-            <label>Benutzername</label>
+            <label>{{ t('forgot_benutzername') }}</label>
             <input type="text" name="username" required autofocus>
           </div>
           <div class="form-row">
-            <label>Backup-Code</label>
+            <label>{{ t('forgot_backup_code') }}</label>
             <input type="text" name="code" required
                    style="font-family:var(--font-mono);font-size:16px;letter-spacing:2px"
                    placeholder="XXXXXXXX">
-            <div class="form-hint">8 Zeichen, normalerweise hexadezimal (0-9, A-F).</div>
+            <div class="form-hint">{{ t('forgot_8_zeichen_normalerweise_hexadezimal') }}</div>
           </div>
         {% endif %}
 
         {% if showCaptcha %}
           <div class="form-row captcha-row">
             <label>
-              Sicherheitsfrage:
+              {{ t('forgot_sicherheitsfrage') }}
               <strong style="font-size:18px;font-family:var(--font-mono)">{{ captcha.question }} = ?</strong>
             </label>
             <input type="number" name="_captcha_answer" required autocomplete="off"
@@ -93,25 +90,25 @@
                    style="max-width:120px;text-align:center;font-size:18px">
             <input type="hidden" name="_captcha_token" value="{{ captcha.token }}">
             <div class="form-hint">
-              Diese Frage erscheint, weil zu viele fehlgeschlagene Versuche von deiner IP kamen.
+              {{ t('forgot_diese_frage_erscheint_weil') }}
             </div>
           </div>
         {% endif %}
 
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
           {% if method == 'email' %}
-            <button type="submit" class="btn btn-primary">Link senden</button>
+            <button type="submit" class="btn btn-primary">{{ t('forgot_link_senden') }}</button>
           {% elseif method == '2fa' %}
-            <button type="submit" class="btn btn-primary">Mit 2FA bestätigen</button>
+            <button type="submit" class="btn btn-primary">{{ t('forgot_mit_2fa_bestaetigen') }}</button>
           {% elseif method == 'backup' %}
-            <button type="submit" class="btn btn-primary">Mit Backup-Code bestätigen</button>
+            <button type="submit" class="btn btn-primary">{{ t('forgot_mit_backup_code_bestaetigen') }}</button>
           {% endif %}
-          <a href="{{ url('/login.php') }}" class="btn btn-ghost">← Zurück</a>
+          <a href="{{ url('/login.php') }}" class="btn btn-ghost">{{ t('forgot_zurueck') }}</a>
         </div>
       </form>
 
       <p style="text-align:center;margin-top:14px;font-size:12px;color:var(--text-faint)">
-        Du hast 2FA nicht eingerichtet? Nutze die E-Mail-Methode.
+        {{ t('forgot_du_hast_2fa_nicht') }}
       </p>
 
     {% endif %}

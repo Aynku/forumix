@@ -5,6 +5,6 @@
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">
       {{ message|default('Ein unbekannter Fehler ist aufgetreten.') }}
     </p>
-    <a href="{{ url('/') }}" class="btn btn-primary">← Zur Startseite</a>
+    <a href="{{ url('/') }}" class="btn btn-primary">{{ t('error_zur_startseite') }}</a>
   </div>
 </div>

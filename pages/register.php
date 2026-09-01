@@ -6,7 +6,7 @@ require_once __DIR__ . '/../bootstrap.php';
 if (is_logged_in()) redirect(FORUM_URL . '/index.php');
 
 if ((string) get_setting('registration_enabled', '1') !== '1') {
-    flash('Registrierungen sind aktuell deaktiviert.', 'error');
+    flash(t('register_disabled'), 'error');
     redirect(FORUM_URL . '/login.php');
 }
 
@@ -14,11 +14,11 @@ $error    = '';
 $formData = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
 
     // CAPTCHA-Schicht 2: Verhaltens-Token
     if (!behavior_verify(post_str('_bt'))) {
-        $error = 'Sicherheits-Prüfung fehlgeschlagen. Bitte versuche es erneut.';
+        $error = t('captcha_behavior_failed');
         captcha_failed_attempt('register');
     }
     // CAPTCHA-Schicht 3: Sichtbares CAPTCHA wenn erforderlich
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $captchaToken  = post_str('_captcha_token');
         $captchaAnswer = post_str('_captcha_answer');
         if (!captcha_verify($captchaToken, $captchaAnswer)) {
-            $error = 'Sicherheitsfrage falsch beantwortet.';
+            $error = t('captcha_wrong');
             captcha_failed_attempt('register');
         }
     }
@@ -37,10 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $maxReg = (int) get_setting('rate_limit_register', 3);
     if (!rate_limit_check('register', $maxReg, 3600)) {
-        $error = 'Zu viele Registrierungs-Versuche. Bitte später erneut versuchen.';
+        $error = t('register_too_many');
     } elseif (!empty($_POST['website'])) {
         // Honeypot ausgelöst - Bot
-        $error = 'Registrierung fehlgeschlagen.';
+        $error = t('register_failed');
         captcha_failed_attempt('register');
     } else {
         $un  = post_str('username');
@@ -53,22 +53,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $formData = ['username' => $un, 'email' => $em];
 
         if (mb_strlen($un) < $minUn) {
-            $error = 'Benutzername mindestens ' . $minUn . ' Zeichen.';
+            $error = tn('register_username_min', (int) $minUn);
         } elseif (mb_strlen($un) > 30) {
-            $error = 'Benutzername höchstens 30 Zeichen.';
+            $error = t('register_username_max');
         } elseif (!preg_match('/^[\p{L}\p{N} ._-]+$/u', $un)) {
             // Namen landen auch in HTML, das erst im Browser gebaut wird
-            $error = 'Benutzername darf nur Buchstaben, Ziffern, Leerzeichen, Punkt, Unterstrich und Bindestrich enthalten.';
+            $error = t('register_username_chars');
         } elseif (preg_match('/^gel(ö|oe)schter\s*benutzer/i', $un)) {
-            $error = 'Dieser Benutzername ist reserviert.';
+            $error = t('register_username_reserved');
         } elseif (!filter_var($em, FILTER_VALIDATE_EMAIL)) {
-            $error = 'Ungültige E-Mail-Adresse.';
+            $error = t('error_bad_email');
         } elseif (mb_strlen($pw) < $minPw) {
-            $error = 'Passwort mindestens ' . $minPw . ' Zeichen.';
+            $error = tn('register_password_min', (int) $minPw);
         } elseif ($pw !== $pw2) {
-            $error = 'Passwörter stimmen nicht überein.';
+            $error = t('error_passwords_differ');
         } elseif ((string) get_setting('registration_terms_required', '1') === '1' && empty($_POST['accept_terms'])) {
-            $error = 'Bitte stimme den Nutzungsbedingungen zu, um fortzufahren.';
+            $error = t('register_terms_required');
         } else {
             $approvalRequired = user_approval_required();
             $emailRequired    = (string) get_setting('email_verification_required', '0') === '1';
@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $uid = register_user($un, $em, $pw, $isApproved);
             if ($uid === false) {
-                $error = 'Benutzername oder E-Mail bereits vergeben.';
+                $error = t('register_taken');
             } else {
                 captcha_reset_attempts('register');
 
@@ -120,20 +120,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         send_verification_email($user, $token);
                     }
                     if ($skipApproval) {
-                        flash('Konto erstellt! Dein Einladungs-Code wurde akzeptiert. Bitte bestätige zuerst deine E-Mail-Adresse über den Link.', 'success');
+                        flash(t('register_done_invite_verify'), 'success');
                     } elseif ($approvalRequired) {
-                        flash('Konto erstellt! Bitte bestätige zuerst deine E-Mail-Adresse über den Link – danach wartet der Account noch auf Admin-Freigabe. Du wirst per E-Mail benachrichtigt sobald freigeschaltet.', 'info');
+                        flash(t('register_done_verify_approve'), 'info');
                     } else {
-                        flash('Konto erstellt! Bitte bestätige zuerst deine E-Mail-Adresse über den Link, den wir dir geschickt haben.', 'info');
+                        flash(t('register_done_verify'), 'info');
                     }
                     redirect(FORUM_URL . '/login.php');
                 } elseif ($approvalRequired && !$skipApproval) {
-                    flash('Konto erstellt! Dein Account wartet jetzt auf Admin-Freigabe. Du wirst per E-Mail benachrichtigt sobald freigeschaltet.', 'info');
+                    flash(t('register_done_approve'), 'info');
                     redirect(FORUM_URL . '/login.php');
                 } else {
                     login_user($un, $pw);
                     if ($skipApproval) {
-                        flash('Willkommen, ' . $un . '! Dein Einladungs-Code wurde akzeptiert. 🎉', 'success');
+                        flash(t('register_welcome_invite', $un), 'success');
                     } else {
                         flash('Willkommen, ' . $un . '!', 'success');
                     }
@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 render('register', [
-    'title'         => 'Registrieren',
+    'title'         => t('register'),
     'error'         => $error,
     'formData'      => $formData,
     'showCaptcha'   => captcha_required('register'),

@@ -59,7 +59,7 @@ function group_members(int $groupId): array {
  */
 function group_create(string $name, bool $abzeichen = false): int {
     $name = trim($name);
-    if ($name === '') throw new InvalidArgumentException('Die Gruppe braucht einen Namen.');
+    if ($name === '') throw new InvalidArgumentException(t('group_name_required'));
 
     $basis = strtolower($name);
     $basis = strtr($basis, ['ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue', 'ß' => 'ss']);
@@ -80,9 +80,9 @@ function group_create(string $name, bool $abzeichen = false): int {
 
 function group_rename(int $id, string $name, bool $abzeichen, bool $rangErsetzen = false): void {
     $name = trim($name);
-    if ($name === '') throw new InvalidArgumentException('Die Gruppe braucht einen Namen.');
+    if ($name === '') throw new InvalidArgumentException(t('group_name_required'));
     $g = group_by_id($id);
-    if (!$g) throw new RuntimeException('Diese Gruppe gibt es nicht.');
+    if (!$g) throw new RuntimeException(t('group_missing'));
 
     // Bei den eingebauten darf der Name geaendert werden (manche nennen ihre
     // Gaeste "Besucher"), der Kurzname aber nicht — daran haengt der Code.
@@ -104,7 +104,7 @@ function group_delete(int $id): void {
     $g = group_by_id($id);
     if (!$g) return;
     if (!empty($g['is_builtin'])) {
-        throw new RuntimeException('Gäste und Angemeldete lassen sich nicht löschen.');
+        throw new RuntimeException(t('group_builtin_undeletable'));
     }
     db_execute('DELETE FROM board_permissions WHERE group_id = ?', [$id]);
     db_execute('DELETE FROM group_members WHERE group_id = ?', [$id]);
@@ -113,11 +113,11 @@ function group_delete(int $id): void {
 
 function group_member_add(int $groupId, int $userId): void {
     $g = group_by_id($groupId);
-    if (!$g) throw new RuntimeException('Diese Gruppe gibt es nicht.');
+    if (!$g) throw new RuntimeException(t('group_missing'));
     if (!empty($g['is_builtin'])) {
         // Wer angemeldet ist, ist "Angemeldete" — das ergibt sich, statt
         // gepflegt zu werden. Eine Liste dafuer waere sofort veraltet.
-        throw new RuntimeException('In eingebaute Gruppen wird niemand eingetragen.');
+        throw new RuntimeException(t('group_builtin_no_members'));
     }
     db_execute('INSERT IGNORE INTO group_members (group_id, user_id) VALUES (?, ?)', [$groupId, $userId]);
 }

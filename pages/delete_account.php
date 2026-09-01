@@ -11,7 +11,7 @@ $cu = current_user();
 $canDelete = can_user_delete_self((int) $cu['user_id']);
 if (!$canDelete['ok']) {
     render('delete_account_blocked', [
-        'title'  => 'Account löschen nicht möglich',
+        'title'  => t('delete_account_impossible_title'),
         'reason' => $canDelete['reason'],
     ]);
     exit;
@@ -22,18 +22,18 @@ $step  = 'confirm';  // confirm | done
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf(post_str('csrf'))) {
-        $error = 'Sicherheits-Token ungültig. Bitte Seite neu laden und nochmal versuchen.';
+        $error = t('delete_account_csrf');
     } else {
         $password = post_str('password');
         $confirm  = post_str('confirm_text');
 
         // Sicherheits-Schritt 1: korrektes Passwort
         if (empty($password) || empty($cu['password']) || !password_verify($password, $cu['password'])) {
-            $error = 'Falsches Passwort.';
+            $error = t('error_wrong_password');
         }
         // Sicherheits-Schritt 2: Bestätigungs-Text muss exakt stimmen
-        elseif ($confirm !== 'LÖSCHEN') {
-            $error = 'Bitte gib das Wort „LÖSCHEN" exakt so ein (großgeschrieben).';
+        elseif ($confirm !== t('delete_account_confirm_word')) {
+            $error = t('delete_account_confirm_hint', t('delete_account_confirm_word'));
         }
         // Sicherheits-Schritt 3: nochmal can_user_delete_self prüfen (Race-Condition-Schutz)
         else {
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $result = delete_user_account((int) $cu['user_id']);
 
                 if (!$result['ok']) {
-                    $error = $result['error'] ?? 'Account konnte nicht gelöscht werden.';
+                    $error = $result['error'] ?? t('delete_account_failed');
                 } else {
                     // Komplett ausloggen
                     try { remember_destroy_all_for_user((int) $cu['user_id']); } catch (Exception $e) {}
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 render('delete_account', [
-    'title' => 'Account löschen',
+    'title' => t('delete_account_title'),
     'error' => $error,
     'step'  => $step,
 ]);

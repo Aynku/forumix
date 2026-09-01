@@ -38,7 +38,7 @@ function activate_email_verification(string $token): bool {
 
 function send_verification_email(array $user, string $token): bool {
     $link = FORUM_URL . '/verify.php?token=' . $token;
-    $body = email_template('E-Mail bestätigen', '
+    $body = email_template(t('sys_e_mail_bestaetigen'), '
         <p>Hallo ' . e($user['username']) . ',</p>
         <p>willkommen bei ' . e(FORUM_NAME) . '! Um dein Konto zu aktivieren, bestätige bitte deine E-Mail-Adresse:</p>
         <p style="margin:24px 0">
@@ -51,5 +51,5 @@ function send_verification_email(array $user, string $token): bool {
         <code style="font-size:11px;word-break:break-all">' . e($link) . '</code></p>
         <p style="font-size:12px;color:#666;margin-top:24px">Der Link ist 24 Stunden gültig.</p>
     ');
-    return send_email($user['email'], 'E-Mail bestätigen – ' . FORUM_NAME, $body);
+    return send_email($user['email'], t('sys_e_mail_bestaetigen_2') . FORUM_NAME, $body);
 }

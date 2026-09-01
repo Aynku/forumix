@@ -9,7 +9,7 @@ $cu = current_user();
 $theme = $_POST['theme'] ?? '';
 
 if (!in_array($theme, ['light', 'dark', 'auto'], true)) {
-    echo json_encode(['ok' => false, 'error' => 'Ungültiges Theme']);
+    echo json_encode(['ok' => false, 'error' => t('api_ungueltiges_theme')]);
     exit;
 }
 

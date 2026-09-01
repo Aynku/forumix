@@ -43,7 +43,7 @@ function modulquelle_erlaubt(): bool {
  */
 function modulquelle_liste(bool $frisch = false): array {
     if (!modulquelle_erlaubt()) {
-        return ['ok' => false, 'error' => 'Der Bezug vom Hersteller ist nicht eingeschaltet.'];
+        return ['ok' => false, 'error' => t('sys_der_bezug_vom_hersteller')];
     }
 
     $cache = rtrim(sys_get_temp_dir(), '/') . '/forumix-module-' . substr(sha1(FORUM_URL), 0, 12) . '.json';
@@ -60,7 +60,7 @@ function modulquelle_liste(bool $frisch = false): array {
 
     $daten = json_decode($antwort['inhalt'], true);
     if (!is_array($daten) || !isset($daten['module'])) {
-        return ['ok' => false, 'error' => 'Die Liste war nicht lesbar.'];
+        return ['ok' => false, 'error' => t('sys_die_liste_war_nicht')];
     }
 
     @file_put_contents($cache, $antwort['inhalt']);
@@ -76,10 +76,10 @@ function modulquelle_liste(bool $frisch = false): array {
  */
 function modulquelle_holen(string $url): array {
     if (!str_starts_with($url, 'https://')) {
-        return ['ok' => false, 'error' => 'Nur HTTPS.'];
+        return ['ok' => false, 'error' => t('sys_nur_https')];
     }
     if (!function_exists('curl_init')) {
-        return ['ok' => false, 'error' => 'Auf diesem Server fehlt die PHP-Erweiterung curl.'];
+        return ['ok' => false, 'error' => t('sys_auf_diesem_server_fehlt')];
     }
 
     $ch = curl_init($url);
@@ -99,10 +99,10 @@ function modulquelle_holen(string $url): array {
 
     if ($inhalt === false) {
         error_log('[modulquelle] ' . $fehler);
-        return ['ok' => false, 'error' => 'Der Hersteller war nicht erreichbar.'];
+        return ['ok' => false, 'error' => t('sys_der_hersteller_war_nicht')];
     }
     if ($code !== 200) {
-        return ['ok' => false, 'error' => 'Der Hersteller antwortete mit HTTP ' . $code . '.'];
+        return ['ok' => false, 'error' => t('sys_der_hersteller_antwortete_mit') . $code . '.'];
     }
     return ['ok' => true, 'inhalt' => (string) $inhalt];
 }
@@ -117,7 +117,7 @@ function modulquelle_paket_laden(array $eintrag): array {
     $datei = (string) ($eintrag['datei'] ?? '');
     // Der Dateiname kommt aus einer fremden Antwort und wandert in eine URL.
     if (!preg_match('/^forumix-modul-[a-z0-9_-]+-[0-9.]+\.zip$/i', $datei)) {
-        return ['ok' => false, 'error' => 'Unerwarteter Dateiname in der Liste.'];
+        return ['ok' => false, 'error' => t('sys_unerwarteter_dateiname_in_der')];
     }
 
     $antwort = modulquelle_holen(MODULQUELLE_BASIS . $datei);
@@ -126,13 +126,13 @@ function modulquelle_paket_laden(array $eintrag): array {
     $soll = strtolower((string) ($eintrag['sha256'] ?? ''));
     if ($soll !== '') {
         if (!hash_equals($soll, hash('sha256', $antwort['inhalt']))) {
-            return ['ok' => false, 'error' => 'Die Prüfsumme stimmt nicht — das Paket kam beschädigt an.'];
+            return ['ok' => false, 'error' => t('sys_die_pruefsumme_stimmt_nicht')];
         }
     }
 
     $ziel = rtrim(sys_get_temp_dir(), '/') . '/forumix-modul-' . bin2hex(random_bytes(8)) . '.zip';
     if (file_put_contents($ziel, $antwort['inhalt']) === false) {
-        return ['ok' => false, 'error' => 'Das Paket liess sich nicht zwischenspeichern.'];
+        return ['ok' => false, 'error' => t('sys_das_paket_liess_sich')];
     }
     return ['ok' => true, 'datei' => $ziel];
 }

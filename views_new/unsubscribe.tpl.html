@@ -1,7 +1,7 @@
 <div style="max-width:480px;margin:40px auto">
   <div class="form-card">
     {% if status == 'success' %}
-      <h2 style="margin-top:0">Abmeldung erfolgreich</h2>
+      <h2 style="margin-top:0">{{ t('unsubscribe_abmeldung_erfolgreich') }}</h2>
       <p style="line-height:1.6">
         Du wirst keine Benachrichtigungen mehr für
         {% if threadTitle %}
@@ -12,32 +12,30 @@
         erhalten.
       </p>
       <p style="font-size:13px;color:var(--text-muted);margin-top:14px;line-height:1.6">
-        Falls du auch generell keine E-Mail-Benachrichtigungen mehr möchtest, kannst du das
-        in deinen <a href="{{ url('/settings.php?tab=notifications') }}">Einstellungen</a> abschalten.
+        {{ t('unsubscribe_falls_du_auch_generell') }} <a href="{{ url('/settings.php?tab=notifications') }}">{{ t('unsubscribe_einstellungen') }}</a> abschalten.
       </p>
 
     {% elseif status == 'error' %}
-      <h2 style="margin-top:0;color:var(--color-danger)">Etwas ist schiefgegangen</h2>
+      <h2 style="margin-top:0;color:var(--color-danger)">{{ t('unsubscribe_etwas_ist_schiefgegangen') }}</h2>
       <p style="line-height:1.6">
-        Wir konnten dein Abo gerade nicht entfernen. Bitte versuche es später nochmal oder
-        melde dich in deinen <a href="{{ url('/settings.php?tab=notifications') }}">Einstellungen</a>
+        {{ t('unsubscribe_wir_konnten_dein_abo') }} <a href="{{ url('/settings.php?tab=notifications') }}">{{ t('unsubscribe_einstellungen') }}</a>
         manuell ab.
       </p>
 
     {% else %}
-      <h2 style="margin-top:0;color:var(--color-danger)">Ungültiger Link</h2>
+      <h2 style="margin-top:0;color:var(--color-danger)">{{ t('unsubscribe_ungueltiger_link') }}</h2>
       <p style="line-height:1.6">
-        Dieser Abmelde-Link ist nicht gültig oder bereits abgelaufen (Links sind 30 Tage gültig).
+        {{ t('unsubscribe_dieser_abmelde_link_ist') }}
       </p>
       <p style="font-size:13px;color:var(--text-muted);margin-top:14px;line-height:1.6">
-        Du kannst dich auch direkt in deinen
-        <a href="{{ url('/settings.php?tab=notifications') }}">Einstellungen</a>
+        {{ t('unsubscribe_du_kannst_dich_auch') }}
+        <a href="{{ url('/settings.php?tab=notifications') }}">{{ t('unsubscribe_einstellungen') }}</a>
         von E-Mail-Benachrichtigungen abmelden.
       </p>
     {% endif %}
 
     <p style="margin-top:20px;text-align:center">
-      <a href="{{ url('/') }}" class="btn btn-ghost">← Zur Startseite</a>
+      <a href="{{ url('/') }}" class="btn btn-ghost">{{ t('unsubscribe_zur_startseite') }}</a>
     </p>
   </div>
 </div>

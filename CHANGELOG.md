@@ -8,6 +8,65 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.10.0 (2026-09-02)
+
+### Forumix spricht Deutsch und Englisch
+
+Bisher stand der deutsche Text fest im Programmcode. Die beiden Sprachdateien
+gab es zwar, sie deckten aber 47 Begriffe ab — Menüpunkte im Wesentlichen.
+Alles andere war unveränderlich deutsch.
+
+Jetzt kommt jeder sichtbare Text aus dem Sprachpaket: das Forum, der
+Adminbereich, die Moderation, der Installer und die Meldungen, die das
+JavaScript im Browser zeigt. Rund 1900 Texte, beide Sprachen vollständig.
+
+- **Umschalten** unter *Einstellungen → Darstellung*. Die Wahl gilt für das
+  Konto, nicht für das ganze Forum — zwei Mitglieder desselben Forums können
+  es in verschiedenen Sprachen lesen. Das Feld war seit v0.18.35 abgeschaltet
+  und ist wieder da.
+- **Der Installer** nimmt die Sprache aus der Adresse: `install/?lang=en`.
+  Dort gibt es noch kein Konto, das befragt werden könnte.
+- **Ein- und Mehrzahl** werden getrennt geführt. „1 Thread als gelesen
+  markiert" und „5 Threads als gelesen markiert" sind zwei Angaben in der
+  Sprachdatei, keine angehängte Endung. Das ist der Grund, warum die Zahl in
+  einer Übersetzung an einer anderen Stelle im Satz stehen darf.
+
+**Für Modul-Entwickler:** Ein Modul bringt seine Texte selbst mit, in
+`modules/<code>/lang/de.php` und `en.php`:
+
+    return [
+        'faq_title' => 'FAQ – Häufige Fragen',
+    ];
+
+Geladen wird in dieser Reihenfolge: Module auf Deutsch, Module in der
+gewählten Sprache, zuletzt der Kern. Damit kann ein Modul keinen Kerntext
+überschreiben, und wer ein Modul entfernt, nimmt seine Texte mit. Fehlt eine
+Übersetzung, erscheint der deutsche Text — nie ein leeres Feld.
+
+### Was noch fehlt
+
+- **Für Gäste gibt es keinen Umschalter.** Die Sprache steht in den
+  Konto-Einstellungen; wer nicht angemeldet ist, sieht das Forum in Deutsch.
+- **E-Mails gehen weiterhin auf Deutsch raus**, auch an ein englisch
+  eingestelltes Konto. Eine Mail wird oft von jemand anderem ausgelöst als von
+  dem, der sie bekommt — dafür fehlt noch die Zuordnung zum Empfänger.
+- **Rangbezeichnungen** bleiben deutsch. Sie stehen als Text in der
+  Benutzertabelle und lassen sich nicht ohne eine Datenbank-Anpassung
+  umstellen.
+- **Was in der Datenbank steht, ist Inhalt und wird nicht übersetzt:** die
+  Namen der eingebauten Gruppen, die Titel der Datenbank-Anpassungen, der Text
+  einer automatischen Meldung. Ebenso die Anweisungen an das Sprachmodell im
+  KI-Modul und der Absatz für die Datenschutzerklärung — eine englische
+  Fassung davon muss juristisch tragen und gehört in die Hand des Betreibers.
+- **Die Kommandozeilen-Werkzeuge** (`install/cli.php`, der phpBB-Import über
+  die Konsole) bleiben deutsch.
+
+**Für Betreiber:** Es ist keine Datenbank-Anpassung nötig. Bestehende Foren
+laufen nach dem Update unverändert auf Deutsch weiter; die englische Fassung
+wählt jedes Mitglied für sich.
+
+---
+
 ## v1.9.3 (2026-08-22)
 
 ### Die Rückfrage vor dem Entfernen kam gar nicht

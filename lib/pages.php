@@ -92,14 +92,14 @@ function render_page_content(string $slug): string {
  */
 function page_placeholder_list(): array {
     $liste = [
-        '{{name}}'       => 'Name des Verantwortlichen (aus Settings)',
-        '{{street}}'     => 'Straße und Hausnummer',
+        '{{name}}'       => t('sys_name_des_verantwortlichen_aus'),
+        '{{street}}'     => t('sys_strasse_und_hausnummer'),
         '{{city}}'       => 'PLZ und Ort',
         '{{email}}'      => 'Kontakt-E-Mail',
-        '{{forum_name}}' => 'Name des Forums',
+        '{{forum_name}}' => t('sys_name_des_forums'),
         '{{forum_url}}'  => 'URL des Forums',
-        '{{date}}'       => 'Heutiges Datum (dd.mm.yyyy)',
-        '{{month_year}}' => 'Aktueller Monat und Jahr (mm.yyyy)',
+        '{{date}}'       => t('sys_heutiges_datum_dd_mm'),
+        '{{month_year}}' => t('sys_aktueller_monat_und_jahr'),
     ];
 
     // Was aktive Module mitbringen, gehoert in die Hilfe — sonst weiss

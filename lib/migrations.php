@@ -168,8 +168,8 @@ function execute_migration(string $version): array {
         if ($m['version'] === $version) { $found = $m; break; }
     }
 
-    if (!$found) return ['success' => false, 'output' => 'Migration nicht gefunden.'];
-    if (!is_file($found['file'])) return ['success' => false, 'output' => 'Datei nicht lesbar.'];
+    if (!$found) return ['success' => false, 'output' => t('sys_migration_nicht_gefunden')];
+    if (!is_file($found['file'])) return ['success' => false, 'output' => t('sys_datei_nicht_lesbar')];
 
     // Output capturen
     ob_start();
@@ -191,7 +191,7 @@ function execute_migration(string $version): array {
             $cleanOutput .= $text . "\n";
         }
     } else {
-        $cleanOutput = $error ?: 'Migration ausgeführt.';
+        $cleanOutput = $error ?: t('sys_migration_ausgefuehrt');
     }
 
     // In Tracking-Tabelle eintragen

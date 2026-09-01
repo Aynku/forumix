@@ -2,42 +2,41 @@
 
 <div class="form-card" style="max-width:560px;margin:40px auto;text-align:center;padding:40px 32px">
   <div style="font-size:48px;margin-bottom:16px">👋</div>
-  <h2 style="margin-bottom:12px">Account gelöscht</h2>
+  <h2 style="margin-bottom:12px">{{ t('delete_account_account_geloescht') }}</h2>
   <p style="color:var(--text-muted);font-size:14px;line-height:1.6">
-    Dein Account wurde unwiederbringlich gelöscht. Deine Beiträge sind erhalten geblieben,
-    werden aber nur noch unter „Gelöschter Benutzer" angezeigt.
+    {{ t('delete_account_dein_account_wurde_unwiederbringlich') }}
   </p>
   <p style="color:var(--text-muted);font-size:13px;margin-top:14px">
-    Schade, dass du gehst. Auf Wiedersehen.
+    {{ t('delete_account_schade_dass_du_gehst') }}
   </p>
   <p style="margin-top:24px">
-    <a href="{{ url('/index.php') }}" class="btn btn-primary">Zur Startseite</a>
+    <a href="{{ url('/index.php') }}" class="btn btn-primary">{{ t('delete_account_zur_startseite') }}</a>
   </p>
 </div>
 
 {% else %}
 
-<div class="section-heading">Account löschen</div>
+<div class="section-heading">{{ t('delete_account_account_loeschen') }}</div>
 
 <div class="form-card" style="max-width:640px;margin:0 auto">
 
   <div style="background:#dc262615;border-left:3px solid #dc2626;padding:14px 18px;border-radius:var(--radius-sm);margin-bottom:20px">
-    <strong style="color:#dc2626;font-size:14px">Achtung: Diese Aktion ist endgültig.</strong>
+    <strong style="color:#dc2626;font-size:14px">{{ t('delete_account_achtung_diese_aktion_ist') }}</strong>
     <p style="font-size:13px;color:var(--text-muted);margin-top:8px;line-height:1.6">
-      Mit der Löschung deines Accounts wird folgendes passieren:
+      {{ t('delete_account_mit_der_loeschung_deines') }}
     </p>
     <ul style="font-size:13px;color:var(--text-muted);margin-top:6px;padding-left:22px;line-height:1.7">
-      <li>Dein <strong>Benutzername</strong> wird durch „Gelöschter Benutzer" ersetzt</li>
-      <li>Deine <strong>E-Mail-Adresse</strong>, dein <strong>Avatar</strong>, deine <strong>Signatur</strong>,
-          deine <strong>Bio</strong> und alle <strong>persönlichen Profil-Daten</strong> werden gelöscht</li>
-      <li>Deine <strong>Beiträge und Themen bleiben</strong> bestehen (sonst würden Diskussionen zerfallen),
+      <li>{{ t('delete_account_dein') }} <strong>{{ t('delete_account_benutzername') }}</strong> wird durch „Gelöschter Benutzer" ersetzt</li>
+      <li>{{ t('delete_account_deine') }} <strong>{{ t('delete_account_e_mail_adresse') }}</strong>, dein <strong>{{ t('delete_account_avatar') }}</strong>, deine <strong>{{ t('delete_account_signatur') }}</strong>,
+          deine <strong>{{ t('delete_account_bio') }}</strong> und alle <strong>persönlichen Profil-Daten</strong> werden gelöscht</li>
+      <li>{{ t('delete_account_deine') }} <strong>{{ t('delete_account_beitraege_und_themen_bleiben') }}</strong> bestehen (sonst würden Diskussionen zerfallen),
           erscheinen aber unter „Gelöschter Benutzer"</li>
-      <li>Deine <strong>privaten Nachrichten</strong> sind beim Empfänger noch lesbar, aber ohne deinen Namen</li>
-      <li>Deine <strong>Lesezeichen, Abos, Benachrichtigungen, Achievements</strong> werden gelöscht</li>
-      <li><strong>Login wird unmöglich</strong> – du kannst dich nie wieder anmelden</li>
+      <li>{{ t('delete_account_deine') }} <strong>privaten Nachrichten</strong> sind beim Empfänger noch lesbar, aber ohne deinen Namen</li>
+      <li>{{ t('delete_account_deine') }} <strong>{{ t('delete_account_lesezeichen_abos_benachrichtigungen_achievements') }}</strong> werden gelöscht</li>
+      <li><strong>{{ t('delete_account_login_wird_unmoeglich') }}</strong> – du kannst dich nie wieder anmelden</li>
     </ul>
     <p style="font-size:13px;color:var(--text-muted);margin-top:10px;line-height:1.6">
-      <strong>Es gibt keine Wiederherstellung.</strong> Auch nicht durch einen Administrator.
+      <strong>{{ t('delete_account_es_gibt_keine_wiederherstellung') }}</strong> {{ t('delete_account_auch_nicht_durch_einen') }}
     </p>
   </div>
 
@@ -51,27 +50,27 @@
     <input type="hidden" name="csrf" value="{{ csrfToken }}">
 
     <div class="form-row">
-      <label>Dein Passwort <span style="color:#dc2626">*</span></label>
+      <label>{{ t('delete_account_dein_passwort') }} <span style="color:#dc2626">*</span></label>
       <input type="password" name="password" required autocomplete="current-password"
              placeholder="Dein aktuelles Passwort">
       <div class="form-hint">
-        Zur Sicherheit: bestätige deine Identität mit deinem Passwort.
+        {{ t('delete_account_zur_sicherheit_bestaetige_deine') }}
       </div>
     </div>
 
     <div class="form-row">
-      <label>Bestätigung <span style="color:#dc2626">*</span></label>
+      <label>{{ t('delete_account_bestaetigung') }} <span style="color:#dc2626">*</span></label>
       <input type="text" name="confirm_text" required autocomplete="off"
-             placeholder="Tippe das Wort LÖSCHEN ein">
+             placeholder="{{ t('delete_account_input_placeholder', t('delete_account_confirm_word')) }}">
       <div class="form-hint">
-        Gib das Wort <strong>LÖSCHEN</strong> ein (groß geschrieben), um zu bestätigen dass
+        {{ t('delete_account_gib_das_wort') }} <strong>{{ t('delete_account_loeschen') }}</strong> ein (groß geschrieben), um zu bestätigen dass
         du das wirklich willst.
       </div>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:24px">
-      <button type="submit" class="btn btn-danger">Meinen Account endgültig löschen</button>
-      <a href="{{ url('/profile.php?id=') }}{{ currentUser.user_id }}" class="btn btn-ghost">Abbrechen</a>
+      <button type="submit" class="btn btn-danger">{{ t('delete_account_meinen_account_endgueltig_loeschen') }}</button>
+      <a href="{{ url('/profile.php?id=') }}{{ currentUser.user_id }}" class="btn btn-ghost">{{ t('delete_account_abbrechen') }}</a>
     </div>
   </form>
 

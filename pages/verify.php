@@ -7,6 +7,6 @@ $token = trim($_GET['token'] ?? '');
 $ok    = $token ? activate_email_verification($token) : false;
 
 render('verify', [
-    'title' => $ok ? 'E-Mail bestätigt' : 'Bestätigung fehlgeschlagen',
+    'title' => $ok ? t('verify_ok_title') : t('verify_failed_title'),
     'ok'    => $ok,
 ]);

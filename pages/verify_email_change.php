@@ -10,14 +10,14 @@ require_once __DIR__ . '/../bootstrap.php';
 require_once __DIR__ . '/../lib/email_change.php';
 
 $token = trim($_GET['token'] ?? '');
-$result = ['ok' => false, 'error' => 'Kein Token angegeben.'];
+$result = ['ok' => false, 'error' => t('verify_no_token')];
 
 if ($token !== '') {
     $result = email_change_verify($token);
 }
 
 render('verify_email_change', [
-    'title'     => 'E-Mail-Änderung',
+    'title'     => t('verify_email_change_title'),
     'result'    => $result,
     'breadcrumb' => [],
 ]);

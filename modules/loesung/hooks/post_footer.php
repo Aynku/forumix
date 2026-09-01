@@ -22,7 +22,7 @@ if (!$istLoesung && (!$darf || $istFrage)) return;
               background:color-mix(in srgb, var(--color-success) 14%, transparent);
               border-top:2px solid var(--color-success);
               color:var(--color-success);font-size:14px;font-weight:600">
-    <span>Dieser Beitrag hat das Problem gelöst</span>
+    <span><?= t('loesung_solved_post') ?></span>
     <?php if ($darf): ?>
       <form method="post" action="<?= e(FORUM_URL) ?>/modules/loesung/markieren.php"
             style="margin-left:auto">
@@ -30,7 +30,7 @@ if (!$istLoesung && (!$darf || $istFrage)) return;
         <input type="hidden" name="tun" value="aufheben">
         <input type="hidden" name="thread_id" value="<?= (int) $thread['thread_id'] ?>">
         <input type="hidden" name="post_id" value="<?= (int) $post['post_id'] ?>">
-        <button class="btn btn-ghost btn-sm">Markierung aufheben</button>
+        <button class="btn btn-ghost btn-sm"><?= t('loesung_unmark') ?></button>
       </form>
     <?php endif; ?>
   </div>
@@ -40,7 +40,7 @@ if (!$istLoesung && (!$darf || $istFrage)) return;
       <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
       <input type="hidden" name="thread_id" value="<?= (int) $thread['thread_id'] ?>">
       <input type="hidden" name="post_id" value="<?= (int) $post['post_id'] ?>">
-      <button class="btn btn-ghost btn-sm">Als Lösung markieren</button>
+      <button class="btn btn-ghost btn-sm"><?= t('loesung_mark') ?></button>
     </form>
   </div>
 <?php endif; ?>

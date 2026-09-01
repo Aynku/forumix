@@ -6,15 +6,14 @@
 
   {% if imp.is_default and is_admin(current_user()) %}
     <div class="flash flash-warning" style="margin-bottom:20px">
-      <strong>Hinweis für Administratoren:</strong> Die Impressums-Daten sind noch nicht ausgefüllt.
-      Bitte unter <a href="{{ url('/admin/?action=legal') }}">Admin → Rechtliches</a> die Daten eintragen.
+      <strong>{{ t('imprint_hinweis_fuer_administratoren') }}</strong> {{ t('imprint_die_impressums_daten_sind') }} <a href="{{ url('/admin/?action=legal') }}">{{ t('imprint_admin_rechtliches') }}</a> die Daten eintragen.
     </div>
   {% endif %}
 
   {% if page %}
     {{ render_page_content('imprint')|raw }}
   {% else %}
-    <p>Der Impressums-Inhalt wurde noch nicht eingerichtet.</p>
+    <p>{{ t('imprint_der_impressums_inhalt_wurde') }}</p>
   {% endif %}
 
 </div>

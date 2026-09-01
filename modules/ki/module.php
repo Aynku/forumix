@@ -4,13 +4,8 @@ if (!defined('FORUM_RUNNING')) return [];
 
 return [
     'code'        => 'ki',
-    'name'        => 'KI-Funktionen',
-    'description' => 'Zwei Dinge: Knöpfe im Editor für Rechtschreibung, Kürzen, '
-                   . 'Zusammenfassen und Übersetzen — jedes Ergebnis erscheint erst in einer '
-                   . 'Vorschau, übernommen wird nur, was der Verfasser übernimmt. Und eine '
-                   . 'Vorsortierung neuer Beiträge auf Werbung und Beleidigungen, die meldet '
-                   . 'statt zu löschen. Beides einzeln abschaltbar, der API-Schlüssel kommt '
-                   . 'vom Betreiber.',
+    'name'        => 'ki_modul_name',
+    'description' => 'ki_modul_beschreibung',
     'icon'        => '✨',
     'version'     => '1.1',
     // Kein 'menu': die Einstellungen stehen im Adminbereich, nicht in der

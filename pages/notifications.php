@@ -10,7 +10,7 @@ $cu = current_user();
 if (isset($_GET['delete'])) {
     if (verify_csrf($_GET['csrf'] ?? '')) {
         delete_notification((int) $cu['user_id'], (int) $_GET['delete']);
-        flash('Benachrichtigung gelöscht.', 'success');
+        flash(t('notification_deleted'), 'success');
     }
     redirect(FORUM_URL . '/notifications.php');
 }
@@ -19,7 +19,7 @@ if (isset($_GET['delete'])) {
 if (isset($_GET['delete_read'])) {
     if (verify_csrf($_GET['csrf'] ?? '')) {
         $n = delete_all_notifications((int) $cu['user_id'], true);
-        flash($n . ' gelesene Benachrichtigung' . ($n !== 1 ? 'en' : '') . ' gelöscht.', 'success');
+        flash(tn('notifications_read_deleted', (int) $n), 'success');
     }
     redirect(FORUM_URL . '/notifications.php');
 }
@@ -28,7 +28,7 @@ if (isset($_GET['delete_read'])) {
 if (isset($_GET['delete_all'])) {
     if (verify_csrf($_GET['csrf'] ?? '')) {
         $n = delete_all_notifications((int) $cu['user_id'], false);
-        flash($n . ' Benachrichtigung' . ($n !== 1 ? 'en' : '') . ' gelöscht.', 'success');
+        flash(tn('notifications_deleted', (int) $n), 'success');
     }
     redirect(FORUM_URL . '/notifications.php');
 }

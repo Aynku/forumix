@@ -148,7 +148,7 @@ function is_owner(): bool     { $u = current_user(); return $u && (bool) ($u['is
  */
 function user_role_style(array $u): array {
     if (!empty($u['is_deleted'])) {
-        return ['color' => 'var(--text-faint)', 'title' => 'Gelöschter Benutzer', 'weight' => 400];
+        return ['color' => 'var(--text-faint)', 'title' => t('deleted_user'), 'weight' => 400];
     }
     if (!empty($u['is_banned'])) {
         return ['color' => '#dc2626', 'title' => 'Gesperrt', 'weight' => 500];
@@ -191,10 +191,10 @@ function require_login(): void {
     }
 }
 function require_admin(): void {
-    if (!is_admin()) error_page(403, 'Zugriff verweigert', 'Dieser Bereich ist Administratoren vorbehalten.');
+    if (!is_admin()) error_page(403, t('error_access_denied'), t('error_admins_only'));
 }
 function require_mod(): void {
-    if (!is_mod()) error_page(403, 'Zugriff verweigert', 'Dieser Bereich ist dem Moderationsteam vorbehalten.');
+    if (!is_mod()) error_page(403, t('error_access_denied'), t('error_mods_only'));
 }
 
 function csrf_token(): string {

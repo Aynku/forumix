@@ -4,7 +4,7 @@ if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
 require_once __DIR__ . '/../bootstrap.php';
 require_login();
 
-if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
 
 $action   = $_GET['action'] ?? '';
 $threadId = get_int('thread');
@@ -29,7 +29,7 @@ function ensure_board_permission(?int $threadId = null, ?int $postId = null): vo
     }
     if (!$boardId || !is_mod_for_board((int) $cu['user_id'], $boardId)) {
         http_response_code(403);
-        error_page(403, 'Keine Berechtigung', 'Du bist in diesem Forum kein Moderator.');
+        error_page(403, t('error_denied_title_short'), t('mod_not_moderator'));
     }
 }
 
@@ -42,11 +42,11 @@ function ensure_user_permission(int $targetId): void {
     $target = $targetId > 0 ? db_fetch('SELECT * FROM users WHERE user_id = ?', [$targetId]) : null;
     if (!$target) {
         http_response_code(404);
-        error_page(404, 'Benutzer nicht gefunden', 'Dieses Konto gibt es nicht.');
+        error_page(404, t('error_user_missing_title'), t('error_user_missing_text'));
     }
     if (!can_modify_user($cu, $target)) {
         http_response_code(403);
-        error_page(403, 'Nicht erlaubt', 'Dieser Benutzer darf nicht geändert werden.');
+        error_page(403, t('error_forbidden_title'), t('mod_user_protected'));
     }
 }
 
@@ -61,28 +61,28 @@ switch ($action) {
         ensure_board_permission($threadId);
         db_execute('UPDATE threads SET is_sticky = 1 WHERE thread_id = ?', [$threadId]);
         mod_log_entry('sticky', 'thread', $threadId);
-        flash('Thread angepinnt.', 'success');
+        flash(t('mod_thread_pinned'), 'success');
         redirect(FORUM_URL . '/thread.php?id=' . $threadId);
 
     case 'unsticky':
         ensure_board_permission($threadId);
         db_execute('UPDATE threads SET is_sticky = 0 WHERE thread_id = ?', [$threadId]);
         mod_log_entry('unsticky', 'thread', $threadId);
-        flash('Thread losgelöst.', 'success');
+        flash(t('mod_thread_unpinned'), 'success');
         redirect(FORUM_URL . '/thread.php?id=' . $threadId);
 
     case 'close':
         ensure_board_permission($threadId);
         db_execute('UPDATE threads SET is_closed = 1 WHERE thread_id = ?', [$threadId]);
         mod_log_entry('close', 'thread', $threadId);
-        flash('Thread geschlossen.', 'success');
+        flash(t('mod_thread_closed'), 'success');
         redirect(FORUM_URL . '/thread.php?id=' . $threadId);
 
     case 'open':
         ensure_board_permission($threadId);
         db_execute('UPDATE threads SET is_closed = 0 WHERE thread_id = ?', [$threadId]);
         mod_log_entry('open', 'thread', $threadId);
-        flash('Thread geöffnet.', 'success');
+        flash(t('mod_thread_opened'), 'success');
         redirect(FORUM_URL . '/thread.php?id=' . $threadId);
 
     case 'move':
@@ -91,24 +91,24 @@ switch ($action) {
         $t      = db_fetch('SELECT board_id FROM threads WHERE thread_id = ?', [$threadId]);
         $ziel   = $zielId > 0 ? db_fetch('SELECT board_id FROM boards WHERE board_id = ?', [$zielId]) : null;
         if (!$t || !$ziel) {
-            error_page(404, 'Forum nicht gefunden', 'Dieses Zielforum gibt es nicht.');
+            error_page(404, t('error_board_missing_title'), t('mod_target_board_missing'));
         }
         // Auch im Ziel muss moderiert werden duerfen. Sonst waere das
         // Verschieben ein Weg, ein Thema in ein fremdes Forum zu heben, in dem
         // man selbst nichts zu sagen hat.
         if (!is_mod_for_board((int) $cu['user_id'], $zielId)) {
             http_response_code(403);
-            error_page(403, 'Keine Berechtigung', 'Im Zielforum bist du kein Moderator.');
+            error_page(403, t('error_denied_title_short'), t('mod_not_moderator_target'));
         }
         if ((int) $t['board_id'] === $zielId) {
-            flash('Das Thema liegt bereits in diesem Forum.', 'info');
+            flash(t('mod_thread_already_here'), 'info');
             redirect(FORUM_URL . '/thread.php?id=' . $threadId);
         }
         db_execute('UPDATE threads SET board_id = ? WHERE thread_id = ?', [$zielId, $threadId]);
         board_zaehler_neu((int) $t['board_id']);
         board_zaehler_neu($zielId);
         mod_log_entry('move', 'thread', $threadId, 'nach Forum ' . $zielId);
-        flash('Thema verschoben.', 'success');
+        flash(t('mod_thread_moved'), 'success');
         redirect(FORUM_URL . '/thread.php?id=' . $threadId);
 
     /* Loeschen legt in den Papierkorb, es entfernt nichts.
@@ -128,9 +128,9 @@ switch ($action) {
         if ($t) {
             if (thema_in_papierkorb($threadId, (int) $cu['user_id'])) {
                 mod_log_entry('delete_thread', 'thread', $threadId, 'in den Papierkorb');
-                flash('Thema liegt im Papierkorb. Wiederherstellen geht dort.', 'success');
+                flash(t('mod_thread_trashed'), 'success');
             } else {
-                flash('Das Thema liegt bereits im Papierkorb.', 'info');
+                flash(t('mod_thread_already_trashed'), 'info');
             }
             redirect(FORUM_URL . '/board.php?id=' . $t['board_id']);
         }
@@ -140,9 +140,9 @@ switch ($action) {
         ensure_board_permission($threadId);
         if (thema_zurueckholen($threadId)) {
             mod_log_entry('restore_thread', 'thread', $threadId);
-            flash('Thema wiederhergestellt.', 'success');
+            flash(t('mod_thread_restored'), 'success');
         } else {
-            flash('Dieses Thema liegt nicht im Papierkorb.', 'error');
+            flash(t('mod_thread_not_trashed'), 'error');
         }
         redirect(FORUM_URL . '/thread.php?id=' . $threadId);
 
@@ -151,12 +151,12 @@ switch ($action) {
         $t = db_fetch('SELECT board_id, deleted_at FROM threads WHERE thread_id = ?', [$threadId]);
         if (!$t) break;
         if (empty($t['deleted_at'])) {
-            flash('Erst in den Papierkorb, dann endgültig löschen.', 'error');
+            flash(t('mod_trash_first'), 'error');
             redirect(FORUM_URL . '/thread.php?id=' . $threadId);
         }
         thema_endgueltig_loeschen($threadId);
         mod_log_entry('purge_thread', 'thread', $threadId, 'endgültig');
-        flash('Thema endgültig gelöscht.', 'success');
+        flash(t('mod_thread_purged'), 'success');
         redirect(FORUM_URL . '/board.php?id=' . $t['board_id']);
 
     case 'delete_post':
@@ -168,14 +168,14 @@ switch ($action) {
             // des Themas.
             $erster = db_count('SELECT COALESCE(MIN(post_id), 0) FROM posts WHERE thread_id = ?', [$p['thread_id']]);
             if ($erster === $postId) {
-                flash('Das ist der erste Beitrag — dafür das ganze Thema löschen.', 'error');
+                flash(t('mod_first_post_whole_thread'), 'error');
                 redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);
             }
             if (beitrag_in_papierkorb($postId, (int) $cu['user_id'])) {
                 mod_log_entry('delete_post', 'post', $postId, 'in den Papierkorb');
-                flash('Beitrag liegt im Papierkorb.', 'success');
+                flash(t('mod_post_trashed'), 'success');
             } else {
-                flash('Der Beitrag liegt bereits im Papierkorb.', 'info');
+                flash(t('mod_post_already_trashed'), 'info');
             }
             redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);
         }
@@ -186,9 +186,9 @@ switch ($action) {
         $p = db_fetch('SELECT thread_id FROM posts WHERE post_id = ?', [$postId]);
         if ($p && beitrag_zurueckholen($postId)) {
             mod_log_entry('restore_post', 'post', $postId);
-            flash('Beitrag wiederhergestellt.', 'success');
+            flash(t('mod_post_restored'), 'success');
         } else {
-            flash('Dieser Beitrag liegt nicht im Papierkorb.', 'error');
+            flash(t('mod_post_not_trashed'), 'error');
         }
         redirect(FORUM_URL . '/thread.php?id=' . ($p['thread_id'] ?? 0));
 
@@ -197,12 +197,12 @@ switch ($action) {
         $p = db_fetch('SELECT thread_id, deleted_at FROM posts WHERE post_id = ?', [$postId]);
         if (!$p) break;
         if (empty($p['deleted_at'])) {
-            flash('Erst in den Papierkorb, dann endgültig löschen.', 'error');
+            flash(t('mod_trash_first'), 'error');
             redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);
         }
         beitrag_endgueltig_loeschen($postId);
         mod_log_entry('purge_post', 'post', $postId, 'endgültig');
-        flash('Beitrag endgültig gelöscht.', 'success');
+        flash(t('mod_post_purged'), 'success');
         redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);
 
     /* Teilen: ab dem angegebenen Beitrag wandert alles Folgende in ein neues
@@ -219,23 +219,23 @@ switch ($action) {
 
         $erster = db_count('SELECT COALESCE(MIN(post_id), 0) FROM posts WHERE thread_id = ?', [$p['thread_id']]);
         if ($erster === $postId) {
-            flash('Am ersten Beitrag lässt sich nichts abtrennen — das wäre das ganze Thema.', 'error');
+            flash(t('mod_split_first_post'), 'error');
             redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);
         }
 
-        $titel = post_str('title') !== '' ? post_str('title') : 'Abgetrennt aus: ' . $p['title'];
+        $titel = post_str('title') !== '' ? post_str('title') : t('mod_split_title', $p['title']);
         if (mb_strlen($titel) < 3) {
-            flash('Der Titel des neuen Themas ist zu kurz.', 'error');
+            flash(t('mod_split_title_short'), 'error');
             redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);
         }
 
         $neuesThema = thema_teilen($postId, $titel);
         if (!$neuesThema) {
-            flash('Hier ließ sich nichts abtrennen.', 'error');
+            flash(t('mod_split_nothing'), 'error');
             redirect(FORUM_URL . '/thread.php?id=' . $p['thread_id']);
         }
         mod_log_entry('split', 'thread', (int) $p['thread_id'], 'ab Beitrag ' . $postId . ' → Thema ' . $neuesThema);
-        flash('Thema geteilt.', 'success');
+        flash(t('mod_thread_split'), 'success');
         redirect(FORUM_URL . '/thread.php?id=' . $neuesThema);
 
     /* Zusammenfuehren: alles aus diesem Thema wandert in ein anderes, das
@@ -247,20 +247,20 @@ switch ($action) {
         $quelle = db_fetch('SELECT thread_id, board_id FROM threads WHERE thread_id = ?', [$threadId]);
         $ziel   = $zielThema > 0 ? db_fetch('SELECT thread_id, board_id FROM threads WHERE thread_id = ?', [$zielThema]) : null;
         if (!$quelle || !$ziel) {
-            error_page(404, 'Thema nicht gefunden', 'Dieses Zielthema gibt es nicht.');
+            error_page(404, t('error_thread_missing_title'), t('mod_target_thread_missing'));
         }
         if ((int) $quelle['thread_id'] === (int) $ziel['thread_id']) {
-            flash('Ein Thema lässt sich nicht mit sich selbst zusammenführen.', 'error');
+            flash(t('mod_merge_self'), 'error');
             redirect(FORUM_URL . '/thread.php?id=' . $threadId);
         }
         if (!is_mod_for_board((int) $cu['user_id'], (int) $ziel['board_id'])) {
             http_response_code(403);
-            error_page(403, 'Keine Berechtigung', 'Im Forum des Zielthemas bist du kein Moderator.');
+            error_page(403, t('error_denied_title_short'), t('mod_not_moderator_target_thread'));
         }
 
         themen_zusammenfuehren($threadId, (int) $ziel['thread_id']);
         mod_log_entry('merge', 'thread', $threadId, 'in Thema ' . $ziel['thread_id']);
-        flash('Themen zusammengeführt.', 'success');
+        flash(t('mod_threads_merged'), 'success');
         redirect(FORUM_URL . '/thread.php?id=' . $ziel['thread_id']);
 
     case 'ban':
@@ -268,7 +268,7 @@ switch ($action) {
         ensure_user_permission($userId2);
         db_execute('UPDATE users SET is_banned = 1 WHERE user_id = ?', [$userId2]);
         mod_log_entry('ban', 'user', $userId2);
-        flash('Benutzer gesperrt.', 'success');
+        flash(t('mod_user_banned'), 'success');
         redirect(FORUM_URL . '/profile.php?id=' . $userId2);
 
     case 'unban':
@@ -276,23 +276,23 @@ switch ($action) {
         ensure_user_permission($userId2);
         db_execute('UPDATE users SET is_banned = 0 WHERE user_id = ?', [$userId2]);
         mod_log_entry('unban', 'user', $userId2);
-        flash('Benutzer entsperrt.', 'success');
+        flash(t('mod_user_unbanned'), 'success');
         redirect(FORUM_URL . '/profile.php?id=' . $userId2);
 
     case 'make_mod':
         require_admin();
         ensure_user_permission($userId2);
         db_execute('UPDATE users SET is_mod = 1 WHERE user_id = ?', [$userId2]);
-        flash('Moderator ernannt.', 'success');
+        flash(t('mod_user_promoted'), 'success');
         redirect(FORUM_URL . '/admin/');
 
     case 'remove_mod':
         require_admin();
         ensure_user_permission($userId2);
         db_execute('UPDATE users SET is_mod = 0 WHERE user_id = ?', [$userId2]);
-        flash('Moderationsrechte entzogen.', 'success');
+        flash(t('mod_user_demoted'), 'success');
         redirect(FORUM_URL . '/admin/');
 
     default:
-        error_page(400, 'Unbekannte Aktion', 'Diese Moderations-Aktion gibt es nicht.');
+        error_page(400, t('mod_unknown_action_title'), t('mod_unknown_action_text'));
 }

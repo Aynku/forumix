@@ -8,13 +8,13 @@
       <a href="?delete_read=1&csrf={{ csrfToken }}"
          class="btn btn-ghost btn-sm"
          onclick="return confirm('Alle bereits gelesenen Benachrichtigungen wirklich löschen?')">
-        Gelesene löschen
+        {{ t('notifications_gelesene_loeschen') }}
       </a>
       <a href="?delete_all=1&csrf={{ csrfToken }}"
          class="btn btn-ghost btn-sm action-danger"
          style="color:var(--color-danger);border-color:rgba(220,38,38,.3)"
          onclick="return confirm('WIRKLICH alle Benachrichtigungen löschen? Auch ungelesene!')">
-        Alle löschen
+        {{ t('notifications_alle_loeschen') }}
       </a>
     </span>
   {% endif %}
@@ -43,7 +43,7 @@
       </a>
       <a href="?delete={{ n.notif_id }}&csrf={{ csrfToken }}"
          class="notif-delete"
-         title="Löschen"
+         title="{{ t('delete') }}"
          onclick="return confirm('Diese Benachrichtigung löschen?')">
         ✕
       </a>

@@ -13,7 +13,7 @@ $thread = db_fetch('
     WHERE t.thread_id = ?
 ', [$threadId]);
 
-if (!$thread) error_page(404, 'Thread nicht gefunden', 'Dieses Thema gibt es nicht oder es wurde entfernt.');
+if (!$thread) error_page(404, t('error_thread_missing_title'), t('error_thread_missing_text'));
 
 // Noch nicht freigegeben? Dann sehen es nur der Verfasser und die Moderation.
 // Ueber die ID war es bisher fuer jeden aufrufbar — die Freigabe-Warteschlange
@@ -23,7 +23,7 @@ if (isset($thread['is_approved']) && (int) $thread['is_approved'] === 0) {
     $darf = $cu && ((int) $cu['user_id'] === (int) $thread['user_id']
                     || board_has_privileged_access((int) $thread['board_id']));
     if (!$darf) {
-        error_page(404, 'Thread nicht gefunden', 'Dieses Thema gibt es nicht oder es wurde entfernt.');
+        error_page(404, t('error_thread_missing_title'), t('error_thread_missing_text'));
     }
 }
 
@@ -33,7 +33,7 @@ if ($threadBoard && !board_user_can_access($threadBoard)) {
     // Wie im Forum selbst: fehlende Gruppe sieht aus wie "gibt es nicht".
     if (board_zugangsgrund($threadBoard) === 'gruppe') {
         http_response_code(404);
-        error_page(404, 'Thread nicht gefunden', 'Dieses Thema gibt es nicht oder es wurde entfernt.');
+        error_page(404, t('error_thread_missing_title'), t('error_thread_missing_text'));
     }
     redirect(FORUM_URL . '/board_unlock.php?id=' . $thread['board_id']);
 }
@@ -48,15 +48,15 @@ if (current_user()) {
 // ─── Vote-Handler ────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['poll_vote'])) {
     require_login();
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
     $pollId = (int) post_int('poll_id');
     $opts   = $_POST['option'] ?? [];
     if (!is_array($opts)) $opts = [$opts];
     $cu = current_user();
     if (cast_vote($pollId, $opts, (int) $cu['user_id'], $threadId)) {
-        flash('Stimme abgegeben!', 'success');
+        flash(t('thread_vote_done'), 'success');
     } else {
-        flash('Abstimmung fehlgeschlagen.', 'error');
+        flash(t('thread_vote_failed'), 'error');
     }
     redirect(FORUM_URL . '/thread.php?id=' . $threadId);
 }
@@ -64,10 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['poll_vote'])) {
 // ─── Antwort speichern ───────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
     require_login();
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
 
     if ($thread['is_closed'] && !is_mod()) {
-        flash('Dieser Thread ist geschlossen.', 'error');
+        flash(t('thread_closed'), 'error');
         redirect(FORUM_URL . '/thread.php?id=' . $threadId);
     }
 
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
     // Moderation, die es ja noch sieht. Sonst haengt nach dem Zurueckholen
     // eine Antwort daran, die es waehrend der Loeschung nicht geben konnte.
     if (!empty($thread['deleted_at'])) {
-        flash('Dieses Thema liegt im Papierkorb.', 'error');
+        flash(t('thread_in_trash'), 'error');
         redirect(FORUM_URL . '/thread.php?id=' . $threadId);
     }
 
@@ -83,12 +83,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
     // angezeigt, aber wer die Anfrage von Hand schickt, kommt hier an.
     if (!board_darf((int) $thread['board_id'], 'antwort')) {
         http_response_code(403);
-        error_page(403, 'Nur zum Lesen', 'In diesem Forum darfst du nicht antworten.');
+        error_page(403, t('error_readonly_title'), t('thread_no_reply_right'));
     }
 
     $content = post_str('content');
     if (mb_strlen($content) < 3) {
-        flash('Beitrag zu kurz.', 'error');
+        flash(t('error_post_too_short'), 'error');
     } else {
         $cu = current_user();
 
@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
             if ($lastPost) {
                 $diff = time() - strtotime($lastPost['created_at']);
                 if ($diff < $cooldown) {
-                    flash('Bitte warte noch ' . ($cooldown - $diff) . ' Sekunden vor dem nächsten Beitrag.', 'error');
+                    flash(tn('thread_cooldown', (int) ($cooldown - $diff)), 'error');
                     redirect(FORUM_URL . '/thread.php?id=' . $threadId);
                 }
             }
@@ -172,10 +172,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['content'])) {
         }
 
         if ($isApproved) {
-            flash('Beitrag erfolgreich erstellt.', 'success');
+            flash(t('thread_post_created'), 'success');
             redirect(FORUM_URL . '/thread.php?id=' . $threadId . '&page=last#post' . $postId);
         } else {
-            flash('⏳ Dein Beitrag wartet auf Freigabe durch einen Moderator.', 'info');
+            flash(t('thread_post_pending'), 'info');
             redirect(FORUM_URL . '/thread.php?id=' . $threadId);
         }
     }
@@ -205,7 +205,7 @@ $approvalFilter .= $canSeeAll ? '' : sichtbar_sql('p');
 // Und das Thema selbst: liegt es im Papierkorb, ist es fuer alle uebrigen
 // dasselbe wie ein Thema, das es nicht gibt.
 if (!empty($thread['deleted_at']) && !$canSeeAll) {
-    error_page(404, 'Thread nicht gefunden', 'Dieses Thema gibt es nicht oder es wurde entfernt.');
+    error_page(404, t('error_thread_missing_title'), t('error_thread_missing_text'));
 }
 
 $page  = get_int('page', 1);

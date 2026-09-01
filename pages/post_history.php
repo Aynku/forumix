@@ -12,16 +12,16 @@ $post = db_fetch('
     JOIN users u ON u.user_id = p.user_id
     WHERE p.post_id = ?
 ', [$postId]);
-if (!$post) error_page(404, 'Beitrag nicht gefunden', 'Dieser Beitrag gibt es nicht oder er wurde entfernt.');
+if (!$post) error_page(404, t('error_post_missing_title'), t('error_post_missing_text'));
 
 $cu = current_user();
 $canView = is_mod() || $cu['user_id'] == $post['user_id'];
-if (!$canView) error_page(403, 'Keine Berechtigung', 'Den Bearbeitungsverlauf sehen nur Moderatoren und der Autor selbst.');
+if (!$canView) error_page(403, t('error_denied_title_short'), t('post_history_denied'));
 
 $history = post_edit_history($postId);
 
 render('post_history', [
-    'title'   => 'Edit-Verlauf',
+    'title'   => t('post_history'),
     'post'    => $post,
     'history' => $history,
 ]);

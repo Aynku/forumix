@@ -36,7 +36,7 @@
                 <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                 <input type="hidden" name="tun" value="loeschen">
                 <input type="hidden" name="id" value="<?= (int) $t['termin_id'] ?>">
-                <button class="btn btn-ghost btn-sm">Löschen</button>
+                <button class="btn btn-ghost btn-sm"><?= t('termine_loeschen') ?></button>
               </form>
             </div>
           <?php endif; ?>
@@ -62,39 +62,39 @@
       <input type="hidden" name="id" value="<?= (int) $bearbeiten['termin_id'] ?>">
     <?php endif; ?>
 
-    <h3 style="margin-top:0"><?= $bearbeiten ? 'Termin ändern' : 'Neuer Termin' ?></h3>
+    <h3 style="margin-top:0"><?= $bearbeiten ? t('termine_edit') : t('termine_new') ?></h3>
 
     <div class="form-row">
-      <label>Titel</label>
+      <label><?= t('termine_titel') ?></label>
       <input type="text" name="titel" maxlength="140" required
              value="<?= e($bearbeiten['titel'] ?? '') ?>">
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div class="form-row">
-        <label>Beginn</label>
+        <label><?= t('termine_beginn') ?></label>
         <input type="datetime-local" name="beginn" required
                value="<?= e($fuersFeld($bearbeiten['beginn'] ?? null)) ?>">
       </div>
       <div class="form-row">
-        <label>Ende <span style="color:var(--text-faint)">(optional)</span></label>
+        <label><?= t('termine_ende') ?> <span style="color:var(--text-faint)">(optional)</span></label>
         <input type="datetime-local" name="ende"
                value="<?= e($fuersFeld($bearbeiten['ende'] ?? null)) ?>">
       </div>
     </div>
 
     <div class="form-row">
-      <label>Ort <span style="color:var(--text-faint)">(optional)</span></label>
+      <label><?= t('termine_ort') ?> <span style="color:var(--text-faint)">(optional)</span></label>
       <input type="text" name="ort" maxlength="140"
              value="<?= e($bearbeiten['ort'] ?? '') ?>">
     </div>
 
     <div class="form-row">
-      <label>Beschreibung <span style="color:var(--text-faint)">(optional)</span></label>
+      <label><?= t('termine_beschreibung') ?> <span style="color:var(--text-faint)">(optional)</span></label>
       <textarea name="beschreibung" maxlength="2000" style="min-height:90px"><?= e($bearbeiten['beschreibung'] ?? '') ?></textarea>
     </div>
 
-    <button class="btn btn-primary"><?= $bearbeiten ? 'Änderung speichern' : 'Termin anlegen' ?></button>
+    <button class="btn btn-primary"><?= $bearbeiten ? t('termine_save_change') : t('termine_create') ?></button>
     <?php if ($bearbeiten): ?>
       <a class="btn btn-ghost" href="<?= e($selbst) ?>">Abbrechen</a>
     <?php endif; ?>
@@ -104,19 +104,19 @@
 <?php if (empty($kommende) && empty($vergangene)): ?>
   <div class="card" style="padding:40px;text-align:center">
     <div style="font-size:48px;margin-bottom:12px">📅</div>
-    <strong>Noch keine Termine eingetragen</strong>
+    <strong><?= t('termine_noch_keine_termine_eingetragen') ?></strong>
     <?php if (!$canAdmin): ?>
-      <div style="color:var(--text-muted);margin-top:6px">Schau später noch einmal vorbei.</div>
+      <div style="color:var(--text-muted);margin-top:6px"><?= t('termine_schau_spaeter_noch_einmal') ?></div>
     <?php endif; ?>
   </div>
 <?php endif; ?>
 
 <?php if ($kommende): ?>
-  <h3 style="margin:18px 0 10px">Kommend</h3>
+  <h3 style="margin:18px 0 10px"><?= t('termine_kommend') ?></h3>
   <?php foreach ($kommende as $t) $zeile($t); ?>
 <?php endif; ?>
 
 <?php if ($vergangene): ?>
-  <h3 style="margin:24px 0 10px;color:var(--text-muted)">Vorbei</h3>
+  <h3 style="margin:24px 0 10px;color:var(--text-muted)"><?= t('termine_vorbei') ?></h3>
   <?php foreach ($vergangene as $t) $zeile($t); ?>
 <?php endif; ?>

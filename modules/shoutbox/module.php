@@ -4,8 +4,8 @@ if (!defined('FORUM_RUNNING')) return [];
 
 return [
     'code'        => 'shoutbox',
-    'name'        => 'Shoutbox',
-    'description' => 'Mini-Chat-Box auf der Startseite mit Live-Updates. Eingeloggte User können kurze Nachrichten posten.',
+    'name'        => 'shoutbox_modul_name',
+    'description' => 'shoutbox_modul_beschreibung',
     'icon'        => '💬',
     'version'     => '1.0',
     'author'      => 'Forumix',

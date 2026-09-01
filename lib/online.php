@@ -248,30 +248,30 @@ function location_label(): string {
         }
         return 'Forum';  // Crawler/anonyme Zugriffs-Versuche neutral labeln
     }
-    if (str_contains($uri, '/install/')) return 'Installation';
+    if (str_contains($uri, '/install/')) return t('page_install');
 
     $map = [
-        'index.php'         => 'Startseite',
-        'board.php'         => 'Forum-Übersicht',
-        'thread.php'        => 'Thread',
-        'profile.php'       => 'Profil',
-        'settings.php'      => 'Einstellungen',
-        'pm.php'            => 'Private Nachrichten',
-        'notifications.php' => 'Benachrichtigungen',
-        'search.php'        => 'Suche',
-        'login.php'         => 'Anmeldung',
-        'register.php'      => 'Registrierung',
-        'new_thread.php'    => 'Neues Thema',
-        'edit_post.php'     => 'Beitrag bearbeiten',
-        'imprint.php'       => 'Impressum',
-        'privacy.php'       => 'Datenschutz',
-        'terms.php'         => 'Nutzungsbedingungen',
-        'bookmarks.php'     => 'Lesezeichen',
-        'achievements.php'  => 'Achievements',
-        'online.php'        => 'Online-Liste',
-        'members.php'       => 'Mitglieder',
+        'index.php'         => 'home',
+        'board.php'         => 'page_board',
+        'thread.php'        => 'page_thread',
+        'profile.php'       => 'profile',
+        'settings.php'      => 'settings',
+        'pm.php'            => 'page_pm',
+        'notifications.php' => 'notifications',
+        'search.php'        => 'search',
+        'login.php'         => 'login',
+        'register.php'      => 'register',
+        'new_thread.php'    => 'new_thread',
+        'edit_post.php'     => 'edit_post_title',
+        'imprint.php'       => 'imprint',
+        'privacy.php'       => 'privacy',
+        'terms.php'         => 'terms',
+        'bookmarks.php'     => 'bookmarks',
+        'achievements.php'  => 'achievements',
+        'online.php'        => 'page_online',
+        'members.php'       => 'members',
     ];
-    return $map[$script] ?? 'Forum';
+    return t($map[$script] ?? 'forum');
 }
 
 function online_users(): array {
@@ -331,7 +331,7 @@ function online_dot($userOrId): string {
 
     $isOnline = is_user_online($userId);
     $color    = $isOnline ? '#22c55e' : '#6b6b6b';
-    $title    = $isOnline ? 'Online' : 'Offline';
+    $title    = $isOnline ? t('status_online') : t('status_offline');
     return '<span class="online-dot" style="background:' . $color . '" title="' . $title . '"></span>';
 }
 

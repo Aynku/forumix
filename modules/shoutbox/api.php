@@ -8,7 +8,7 @@ require_once __DIR__ . '/../../bootstrap.php';
 if (!module_enabled('shoutbox')) {
     http_response_code(404);
     header('Content-Type: application/json; charset=utf-8');
-    die(json_encode(['ok' => false, 'error' => 'Modul nicht aktiv']));
+    die(json_encode(['ok' => false, 'error' => t('shoutbox_disabled')]));
 }
 
 header('Content-Type: application/json; charset=utf-8');
@@ -51,7 +51,7 @@ if ($action === 'list') {
 // Ab hier Login nötig
 if (!$cu) {
     http_response_code(401);
-    echo json_encode(['ok' => false, 'error' => 'Nicht eingeloggt']);
+    echo json_encode(['ok' => false, 'error' => t('error_not_signed_in')]);
     exit;
 }
 
@@ -64,7 +64,7 @@ if ($action === 'post') {
     }
     $msg = trim($_POST['message'] ?? '');
     if (mb_strlen($msg) < 1) {
-        echo json_encode(['ok' => false, 'error' => 'Bitte etwas eingeben']);
+        echo json_encode(['ok' => false, 'error' => t('shoutbox_empty_input')]);
         exit;
     }
     if (mb_strlen($msg) > 500) {
@@ -106,13 +106,13 @@ if ($action === 'delete') {
     try {
         $row = db_fetch('SELECT user_id FROM shoutbox_messages WHERE shout_id = ?', [$id]);
         if (!$row) {
-            echo json_encode(['ok' => false, 'error' => 'Nicht gefunden']);
+            echo json_encode(['ok' => false, 'error' => t('error_not_found_title')]);
             exit;
         }
         $isOwn = (int) $row['user_id'] === (int) $cu['user_id'];
         $canMod = $cu['is_admin'] || $cu['is_mod'] || !empty($cu['is_owner']);
         if (!$isOwn && !$canMod) {
-            echo json_encode(['ok' => false, 'error' => 'Keine Berechtigung']);
+            echo json_encode(['ok' => false, 'error' => t('error_denied_title_short')]);
             exit;
         }
         db_execute('DELETE FROM shoutbox_messages WHERE shout_id = ?', [$id]);
@@ -124,4 +124,4 @@ if ($action === 'delete') {
     exit;
 }
 
-echo json_encode(['ok' => false, 'error' => 'Unbekannte Aktion']);
+echo json_encode(['ok' => false, 'error' => t('mod_unknown_action_title')]);

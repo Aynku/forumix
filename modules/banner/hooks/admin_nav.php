@@ -9,4 +9,4 @@
 if (!defined('FORUM_RUNNING')) return;
 if (!(is_admin() || is_owner())) return;
 ?>
-<a href="<?= FORUM_URL ?>/modules/banner/banner.php" class="admin-nav-item">📣 Band</a>
+<a href="<?= FORUM_URL ?>/modules/banner/banner.php" class="admin-nav-item">📣 <?= t('banner_nav') ?></a>

@@ -6,7 +6,7 @@ require_once __DIR__ . '/../bootstrap.php';
 
 $cu = current_user();
 if (!$cu) {
-    flash('Du musst eingeloggt sein um die Einstellungen zu öffnen.', 'error');
+    flash(t('settings_login_required'), 'error');
     redirect(FORUM_URL . '/login.php');
 }
 
@@ -14,7 +14,7 @@ $userId  = (int) $cu['user_id'];
 $profile = db_fetch('SELECT * FROM users WHERE user_id = ?', [$userId]);
 if (!$profile) {
     http_response_code(404);
-    error_page(404, 'Benutzer nicht gefunden', 'Dieses Konto gibt es nicht.');
+    error_page(404, t('error_user_missing_title'), t('error_user_missing_text'));
 }
 
 $error = '';
@@ -27,7 +27,7 @@ if (!in_array($activeTab, $validTabs, true)) $activeTab = 'profile';
 // ─── Session-Verwaltung ─────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST'
     && in_array(post_str('session_action'), ['revoke_one', 'revoke_others'], true)) {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
 
     if (post_str('session_action') === 'revoke_one') {
         $tokId = (int) post_str('token_id');
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
             $ownTokenIds = array_column($tokens, 'token_id');
             if (in_array($tokId, array_map('intval', $ownTokenIds), true)) {
                 remember_destroy_one($tokId);
-                flash('Sitzung wurde abgemeldet.', 'success');
+                flash(t('settings_session_ended'), 'success');
             }
         }
     } elseif (post_str('session_action') === 'revoke_others') {
@@ -48,14 +48,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
                 remember_destroy_one((int) $t['token_id']);
             }
         }
-        flash('Alle anderen Geräte wurden abgemeldet.', 'success');
+        flash(t('settings_other_devices_ended'), 'success');
     }
     redirect(FORUM_URL . '/settings.php?tab=sessions');
 }
 
 // ─── 2FA aktivieren ─────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'enable_2fa') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
     $secret = post_str('secret');
     $code   = post_str('code');
 
@@ -73,24 +73,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'enable_2fa'
         );
         // Backup-Codes über Session weiterreichen damit sie nach Redirect noch sichtbar sind
         $_SESSION['_2fa_new_backup_codes'] = $codes;
-        flash('2FA aktiviert! Speichere deine Backup-Codes sicher ab — sie werden nur einmal angezeigt.', 'success');
+        flash(t('settings_2fa_enabled'), 'success');
         redirect(FORUM_URL . '/settings.php?tab=security');
     } else {
-        $error = 'Falscher Code. Bitte erneut versuchen.';
+        $error = t('settings_2fa_wrong_code');
         $activeTab = 'security';
     }
 }
 
 // ─── 2FA deaktivieren ───────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'disable_2fa') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
     $pw = post_str('password_confirm');
     if (password_verify($pw, $profile['password'])) {
         db_execute('DELETE FROM user_2fa WHERE user_id = ?', [$userId]);
-        flash('2FA wurde deaktiviert.', 'success');
+        flash(t('settings_2fa_disabled'), 'success');
         redirect(FORUM_URL . '/settings.php?tab=security');
     } else {
-        $error = 'Passwort falsch. 2FA bleibt aktiv.';
+        $error = t('settings_2fa_wrong_password');
         $activeTab = 'security';
     }
 }
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'disable_2fa
 // ─── Profil/Account-Bearbeitung ─────────────────────────
 // ─── Passwort ändern (v0.18.48) ─────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'change_password') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
     $activeTab = 'security';
 
     $currentPw = post_str('current_password');
@@ -108,13 +108,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'change_pass
     // Aktuelles Passwort prüfen
     $userRow = db_fetch('SELECT password FROM users WHERE user_id = ?', [$userId]);
     if (!$userRow || !password_verify($currentPw, (string) $userRow['password'])) {
-        $error = 'Das aktuelle Passwort ist nicht korrekt.';
+        $error = t('settings_current_password_wrong');
     } elseif (mb_strlen($newPw) < 6) {
-        $error = 'Das neue Passwort muss mindestens 6 Zeichen lang sein.';
+        $error = t('settings_password_too_short');
     } elseif ($newPw !== $newPw2) {
-        $error = 'Die beiden neuen Passwörter stimmen nicht überein.';
+        $error = t('settings_passwords_differ');
     } elseif ($newPw === $currentPw) {
-        $error = 'Das neue Passwort darf nicht identisch mit dem alten sein.';
+        $error = t('settings_password_same');
     } else {
         // Alles gut → neues Passwort setzen
         $newHash = password_hash($newPw, PASSWORD_BCRYPT, ['cost' => HASH_COST]);
@@ -132,17 +132,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'change_pass
                 }
             } catch (Exception $e) {}
 
-            flash('Passwort erfolgreich geändert. Andere Geräte wurden abgemeldet.', 'success');
+            flash(t('settings_password_changed'), 'success');
             redirect(FORUM_URL . '/settings.php?tab=security');
         } catch (Exception $e) {
-            $error = 'Fehler beim Speichern des neuen Passworts.';
+            $error = t('settings_password_save_failed');
         }
     }
 }
 
 // ─── E-Mail-Änderung anfordern (v0.18.48) ─────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'request_email_change') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
     require_once __DIR__ . '/../lib/email_change.php';
     $activeTab = 'security';
 
@@ -152,30 +152,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'request_ema
     // Aktuelles Passwort als Sicherheits-Bestätigung prüfen
     $userRow = db_fetch('SELECT password FROM users WHERE user_id = ?', [$userId]);
     if (!$userRow || !password_verify($currentPw, (string) $userRow['password'])) {
-        $error = 'Das aktuelle Passwort ist nicht korrekt.';
+        $error = t('settings_current_password_wrong');
     } else {
         $result = email_change_initiate($userId, $newEmail);
         if (!empty($result['ok'])) {
-            flash('Bestätigungs-Mail an die neue Adresse gesendet. Bitte den Link in der Mail klicken — er ist 24 Stunden gültig.', 'success');
+            flash(t('settings_email_confirm_sent'), 'success');
             redirect(FORUM_URL . '/settings.php?tab=security');
         } else {
-            $error = $result['error'] ?? 'Unbekannter Fehler.';
+            $error = $result['error'] ?? t('error_unknown');
         }
     }
 }
 
 // ─── E-Mail-Änderung abbrechen (v0.18.48) ─────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'cancel_email_change') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
     require_once __DIR__ . '/../lib/email_change.php';
 
     email_change_cancel($userId);
-    flash('E-Mail-Änderungs-Anfrage wurde abgebrochen.', 'info');
+    flash(t('settings_email_change_cancelled'), 'info');
     redirect(FORUM_URL . '/settings.php?tab=security');
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'save_profile') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
 
     // Tab-spezifische Forms (v0.18.45 fix): Wenn ein Feld NICHT im POST steht,
     // bestehenden DB-Wert behalten statt mit '' überschreiben.
@@ -204,9 +204,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'save_profil
         $file = $_FILES['avatar'];
         $mime = mime_content_type($file['tmp_name']) ?: '';
         if ($file['size'] > MAX_AVATAR_SIZE) {
-            $error = 'Avatar zu groß (max. 512 KB).';
+            $error = t('settings_avatar_too_big');
         } elseif (!isset(UPLOAD_IMAGE_EXTENSIONS[$mime])) {
-            $error = 'Ungültiges Bildformat (JPEG/PNG/GIF/WebP).';
+            $error = t('error_bad_image_format');
         } else {
             // Endung aus dem geprüften Inhaltstyp, nie aus dem Dateinamen
             $ext  = UPLOAD_IMAGE_EXTENSIONS[$mime];
@@ -234,9 +234,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'save_profil
         $file = $_FILES['banner'];
         $mime = mime_content_type($file['tmp_name']) ?: '';
         if ($file['size'] > 2 * 1024 * 1024) {
-            $error = 'Banner zu groß (max. 2 MB).';
+            $error = t('settings_banner_too_big');
         } elseif (!isset(UPLOAD_IMAGE_EXTENSIONS[$mime])) {
-            $error = 'Ungültiges Bildformat (JPEG/PNG/GIF/WebP).';
+            $error = t('error_bad_image_format');
         } else {
             $ext  = UPLOAD_IMAGE_EXTENSIONS[$mime];
             $name = 'banner_' . $userId . '_' . time() . '.' . $ext;
@@ -254,7 +254,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'save_profil
     $pwHash = '';
 
     if (!$error) {
-        $language = 'de';  // Mehrsprachigkeit deaktiviert in v0.18.35 (siehe CHANGELOG)
+        /*
+         * Die Sprachwahl war seit v0.18.35 abgeschaltet — mit 47 uebersetzten
+         * Begriffen war sie ein Versprechen, das die Oberflaeche nicht hielt.
+         * Seit 1.10.0 ist das Sprachpaket vollstaendig, also darf sie zurueck.
+         *
+         * Angenommen wird nur, was available_languages() kennt; alles andere
+         * faellt auf den bisherigen Wert zurueck, nicht auf eine Vorgabe.
+         */
+        $language = (string) ($profile['language'] ?? 'de');
+
+        if (isset($_POST['language'])) {
+            $gewaehlt = preg_replace('/[^a-z]/', '', (string) $_POST['language']);
+
+            if (array_key_exists($gewaehlt, available_languages())) {
+                $language = $gewaehlt;
+            }
+        }
 
         // ── Tab-spezifische Felder defensiv lesen (v0.18.45 fix) ───────────
         // Wenn ein Feld nicht im POST ist → bestehenden DB-Wert behalten
@@ -379,7 +395,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_str('action') === 'save_profil
         }
 
         try { check_achievements($userId); } catch (Exception $e) {}
-        flash('Einstellungen gespeichert.', 'success');
+        flash(t('settings_saved'), 'success');
         redirect(FORUM_URL . '/settings.php?tab=' . $activeTab);
     }
 
@@ -405,7 +421,7 @@ $newBackupCodes = $_SESSION['_2fa_new_backup_codes'] ?? [];
 unset($_SESSION['_2fa_new_backup_codes']);
 
 render('settings', [
-    'title'            => 'Einstellungen',
+    'title'            => t('settings'),
     'profile'          => $profile,
     'sessions'         => $sessions,
     'currentSessionId' => $currentSessionId,
@@ -417,6 +433,6 @@ render('settings', [
     'otpSvg'           => $otpSvg,
     'newBackupCodes'   => $newBackupCodes,
     'breadcrumb'       => [
-        ['title' => 'Einstellungen', 'url' => FORUM_URL . '/settings.php'],
+        ['title' => t('settings'), 'url' => FORUM_URL . '/settings.php'],
     ],
 ]);

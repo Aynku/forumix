@@ -9,9 +9,9 @@
 <?php if ($gesendet): ?>
   <div class="card" style="padding:34px;text-align:center">
     <div style="font-size:44px;margin-bottom:10px">✅</div>
-    <strong>Nachricht ist raus</strong>
+    <strong><?= t('kontakt_nachricht_ist_raus') ?></strong>
     <div style="color:var(--text-muted);margin-top:6px">
-      Danke. Wir melden uns, sobald jemand hineingeschaut hat.
+      <?= t('kontakt_danke_wir_melden_uns') ?>
     </div>
     <div style="margin-top:16px">
       <a class="btn btn-ghost" href="<?= e($selbst) ?>">Noch eine Nachricht schreiben</a>
@@ -22,11 +22,11 @@
 
   <?php if ($empfaenger === '' && $canAdmin): ?>
     <div class="card" style="border-left:3px solid var(--color-warning);margin-bottom:16px">
-      <strong>⚠️ Noch keine Empfängeradresse</strong>
+      <strong><?= t('kontakt_no_recipient_heading') ?></strong>
       <div style="color:var(--text-muted);margin-top:6px;font-size:14px">
-        Das Formular nimmt nichts an, solange keine Adresse feststeht. Trage sie unter
-        <em>Adminbereich → Rechtliches</em> als Impressum-E-Mail ein, oder hinterlege
-        unter <em>E-Mail</em> eine Absenderadresse.
+        <?= t('kontakt_das_formular_nimmt_nichts') ?>
+        <em><?= t('kontakt_adminbereich_rechtliches') ?></em> als Impressum-E-Mail ein, oder hinterlege
+        unter <em><?= t('kontakt_e_mail') ?></em> eine Absenderadresse.
       </div>
     </div>
   <?php endif; ?>
@@ -42,42 +42,42 @@
 
     <?php /* Honigtopf: fuer Menschen unsichtbar, fuer Skripte ein Feld wie jedes andere. */ ?>
     <div style="position:absolute;left:-9999px" aria-hidden="true">
-      <label>Website</label>
+      <label><?= t('kontakt_website') ?></label>
       <input type="text" name="website" tabindex="-1" autocomplete="off">
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div class="form-row">
-        <label>Dein Name</label>
+        <label><?= t('kontakt_dein_name') ?></label>
         <input type="text" name="absender" maxlength="80" required
                value="<?= e($werte['absender']) ?>">
       </div>
       <div class="form-row">
-        <label>Deine E-Mail</label>
+        <label><?= t('kontakt_deine_e_mail') ?></label>
         <input type="email" name="email" maxlength="190" required
                value="<?= e($werte['email']) ?>">
-        <div class="form-hint">Nur damit wir antworten können.</div>
+        <div class="form-hint"><?= t('kontakt_nur_damit_wir_antworten') ?></div>
       </div>
     </div>
 
     <div class="form-row">
-      <label>Betreff</label>
+      <label><?= t('kontakt_betreff') ?></label>
       <input type="text" name="betreff" maxlength="140" required
              value="<?= e($werte['betreff']) ?>">
     </div>
 
     <div class="form-row">
-      <label>Nachricht</label>
+      <label><?= t('kontakt_nachricht') ?></label>
       <textarea name="nachricht" maxlength="5000" required
                 style="min-height:150px"><?= e($werte['nachricht']) ?></textarea>
     </div>
 
-    <button class="btn btn-primary">Nachricht senden</button>
+    <button class="btn btn-primary"><?= t('kontakt_nachricht_senden') ?></button>
   </form>
 <?php endif; ?>
 
 <?php if ($canAdmin && $letzte): ?>
-  <h3 style="margin:26px 0 10px">Eingegangen</h3>
+  <h3 style="margin:26px 0 10px"><?= t('kontakt_eingegangen') ?></h3>
   <?php foreach ($letzte as $n): ?>
     <div class="card" style="margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">

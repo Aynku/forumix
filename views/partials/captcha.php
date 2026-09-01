@@ -20,7 +20,7 @@ $_captcha      = $_showCaptcha ? captcha_generate() : null;
 <?php if ($_showCaptcha): ?>
   <div class="form-row captcha-row">
     <label>
-      🤖 Sicherheitsfrage:
+      <?= t('captcha_question_label') ?>
       <strong style="font-size:18px;font-family:var(--font-mono)"><?= e($_captcha['question']) ?> = ?</strong>
     </label>
     <input type="number" name="_captcha_answer" required autocomplete="off"
@@ -28,8 +28,7 @@ $_captcha      = $_showCaptcha ? captcha_generate() : null;
            style="max-width:120px;text-align:center;font-size:18px">
     <input type="hidden" name="_captcha_token" value="<?= e($_captcha['token']) ?>">
     <div class="form-hint">
-      Diese Frage erscheint, weil zu viele fehlgeschlagene Versuche von deiner IP kamen.
-      Sie verschwindet nach erfolgreicher Aktion.
+      <?= t('captcha_why') ?>
     </div>
   </div>
 <?php endif; ?>

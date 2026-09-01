@@ -1,7 +1,7 @@
 <?php if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); } ?>
 <?php /** @var string $text; @var string $art; @var bool $aktiv; @var array $arten */ ?>
 
-<div class="section-heading">📣 Ankündigungsband</div>
+<div class="section-heading"><?= t('banner_heading') ?></div>
 
 <form method="post" class="form-card">
   <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
@@ -11,34 +11,34 @@
       <input type="checkbox" name="aktiv" value="1" <?= $aktiv ? 'checked' : '' ?>>
       Band anzeigen
     </label>
-    <div class="form-hint">Ohne Haken bleibt es aus, der Text bleibt aber gespeichert.</div>
+    <div class="form-hint"><?= t('banner_ohne_haken_bleibt_es') ?></div>
   </div>
 
   <div class="form-row">
-    <label>Text</label>
+    <label><?= t('banner_text') ?></label>
     <textarea name="text" maxlength="300" style="min-height:70px"
               placeholder="Am Samstag ab 20 Uhr ist das Forum kurz nicht erreichbar."><?= e($text) ?></textarea>
-    <div class="form-hint">Nur Text, kein HTML. Höchstens 300 Zeichen.</div>
+    <div class="form-hint"><?= t('banner_nur_text_kein_html') ?></div>
   </div>
 
   <div class="form-row">
-    <label>Art</label>
+    <label><?= t('banner_art') ?></label>
     <select name="art">
       <?php foreach ($arten as $wert => $label): ?>
-        <option value="<?= e($wert) ?>" <?= $art === $wert ? 'selected' : '' ?>><?= e($label) ?></option>
+        <option value="<?= e($wert) ?>" <?= $art === $wert ? 'selected' : '' ?>><?= e(t($label)) ?></option>
       <?php endforeach; ?>
     </select>
-    <div class="form-hint">Bestimmt nur die Farbe.</div>
+    <div class="form-hint"><?= t('banner_bestimmt_nur_die_farbe') ?></div>
   </div>
 
-  <button class="btn btn-primary">Speichern</button>
+  <button class="btn btn-primary"><?= t('banner_speichern') ?></button>
 </form>
 
 <div class="card" style="margin-top:16px">
-  <strong>Wie es sich verhält</strong>
+  <strong><?= t('banner_wie_es_sich_verhaelt') ?></strong>
   <ul style="margin:8px 0 0;padding-left:18px;color:var(--text-muted);font-size:14px;line-height:1.8">
-    <li>Das Band steht über allem, auf jeder Seite.</li>
-    <li>Wer es wegklickt, sieht es nicht wieder — bis der Text sich ändert.</li>
-    <li>Das merkt sich der Browser des Besuchers, nicht das Forum.</li>
+    <li><?= t('banner_das_band_steht_ueber') ?></li>
+    <li><?= t('banner_wer_es_wegklickt_sieht') ?></li>
+    <li><?= t('banner_das_merkt_sich_der') ?></li>
   </ul>
 </div>

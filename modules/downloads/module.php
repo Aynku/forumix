@@ -4,10 +4,10 @@ if (!defined('FORUM_RUNNING')) return [];
 
 return [
     'code'        => 'downloads',
-    'name'        => 'Downloads',
-    'description' => 'Dateiablage mit eigener Seite. Admins laden Dateien hoch und gruppieren sie in Kategorien, alle anderen laden herunter. Zählt die Abrufe.',
+    'name'        => 'downloads_modul_name',
+    'description' => 'downloads_modul_beschreibung',
     'icon'        => '📥',
     'version'     => '1.0',
-    'menu'        => ['label' => 'Downloads', 'url' => 'modules/downloads/downloads.php'],
+    'menu'        => ['label' => 'downloads_menu', 'url' => 'modules/downloads/downloads.php'],
     'author'      => 'Forumix',
 ];

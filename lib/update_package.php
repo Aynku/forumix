@@ -69,11 +69,11 @@ function update_validate_entry(string $entryName, array $wurzelDateien = ['updat
     if (str_ends_with($entryName, '/')) return null;
 
     // Leerer Name
-    if ($entryName === '') return 'Leerer Datei-Name im Archiv.';
+    if ($entryName === '') return t('sys_leerer_datei_name_im');
 
     // Absolute Pfade verbieten
     if ($entryName[0] === '/' || preg_match('#^[a-zA-Z]:[\\\\/]#', $entryName)) {
-        return 'Absoluter Pfad nicht erlaubt: ' . $entryName;
+        return t('sys_absoluter_pfad_nicht_erlaubt') . $entryName;
     }
 
     // Path-Traversal (Zip-Slip) verbieten — kein ".." in irgendeinem Segment
@@ -84,7 +84,7 @@ function update_validate_entry(string $entryName, array $wurzelDateien = ['updat
         }
         // Null-Byte
         if (str_contains($seg, "\0")) {
-            return 'Ungültiges Zeichen im Pfad: ' . $entryName;
+            return t('sys_ungueltiges_zeichen_im_pfad') . $entryName;
         }
     }
 
@@ -94,13 +94,13 @@ function update_validate_entry(string $entryName, array $wurzelDateien = ['updat
 
     // Alles andere MUSS unter files/ liegen
     if (!str_starts_with($lower, 'files/')) {
-        return 'Datei außerhalb von files/ (und nicht ' . implode('/', $wurzelDateien) . '): ' . $entryName;
+        return t('sys_datei_ausserhalb_von_files') . implode('/', $wurzelDateien) . '): ' . $entryName;
     }
 
     // Endung gegen Whitelist
     $ext = update_ext_of($entryName);
     if (!in_array($ext, UPDATE_ALLOWED_EXT, true)) {
-        return 'Datei-Typ nicht erlaubt (.' . $ext . '): ' . $entryName;
+        return t('sys_datei_typ_nicht_erlaubt') . $ext . '): ' . $entryName;
     }
 
     return null;
@@ -116,17 +116,17 @@ function update_validate_entry(string $entryName, array $wurzelDateien = ['updat
  */
 function update_validate_zip(string $zipPath): array {
     if (!class_exists('ZipArchive')) {
-        return ['ok' => false, 'error' => 'ZipArchive-Erweiterung ist auf dem Server nicht verfügbar.'];
+        return ['ok' => false, 'error' => t('sys_ziparchive_erweiterung_ist_auf')];
     }
 
     $size = filesize($zipPath);
     if ($size === false || $size > UPDATE_MAX_ZIP_BYTES) {
-        return ['ok' => false, 'error' => 'Archiv zu groß (max. ' . (UPDATE_MAX_ZIP_BYTES / 1024 / 1024) . ' MB).'];
+        return ['ok' => false, 'error' => t('sys_archiv_zu_gross_max') . (UPDATE_MAX_ZIP_BYTES / 1024 / 1024) . ' MB).'];
     }
 
     $zip = new ZipArchive();
     if ($zip->open($zipPath) !== true) {
-        return ['ok' => false, 'error' => 'Archiv konnte nicht geöffnet werden (kein gültiges ZIP?).'];
+        return ['ok' => false, 'error' => t('sys_archiv_konnte_nicht_geoeffnet')];
     }
 
     $files       = [];
@@ -158,7 +158,7 @@ function update_validate_zip(string $zipPath): array {
 
     if (!$hasManifest) {
         $zip->close();
-        return ['ok' => false, 'error' => 'Kein update.json im Archiv gefunden. Das ist kein gültiges Update-Paket.'];
+        return ['ok' => false, 'error' => t('sys_kein_update_json_im')];
     }
 
     // Manifest lesen + validieren
@@ -175,7 +175,7 @@ function update_validate_zip(string $zipPath): array {
     // Version-Format prüfen (nur Ziffern, Punkte, Buchstaben, Leerzeichen)
     if (!preg_match('/^[\w.\- ]{1,40}$/', (string) $manifest['version'])) {
         $zip->close();
-        return ['ok' => false, 'error' => 'Ungültige Versions-Angabe im Manifest.'];
+        return ['ok' => false, 'error' => t('sys_ungueltige_versions_angabe_im')];
     }
 
     // Passt das Paket auf diesen Stand?
@@ -198,10 +198,10 @@ function update_validate_zip(string $zipPath): array {
         if (version_compare($blank($hier), $blank($von), '!=')) {
             $zip->close();
             return ['ok' => false, 'error' =>
-                'Dieses Updatepaket setzt Fassung ' . $von . ' voraus, hier läuft '
+                t('sys_dieses_updatepaket_setzt_fassung') . $von . ' voraus, hier läuft '
                 . $hier . '. Ein Updatepaket enthält nur die geänderten Dateien und '
                 . 'lässt den Rest auf dem alten Stand. Für den Sprung über mehrere '
-                . 'Fassungen bitte das Vollpaket nehmen — es geht von jedem Stand aus.'];
+                . t('sys_fassungen_bitte_das_vollpaket')];
         }
     }
 
@@ -229,7 +229,7 @@ function update_install_package(ZipArchive $zip, array $manifest, array $fileLis
     $error  = null;
     $forumRoot = realpath(__DIR__ . '/..');
     if ($forumRoot === false) {
-        return ['success' => false, 'log' => [], 'error' => 'Forum-Root nicht auflösbar.'];
+        return ['success' => false, 'log' => [], 'error' => t('sys_forum_root_nicht_aufloesbar')];
     }
 
     // ── Phase 1: Dateien kopieren ────────────────────────────────────
@@ -239,7 +239,7 @@ function update_install_package(ZipArchive $zip, array $manifest, array $fileLis
         $entryName = 'files/' . $rel;
         $content   = $zip->getFromName($entryName);
         if ($content === false) {
-            $error = 'Datei aus Archiv nicht lesbar: ' . $entryName;
+            $error = t('sys_datei_aus_archiv_nicht') . $entryName;
             break;
         }
 
@@ -261,7 +261,7 @@ function update_install_package(ZipArchive $zip, array $manifest, array $fileLis
         // Verzeichnis ggf. anlegen
         if (!is_dir($targetDir)) {
             if (!@mkdir($targetDir, 0755, true) && !is_dir($targetDir)) {
-                $error = 'Verzeichnis konnte nicht angelegt werden: ' . $rel;
+                $error = t('sys_verzeichnis_konnte_nicht_angelegt') . $rel;
                 break;
             }
         }
@@ -269,7 +269,7 @@ function update_install_package(ZipArchive $zip, array $manifest, array $fileLis
         // (doppelter Boden zusätzlich zur Entry-Validierung)
         $realTargetDir = realpath($targetDir);
         if ($realTargetDir === false || !str_starts_with($realTargetDir . '/', $forumRoot . '/')) {
-            $error = 'Sicherheits-Abbruch: Ziel außerhalb des Forum-Verzeichnisses (' . $rel . ').';
+            $error = t('sys_sicherheits_abbruch_ziel_ausserhalb') . $rel . ').';
             break;
         }
 
@@ -282,7 +282,7 @@ function update_install_package(ZipArchive $zip, array $manifest, array $fileLis
 
         // Schreiben
         if (file_put_contents($target, $content) === false) {
-            $error = 'Datei konnte nicht geschrieben werden: ' . $rel;
+            $error = t('sys_datei_konnte_nicht_geschrieben') . $rel;
             break;
         }
         if ($fileStatus === 'new') {
@@ -361,16 +361,16 @@ function update_run_sql(string $sql): array {
         } catch (PDOException $e) {
             // Idempotenz-freundlich: "Duplicate column" / "already exists" tolerieren
             $msg = $e->getMessage();
-            if (stripos($msg, 'Duplicate column') !== false
+            if (stripos($msg, t('sys_duplicate_column')) !== false
                 || stripos($msg, 'already exists') !== false
-                || stripos($msg, 'Duplicate key name') !== false) {
+                || stripos($msg, t('sys_duplicate_key_name')) !== false) {
                 $log[] = '⊘ Übersprungen (existiert bereits): ' . update_sql_preview($stmt);
                 continue;
             }
             return [
                 'success' => false,
                 'log'     => $log,
-                'error'   => 'SQL-Fehler bei: ' . update_sql_preview($stmt) . ' → ' . $msg,
+                'error'   => t('sys_sql_fehler_bei') . update_sql_preview($stmt) . ' → ' . $msg,
             ];
         }
     }

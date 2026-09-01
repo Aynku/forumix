@@ -17,53 +17,53 @@ function profile_field_schema(): array {
     return [
         'gender' => [
             'icon'   => '🚻',
-            'label'  => 'Geschlecht',
+            'label'  => 'profile_field_gender',
             'type'   => 'select',
             'column' => 'profile_gender',
             'options' => [
-                ''         => '(keine Angabe)',
-                'female'   => '♀ Weiblich',
-                'male'     => '♂ Männlich',
-                'diverse'  => '⚧ Divers',
-                'other'    => '✨ Sonstige',
+                ''         => 'profile_gender_none',
+                'female'   => 'profile_gender_female',
+                'male'     => 'profile_gender_male',
+                'diverse'  => 'profile_gender_diverse',
+                'other'    => 'profile_gender_other',
             ],
         ],
         'birthday' => [
             'icon'   => '🎂',
-            'label'  => 'Geburtstag',
+            'label'  => 'profile_field_birthday',
             'type'   => 'date',
             'column' => 'profile_birthday',
         ],
         'location' => [
             'icon'   => '📍',
-            'label'  => 'Wohnort',
+            'label'  => 'profile_field_place',
             'type'   => 'text',
             'column' => 'profile_location',
             'max'    => 100,
-            'placeholder' => 'z.B. Dortmund',
+            'placeholder' => 'profile_place_placeholder',
         ],
         'occupation' => [
             'icon'   => '💼',
-            'label'  => 'Beruf',
+            'label'  => 'profile_field_job',
             'type'   => 'text',
             'column' => 'profile_occupation',
             'max'    => 100,
-            'placeholder' => 'z.B. Webentwickler',
+            'placeholder' => 'profile_job_placeholder',
         ],
         'interests' => [
             'icon'   => '🎯',
-            'label'  => 'Interessen',
+            'label'  => 'profile_field_interests',
             'type'   => 'text',
             'column' => 'profile_interests',
             'max'    => 500,
-            'placeholder' => 'z.B. Programmieren, Bouldern, Sci-Fi-Romane',
+            'placeholder' => 'profile_interests_placeholder',
         ],
         'about' => [
             'icon'   => '📝',
-            'label'  => 'Über mich',
+            'label'  => 'profile_field_about',
             'type'   => 'textarea',
             'column' => 'profile_about',
-            'placeholder' => 'Erzähl etwas über dich – BBCode ist erlaubt.',
+            'placeholder' => 'profile_about_placeholder',
         ],
     ];
 }
@@ -151,7 +151,7 @@ function profile_field_display(string $fieldKey, array $profileUser): ?string {
     if ($raw === null || $raw === '') return null;
 
     return match ($def['type']) {
-        'select' => $def['options'][$raw] ?? $raw,
+        'select' => isset($def['options'][$raw]) ? t($def['options'][$raw]) : $raw,
         'date'   => profile_format_birthday($raw),
         default  => (string) $raw,
     };
@@ -180,7 +180,7 @@ function profile_visible_fields(array $profileUser, ?array $viewer): array {
         if ($value === null) continue;  // leeres Feld → nicht anzeigen
         $out[$key] = [
             'icon'  => $def['icon'],
-            'label' => $def['label'],
+            'label' => t($def['label']),
             'value' => $value,
             'type'  => $def['type'],
         ];
@@ -204,13 +204,13 @@ function render_profile_field_inputs(array $profile, array $privacy): string {
         ?>
         <div class="form-row profile-field-row">
           <div class="profile-field-main">
-            <label><?= $def['icon'] ?> <?= htmlspecialchars($def['label'], ENT_QUOTES, 'UTF-8') ?></label>
+            <label><?= $def['icon'] ?> <?= htmlspecialchars(t($def['label']), ENT_QUOTES, 'UTF-8') ?></label>
             <?php if ($def['type'] === 'select'): ?>
               <select name="profile_<?= $keyE ?>">
                 <?php foreach ($def['options'] as $optVal => $optLabel): ?>
                   <option value="<?= htmlspecialchars($optVal, ENT_QUOTES, 'UTF-8') ?>"
                           <?= (string) $val === (string) $optVal ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($optLabel, ENT_QUOTES, 'UTF-8') ?>
+                    <?= htmlspecialchars(t($optLabel), ENT_QUOTES, 'UTF-8') ?>
                   </option>
                 <?php endforeach; ?>
               </select>
@@ -225,19 +225,19 @@ function render_profile_field_inputs(array $profile, array $privacy): string {
                       'about_editor',
                       'profile_' . $key,
                       (string) ($val ?? ''),
-                      $def['placeholder'] ?? 'Erzähl etwas über dich… (BBCode unterstützt)',
+                      t($def['placeholder'] ?? 'profile_about_placeholder'),
                       false,
                       false
                     ) ?>
               <?php else: ?>
                 <textarea name="profile_<?= $keyE ?>" rows="3"
-                          placeholder="<?= htmlspecialchars($def['placeholder'] ?? '', ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string) ($val ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
+                          placeholder="<?= htmlspecialchars(isset($def['placeholder']) ? t($def['placeholder']) : '', ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars((string) ($val ?? ''), ENT_QUOTES, 'UTF-8') ?></textarea>
               <?php endif; ?>
             <?php else: ?>
               <input type="text" name="profile_<?= $keyE ?>"
                      value="<?= htmlspecialchars((string) ($val ?? ''), ENT_QUOTES, 'UTF-8') ?>"
                      maxlength="<?= (int) ($def['max'] ?? 100) ?>"
-                     placeholder="<?= htmlspecialchars($def['placeholder'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                     placeholder="<?= htmlspecialchars(isset($def['placeholder']) ? t($def['placeholder']) : '', ENT_QUOTES, 'UTF-8') ?>">
             <?php endif; ?>
           </div>
           <div class="profile-field-privacy">

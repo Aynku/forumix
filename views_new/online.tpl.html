@@ -1,37 +1,37 @@
-<div class="section-heading">Wer ist online</div>
+<div class="section-heading">{{ t('online_wer_ist_online') }}</div>
 
 <div class="stat-grid" style="margin-bottom:18px">
   <div class="stat-box">
     <div class="stat-icon">👥</div>
     <div class="stat-num">{{ stats.total }}</div>
-    <div class="stat-label">Gesamt online</div>
+    <div class="stat-label">{{ t('online_gesamt_online') }}</div>
   </div>
   <div class="stat-box">
     <div class="stat-icon">👤</div>
     <div class="stat-num">{{ stats.members }}</div>
-    <div class="stat-label">Mitglieder</div>
+    <div class="stat-label">{{ t('online_mitglieder') }}</div>
   </div>
   <div class="stat-box">
     <div class="stat-icon">👻</div>
     <div class="stat-num">{{ stats.guests }}</div>
-    <div class="stat-label">Gäste</div>
+    <div class="stat-label">{{ t('online_gaeste') }}</div>
   </div>
   <div class="stat-box">
     <div class="stat-icon">🤖</div>
     <div class="stat-num">{{ stats.bots|default(0) }}</div>
-    <div class="stat-label">Bots</div>
+    <div class="stat-label">{{ t('online_bots') }}</div>
   </div>
 </div>
 
 <div class="card">
   <table class="forum-table">
     <thead>
-      <tr><th>Benutzer</th><th>Ort</th><th>Zuletzt gesehen</th>{% if showIps %}<th>IP</th>{% endif %}</tr>
+      <tr><th>{{ t('online_benutzer') }}</th><th>{{ t('online_ort') }}</th><th>{{ t('online_zuletzt_gesehen') }}</th>{% if showIps %}<th>{{ t('online_ip') }}</th>{% endif %}</tr>
     </thead>
     <tbody>
       {% if not users %}
         <tr><td colspan="{{ showIps ? 4 : 3 }}" style="text-align:center;padding:20px;color:var(--text-faint)">
-          Niemand online.
+          {{ t('online_niemand_online') }}
         </td></tr>
       {% endif %}
       {% for u in users %}
@@ -54,7 +54,7 @@
                 {{ bot.icon|raw }} {{ bot.name }}
               </span>
             {% else %}
-              <span style="color:var(--text-muted)">Gast</span>
+              <span style="color:var(--text-muted)">{{ t('online_gast') }}</span>
             {% endif %}
           </td>
           <td style="font-size:12px;color:var(--text-muted)">{{ u.location }}</td>

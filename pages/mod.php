@@ -15,8 +15,8 @@ $hasModAccess = $cu['is_admin']
 if (!$hasModAccess) {
     http_response_code(403);
     render('error', [
-        'title' => 'Kein Zugriff',
-        'message' => 'Du hast keine Moderator-Rechte.',
+        'title' => t('error_denied_title'),
+        'message' => t('mod_no_rights'),
     ]);
     return;
 }
@@ -30,7 +30,7 @@ $boardIds = $isGlobalMod ? null : $boardModFor;
 // ── AKTIONEN ───────────────────────────────────────────────────────
 
 if (in_array($action, ['approve_thread', 'approve_post', 'reject_thread', 'reject_post'], true)) {
-    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf($_GET['csrf'] ?? '')) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
     $id = get_int('id');
     $reason = $_GET['reason'] ?? '';
 
@@ -41,7 +41,7 @@ if (in_array($action, ['approve_thread', 'approve_post', 'reject_thread', 'rejec
             ? db_fetch('SELECT board_id FROM threads WHERE thread_id = ?', [$id])
             : db_fetch('SELECT t.board_id FROM posts p JOIN threads t ON t.thread_id = p.thread_id WHERE p.post_id = ?', [$id]);
         if (!$check || !in_array((int) $check['board_id'], $boardIds, true)) {
-            flash('Du bist kein Mod in diesem Forum.', 'error');
+            flash(t('mod_not_in_board'), 'error');
             redirect(FORUM_URL . '/mod.php?action=approval');
         }
     }
@@ -53,13 +53,13 @@ if (in_array($action, ['approve_thread', 'approve_post', 'reject_thread', 'rejec
         'reject_post'    => reject_post($id, $reason),
     };
 
-    flash($ok ? 'Aktion ausgeführt.' : 'Aktion fehlgeschlagen.', $ok ? 'success' : 'error');
+    flash($ok ? t('mod_action_done') : t('mod_action_failed'), $ok ? 'success' : 'error');
     redirect(FORUM_URL . '/mod.php?action=approval');
 }
 
 // Report-Status ändern
 if ($action === 'report_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
     $reportId = post_int('report_id');
     $newStatus = post_str('status');
 
@@ -75,7 +75,7 @@ if ($action === 'report_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             [$reportId]
         );
         if (!$r || !in_array((int) $r['board_id'], $boardIds, true)) {
-            flash('Du bist kein Mod in diesem Forum.', 'error');
+            flash(t('mod_not_in_board'), 'error');
             redirect(FORUM_URL . '/mod.php?action=reports');
         }
     }
@@ -84,10 +84,10 @@ if ($action === 'report_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             db_execute('UPDATE reports SET status = ?, reviewed_by = ?, reviewed_at = NOW() WHERE report_id = ?',
                 [$newStatus, $cu['user_id'], $reportId]);
-            flash('Meldung aktualisiert.', 'success');
+            flash(t('mod_report_updated'), 'success');
         } catch (Exception $e) {
             error_log('[mod] report_action: ' . $e->getMessage());
-            flash('Meldung konnte nicht aktualisiert werden.', 'error');
+            flash(t('mod_report_update_failed'), 'error');
         }
     }
     redirect(FORUM_URL . '/mod.php?action=reports');

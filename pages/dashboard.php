@@ -80,7 +80,7 @@ if (!empty($dashUserData['is_owner'])
 }
 
 render('dashboard', [
-    'title'        => 'Dein Dashboard',
+    'title'        => t('dashboard_title'),
     'dashUser'     => $dashData['user']             ?? null,
     'dashOverview' => $dashData['overview']         ?? [],
     'dashStreak'   => $dashData['streak']           ?? ['current' => 0, 'longest' => 0, 'today' => false],

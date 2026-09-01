@@ -12,7 +12,7 @@ $board = db_fetch('
 
 if (!$board) {
     http_response_code(404);
-    error_page(404, 'Forum nicht gefunden', 'Dieses Forum gibt es nicht.');
+    error_page(404, t('error_board_missing_title'), t('error_board_missing_text'));
 }
 
 // Wenn das Board nicht (mehr) geschützt ist oder der User bereits Zugang hat → direkt rein
@@ -25,33 +25,33 @@ if (board_user_can_access($board)) {
 // Auskunft darueber, dass es dieses Forum gibt.
 if (board_zugangsgrund($board) === 'gruppe') {
     http_response_code(404);
-    error_page(404, 'Forum nicht gefunden', 'Dieses Forum gibt es nicht.');
+    error_page(404, t('error_board_missing_title'), t('error_board_missing_text'));
 }
 
 // Login erforderlich (Gäste können nicht entsperren)
 if (!is_logged_in()) {
-    flash('Bitte melde dich an, um auf passwort-geschützte Foren zuzugreifen.', 'info');
+    flash(t('board_unlock_login_required'), 'info');
     redirect(FORUM_URL . '/login.php');
 }
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
 
     $pw = (string) ($_POST['password'] ?? '');
 
     // Sanftes Rate-Limit gegen Brute-Force (per User+Board, 5 Versuche/15 Min)
     $rateKey = 'board_unlock_' . $boardId;
     if (!rate_limit_check($rateKey, 5, 900)) {
-        $error = 'Zu viele falsche Versuche. Bitte warte ' . ceil(rate_limit_remaining($rateKey) / 60) . ' Minuten.';
+        $error = tn('board_unlock_too_many', (int) ceil(rate_limit_remaining($rateKey) / 60));
     } else {
         if (board_check_password($boardId, $pw)) {
             board_unlock_in_session($boardId);
             rate_limit_reset($rateKey);
-            flash('Forum entsperrt – willkommen!', 'success');
+            flash(t('board_unlock_done'), 'success');
             redirect(FORUM_URL . '/board.php?id=' . $boardId);
         } else {
-            $error = 'Falsches Passwort.';
+            $error = t('error_wrong_password');
         }
     }
 }

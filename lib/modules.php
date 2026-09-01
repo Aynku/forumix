@@ -29,8 +29,8 @@ function available_modules(): array {
         $code = $manifest['code'];
         $modules[$code] = [
             'code'         => $code,
-            'name'         => $manifest['name']        ?? $code,
-            'description'  => $manifest['description'] ?? '',
+            'name'         => isset($manifest['name']) ? t($manifest['name']) : $code,
+            'description'  => isset($manifest['description']) ? t($manifest['description']) : '',
             'icon'         => $manifest['icon']        ?? '🧩',
             'version'      => $manifest['version']     ?? '1.0',
             'author'       => $manifest['author']      ?? 'unbekannt',
@@ -73,12 +73,12 @@ function module_code_is_valid(string $code): bool {
 
 function enable_module(string $code): array {
     if (!module_code_is_valid($code)) {
-        return ['ok' => false, 'error' => 'Ungültiger Modulname'];
+        return ['ok' => false, 'error' => t('sys_ungueltiger_modulname')];
     }
     $modulesDir = __DIR__ . '/../modules';
     $manifestFile = $modulesDir . '/' . $code . '/module.php';
     if (!file_exists($manifestFile)) {
-        return ['ok' => false, 'error' => 'Modul nicht gefunden'];
+        return ['ok' => false, 'error' => t('sys_modul_nicht_gefunden')];
     }
 
     $manifest = include $manifestFile;
@@ -167,7 +167,7 @@ function sql_in_anweisungen(string $sql): array {
  */
 function disable_module(string $code): array {
     if (!module_code_is_valid($code)) {
-        return ['ok' => false, 'error' => 'Ungültiger Modulname'];
+        return ['ok' => false, 'error' => t('sys_ungueltiger_modulname')];
     }
     try {
         $modulesDir = __DIR__ . '/../modules';
@@ -256,7 +256,7 @@ function module_kern_tabellen(): array {
  */
 function module_entfernen(string $code): array {
     if (!module_code_is_valid($code)) {
-        return ['ok' => false, 'error' => 'Ungültiger Modulname'];
+        return ['ok' => false, 'error' => t('sys_ungueltiger_modulname')];
     }
 
     // Frisch aus der Datenbank, nicht ueber den Anfrage-Cache: der merkt sich
@@ -268,20 +268,20 @@ function module_entfernen(string $code): array {
         $zeile = null;
     }
     if ($zeile && (int) $zeile['enabled'] === 1) {
-        return ['ok' => false, 'error' => 'Das Modul ist noch aktiv. Erst abschalten, dann entfernen.'];
+        return ['ok' => false, 'error' => t('sys_das_modul_ist_noch')];
     }
 
     $wurzel = realpath(__DIR__ . '/../modules');
     $ziel   = realpath(__DIR__ . '/../modules/' . $code);
 
     if ($wurzel === false || $ziel === false) {
-        return ['ok' => false, 'error' => 'Das Modulverzeichnis gibt es nicht.'];
+        return ['ok' => false, 'error' => t('sys_das_modulverzeichnis_gibt_es')];
     }
     // Der Name kommt aus der Anfrage. module_code_is_valid() laesst keine
     // Schraegstriche zu, aber ein Symlink im Modulordner koennte woanders
     // hinzeigen — geprueft wird deshalb das Ergebnis, nicht die Absicht.
     if ($ziel === $wurzel || !str_starts_with($ziel . '/', $wurzel . '/')) {
-        return ['ok' => false, 'error' => 'Der Pfad zeigt aus dem Modulverzeichnis heraus.'];
+        return ['ok' => false, 'error' => t('sys_der_pfad_zeigt_aus')];
     }
 
     // Die Tabellennamen VOR dem Loeschen der Dateien holen — danach ist die
@@ -290,7 +290,7 @@ function module_entfernen(string $code): array {
 
     $zahl = module_verzeichnis_leeren($ziel);
     if ($zahl < 0) {
-        return ['ok' => false, 'error' => 'Nicht alles liess sich löschen — fehlen Schreibrechte?'];
+        return ['ok' => false, 'error' => t('sys_nicht_alles_liess_sich')];
     }
     @rmdir($ziel);
 
@@ -415,7 +415,7 @@ function module_menu_links(): array {
             if (!in_array($ort, ['menue', 'fuss', 'beides'], true)) $ort = 'beides';
 
             $links[] = [
-                'label' => (string) $e['label'],
+                'label' => t((string) $e['label']),
                 'url'   => FORUM_URL . '/' . $url,
                 'ort'   => $ort,
             ];

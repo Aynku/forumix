@@ -11,19 +11,19 @@ require_once __DIR__ . '/lib/befehle.php';
 require_once __DIR__ . '/lib/moderation.php';
 
 if (!module_enabled('ki')) {
-    error_page(404, 'Nicht gefunden', 'Die KI-Funktionen sind nicht aktiv.');
+    error_page(404, t('error_not_found_title'), t('ki_disabled'));
 }
 // Der Punkt im Adminbereich ist fuer andere ausgeblendet — das ersetzt
 // keine Pruefung.
 if (!(is_admin() || is_owner())) {
-    error_page(403, 'Kein Zugriff', 'Diese Einstellungen dürfen nur Inhaber und Administratoren sehen.');
+    error_page(403, t('error_denied_title'), t('ki_settings_denied'));
 }
 
 $probe_ergebnis = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf($_POST['csrf'] ?? '')) {
-        error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+        error_page(400, t('error_csrf_title'), t('error_csrf_text'));
     }
 
     $alt = ki_einstellungen();
@@ -100,8 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ki_einstellungen_speichern($neu);
 
     if ($melder_fehler !== '') {
-        flash('Ein Konto namens „' . $melder_fehler . '" gibt es nicht. '
-            . 'Ohne meldendes Konto entsteht keine Meldung.', 'error');
+        flash(t('ki_reporter_missing', $melder_fehler), 'error');
     }
 
     if (!empty($_POST['probe'])) {
@@ -109,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['ki_probe'] = $fehler ?? '';
     }
 
-    flash('Einstellungen gespeichert.', 'success');
+    flash(t('settings_saved'), 'success');
     redirect(FORUM_URL . '/modules/ki/ki.php');
 }
 

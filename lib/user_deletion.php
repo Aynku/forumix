@@ -36,7 +36,7 @@ function is_last_owner(int $userId): bool {
 function delete_user_account(int $userId): array {
     // Sicherheits-Check: letzter Owner darf nicht gelöscht werden
     if (is_last_owner($userId)) {
-        return ['ok' => false, 'error' => 'Der letzte Owner kann nicht gelöscht werden. Bitte mache einen anderen User zum Owner, bevor du diesen Account löschst.'];
+        return ['ok' => false, 'error' => t('delete_last_owner')];
     }
 
     try {
@@ -242,13 +242,13 @@ function can_user_delete_self(int $userId): array {
     if ($userId === 1) {
         return [
             'ok' => false,
-            'reason' => 'Der Forum-Gründer (User-ID 1) kann seinen Account nicht selbst löschen. Das ist ein Schutz gegen versehentlichen Lock-Out des Forums.'
+            'reason' => t('delete_founder')
         ];
     }
     if (is_last_owner($userId)) {
         return [
             'ok' => false,
-            'reason' => 'Du bist der einzige verbliebene Owner. Bitte mache zuerst einen anderen Benutzer zum Owner, bevor du deinen Account löschst.'
+            'reason' => t('delete_only_owner')
         ];
     }
     return ['ok' => true];

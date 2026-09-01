@@ -9,7 +9,7 @@ $type = $_GET['type'] ?? 'forum';
 $id   = get_int('id');
 
 $feedTitle = FORUM_NAME;
-$feedDesc  = 'Neueste Beiträge';
+$feedDesc  = t('rss_latest_posts');
 $feedLink  = FORUM_URL;
 $items     = [];
 
@@ -18,11 +18,11 @@ if ($type === 'board' && $id > 0) {
     if ($board && !board_user_can_access($board)) {
         // Geschütztes Board → kein RSS für Nicht-Berechtigte
         http_response_code(403);
-        error_page(403, 'Kein Zugriff', 'Dieses Forum ist passwortgeschützt — es gibt dafür keinen Feed.');
+        error_page(403, t('error_denied_title'), t('rss_board_locked'));
     }
     if ($board) {
         $feedTitle = FORUM_NAME . ' – ' . $board['title'];
-        $feedDesc  = $board['description'] ?: 'Neueste Threads';
+        $feedDesc  = $board['description'] ?: t('rss_latest_threads');
         $feedLink  = FORUM_URL . '/board.php?id=' . $id;
         $items = db_fetchAll('
             SELECT t.thread_id, t.title, t.created_at, u.username, p.content AS first_post
@@ -42,10 +42,10 @@ if ($type === 'board' && $id > 0) {
         $tBoard = db_fetch('SELECT board_id, password_hash FROM boards WHERE board_id = ?', [$thread['board_id']]);
         if ($tBoard && !board_user_can_access($tBoard)) {
             http_response_code(403);
-            error_page(403, 'Kein Zugriff', 'Dieses Forum ist passwortgeschützt — es gibt dafür keinen Feed.');
+            error_page(403, t('error_denied_title'), t('rss_board_locked'));
         }
         $feedTitle = FORUM_NAME . ' – ' . $thread['title'];
-        $feedDesc  = 'Beiträge im Thread';
+        $feedDesc  = t('rss_thread_posts');
         $feedLink  = FORUM_URL . '/thread.php?id=' . $id;
         $items = db_fetchAll('
             SELECT p.post_id AS thread_id, t.title, p.created_at, u.username, p.content AS first_post

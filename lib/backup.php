@@ -14,7 +14,7 @@ function backup_ensure_dir(): void {
     // .htaccess-Schutz (falls beim FTP-Upload verloren gegangen)
     $ht = BACKUP_DIR . '/.htaccess';
     if (!file_exists($ht)) {
-        @file_put_contents($ht, "Order Deny,Allow\nDeny from all\n");
+        @file_put_contents($ht, t('sys_order_deny_allow_ndeny'));
     }
     // index.html als zusätzlicher Schutz
     $idx = BACKUP_DIR . '/index.html';
@@ -263,7 +263,7 @@ function backup_full(?string $note = null): ?string {
     $zip->addFile($dbPath, 'database.sql');
     $zip->addFile($filePath, 'files.zip');
     $zip->setArchiveComment(
-        "Forumix Komplett-Backup\n" .
+        t('sys_forumix_komplett_backup_n') .
         "Erstellt: " . date('Y-m-d H:i:s') . "\n" .
         "Version: " . FORUM_VERSION_CODE
     );

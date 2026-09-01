@@ -1,5 +1,5 @@
 <div class="section-heading">
-  Tag: <span style="color:{{ tag.color }}">{{ tag.name }}</span>
+  {{ t('tag_tag') }} <span style="color:{{ tag.color }}">{{ tag.name }}</span>
   <span style="font-size:12px;color:var(--text-muted);font-weight:400;text-transform:none">
     {{ count(threads) }} Threads
   </span>
@@ -12,12 +12,12 @@
 <div class="card">
   {% if not threads %}
     <div style="padding:30px;text-align:center;color:var(--text-faint)">
-      Noch keine Threads mit diesem Tag.
+      {{ t('tag_noch_keine_threads_mit') }}
     </div>
   {% else %}
     <table class="forum-table">
       <thead>
-        <tr><th>Thread</th><th>Autor</th><th>Antworten</th><th>Aufrufe</th></tr>
+        <tr><th>{{ t('tag_thread') }}</th><th>{{ t('tag_autor') }}</th><th>{{ t('tag_antworten') }}</th><th>{{ t('tag_aufrufe') }}</th></tr>
       </thead>
       <tbody>
         {% for t in threads %}
@@ -39,5 +39,5 @@
 </div>
 
 <p style="margin-top:14px;text-align:center">
-  <a href="{{ url('/tag.php') }}" class="btn btn-ghost btn-sm">← Alle Tags</a>
+  <a href="{{ url('/tag.php') }}" class="btn btn-ghost btn-sm">{{ t('tag_alle_tags') }}</a>
 </p>

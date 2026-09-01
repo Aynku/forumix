@@ -6,15 +6,14 @@
 
   {% if imp.is_default and is_admin(current_user()) %}
     <div class="flash flash-warning" style="margin-bottom:20px">
-      <strong>Hinweis für Administratoren:</strong> Die Kontaktdaten sind noch nicht ausgefüllt.
-      Bitte unter <a href="{{ url('/admin/?action=legal') }}">Admin → Rechtliches</a> die Daten eintragen.
+      <strong>{{ t('privacy_hinweis_fuer_administratoren') }}</strong> {{ t('privacy_die_kontaktdaten_sind_noch') }} <a href="{{ url('/admin/?action=legal') }}">{{ t('privacy_admin_rechtliches') }}</a> die Daten eintragen.
     </div>
   {% endif %}
 
   {% if page %}
     {{ render_page_content('privacy')|raw }}
   {% else %}
-    <p>Die Datenschutzerklärung wurde noch nicht eingerichtet.</p>
+    <p>{{ t('privacy_die_datenschutzerklaerung_wurde_noch') }}</p>
   {% endif %}
 
   {# Module, die Daten an Dritte geben, haengen hier ihren Absatz an. Der Text

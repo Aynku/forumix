@@ -9,7 +9,7 @@ $tag  = $slug ? db_fetch('SELECT * FROM tags WHERE slug = ?', [$slug]) : null;
 if (!$tag) {
     $tags = all_tags();
     render('tag_index', [
-        'title' => 'Alle Tags',
+        'title' => t('all_tags'),
         'tags'  => $tags,
     ]);
     exit;
@@ -18,7 +18,7 @@ if (!$tag) {
 $threads = threads_by_tag((int) $tag['tag_id'], 100);
 
 render('tag', [
-    'title'   => 'Tag: ' . $tag['name'],
+    'title'   => t('tag_title', $tag['name']),
     'tag'     => $tag,
     'threads' => $threads,
 ]);

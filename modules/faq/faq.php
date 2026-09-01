@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../bootstrap.php';
 
 if (!module_enabled('faq')) {
     http_response_code(404);
-    render('error', ['title' => 'Nicht gefunden', 'message' => 'Die FAQ ist aktuell nicht aktiv.']);
+    render('error', ['title' => t('error_not_found_title'), 'message' => t('faq_disabled')]);
     return;
 }
 
@@ -25,9 +25,9 @@ if ($canAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $maxPos = (int) db_count('SELECT COALESCE(MAX(position),0) FROM faq_items WHERE cat_id = ?', [$catId]);
             db_execute('INSERT INTO faq_items (cat_id, question, answer, position) VALUES (?, ?, ?, ?)',
                 [$catId, $question, $answer, $maxPos + 10]);
-            flash('Frage hinzugefügt.', 'success');
+            flash(t('faq_question_added'), 'success');
         } else {
-            flash('Bitte alle Felder ausfüllen.', 'error');
+            flash(t('error_fill_all_fields'), 'error');
         }
         redirect(FORUM_URL . '/modules/faq/faq.php?admin=1');
     }
@@ -41,7 +41,7 @@ if ($canAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($id && $catId && $question && $answer) {
             db_execute('UPDATE faq_items SET cat_id = ?, question = ?, answer = ?, visible = ? WHERE faq_id = ?',
                 [$catId, $question, $answer, $visible, $id]);
-            flash('Frage aktualisiert.', 'success');
+            flash(t('faq_question_updated'), 'success');
         }
         redirect(FORUM_URL . '/modules/faq/faq.php?admin=1');
     }
@@ -50,7 +50,7 @@ if ($canAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int) ($_POST['faq_id'] ?? 0);
         if ($id) {
             db_execute('DELETE FROM faq_items WHERE faq_id = ?', [$id]);
-            flash('Frage gelöscht.', 'success');
+            flash(t('faq_question_deleted'), 'success');
         }
         redirect(FORUM_URL . '/modules/faq/faq.php?admin=1');
     }
@@ -81,7 +81,7 @@ if ($canAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $maxPos = (int) db_count('SELECT COALESCE(MAX(position),0) FROM faq_categories');
             db_execute('INSERT INTO faq_categories (title, icon, position) VALUES (?, ?, ?)',
                 [$title, $icon, $maxPos + 10]);
-            flash('Kategorie angelegt.', 'success');
+            flash(t('faq_category_added'), 'success');
         }
         redirect(FORUM_URL . '/modules/faq/faq.php?admin=1');
     }
@@ -91,10 +91,10 @@ if ($canAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($catId) {
             $count = (int) db_count('SELECT COUNT(*) FROM faq_items WHERE cat_id = ?', [$catId]);
             if ($count > 0) {
-                flash('Kategorie enthält noch Fragen – diese erst löschen oder verschieben.', 'error');
+                flash(t('faq_category_not_empty'), 'error');
             } else {
                 db_execute('DELETE FROM faq_categories WHERE cat_id = ?', [$catId]);
-                flash('Kategorie gelöscht.', 'success');
+                flash(t('faq_category_deleted'), 'success');
             }
         }
         redirect(FORUM_URL . '/modules/faq/faq.php?admin=1');
@@ -112,7 +112,7 @@ $byCategory = [];
 foreach ($items as $it) $byCategory[(int) $it['cat_id']][] = $it;
 
 render('@faq/faq', [
-    'title'       => 'FAQ – Häufige Fragen',
+    'title'       => t('faq_title'),
     'categories'  => $categories,
     'byCategory'  => $byCategory,
     'canAdmin'    => $canAdmin,

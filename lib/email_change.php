@@ -62,18 +62,18 @@ function email_change_initiate(int $userId, string $newEmail): array {
 
     // Validierung: gültige E-Mail?
     if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
-        return ['ok' => false, 'error' => 'Bitte eine gültige E-Mail-Adresse eingeben.'];
+        return ['ok' => false, 'error' => t('error_bad_email')];
     }
 
     // User holen
     $user = db_fetch('SELECT user_id, username, email FROM users WHERE user_id = ?', [$userId]);
     if (!$user) {
-        return ['ok' => false, 'error' => 'Benutzer nicht gefunden.'];
+        return ['ok' => false, 'error' => t('error_user_missing_title')];
     }
 
     // Gleiche Adresse wie aktuell?
     if (strcasecmp($newEmail, (string) $user['email']) === 0) {
-        return ['ok' => false, 'error' => 'Diese E-Mail-Adresse ist bereits hinterlegt.'];
+        return ['ok' => false, 'error' => t('email_change_same')];
     }
 
     // E-Mail schon von einem anderen Konto belegt?
@@ -104,12 +104,12 @@ function email_change_initiate(int $userId, string $newEmail): array {
             [$newEmail, $token, $expiry, $userId]
         );
     } catch (Exception $e) {
-        return ['ok' => false, 'error' => 'Datenbank-Fehler. Bitte später erneut versuchen.'];
+        return ['ok' => false, 'error' => t('error_db')];
     }
 
     // Verifikations-Mail an die NEUE Adresse versenden
     if (!_send_email_change_verify($userId, (string) $user['username'], $newEmail, $token)) {
-        return ['ok' => false, 'error' => 'Verifikations-Mail konnte nicht gesendet werden.'];
+        return ['ok' => false, 'error' => t('email_change_mail_failed')];
     }
 
     // Optional: alte E-Mail informieren (Security-Awareness)
@@ -125,33 +125,33 @@ function email_change_initiate(int $userId, string $newEmail): array {
  */
 function email_change_verify(string $token): array {
     if (!str_contains($token, '.')) {
-        return ['ok' => false, 'error' => 'Ungültiger Link.'];
+        return ['ok' => false, 'error' => t('error_bad_link')];
     }
 
     [$payloadEnc, $hmacEnc] = explode('.', $token, 2);
     $payload = _b64url_decode($payloadEnc);
     $hmac    = _b64url_decode($hmacEnc);
     if ($payload === false || $hmac === false) {
-        return ['ok' => false, 'error' => 'Ungültiger Link.'];
+        return ['ok' => false, 'error' => t('error_bad_link')];
     }
 
     // HMAC-Check
     $expected = hash_hmac('sha256', $payload, email_change_secret(), true);
     if (!hash_equals($expected, $hmac)) {
-        return ['ok' => false, 'error' => 'Ungültiger Link (Signatur falsch).'];
+        return ['ok' => false, 'error' => t('error_bad_link_signature')];
     }
 
     // Payload parsen
     $parts = explode(':', $payload, 3);
     if (count($parts) !== 3) {
-        return ['ok' => false, 'error' => 'Ungültiger Link (Format).'];
+        return ['ok' => false, 'error' => t('error_bad_link_format')];
     }
     [$userId, $newEmail, $expiry] = $parts;
     $userId = (int) $userId;
     $expiry = (int) $expiry;
 
     if ($expiry < time()) {
-        return ['ok' => false, 'error' => 'Der Link ist abgelaufen. Bitte E-Mail-Änderung erneut starten.'];
+        return ['ok' => false, 'error' => t('email_change_expired')];
     }
 
     // Token MUSS noch in DB als pending sein (sonst: schon verbraucht oder abgebrochen)
@@ -161,10 +161,10 @@ function email_change_verify(string $token): array {
         [$userId]
     );
     if (!$user) {
-        return ['ok' => false, 'error' => 'Benutzer nicht gefunden.'];
+        return ['ok' => false, 'error' => t('error_user_missing_title')];
     }
     if (empty($user['pending_email_token']) || !hash_equals((string) $user['pending_email_token'], $token)) {
-        return ['ok' => false, 'error' => 'Dieser Link ist nicht mehr gültig (eventuell schon benutzt oder ein neuer wurde angefordert).'];
+        return ['ok' => false, 'error' => t('email_change_link_stale')];
     }
     if ($user['pending_email'] !== $newEmail) {
         return ['ok' => false, 'error' => 'Daten-Inkonsistenz.'];
@@ -174,7 +174,7 @@ function email_change_verify(string $token): array {
     $clash = db_fetch('SELECT user_id FROM users WHERE email = ? AND user_id != ?',
         [$newEmail, $userId]);
     if ($clash) {
-        return ['ok' => false, 'error' => 'Diese E-Mail-Adresse wurde inzwischen von jemand anderem belegt.'];
+        return ['ok' => false, 'error' => t('email_change_taken')];
     }
 
     // Umzug ausführen
@@ -190,7 +190,7 @@ function email_change_verify(string $token): array {
             [$newEmail, $userId]
         );
     } catch (Exception $e) {
-        return ['ok' => false, 'error' => 'Datenbank-Fehler beim Umzug.'];
+        return ['ok' => false, 'error' => t('error_db_move')];
     }
 
     return ['ok' => true, 'new_email' => $newEmail];
@@ -241,7 +241,7 @@ function _send_email_change_verify(int $userId, string $username, string $newEma
         </p>
     ';
 
-    $body = email_template('E-Mail-Adresse bestätigen', $bodyInner);
+    $body = email_template(t('email_change_subject'), $bodyInner);
     return send_email($newEmail, $subject, $body, true);
 }
 
@@ -276,6 +276,6 @@ function _send_email_change_notice(int $userId, string $username, string $oldEma
         </p>
     ';
 
-    $body = email_template('Hinweis: E-Mail-Änderung angefordert', $bodyInner);
+    $body = email_template(t('email_change_notice_subject'), $bodyInner);
     @send_email($oldEmail, $subject, $body, true);
 }

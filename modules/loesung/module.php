@@ -6,8 +6,8 @@ if (!defined('FORUM_RUNNING')) return [];
 // Themenansicht ein.
 return [
     'code'        => 'loesung',
-    'name'        => 'Als Lösung markieren',
-    'description' => 'Der Fragesteller kann eine Antwort als Lösung auszeichnen. Der Beitrag bekommt einen grünen Balken, oben im Thema steht ein Sprung dorthin.',
+    'name'        => 'loesung_modul_name',
+    'description' => 'loesung_modul_beschreibung',
     'icon'        => '✅',
     'version'     => '1.0',
     'author'      => 'Forumix',

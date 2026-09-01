@@ -1,29 +1,29 @@
 <div style="max-width:460px;margin:0 auto">
-  <div class="section-heading">Passwort zurücksetzen</div>
+  <div class="section-heading">{{ t('reset_passwort_zuruecksetzen') }}</div>
   <div class="form-card">
     {% if invalid %}
-      <div class="flash flash-error">Dieser Link ist ungültig oder abgelaufen. Bitte fordere einen neuen an.</div>
+      <div class="flash flash-error">{{ t('reset_dieser_link_ist_ungueltig') }}</div>
       <p style="margin-top:14px;text-align:center">
-        <a href="{{ url('/forgot.php') }}" class="btn btn-primary btn-sm">Neuen Link anfordern</a>
+        <a href="{{ url('/forgot.php') }}" class="btn btn-primary btn-sm">{{ t('reset_neuen_link_anfordern') }}</a>
       </p>
     {% elseif done %}
-      <div class="flash flash-success">Passwort erfolgreich gesetzt! Du kannst dich jetzt anmelden.</div>
+      <div class="flash flash-success">{{ t('reset_passwort_erfolgreich_gesetzt_du') }}</div>
       <p style="margin-top:14px;text-align:center">
-        <a href="{{ url('/login.php') }}" class="btn btn-primary">→ Zum Login</a>
+        <a href="{{ url('/login.php') }}" class="btn btn-primary">{{ t('reset_zum_login') }}</a>
       </p>
     {% else %}
       {% if error %}
         <div class="flash flash-error">{{ error }}</div>
       {% endif %}
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
-        Hallo <strong>{{ username }}</strong>, wähle ein neues Passwort:
+        {{ t('reset_hallo') }} <strong>{{ username }}</strong>, wähle ein neues Passwort:
       </p>
 
       <form method="post" autocomplete="off" id="resetForm">
         <input type="hidden" name="csrf" value="{{ csrfToken }}">
 
         <div class="form-row">
-          <label>Neues Passwort</label>
+          <label>{{ t('reset_neues_passwort') }}</label>
           <div class="password-input-wrap">
             <input type="password" name="password" id="reset_pw" required autofocus
                    minlength="6" autocomplete="new-password">
@@ -37,13 +37,13 @@
           </div>
           <div class="password-strength-wrap" id="reset_pw_strength" hidden>
             <div class="password-strength-bar"><div class="password-strength-fill" id="reset_pw_fill"></div></div>
-            <div class="password-strength-label" id="reset_pw_label">Passwort-Stärke</div>
+            <div class="password-strength-label" id="reset_pw_label">{{ t('reset_passwort_staerke') }}</div>
           </div>
-          <div class="form-hint">Mindestens 6 Zeichen · empfohlen mindestens 10 mit Zahlen + Sonderzeichen</div>
+          <div class="form-hint">{{ t('reset_mindestens_6_zeichen_empfohlen') }}</div>
         </div>
 
         <div class="form-row">
-          <label>Passwort wiederholen</label>
+          <label>{{ t('reset_passwort_wiederholen') }}</label>
           <div class="password-input-wrap">
             <input type="password" name="password2" id="reset_pw2" required
                    minlength="6" autocomplete="new-password">
@@ -58,7 +58,7 @@
           <div class="password-match-hint" id="reset_pw_match" hidden></div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Passwort speichern</button>
+        <button type="submit" class="btn btn-primary">{{ t('reset_passwort_speichern') }}</button>
       </form>
 
       <script>

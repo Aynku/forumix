@@ -20,7 +20,7 @@
     {% endif %}
 
     <div class="dashboard-hero-meta">
-      <span><strong>{{ dashUser.post_count ?? 0 }}</strong> Beiträge</span>
+      <span><strong>{{ dashUser.post_count ?? 0 }}</strong> {{ t('dashboard_beitraege') }}</span>
       <span class="dashboard-hero-sep">·</span>
       <span>Dabei seit {{ format_date(dashUser.registered_at ?? '') }}</span>
     </div>
@@ -42,40 +42,40 @@
 <div class="dashboard-stats">
   <div class="dash-stat">
     <div class="dash-stat-num">{{ dashOverview.posts_total ?? 0 }}</div>
-    <div class="dash-stat-label">Beiträge gesamt</div>
+    <div class="dash-stat-label">{{ t('dashboard_beitraege_gesamt') }}</div>
   </div>
   <div class="dash-stat dash-stat-accent">
     <div class="dash-stat-num">{{ dashOverview.posts_week ?? 0 }}</div>
-    <div class="dash-stat-label">Diese Woche</div>
+    <div class="dash-stat-label">{{ t('dashboard_diese_woche') }}</div>
   </div>
   <div class="dash-stat">
     <div class="dash-stat-num">{{ dashOverview.posts_month ?? 0 }}</div>
-    <div class="dash-stat-label">Letzte 30 Tage</div>
+    <div class="dash-stat-label">{{ t('dashboard_letzte_30_tage') }}</div>
   </div>
   <div class="dash-stat">
     <div class="dash-stat-num">{{ dashOverview.threads_started ?? 0 }}</div>
-    <div class="dash-stat-label">Themen gestartet</div>
+    <div class="dash-stat-label">{{ t('dashboard_themen_gestartet') }}</div>
   </div>
   <div class="dash-stat">
     <div class="dash-stat-num">{{ dashOverview.reactions_received ?? 0 }}</div>
-    <div class="dash-stat-label">Reaktionen erhalten</div>
+    <div class="dash-stat-label">{{ t('dashboard_reaktionen_erhalten') }}</div>
   </div>
   <div class="dash-stat">
     <div class="dash-stat-num">{{ dashOverview.reactions_given ?? 0 }}</div>
-    <div class="dash-stat-label">Reaktionen gegeben</div>
+    <div class="dash-stat-label">{{ t('dashboard_reaktionen_gegeben') }}</div>
   </div>
   <div class="dash-stat">
     <div class="dash-stat-num">{{ dashOverview.bookmarks ?? 0 }}</div>
-    <div class="dash-stat-label">Lesezeichen</div>
+    <div class="dash-stat-label">{{ t('dashboard_lesezeichen') }}</div>
   </div>
   <div class="dash-stat">
     <div class="dash-stat-num">{{ dashAch.unlocked }}/{{ dashAch.total }}</div>
-    <div class="dash-stat-label">Achievements</div>
+    <div class="dash-stat-label">{{ t('dashboard_achievements') }}</div>
   </div>
 </div>
 
 <div class="card" style="margin-bottom:18px;padding:20px">
-  <h2 style="font-size:15px;margin-bottom:14px">Deine Aktivität – letzte 12 Wochen</h2>
+  <h2 style="font-size:15px;margin-bottom:14px">{{ t('dashboard_deine_aktivitaet_letzte_12') }}</h2>
   <div class="heatmap-wrap">
     <div class="heatmap-grid">
       {% for week in dashWeeks %}
@@ -88,22 +88,22 @@
       {% endfor %}
     </div>
     <div class="heatmap-legend">
-      <span>Weniger</span>
+      <span>{{ t('dashboard_weniger') }}</span>
       <div class="heatmap-cell heatmap-l0"></div>
       <div class="heatmap-cell heatmap-l1"></div>
       <div class="heatmap-cell heatmap-l2"></div>
       <div class="heatmap-cell heatmap-l3"></div>
       <div class="heatmap-cell heatmap-l4"></div>
-      <span>Mehr</span>
+      <span>{{ t('dashboard_mehr') }}</span>
     </div>
   </div>
 </div>
 
 <div class="dashboard-cols">
   <div class="card" style="padding:18px">
-    <h2 style="font-size:15px;margin-bottom:12px">Deine Top-Beiträge</h2>
+    <h2 style="font-size:15px;margin-bottom:12px">{{ t('dashboard_deine_top_beitraege') }}</h2>
     {% if not topPosts %}
-      <div style="color:var(--text-faint);font-size:13px;font-style:italic">Noch keine Reaktionen erhalten.</div>
+      <div style="color:var(--text-faint);font-size:13px;font-style:italic">{{ t('dashboard_noch_keine_reaktionen_erhalten') }}</div>
     {% else %}
       <div class="dash-list">
         {% for p in topPosts %}
@@ -120,9 +120,9 @@
   </div>
 
   <div class="card" style="padding:18px">
-    <h2 style="font-size:15px;margin-bottom:12px">Deine erfolgreichsten Themen</h2>
+    <h2 style="font-size:15px;margin-bottom:12px">{{ t('dashboard_deine_erfolgreichsten_themen') }}</h2>
     {% if not topThreads %}
-      <div style="color:var(--text-faint);font-size:13px;font-style:italic">Noch keine Themen gestartet.</div>
+      <div style="color:var(--text-faint);font-size:13px;font-style:italic">{{ t('dashboard_noch_keine_themen_gestartet') }}</div>
     {% else %}
       <div class="dash-list">
         {% for t in topThreads %}
@@ -139,10 +139,10 @@
   </div>
 
   <div class="card" style="padding:18px">
-    <h2 style="font-size:15px;margin-bottom:12px">Mit wem interagierst du am meisten?</h2>
+    <h2 style="font-size:15px;margin-bottom:12px">{{ t('dashboard_mit_wem_interagierst_du') }}</h2>
     {% if not topInteractions %}
       <div style="color:var(--text-faint);font-size:13px;font-style:italic">
-        Noch keine Interaktionen.
+        {{ t('dashboard_noch_keine_interaktionen') }}
       </div>
     {% else %}
       <div class="dash-list">
@@ -162,7 +162,7 @@
 
   <div class="card" style="padding:18px">
     <h2 style="font-size:15px;margin-bottom:12px">
-      Achievements
+      {{ t('dashboard_achievements') }}
       <a href="{{ url('/achievements.php') }}" style="font-size:12px;font-weight:400;margin-left:6px;color:var(--text-muted)">alle anzeigen →</a>
     </h2>
     <div class="dash-ach-progress">
@@ -172,7 +172,7 @@
       {{ dashAch.unlocked }} von {{ dashAch.total }} freigeschaltet
     </div>
     {% if dashAch.recent %}
-      <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Zuletzt freigeschaltet</div>
+      <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">{{ t('dashboard_zuletzt_freigeschaltet') }}</div>
       <div class="dash-list">
         {% for a in dashAch.recent %}
           <div class="dash-list-item" style="cursor:default">
@@ -189,9 +189,9 @@
 </div>
 
 <div class="card" style="padding:18px;margin-top:18px">
-  <h2 style="font-size:15px;margin-bottom:12px">Deine letzte Aktivität</h2>
+  <h2 style="font-size:15px;margin-bottom:12px">{{ t('dashboard_deine_letzte_aktivitaet') }}</h2>
   {% if not recentActivity %}
-    <div style="color:var(--text-faint);font-size:13px;font-style:italic">Noch keine Aktivität.</div>
+    <div style="color:var(--text-faint);font-size:13px;font-style:italic">{{ t('dashboard_noch_keine_aktivitaet') }}</div>
   {% else %}
     <div class="dash-list">
       {% for r in recentActivity %}

@@ -11,7 +11,7 @@ require_once __DIR__ . '/../../bootstrap.php';
 function datei_weg(int $code): void {
     http_response_code($code);
     header('Content-Type: text/plain; charset=utf-8');
-    echo $code === 404 ? 'Datei nicht gefunden.' : 'Kein Zugriff.';
+    echo $code === 404 ? t('downloads_file_missing') : t('error_denied_flash');
     exit;
 }
 

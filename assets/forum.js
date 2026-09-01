@@ -1,6 +1,13 @@
 // forum.js – Dark Mode + BBCode + Notifications
 
 // ── DARK / LIGHT MODE ────────────────────────────────────────────────
+// Uebersetzung im Browser. window.FORUM_T kommt aus dem Layout und haelt
+// die Saetze, die hier gebraucht werden — siehe js_texte() in lib/lang.php.
+// Fehlt ein Schluessel, steht er selbst da; das faellt sofort auf.
+function T(schluessel) {
+  return (window.FORUM_T && window.FORUM_T[schluessel]) || schluessel;
+}
+
 (function () {
   const KEY  = 'forum_theme';
   const html = document.documentElement;
@@ -179,12 +186,12 @@ document.addEventListener('click', function (e) {
   function showLoading() {
     dropdown.classList.add('open');
     dropdown.setAttribute('aria-hidden', 'false');
-    dropdown.innerHTML = '<div class="qs-loading">⏳ Suche läuft…</div>';
+    dropdown.innerHTML = '<div class="qs-loading">' + T('js_search_running') + '</div>';
   }
 
   function showEmpty(query) {
     dropdown.classList.add('open');
-    dropdown.innerHTML = '<div class="qs-empty">Keine Treffer für <strong>'
+    dropdown.innerHTML = '<div class="qs-empty">' + T('js_no_matches') + ' <strong>'
       + escapeHTML(query) + '</strong></div>'
       + '<a class="qs-all" href="' + FORUM_URL + '/search.php?q=' + encodeURIComponent(query) + '">'
       + '🔍 Erweiterte Suche →</a>';
@@ -230,7 +237,7 @@ document.addEventListener('click', function (e) {
               + '<img class="qs-avatar" src="' + escapeHTML(u.avatar_url) + '" alt="">'
               + '<div class="qs-item-main">'
               +   '<div class="qs-item-title">' + highlight(u.username, data.query) + ' ' + badge + '</div>'
-              +   '<div class="qs-item-meta">' + u.post_count + ' Beiträge &bull; '
+              +   '<div class="qs-item-meta">' + u.post_count + ' ' + T('js_posts_suffix') + ' &bull; '
               +     escapeHTML(u.rank || '') + '</div>'
               + '</div>'
               + '</a>';
@@ -326,12 +333,12 @@ document.addEventListener('click', function (e) {
   })();
   const FORUM_URL = window.location.origin + FORUM_PATH;
   const REACTION_TYPES = {
-    like:   ['👍', 'Gefällt mir'],
-    love:   ['❤️', 'Liebe'],
-    haha:   ['😄', 'Lustig'],
-    wow:    ['😮', 'Wow'],
-    sad:    ['😢', 'Traurig'],
-    thanks: ['🙏', 'Danke'],
+    like:   ['👍', T('react_like')],
+    love:   ['❤️', T('react_love')],
+    haha:   ['😄', T('react_haha')],
+    wow:    ['😮', T('react_wow')],
+    sad:    ['😢', T('react_sad')],
+    thanks: ['🙏', T('react_thanks')],
   };
   const csrfMeta = () => window.FORUM_CSRF || '';
 
@@ -409,14 +416,14 @@ document.addEventListener('click', function (e) {
       .then(data => {
         if (data.error) {
           console.error('Reaktion-Fehler:', data.error);
-          alert('Reaktion fehlgeschlagen: ' + data.error);
+          alert(T('js_reaction_failed') + ' ' + data.error);
           return;
         }
         renderReactions(bar, data.reactions);
       })
       .catch(err => {
         console.error('Reaktion-Netzwerkfehler:', err);
-        alert('Reaktion fehlgeschlagen. Details in der Konsole (F12).');
+        alert(T('js_reaction_failed_console'));
       });
   }
 
@@ -470,10 +477,10 @@ document.addEventListener('click', function (e) {
         // Kein Zeichen mehr daneben — die Beschriftung sagt den Zustand.
         const label = document.getElementById('bookmark-label');
         if (data.action === 'added') {
-          label.textContent = 'Gespeichert';
+          label.textContent = T('js_saved');
           btn.dataset.bookmarked = '1';
         } else {
-          label.textContent = 'Lesezeichen';
+          label.textContent = T('bookmarks');
           btn.dataset.bookmarked = '0';
         }
       })
@@ -511,10 +518,10 @@ document.addEventListener('click', function (e) {
   try {
     const saved = localStorage.getItem(storageKey);
     if (saved && saved.length > 5 && !ta.value.trim()) {
-      const restore = confirm('🔄 Es gibt einen gespeicherten Entwurf für diese Seite. Wiederherstellen?');
+      const restore = confirm(T('js_draft_restore'));
       if (restore) {
         ta.value = saved;
-        showStatus('💾 Entwurf wiederhergestellt');
+        showStatus(T('js_draft_restored'));
         // Live-Vorschau aktualisieren falls aktiv
         ta.dispatchEvent(new Event('input', { bubbles: true }));
       } else {
@@ -531,7 +538,7 @@ document.addEventListener('click', function (e) {
       try {
         if (ta.value.trim()) {
           localStorage.setItem(storageKey, ta.value);
-          showStatus('💾 Entwurf gespeichert');
+          showStatus(T('js_draft_saved'));
           setTimeout(() => showStatus(''), 1500);
         }
       } catch (e) {}
@@ -695,7 +702,7 @@ document.addEventListener('click', function (e) {
   function renderMatches() {
     if (!popup) return;
     if (currentMatches.length === 0) {
-      popup.innerHTML = '<div class="mention-empty">Keine Treffer</div>';
+      popup.innerHTML = '<div class="mention-empty">' + T('js_no_matches') + '</div>';
       return;
     }
     popup.innerHTML = currentMatches.map((u, i) => {
@@ -1332,7 +1339,7 @@ document.addEventListener('click', function (e) {
         status.innerHTML = '<span style="color:var(--color-danger)">❌ ' + data.error + '</span>';
       }
     } catch (e) {
-      status.innerHTML = '<span style="color:var(--color-danger)">❌ Netzwerk-Fehler. Prüfe Browser-Konsole.</span>';
+      status.innerHTML = '<span style="color:var(--color-danger)">' + T('js_network_error') + '</span>';
       console.error(e);
     }
     btn.textContent = originalText;
@@ -1584,7 +1591,7 @@ document.addEventListener('click', function (e) {
   function refreshPreview(ta, target) {
     // Leerer Text → freundlicher Hinweis statt Server-Request
     if (!ta.value.trim()) {
-      target.innerHTML = '<em style="color:var(--text-muted)">Schreibe etwas, um die Vorschau zu sehen…</em>';
+      target.innerHTML = '<em style="color:var(--text-muted)">' + T('js_preview_empty') + '</em>';
       return;
     }
     target.innerHTML = '<em style="color:var(--text-muted)">Lade Vorschau…</em>';
@@ -1595,7 +1602,7 @@ document.addEventListener('click', function (e) {
       .then(d => {
         if (d && d.html) target.innerHTML = d.html;
         else if (d && d.error) target.textContent = 'Fehler: ' + d.error;
-        else target.innerHTML = '<em style="color:var(--text-muted)">Schreibe etwas, um die Vorschau zu sehen…</em>';
+        else target.innerHTML = '<em style="color:var(--text-muted)">' + T('js_preview_empty') + '</em>';
       })
       .catch(() => {
         target.textContent = 'Vorschau konnte nicht geladen werden.';

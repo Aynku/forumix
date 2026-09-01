@@ -1,6 +1,6 @@
 <div style="max-width:480px;margin:0 auto">
   <div class="form-card">
-    <h2>Passwort-geschütztes Forum</h2>
+    <h2>{{ t('board_unlock_passwort_geschuetztes_forum') }}</h2>
 
     <div style="padding:14px;background:var(--bg-surface2);border-radius:var(--radius-sm);margin-bottom:16px">
       <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">FORUM</div>
@@ -11,8 +11,7 @@
     </div>
 
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-      Dieses Forum ist passwort-geschützt. Bitte gib das Passwort ein, das du
-      vom Forum-Team erhalten hast. Du bleibst entsperrt bis zum Logout.
+      {{ t('board_unlock_dieses_forum_ist_passwort') }}
     </p>
 
     {% if error %}
@@ -22,17 +21,17 @@
     <form method="post" autocomplete="off">
       <input type="hidden" name="csrf" value="{{ csrfToken }}">
       <div class="form-row">
-        <label>Passwort</label>
+        <label>{{ t('board_unlock_passwort') }}</label>
         <input type="password" name="password" required autofocus
                placeholder="Passwort eingeben...">
       </div>
       <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
-        Entsperren
+        {{ t('board_unlock_entsperren') }}
       </button>
     </form>
 
     <p style="text-align:center;margin-top:14px;font-size:12px">
-      <a href="{{ url('/index.php') }}" style="color:var(--text-muted)">← Zurück zur Startseite</a>
+      <a href="{{ url('/index.php') }}" style="color:var(--text-muted)">{{ t('board_unlock_zurueck_zur_startseite') }}</a>
     </p>
   </div>
 </div>

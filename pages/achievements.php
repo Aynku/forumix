@@ -7,7 +7,7 @@ require_login();
 $cu       = current_user();
 $showUser = get_int('user', (int) $cu['user_id']);
 $profile  = db_fetch('SELECT * FROM users WHERE user_id = ?', [$showUser]);
-if (!$profile) error_page(404, 'Benutzer nicht gefunden', 'Dieses Konto gibt es nicht.');
+if (!$profile) error_page(404, t('error_user_missing_title'), t('error_user_missing_text'));
 
 check_achievements((int) $profile['user_id']);
 
@@ -17,7 +17,7 @@ $total    = count($overview);
 $points   = user_total_points((int) $profile['user_id']);
 
 render('achievements', [
-    'title'    => 'Achievements',
+    'title'    => t('achievements'),
     'profile'  => $profile,
     'overview' => $overview,
     'earned'   => $earned,

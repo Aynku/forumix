@@ -1,12 +1,12 @@
 <div class="section-heading">Edit-Verlauf von Beitrag #{{ post.post_id }}</div>
 
 <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-  Beitrag von <strong>{{ post.author_name }}</strong> in
+  {{ t('post_history_beitrag_von') }} <strong>{{ post.author_name }}</strong> in
   „<a href="{{ url('/thread.php?id=') }}{{ post.thread_id }}#post{{ post.post_id }}">{{ post.thread_title }}</a>".
 </p>
 
 <div class="card" style="margin-bottom:14px">
-  <div class="card-header"><span class="card-title">Aktuelle Version</span></div>
+  <div class="card-header"><span class="card-title">{{ t('post_history_aktuelle_version') }}</span></div>
   <div style="padding:16px;font-size:13px">
     {{ bbcode(post.content)|raw }}
   </div>
@@ -20,7 +20,7 @@
 {% if not history %}
   <div class="card" style="padding:30px;text-align:center;color:var(--text-faint)">
     <div style="font-size:36px;margin-bottom:8px">📜</div>
-    Noch keine Bearbeitungen.
+    {{ t('post_history_noch_keine_bearbeitungen') }}
   </div>
 {% else %}
   <div class="section-heading">Vorherige Versionen ({{ count(history) }})</div>

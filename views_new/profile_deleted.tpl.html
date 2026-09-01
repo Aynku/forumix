@@ -4,7 +4,7 @@
     <em>{{ zeigename(profile.username) }}</em>
   </h2>
   <p style="color:var(--text-muted);font-size:14px;line-height:1.6">
-    Dieser Account wurde gelöscht.
+    {{ t('profile_deleted_dieser_account_wurde_geloescht') }}
   </p>
   {% if profile.deleted_at %}
     <p style="color:var(--text-faint);font-size:12px;margin-top:8px">
@@ -12,9 +12,9 @@
     </p>
   {% endif %}
   <p style="color:var(--text-faint);font-size:12px;margin-top:14px;line-height:1.6">
-    Beiträge dieses Benutzers bleiben erhalten, persönliche Daten wurden vollständig entfernt.
+    {{ t('profile_deleted_beitraege_dieses_benutzers_bleiben') }}
   </p>
   <p style="margin-top:24px">
-    <a href="{{ url('/index.php') }}" class="btn btn-ghost btn-sm">← Zur Startseite</a>
+    <a href="{{ url('/index.php') }}" class="btn btn-ghost btn-sm">{{ t('profile_deleted_zur_startseite') }}</a>
   </p>
 </div>

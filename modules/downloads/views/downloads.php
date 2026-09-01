@@ -11,16 +11,16 @@
     <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
     <input type="hidden" name="tun" value="hochladen">
 
-    <h3 style="margin-top:0">Datei einstellen</h3>
+    <h3 style="margin-top:0"><?= t('downloads_datei_einstellen') ?></h3>
 
     <div class="form-row">
-      <label>Titel</label>
+      <label><?= t('downloads_titel') ?></label>
       <input type="text" name="titel" maxlength="140" required>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div class="form-row">
-        <label>Kategorie <span style="color:var(--text-faint)">(optional)</span></label>
+        <label><?= t('downloads_kategorie') ?> <span style="color:var(--text-faint)">(optional)</span></label>
         <input type="text" name="kategorie" maxlength="80" list="dl-kategorien"
                placeholder="z.B. Anleitungen">
         <datalist id="dl-kategorien">
@@ -30,27 +30,27 @@
         </datalist>
       </div>
       <div class="form-row">
-        <label>Datei</label>
+        <label><?= t('downloads_datei') ?></label>
         <input type="file" name="datei" required>
-        <div class="form-hint">Bis <?= e($maxGroesse) ?>. Bilder, PDF, TXT, ZIP, RAR.</div>
+        <div class="form-hint"><?= t('downloads_bis') ?> <?= e($maxGroesse) ?>. Bilder, PDF, TXT, ZIP, RAR.</div>
       </div>
     </div>
 
     <div class="form-row">
-      <label>Beschreibung <span style="color:var(--text-faint)">(optional)</span></label>
+      <label><?= t('downloads_beschreibung') ?> <span style="color:var(--text-faint)">(optional)</span></label>
       <textarea name="beschreibung" maxlength="2000" style="min-height:80px"></textarea>
     </div>
 
-    <button class="btn btn-primary">Hochladen</button>
+    <button class="btn btn-primary"><?= t('downloads_hochladen') ?></button>
   </form>
 <?php endif; ?>
 
 <?php if (empty($nachKategorie)): ?>
   <div class="card" style="padding:40px;text-align:center">
     <div style="font-size:48px;margin-bottom:12px">📥</div>
-    <strong>Noch keine Dateien eingestellt</strong>
+    <strong><?= t('downloads_noch_keine_dateien_eingestellt') ?></strong>
     <?php if (!$canAdmin): ?>
-      <div style="color:var(--text-muted);margin-top:6px">Schau später noch einmal vorbei.</div>
+      <div style="color:var(--text-muted);margin-top:6px"><?= t('downloads_schau_spaeter_noch_einmal') ?></div>
     <?php endif; ?>
   </div>
 <?php endif; ?>
@@ -82,7 +82,7 @@
             <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
             <input type="hidden" name="tun" value="loeschen">
             <input type="hidden" name="id" value="<?= (int) $d['download_id'] ?>">
-            <button class="btn btn-ghost btn-sm">Löschen</button>
+            <button class="btn btn-ghost btn-sm"><?= t('downloads_loeschen') ?></button>
           </form>
         <?php endif; ?>
       </div>

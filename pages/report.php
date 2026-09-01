@@ -7,32 +7,32 @@ require_login();
 $postId = get_int('post');
 $post = db_fetch('SELECT p.*, t.thread_id, t.board_id FROM posts p JOIN threads t ON t.thread_id = p.thread_id
                    WHERE p.post_id = ?' . sichtbar_sql('p') . sichtbar_sql('t'), [$postId]);
-if (!$post) error_page(404, 'Beitrag nicht gefunden', 'Dieser Beitrag gibt es nicht oder er wurde entfernt.');
+if (!$post) error_page(404, t('error_post_missing_title'), t('error_post_missing_text'));
 
 // Die Seite zeigt eine Vorschau des Beitrags. Ohne Zugangspruefung waere sie
 // ein Leseweg in passwortgeschuetzte Foren: post_id hochzaehlen genuegt.
 if (!board_id_can_access((int) $post['board_id'])) {
-    error_page(403, 'Kein Zugriff', 'Dieser Beitrag liegt in einem passwortgeschützten Forum.');
+    error_page(403, t('error_denied_title'), t('report_board_locked'));
 }
 
 $error = '';
 $success = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf(post_str('csrf'))) error_page(400, 'Sicherheits-Token ungültig', 'Bitte lade die Seite neu und versuche es noch einmal.');
+    if (!verify_csrf(post_str('csrf'))) error_page(400, t('error_csrf_title'), t('error_csrf_text'));
 
     $reason  = post_str('reason');
     $comment = post_str('comment');
     $cu      = current_user();
 
     if (!isset(report_reasons()[$reason])) {
-        $error = 'Bitte einen Grund auswählen.';
+        $error = t('report_reason_required');
     } elseif (create_report($postId, (int) $cu['user_id'], $reason, $comment)) {
         $success = true;
-        flash('Meldung erfolgreich abgesendet. Vielen Dank!', 'success');
+        flash(t('report_sent'), 'success');
         redirect(FORUM_URL . '/thread.php?id=' . $post['thread_id'] . '#post' . $postId);
     } else {
-        $error = 'Du hast diesen Beitrag bereits gemeldet.';
+        $error = t('report_already');
     }
 }
 
@@ -45,7 +45,7 @@ foreach (report_reasons() as $key => $label) {
 }
 
 render('report', [
-    'title'   => 'Beitrag melden',
+    'title'   => t('report_title'),
     'post'    => $post,
     'error'   => $error,
     'reasons' => $reasonOptions,

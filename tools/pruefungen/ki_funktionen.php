@@ -1052,11 +1052,24 @@ return [
         // Kommentare und Systemtexte duerfen ASCII bleiben — das ist Hausstil
         // und niemand liest sie. Was im Forum steht, nicht: "laesst" faellt
         // dem Benutzer auf und sieht nach Nachlaessigkeit aus.
+        /*
+         * Seit der Umstellung aufs Sprachpaket stehen in name und hinweis
+         * SCHLUESSEL, nicht Texte. Geprueft wird deshalb der Text, den der
+         * Schluessel liefert — sonst pruefte diese Zusicherung nichts mehr.
+         */
+        $texte = require dirname(__DIR__, 2) . '/modules/ki/lang/de.php';
+
         foreach (ki_befehle() as $code => $b) {
             foreach (['name', 'hinweis'] as $feld) {
-                if (preg_match('/\b(ae|oe|ue|ss)\b|laesst|koennen|muessen|fuer|ueber(?!setz)/u', $b[$feld])) {
+                $schluessel = $b[$feld];
+
+                if (!isset($texte[$schluessel])) {
+                    throw new RuntimeException("Zu $code fehlt der Text zu \"$schluessel\" in modules/ki/lang/de.php");
+                }
+
+                if (preg_match('/\b(ae|oe|ue|ss)\b|laesst|koennen|muessen|fuer|ueber(?!setz)/u', $texte[$schluessel])) {
                     throw new RuntimeException("Ersatzschreibweise im sichtbaren Text von $code: "
-                        . var_export($b[$feld], true));
+                        . var_export($texte[$schluessel], true));
                 }
             }
         }
