@@ -24,9 +24,8 @@
     <div class="card" style="border-left:3px solid var(--color-warning);margin-bottom:16px">
       <strong><?= t('kontakt_no_recipient_heading') ?></strong>
       <div style="color:var(--text-muted);margin-top:6px;font-size:14px">
-        <?= t('kontakt_das_formular_nimmt_nichts') ?>
-        <em><?= t('kontakt_adminbereich_rechtliches') ?></em> als Impressum-E-Mail ein, oder hinterlege
-        unter <em><?= t('kontakt_e_mail') ?></em> eine Absenderadresse.
+        <?= t('kontakt_hinweis_adresse', '<em>' . e(t('kontakt_adminbereich_rechtliches')) . '</em>',
+                                          '<em>' . e(t('kontakt_e_mail')) . '</em>') ?>
       </div>
     </div>
   <?php endif; ?>
@@ -87,7 +86,7 @@
             <?= e($n['absender']) ?> &lt;<?= e($n['email']) ?>&gt;
             &nbsp;·&nbsp;<?= e(format_date($n['created_at'])) ?>
             <?php if (!(int) $n['versandt']): ?>
-              &nbsp;·&nbsp;<span style="color:var(--color-warning)">nicht per Mail zugestellt</span>
+              &nbsp;·&nbsp;<span style="color:var(--color-warning)"><?= e(t('kontakt_nicht_zugestellt')) ?></span>
             <?php endif; ?>
           </div>
         </div>

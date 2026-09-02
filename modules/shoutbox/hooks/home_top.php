@@ -25,7 +25,7 @@ if (!isset($csrfToken))   $csrfToken   = $_SESSION['csrf_token'] ?? '';
       </form>
     <?php else: ?>
       <div class="shoutbox-login-hint">
-        <a href="<?= e(FORUM_URL) ?>/login.php">Einloggen</a>, um die Shoutbox zu nutzen
+        <a href="<?= e(FORUM_URL) ?>/login.php"><?= e(t('shoutbox_einloggen')) ?></a><?= e(t('shoutbox_zum_nutzen')) ?>
       </div>
     <?php endif; ?>
   </div>

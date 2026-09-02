@@ -20,4 +20,7 @@ return [
     'loesung_see_below' => 'Der markierte Beitrag steht weiter unten.',
     'loesung_modul_name' => 'Als Lösung markieren',
     'loesung_modul_beschreibung' => 'Der Fragesteller kann eine Antwort als Lösung auszeichnen. Der Beitrag bekommt einen grünen Balken, oben im Thema steht ein Sprung dorthin.',
+
+    // ── Nachgezogen ──
+    'loesung_springen' => 'Zur Lösung springen',
 ];

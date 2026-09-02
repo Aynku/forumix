@@ -30,7 +30,7 @@
           <?php if ($canAdmin): ?>
             <div style="display:flex;gap:6px;align-items:flex-start">
               <a class="btn btn-ghost btn-sm"
-                 href="<?= e($selbst) ?>?bearbeiten=<?= (int) $t['termin_id'] ?>">Ändern</a>
+                 href="<?= e($selbst) ?>?bearbeiten=<?= (int) $t['termin_id'] ?>"><?= e(t('termine_aendern')) ?></a>
               <form method="post" style="display:inline"
                     onsubmit="return confirm(<?= json_encode(t('termine_loeschen_frage')) ?>)">
                 <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">

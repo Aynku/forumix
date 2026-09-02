@@ -31,4 +31,8 @@ return [
     'kontakt_menu' => 'Kontakt',
     'kontakt_modul_name' => 'Kontaktformular',
     'kontakt_modul_beschreibung' => 'Seite, über die auch Nicht-Mitglieder eine Nachricht schicken können. Geht per E-Mail raus und wird zusätzlich in der Datenbank abgelegt, damit nichts verloren geht.',
+
+    // ── Nachgezogen ──
+    'kontakt_hinweis_adresse' => 'Trage unter %s eine Impressum-E-Mail ein, oder hinterlege unter %s eine Absenderadresse.',
+    'kontakt_nicht_zugestellt' => 'nicht per Mail zugestellt',
 ];

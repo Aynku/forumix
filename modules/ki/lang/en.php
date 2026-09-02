@@ -101,4 +101,16 @@ return [
     'ki_js_wohin_uebersetzen' => 'Translate into what?',
     'ki_js_schliessen' => 'Close',
     'ki_js_zu_lang_zum_faerben' => 'The text is too long to colour the differences. Please compare it yourself.',
+
+    // ── Nachgezogen ──
+    'ki_wer_zahlt_text' => '%s whoever runs this forum. Every click on an assistant button is a request to the chosen provider and lands on their bill. That is why there are two brakes further down — characters per request, and requests per hour and person. Enter nothing and nothing is enabled: without a key the button stays invisible in the editor.',
+    'ki_nicht_mehr_aendern' => 'never change it again',
+    'ki_schluessel_hinweis' => '%s and take it along when you move — otherwise what was stored with it can no longer be read. The key helps against a database dump gone astray, not against someone who has the server: they read %s too.',
+    'ki_schluessel_entfernen' => 'remove the stored key',
+    'ki_kennzeichnen_text' => '%s means the post visibly says that a language model helped write it. For a plain spelling fix that is overkill — for a summary it is not, because there the model decides what gets dropped.',
+    'ki_entscheidet_mit' => 'has a say in what gets dropped',
+    'ki_modell_je_befehl_text' => '%s empty means "the one entered above". The choice matters where %s appears — when shortening and summarising, the model picks what stays in the post. For spelling and translation a larger model makes no measurable difference and costs several times as much.',
+
+    'ki_schluessel_hinterlegt' => '•••••••• (stored — leave empty to keep it)',
+    'ki_kein_schluessel' => 'none stored yet',
 ];

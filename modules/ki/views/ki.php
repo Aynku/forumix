@@ -12,11 +12,7 @@
 <?php endif; ?>
 
 <div class="card" style="margin-bottom:16px;padding:14px 16px;font-size:13px;line-height:1.7">
-  <strong><?= t('ki_wer_zahlt') ?></strong> der Betreiber dieses Forums. Jeder Klick auf einen
-  KI-Knopf ist eine Anfrage an den gewählten Anbieter und erscheint auf dessen
-  Rechnung. Deshalb gibt es weiter unten zwei Bremsen — Zeichenzahl je Anfrage
-  und Anfragen je Stunde und Person. Wer nichts einträgt, gibt nichts frei:
-  ohne Schlüssel bleibt der Knopf im Editor unsichtbar.
+  <?= t('ki_wer_zahlt_text', '<strong>' . e(t('ki_wer_zahlt')) . '</strong>') ?>
 </div>
 
 <?php if (!empty($nachgezogen)): ?>
@@ -36,10 +32,7 @@
     <pre style="white-space:pre-wrap;word-break:break-all;background:var(--bg-body);
          padding:10px;border-radius:6px;margin:0"><code>define('FORUM_CRYPT_KEY', '<?= e($crypt_vorschlag) ?>');</code></pre>
     <p style="margin:8px 0 0;font-size:13px;line-height:1.6">
-      <?= t('ki_danach') ?> <strong>nicht mehr ändern</strong> und beim Umzug mitnehmen — sonst ist
-      nicht mehr lesbar, was damit gespeichert wurde. Der Schlüssel hilft gegen einen
-      abhandengekommenen Datenbank-Abzug, nicht gegen jemanden, der den Server hat:
-      der liest die <code>config.php</code> mit.
+      <?= t('ki_schluessel_hinweis', '<strong>' . e(t('ki_nicht_mehr_aendern')) . '</strong>', '<code>config.php</code>') ?>
     </p>
   </div>
 <?php endif; ?>
@@ -67,12 +60,12 @@
   <div class="form-row">
     <label><?= t('ki_api_schluessel') ?></label>
     <input type="password" name="schluessel" autocomplete="off"
-           placeholder="<?= $hat_schluessel ? '•••••••• (hinterlegt — leer lassen, um ihn zu behalten)' : 'noch keiner hinterlegt' ?>">
+           placeholder="<?= e($hat_schluessel ? t('ki_schluessel_hinterlegt') : t('ki_kein_schluessel')) ?>">
     <div class="form-hint">
       <?= t('ki_wird_verschluesselt_gespeichert_und') ?>
       <?php if ($hat_schluessel): ?>
         <label style="display:inline-block;margin-left:8px">
-          <input type="checkbox" name="schluessel_weg" value="1"> hinterlegten Schlüssel entfernen
+          <input type="checkbox" name="schluessel_weg" value="1"> <?= e(t('ki_schluessel_entfernen')) ?>
         </label>
       <?php endif; ?>
     </div>
@@ -89,10 +82,7 @@
 
   <div class="section-heading" style="margin-top:24px"><?= t('ki_befehle') ?></div>
   <div class="form-hint" style="margin-bottom:10px">
-    <strong><?= t('ki_kennzeichnen') ?></strong> heißt: der Beitrag trägt sichtbar den Hinweis, dass
-    ein Sprachmodell mitgeschrieben hat. Bei einer reinen Rechtschreibkorrektur ist
-    das übertrieben — beim Zusammenfassen nicht, denn dabei entscheidet das Modell,
-    was wegfällt.
+    <?= t('ki_kennzeichnen_text', '<strong>' . e(t('ki_kennzeichnen')) . '</strong>') ?>
   </div>
 
   <table class="forum-table" style="margin-bottom:8px">
@@ -122,7 +112,7 @@
                    placeholder="wie oben" style="width:100%;font-size:12px">
             <?php if ($urteil): ?>
               <div style="font-size:11px;color:var(--color-warning);margin-top:3px">
-                entscheidet mit, was wegfällt
+                <?= e(t('ki_entscheidet_mit')) ?>
               </div>
             <?php endif; ?>
           </td>
@@ -137,11 +127,8 @@
     </tbody>
   </table>
   <div class="form-hint" style="margin-bottom:8px">
-    <strong><?= t('ki_modell_je_befehl') ?></strong> leer heißt „das oben eingetragene". Sinnvoll ist
-    der Unterschied dort, wo <em>entscheidet mit, was wegfällt</em> steht — beim Kürzen
-    und Zusammenfassen wählt das Modell aus, was im Beitrag bleibt. Bei Rechtschreibung
-    und Übersetzen macht ein größeres Modell messbar keinen Unterschied, kostet aber
-    ein Vielfaches.
+    <?= t('ki_modell_je_befehl_text', '<strong>' . e(t('ki_modell_je_befehl')) . '</strong>',
+                                     '<em>' . e(t('ki_entscheidet_mit')) . '</em>') ?>
   </div>
 
   <div class="section-heading" style="margin-top:24px"><?= t('ki_wer_darf') ?></div>

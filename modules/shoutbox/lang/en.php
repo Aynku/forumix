@@ -19,4 +19,8 @@ return [
     'shoutbox_loeschen_frage' => 'Delete this message?',
 
     'shoutbox_platzhalter' => 'Write something nice… (Enter to send, max. 500 characters)',
+
+    // ── Nachgezogen ──
+    'shoutbox_einloggen' => 'Sign in',
+    'shoutbox_zum_nutzen' => ' to use the shoutbox',
 ];

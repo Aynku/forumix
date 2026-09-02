@@ -211,7 +211,21 @@ return [
         if (!str_contains($block, 'module_tabellen(')) {
             throw new RuntimeException('Die Rückfrage zählt die Tabellen nicht auf');
         }
-        if (!str_contains($block, 'nicht rückgängig')) {
+        /*
+         * Der Satz selbst steht seit dem Sprachpaket nicht mehr hier, sondern
+         * in lang/de.php. Geprueft wird deshalb beides: dass die Ruckfrage den
+         * Schluessel benutzt, UND dass hinter dem Schluessel wirklich steht,
+         * dass es endgueltig ist. Am blossen Wortlaut in der Ansicht zu haengen
+         * hiesse, dass die Pruefung beim naechsten Umbau umfaellt, obwohl die
+         * Warnung unveraendert dasteht.
+         */
+        if (!str_contains($block, "t('adm_modul_endgueltig')")) {
+            throw new RuntimeException('Die Rückfrage benutzt den Endgültig-Hinweis nicht');
+        }
+
+        $texte = require $wurzel . '/lang/de.php';
+
+        if (!str_contains($texte['adm_modul_endgueltig'] ?? '', 'nicht rückgängig')) {
             throw new RuntimeException('Die Rückfrage sagt nicht, dass es endgültig ist');
         }
 
@@ -223,9 +237,13 @@ return [
             throw new RuntimeException('Die Rückfrage geht ungeschützt ins HTML-Attribut — '
                 . 'dann bricht es beim ersten Anführungszeichen ab und der Dialog fällt aus');
         }
-        // Umbrueche in doppelten Anfuehrungszeichen, sonst steht \n sichtbar da.
-        if (preg_match("/'\\\\n\\\\nGelöscht/", $block)) {
-            throw new RuntimeException('Die Umbrüche stehen in einfachen Anführungszeichen '
+        /*
+         * Umbrueche muessen echte Umbrueche sein. In einfachen Anfuehrungs-
+         * zeichen bleibt \n ein Backslash mit einem n, und die Rueckfrage
+         * stuende als eine lange Zeile mit sichtbaren \n darin.
+         */
+        if (!preg_match('/"\\\\n\\\\n"/', $block)) {
+            throw new RuntimeException('Die Umbrüche stehen nicht in doppelten Anführungszeichen '
                 . 'und erscheinen als sichtbares \n');
         }
     },

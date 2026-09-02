@@ -22,7 +22,7 @@
 
 <?php /* ── Mod-Navi ── */ ?>
 <div class="mod-nav">
-  <a href="?action=dashboard" class="<?= $action === 'dashboard' ? 'active' : '' ?>">📊 Übersicht</a>
+  <a href="?action=dashboard" class="<?= $action === 'dashboard' ? 'active' : '' ?>">📊 <?= t('mod_uebersicht') ?></a>
   <a href="?action=approval"  class="<?= $action === 'approval' ? 'active' : '' ?>">🚦 Freigabe</a>
   <a href="?action=reports"   class="<?= $action === 'reports' ? 'active' : '' ?>"><?= t('admin_meldungen') ?></a>
   <a href="?action=papierkorb" class="<?= $action === 'papierkorb' ? 'active' : '' ?>"><?= t('mod_papierkorb') ?></a>
@@ -110,7 +110,7 @@
   <?php endif; ?>
 
   <?php if (!empty($pendingThreads)): ?>
-    <div class="section-heading">🆕 Neue Themen (<?= count($pendingThreads) ?>)</div>
+    <div class="section-heading">🆕 <?= t('mod_neue_themen') ?> (<?= count($pendingThreads) ?>)</div>
     <?php foreach ($pendingThreads as $t): ?>
       <div class="card" style="margin-bottom:12px;padding:16px 20px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:10px">
@@ -126,7 +126,7 @@
           <div style="display:flex;gap:6px;flex-shrink:0">
             <a href="?action=approve_thread&id=<?= (int) $t['thread_id'] ?>&csrf=<?= e($csrfToken) ?>"
                class="btn btn-primary btn-sm"
-               onclick="return confirm('Thema freigeben?')">✅ Freigeben</a>
+               onclick="return confirm(<?= e(json_encode(t('mod_thema_freigeben_frage'), JSON_UNESCAPED_UNICODE)) ?>)">✅ Freigeben</a>
             <a href="?action=reject_thread&id=<?= (int) $t['thread_id'] ?>&csrf=<?= e($csrfToken) ?>&reason=<?= urlencode(t('mod_verstoss_gegen_forenregeln')) ?>"
                class="btn btn-danger btn-sm"
                onclick="return confirm(<?= e(json_encode(t('mod_thema_ablehnen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🗑️ Ablehnen</a>
@@ -160,7 +160,7 @@
           <div style="display:flex;gap:6px;flex-shrink:0">
             <a href="?action=approve_post&id=<?= (int) $p['post_id'] ?>&csrf=<?= e($csrfToken) ?>"
                class="btn btn-primary btn-sm"
-               onclick="return confirm('Beitrag freigeben?')">✅ Freigeben</a>
+               onclick="return confirm(<?= e(json_encode(t('mod_beitrag_freigeben_frage'), JSON_UNESCAPED_UNICODE)) ?>)">✅ Freigeben</a>
             <a href="?action=reject_post&id=<?= (int) $p['post_id'] ?>&csrf=<?= e($csrfToken) ?>&reason=<?= urlencode(t('mod_verstoss_gegen_forenregeln')) ?>"
                class="btn btn-danger btn-sm"
                onclick="return confirm(<?= e(json_encode(t('mod_beitrag_ablehnen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🗑️ Ablehnen</a>
@@ -188,7 +188,7 @@
           <?php if (!empty($r['board_title'])): ?>
             In <strong><?= e($r['board_title']) ?></strong> ·
           <?php endif; ?>
-          Gemeldet von <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $r['reporter_id'] ?>"><strong><?= e($r['reporter_name']) ?></strong></a>
+          <?= t('mod_gemeldet_von') ?> <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $r['reporter_id'] ?>"><strong><?= e($r['reporter_name']) ?></strong></a>
           · <?= e(format_date($r['created_at'])) ?>
         </div>
 
@@ -231,7 +231,7 @@
   </p>
 
   <div class="card" style="margin-bottom:22px">
-    <h3 style="font-size:15px;margin-bottom:10px">Themen (<?= count($papierkorbThemen ?? []) ?>)</h3>
+    <h3 style="font-size:15px;margin-bottom:10px"><?= t('mod_themen') ?> (<?= count($papierkorbThemen ?? []) ?>)</h3>
     <?php if (empty($papierkorbThemen)): ?>
       <p style="color:var(--text-muted);font-size:14px"><?= t('mod_keine_themen_im_papierkorb') ?></p>
     <?php else: ?>
@@ -243,9 +243,8 @@
                 <td>
                   <a href="<?= e(FORUM_URL) ?>/thread.php?id=<?= (int) $t['thread_id'] ?>"><?= e($t['title']) ?></a>
                   <div style="color:var(--text-muted);font-size:12px">
-                    <?= e($t['brett']) ?> · <?= (int) $t['beitraege'] ?>
-                    <?= (int) $t['beitraege'] === 1 ? 'Beitrag' : t('mod_beitraege') ?> ·
-                    von <?= e(zeigename($t['verfasser'])) ?>
+                    <?= e($t['brett']) ?> · <?= tn('x_beitraege', (int) $t['beitraege']) ?> ·
+                    <?= t('index_von') ?> <?= e(zeigename($t['verfasser'])) ?>
                   </div>
                 </td>
                 <td style="color:var(--text-muted);font-size:12px;white-space:nowrap">
@@ -268,7 +267,7 @@
   </div>
 
   <div class="card">
-    <h3 style="font-size:15px;margin-bottom:10px">Einzelne Beiträge (<?= count($papierkorbBeitraege ?? []) ?>)</h3>
+    <h3 style="font-size:15px;margin-bottom:10px"><?= t('mod_einzelne_beitraege') ?> (<?= count($papierkorbBeitraege ?? []) ?>)</h3>
     <p style="color:var(--text-muted);font-size:12px;margin-bottom:10px">
       <?= t('mod_beitraege_die_mit_ihrem') ?>
     </p>
@@ -283,7 +282,7 @@
                 <td>
                   <a href="<?= e(FORUM_URL) ?>/thread.php?id=<?= (int) $p['thread_id'] ?>#post<?= (int) $p['post_id'] ?>"><?= e($p['thema']) ?></a>
                   <div style="color:var(--text-muted);font-size:12px">
-                    <?= e($p['brett']) ?> · von <?= e(zeigename($p['verfasser'])) ?> ·
+                    <?= e($p['brett']) ?> · <?= t('index_von') ?> <?= e(zeigename($p['verfasser'])) ?> ·
                     <?= e(truncate(strip_tags((string) $p['content']), 70)) ?>
                   </div>
                 </td>

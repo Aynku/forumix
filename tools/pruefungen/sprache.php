@@ -349,4 +349,97 @@ return [
             ));
         }
     },
+    'In den PHP-Ansichten steht kein deutscher Text mehr' => function () use ($wurzel) {
+        /*
+         * Die Pruefung darueber sieht nur views_new/ an. Genau das war die
+         * Luecke: Der Adminbereich ist keine Vorlage, sondern PHP mit HTML
+         * dazwischen — und dort standen nach 1.10.2 noch rund 160 deutsche
+         * Texte. Aufgefallen ist es erst, als Juergen einen Screenshot der
+         * Startseite des Adminbereichs geschickt hat.
+         *
+         * Angesehen wird, was gerendert wird: Text zwischen den Marken
+         * (T_INLINE_HTML) und die Attribute, die der Besucher liest.
+         *
+         * NICHT angesehen werden feste Zeichenketten im PHP-Code. Die sind
+         * mehrdeutig: dort steht neben einer Beschriftung auch der Systemtext
+         * fuer das Sprachmodell (der MUSS deutsch bleiben), ein Eintrag ins
+         * Moderationsprotokoll, eine Meldung fuers Fehlerprotokoll und ein
+         * SQL-Kommentar. Die auseinanderzuhalten ginge nur ueber eine Liste
+         * von Ausnahmen, die mit jeder Datei laenger wird — und eine Pruefung,
+         * die man staendig ausnimmt, prueft irgendwann nichts mehr.
+         *
+         * Kommentare zaehlen ebenfalls nicht: sie erklaeren den Code und
+         * stehen nie auf der Seite. Deutsch ist dort richtig.
+         */
+        $deutsch = '/[ÄÖÜäöüß]|\b(der|die|das|und|oder|nicht|noch|kein|keine|dein|deine|'
+                 . 'von|für|über|zurück|seit|beim|wurde|wird|sind|werden|Beitrag|Beiträge|'
+                 . 'Thema|Themen|Mitglied|Mitglieder|Datei|Dateien|Fehler|Warnung|Hinweise|'
+                 . 'Offen|Geprüft|Bearbeitet|Abgelehnt|Erfolg|erstellt|löschen|Löschen)\b/u';
+
+        $funde  = [];
+        $ordner = ['views', 'admin', 'pages', 'modules'];
+
+        foreach ($ordner as $o) {
+            if (!is_dir($wurzel . '/' . $o)) {
+                continue;
+            }
+
+            $lauf = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($wurzel . '/' . $o, FilesystemIterator::SKIP_DOTS)
+            );
+
+            foreach ($lauf as $datei) {
+                $pfad = $datei->getPathname();
+
+                if (!str_ends_with($pfad, '.php')) { continue; }
+                if (preg_match('#/lang/[a-z]+\.php$#', $pfad)) { continue; }
+
+                foreach (token_get_all(file_get_contents($pfad)) as $marke) {
+                    if (!is_array($marke)) { continue; }
+
+                    if ($marke[0] === T_INLINE_HTML) {
+                        // Kommentare im mitgelieferten JavaScript und CSS raus.
+                        $roh = preg_replace('#/\*.*?\*/#s', '', $marke[1]);
+                        $roh = preg_replace('#^\s*//.*$#m', '', $roh);
+
+                        /*
+                         * console.* ebenso: das ist die Entwicklerkonsole,
+                         * kein Text auf der Seite. Was dort steht, liest
+                         * jemand, der ohnehin im Quelltext sucht.
+                         */
+                        $roh = preg_replace('/\bconsole\.[a-z]+\([^;]*\);/i', '', $roh);
+
+                        // Was jemand liest: Text zwischen den Marken ...
+                        $sichtbar = preg_replace('/<[^>]*>/', ' ', $roh);
+
+                        // ... und die Attribute, die auf der Seite ankommen.
+                        if (preg_match_all('/\b(?:title|placeholder|aria-label|alt|data-label)="([^"<]*)"/', $roh, $a)) {
+                            $sichtbar .= ' ' . implode(' ', $a[1]);
+                        }
+
+                        $sichtbar = preg_replace('/&[a-z]+;|&#\d+;/i', ' ', $sichtbar);
+
+                        foreach (explode("\n", $sichtbar) as $zeile) {
+                            $zeile = trim(preg_replace('/\s+/', ' ', $zeile));
+
+                            if (mb_strlen($zeile) < 4 || !preg_match($deutsch, $zeile)) { continue; }
+
+                            $funde[] = basename($pfad) . ' — ' . mb_substr($zeile, 0, 60);
+                        }
+
+                        continue;
+                    }
+
+                }
+            }
+        }
+
+        if ($funde !== []) {
+            throw new RuntimeException(sprintf(
+                "%d Stellen mit deutschem Text in den PHP-Ansichten:\n        %s",
+                count($funde),
+                implode("\n        ", array_slice($funde, 0, 10))
+            ));
+        }
+    },
 ];

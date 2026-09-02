@@ -8,6 +8,68 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.10.3 (2026-09-02)
+
+### Der Adminbereich spricht jetzt auch Englisch
+
+Mit 1.10.2 war das Forum übersetzt, der Adminbereich aber nur zur Hälfte.
+Rund 200 Stellen standen weiterhin deutsch da — Kachel-Beschriftungen,
+Rückfragen, Reiter, Meldungen nach einer Aktion, Platzhalter in
+Eingabefeldern. Betroffen waren auch die Moderation und mehrere Module.
+
+Der Grund war eine Lücke in meiner Suche: Sie sah Vorlagen an
+(`views_new/*.tpl.html`), aber nicht die PHP-Ansichten. Der Adminbereich ist
+keine Vorlage, sondern PHP mit HTML dazwischen — und dort steht Text an
+Stellen, die eine Vorlagensuche nicht kennt: in Attributen, in
+Bedingungen mitten im Ausdruck, in PHP-Arrays.
+
+Übersetzt sind jetzt:
+
+- **Adminbereich** — Übersicht, Benutzer, Meldungen, Freigaben, Einladungen,
+  Gruppen, Foren, Design, Module, Backups, Updates, Vorlagen, phpBB-Import,
+  Bot-Protokoll und die Rechtstexte-Verwaltung
+- **Moderation** — Übersicht, Freigaben, Papierkorb
+- **Module** — Shoutbox, Kontakt, Termine, Downloads, FAQ, Lösung, Banner,
+  KI-Hilfe
+- **Meldungen nach einer Aktion** („X wurde gesperrt.", „Modul entfernt: …")
+- **Titel der Migrationen** in der Update-Liste
+- **Datums- und Zahlenformate** an allen neu übersetzten Stellen
+
+Nicht übersetzt bleiben, bewusst:
+
+- **Inhalte aus der Datenbank** — Forennamen, Themen, Beiträge, Gruppennamen,
+  Rechtstexte. Die gehören dem Betreiber, nicht dem Programm.
+- **Die Systemtexte der KI-Hilfe.** Das ist der Auftrag an das Sprachmodell,
+  nicht Text für den Bildschirm. Er ist durchgehend deutsch formuliert und
+  bleibt es; nur was der Schreibende im Auswahlfeld liest, ist übersetzt.
+- **Einträge im Moderationsprotokoll.** Sie halten fest, was jemand getan hat,
+  und werden einmal geschrieben — nachträglich übersetzen ginge ohnehin nicht.
+
+### Eine neue Prüfung
+
+**In den PHP-Ansichten steht kein deutscher Text mehr.** Sie liest dieselben
+Kanäle, die ein Besucher zu sehen bekommt: Text zwischen den Marken und die
+Attribute (`title`, `placeholder`, `aria-label`, `alt`, `data-label`).
+Kommentare und Ausgaben in die Entwicklerkonsole zählen nicht.
+
+Feste Zeichenketten im PHP-Code prüft sie **nicht**. Dort steht neben einer
+Beschriftung auch der Systemtext fürs Sprachmodell, ein Protokolleintrag und
+ein SQL-Kommentar; die auseinanderzuhalten ginge nur über eine Liste von
+Ausnahmen, die mit jeder Datei länger wird — und eine Prüfung, die man
+ständig ausnimmt, prüft irgendwann nichts mehr.
+
+### Nebenbei behoben
+
+- Die Rückfrage vor dem Entfernen eines Moduls prüfte auf ihren eigenen
+  Wortlaut. Seit der Text im Sprachpaket steht, wäre sie umgefallen, obwohl
+  die Warnung unverändert dasteht. Sie prüft jetzt, dass der Hinweis benutzt
+  wird **und** dass hinter dem Schlüssel auch wirklich steht, dass es
+  endgültig ist.
+- Der Prüflauf gab beim Übersetzen der Vorlagen eine PHP-Warnung aus
+  (`TPL_CACHE_DIR already defined`), die in PHP 9 ein Fehler geworden wäre.
+
+---
+
 ## v1.10.2 (2026-09-02)
 
 ### Der Rest der Übersetzung

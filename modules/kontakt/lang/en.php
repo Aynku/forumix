@@ -31,4 +31,8 @@ return [
     'kontakt_menu' => 'Contact',
     'kontakt_modul_name' => 'Contact form',
     'kontakt_modul_beschreibung' => 'A page where even non-members can send a message. It goes out by email and is also stored in the database, so nothing is lost.',
+
+    // ── Nachgezogen ──
+    'kontakt_hinweis_adresse' => 'Enter a contact email under %s, or set a sender address under %s.',
+    'kontakt_nicht_zugestellt' => 'not delivered by email',
 ];

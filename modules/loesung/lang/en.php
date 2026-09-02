@@ -20,4 +20,7 @@ return [
     'loesung_see_below' => 'The marked post is further down.',
     'loesung_modul_name' => 'Mark as the solution',
     'loesung_modul_beschreibung' => 'The person who asked can mark an answer as the solution. That post gets a green bar, and a link to it appears at the top of the thread.',
+
+    // ── Nachgezogen ──
+    'loesung_springen' => 'Jump to the solution',
 ];

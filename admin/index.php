@@ -149,7 +149,7 @@ if ($action === 'group_avatar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $datei = $_FILES['bild'];
     if (!is_uploaded_file($datei['tmp_name'])) {
-        flash('Sicherheits-Abbruch: keine echte Upload-Datei.', 'error');
+        flash(t('adm_kein_echter_upload'), 'error');
         redirect($ziel);
     }
 
@@ -259,7 +259,7 @@ if ($action === 'update_board' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     } catch (Exception $e) {
-        flash('Fehler: ' . $e->getMessage(), 'error');
+        flash(t('js_fehler_praefix') . $e->getMessage(), 'error');
     }
     redirect(FORUM_URL . '/admin/?action=boards');
 }
@@ -274,7 +274,7 @@ if ($action === 'update_board_approval' && $_SERVER['REQUEST_METHOD'] === 'POST'
             [$reqThreads, $reqReplies, $bid]);
         flash(t('adm_freigabe_einstellungen_gespeichert'), 'success');
     } catch (Exception $e) {
-        flash('Fehler: ' . $e->getMessage(), 'error');
+        flash(t('js_fehler_praefix') . $e->getMessage(), 'error');
     }
     redirect(FORUM_URL . '/admin/?action=boards');
 }
@@ -517,7 +517,7 @@ if ($action === 'maintenance_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 flash($optimized . t('adm_tabellen_optimiert_fehlgeschlagen') . implode(', ', $failed), 'warning');
             }
         } catch (Exception $e) {
-            flash('Fehler: ' . $e->getMessage(), 'error');
+            flash(t('js_fehler_praefix') . $e->getMessage(), 'error');
         }
 
     } elseif ($task === 'cleanup_ip_logs') {
@@ -615,7 +615,7 @@ if ($action === 'clear_preview') {
 if ($action === 'send_test_mail' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json; charset=utf-8');
     if (!verify_csrf(post_str('csrf'))) {
-        echo json_encode(['ok' => false, 'error' => 'CSRF-Fehler']); exit;
+        echo json_encode(['ok' => false, 'error' => t('error_csrf_short')]); exit;
     }
     $to = trim((string) ($_POST['to'] ?? ''));
     if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
@@ -623,19 +623,15 @@ if ($action === 'send_test_mail' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $forum  = forum_name();
     $body   = email_template(t('adm_test_mail_von') . $forum,
-        '<p>Hallo!</p>'
-      . '<p>Diese Mail wurde aus dem Admin-Bereich als <strong>Test</strong> gesendet, '
-      . 'um deine SMTP-Einstellungen zu prüfen.</p>'
-      . '<p>Wenn du das hier liest, funktioniert alles. 🎉</p>'
+        t('adm_test_mail_koerper')
       . '<p style="color:#888;font-size:12px;margin-top:20px">'
-      . t('adm_gesendet_am') . date('d.m.Y H:i:s') . ' Uhr.</p>'
+      . t('adm_gesendet_am', date(t('datum_format_sekunden'))) . '</p>'
     );
     $ok = send_email($to, t('adm_test_mail_von') . $forum, $body);
     if ($ok) {
         echo json_encode([
             'ok'  => true,
-            'msg' => t('adm_server_hat_die_mail') . $to . ' angenommen. Wenn sie nicht ankommt: Spam-Ordner prüfen, '
-                   . 'sonst evtl. Bounce-Mail im Postfach des Absenders ansehen (zeigt den genauen Fehler).'
+            'msg' => t('adm_mail_angenommen', $to)
         ]);
     } else {
         echo json_encode(['ok' => false, 'error' => t('adm_versand_fehlgeschlagen_pruefe_smtp')]);
@@ -721,10 +717,10 @@ if ($action === 'module_toggle') {
     $turnOn = ($_GET['enable'] ?? '0') === '1';
     if ($turnOn) {
         $r = enable_module($code);
-        flash($r['ok'] ? t('adm_modul_aktiviert') : 'Fehler: ' . ($r['error'] ?? '?'), $r['ok'] ? 'success' : 'error');
+        flash($r['ok'] ? t('adm_modul_aktiviert') : t('js_fehler_praefix') . ($r['error'] ?? '?'), $r['ok'] ? 'success' : 'error');
     } else {
         $r = disable_module($code);
-        flash($r['ok'] ? t('adm_modul_deaktiviert') : 'Fehler: ' . ($r['error'] ?? '?'), $r['ok'] ? 'success' : 'error');
+        flash($r['ok'] ? t('adm_modul_deaktiviert') : t('js_fehler_praefix') . ($r['error'] ?? '?'), $r['ok'] ? 'success' : 'error');
     }
     redirect(FORUM_URL . '/admin/?action=modules');
 }
@@ -747,9 +743,10 @@ if ($action === 'module_entfernen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $r = module_entfernen($code);
     $tabellen = $r['tabellen'] ?? [];
     flash($r['ok']
-        ? 'Modul „' . $name . '" entfernt: ' . (int) $r['geloescht'] . ' Dateien'
-          . ($tabellen ? ' und ' . count($tabellen) . ' '
-             . (count($tabellen) === 1 ? 'Tabelle' : 'Tabellen') . ' (' . implode(', ', $tabellen) . ')' : '')
+        ? t('adm_modul_entfernt', $name, (int) $r['geloescht'])
+          . ($tabellen
+              ? ' ' . tn('adm_modul_und_x_tabellen', count($tabellen), implode(', ', $tabellen))
+              : '')
           . '.'
         : t('adm_nicht_entfernt') . ($r['error'] ?? '?'),
         $r['ok'] ? 'success' : 'error');
@@ -893,7 +890,7 @@ if ($action === 'add_smiley' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             smileys_cache_clear();
             flash('Smiley „' . $code . '" angelegt.', 'success');
         } catch (Exception $e) {
-            flash('Fehler: ' . $e->getMessage(), 'error');
+            flash(t('js_fehler_praefix') . $e->getMessage(), 'error');
         }
     }
     redirect(FORUM_URL . '/admin/?action=smileys');
@@ -925,7 +922,7 @@ if ($action === 'update_smiley' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             smileys_cache_clear();
             flash(t('adm_smiley_aktualisiert'), 'success');
         } catch (Exception $e) {
-            flash('Fehler: ' . $e->getMessage(), 'error');
+            flash(t('js_fehler_praefix') . $e->getMessage(), 'error');
         }
     }
     redirect(FORUM_URL . '/admin/?action=smileys');
@@ -940,7 +937,7 @@ if ($action === 'delete_smiley') {
             smileys_cache_clear();
             flash(t('adm_smiley_geloescht'), 'success');
         } catch (Exception $e) {
-            flash('Fehler: ' . $e->getMessage(), 'error');
+            flash(t('js_fehler_praefix') . $e->getMessage(), 'error');
         }
     }
     redirect(FORUM_URL . '/admin/?action=smileys');
@@ -1205,7 +1202,7 @@ if ($action === 'clear_cache' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($type === 'templates' || $type === 'all') {
         $n = tpl_cache_clear();
-        $cleared[] = $n . ' Template-Cache-Dateien';
+        $cleared[] = tn('adm_template_cache_dateien', $n);
     }
 
     if ($type === 'smileys' || $type === 'all') {
@@ -1397,7 +1394,7 @@ if ($action === 'run_migration' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $result  = execute_migration($version);
 
     if ($result['success']) {
-        flash('Migration ' . htmlspecialchars($version) . ' erfolgreich ausgeführt.', 'success');
+        flash(t('adm_migration_ausgefuehrt', htmlspecialchars($version)), 'success');
     } else {
         flash(t('adm_migration_fehlgeschlagen') . htmlspecialchars($result['error'] ?? 'unbekannt'), 'error');
     }
@@ -1429,7 +1426,7 @@ if ($action === 'upload_update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $tmpPath = $_FILES['update_zip']['tmp_name'];
     if (!is_uploaded_file($tmpPath)) {
-        flash('Sicherheits-Abbruch: keine echte Upload-Datei.', 'error');
+        flash(t('adm_kein_echter_upload'), 'error');
         redirect(FORUM_URL . '/admin/?action=updates');
     }
 
@@ -1518,7 +1515,7 @@ if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', '
                 // Owner-Status weg, aber Admin-Status bleibt (Soft-Demotion)
                 db_execute('UPDATE users SET is_owner = 0, is_admin = 1 WHERE user_id = ?', [$targetId]);
                 db_execute("UPDATE users SET `rank` = 'Administrator' WHERE user_id = ?", [$targetId]);
-                flash($target['username'] . ' ist kein Inhaber mehr (jetzt Administrator).', 'success');
+                flash(t('adm_kein_inhaber_mehr', $target['username']), 'success');
                 db_execute('INSERT INTO mod_log (mod_id, action, target_type, target_id) VALUES (?, ?, ?, ?)',
                     [$cu['user_id'], 'remove_owner', 'user', $targetId]);
                 break;
@@ -1534,7 +1531,7 @@ if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', '
                 db_execute('UPDATE users SET is_admin = 0 WHERE user_id = ?', [$targetId]);
                 // Rank zurück auf Post-Count-basiert
                 try { update_user_rank($targetId); } catch (Exception $e) {}
-                flash($target['username'] . ' ist kein Administrator mehr.', 'success');
+                flash(t('adm_kein_admin_mehr', $target['username']), 'success');
                 db_execute('INSERT INTO mod_log (mod_id, action, target_type, target_id) VALUES (?, ?, ?, ?)',
                     [$cu['user_id'], 'remove_admin', 'user', $targetId]);
                 break;
@@ -1548,7 +1545,7 @@ if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', '
 
             case 'remove_mod':
                 db_execute('UPDATE users SET is_mod = 0 WHERE user_id = ?', [$targetId]);
-                flash($target['username'] . ' ist kein Moderator mehr.', 'success');
+                flash(t('adm_kein_mod_mehr', $target['username']), 'success');
                 db_execute('INSERT INTO mod_log (mod_id, action, target_type, target_id) VALUES (?, ?, ?, ?)',
                     [$cu['user_id'], 'remove_mod', 'user', $targetId]);
                 break;
@@ -1557,14 +1554,14 @@ if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', '
                 $reason = $_GET['reason'] ?? t('adm_vom_admin_gesperrt');
                 db_execute('UPDATE users SET is_banned = 1, is_admin = 0, is_mod = 0, ban_reason = ? WHERE user_id = ?',
                     [$reason, $targetId]);
-                flash($target['username'] . ' wurde gesperrt.', 'success');
+                flash(t('adm_wurde_gesperrt', $target['username']), 'success');
                 db_execute('INSERT INTO mod_log (mod_id, action, target_type, target_id, reason) VALUES (?, ?, ?, ?, ?)',
                     [$cu['user_id'], 'ban', 'user', $targetId, $reason]);
                 break;
 
             case 'unban_user':
                 db_execute('UPDATE users SET is_banned = 0, ban_reason = NULL WHERE user_id = ?', [$targetId]);
-                flash($target['username'] . ' wurde entsperrt.', 'success');
+                flash(t('adm_wurde_entsperrt', $target['username']), 'success');
                 db_execute('INSERT INTO mod_log (mod_id, action, target_type, target_id) VALUES (?, ?, ?, ?)',
                     [$cu['user_id'], 'unban', 'user', $targetId]);
                 break;
@@ -1585,14 +1582,14 @@ if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', '
                 if (!$delResult['ok']) {
                     flash($delResult['error'] ?? t('adm_account_konnte_nicht_geloescht'), 'error');
                 } else {
-                    flash($target['username'] . ' wurde gelöscht (anonymisiert). Beiträge bleiben erhalten.', 'success');
+                    flash(t('adm_wurde_geloescht', $target['username']), 'success');
                     db_execute('INSERT INTO mod_log (mod_id, action, target_type, target_id) VALUES (?, ?, ?, ?)',
                         [$cu['user_id'], 'delete_user', 'user', $targetId]);
                 }
                 break;
         }
     } catch (Exception $e) {
-        flash('Fehler: ' . $e->getMessage(), 'error');
+        flash(t('js_fehler_praefix') . $e->getMessage(), 'error');
     }
 
     redirect(FORUM_URL . '/admin/?action=users');
@@ -1683,7 +1680,7 @@ if ($action === 'add_tag' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 [$slug, $name, $desc, $col]);
             flash(t('adm_tag_angelegt'), 'success');
         } catch (Exception $e) {
-            flash('Fehler: ' . $e->getMessage(), 'error');
+            flash(t('js_fehler_praefix') . $e->getMessage(), 'error');
         }
     }
     redirect(FORUM_URL . '/admin/?action=tags');
@@ -1706,11 +1703,11 @@ switch ($action) {
             // Geloeschte Konten sind keine Mitglieder mehr — sie stehen nur noch
             // als Anker unter ihren Beitraegen. Mitgezaehlt waere die Zahl hier
             // groesser als die auf der Startseite.
-            ['icon' => '👥', 'label' => 'Mitglieder', 'value' => db_count('SELECT COUNT(*) FROM users WHERE COALESCE(is_deleted, 0) = 0')],
-            ['icon' => '💬', 'label' => 'Threads',    'value' => db_count('SELECT COUNT(*) FROM threads')],
+            ['icon' => '👥', 'label' => t('adm_mitglieder'), 'value' => db_count('SELECT COUNT(*) FROM users WHERE COALESCE(is_deleted, 0) = 0')],
+            ['icon' => '💬', 'label' => t('adm_threads'),   'value' => db_count('SELECT COUNT(*) FROM threads')],
             ['icon' => '📝', 'label' => t('adm_beitraege'),   'value' => db_count('SELECT COUNT(*) FROM posts')],
             ['icon' => '🚨', 'label' => t('adm_offene_meldungen'), 'value' => open_reports_count()],
-            ['icon' => '🚫', 'label' => 'IP-Banns',   'value' => db_count('SELECT COUNT(*) FROM ip_bans WHERE expires_at IS NULL OR expires_at > NOW()')],
+            ['icon' => '🚫', 'label' => t('adm_ip_banns'),  'value' => db_count('SELECT COUNT(*) FROM ip_bans WHERE expires_at IS NULL OR expires_at > NOW()')],
             ['icon' => '🟢', 'label' => t('adm_online_jetzt'), 'value' => online_stats()['total']],
         ];
         $vars['newestUsers']  = db_fetchAll('

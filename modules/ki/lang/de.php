@@ -101,4 +101,16 @@ return [
     'ki_js_wohin_uebersetzen' => 'Wohin übersetzen?',
     'ki_js_schliessen' => 'Schließen',
     'ki_js_zu_lang_zum_faerben' => 'Der Text ist zu lang, um die Unterschiede zu färben. Bitte selbst vergleichen.',
+
+    // ── Nachgezogen ──
+    'ki_wer_zahlt_text' => '%s der Betreiber dieses Forums. Jeder Klick auf einen KI-Knopf ist eine Anfrage an den gewählten Anbieter und erscheint auf dessen Rechnung. Deshalb gibt es weiter unten zwei Bremsen — Zeichenzahl je Anfrage und Anfragen je Stunde und Person. Wer nichts einträgt, gibt nichts frei: ohne Schlüssel bleibt der Knopf im Editor unsichtbar.',
+    'ki_nicht_mehr_aendern' => 'nicht mehr ändern',
+    'ki_schluessel_hinweis' => '%s und beim Umzug mitnehmen — sonst ist nicht mehr lesbar, was damit gespeichert wurde. Der Schlüssel hilft gegen einen abhandengekommenen Datenbank-Abzug, nicht gegen jemanden, der den Server hat: der liest die %s mit.',
+    'ki_schluessel_entfernen' => 'hinterlegten Schlüssel entfernen',
+    'ki_kennzeichnen_text' => '%s heißt: der Beitrag trägt sichtbar den Hinweis, dass ein Sprachmodell mitgeschrieben hat. Bei einer reinen Rechtschreibkorrektur ist das übertrieben — beim Zusammenfassen nicht, denn dabei entscheidet das Modell, was wegfällt.',
+    'ki_entscheidet_mit' => 'entscheidet mit, was wegfällt',
+    'ki_modell_je_befehl_text' => '%s leer heißt „das oben eingetragene". Sinnvoll ist der Unterschied dort, wo %s steht — beim Kürzen und Zusammenfassen wählt das Modell aus, was im Beitrag bleibt. Bei Rechtschreibung und Übersetzen macht ein größeres Modell messbar keinen Unterschied, kostet aber ein Vielfaches.',
+
+    'ki_schluessel_hinterlegt' => '•••••••• (hinterlegt — leer lassen, um ihn zu behalten)',
+    'ki_kein_schluessel' => 'noch keiner hinterlegt',
 ];

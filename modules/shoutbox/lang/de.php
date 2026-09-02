@@ -19,4 +19,8 @@ return [
     'shoutbox_loeschen_frage' => 'Diese Nachricht löschen?',
 
     'shoutbox_platzhalter' => 'Schreib was Schönes… (Enter zum Absenden, max. 500 Zeichen)',
+
+    // ── Nachgezogen ──
+    'shoutbox_einloggen' => 'Einloggen',
+    'shoutbox_zum_nutzen' => ', um die Shoutbox zu nutzen',
 ];

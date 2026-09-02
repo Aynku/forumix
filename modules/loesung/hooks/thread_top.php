@@ -29,5 +29,5 @@ try {
       <?php endif; ?>
     </div>
   </div>
-  <a class="btn btn-ghost btn-sm" href="#post<?= (int) $loesung['post_id'] ?>">Zur Lösung springen</a>
+  <a class="btn btn-ghost btn-sm" href="#post<?= (int) $loesung['post_id'] ?>"><?= e(t('loesung_springen')) ?></a>
 </div>
