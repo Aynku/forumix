@@ -21,7 +21,14 @@ if (!defined('FORUM_PRUEFLAUF')) { http_response_code(403); die('Forbidden'); }
 $wurzel = dirname(__DIR__, 2);
 
 if (!defined('FORUM_URL')) { define('FORUM_URL', 'https://pruefstand.invalid'); }
-if (!defined('TPL_CACHE_DIR')) { define('TPL_CACHE_DIR', sys_get_temp_dir() . '/forumix-tpl-pruefung'); }
+
+/*
+ * TPL_CACHE_DIR wird hier NICHT gesetzt. In template.php steht sie als const,
+ * und eine const laesst sich nicht ueberschreiben — wer sie vorher per
+ * define() anlegt, bekommt beim Laden eine Warnung ("already defined"), die
+ * in PHP 9 ein Fehler wird. Gebraucht wird sie ohnehin nicht: tpl_compile()
+ * uebersetzt nur, es schreibt nichts in den Zwischenspeicher.
+ */
 
 require_once $wurzel . '/lib/template.php';
 
