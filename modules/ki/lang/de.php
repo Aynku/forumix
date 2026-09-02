@@ -83,4 +83,14 @@ return [
     'ki_nav' => 'KI-Funktionen',
     'ki_modul_name' => 'KI-Funktionen',
     'ki_modul_beschreibung' => 'Zwei Dinge: Knöpfe im Editor für Rechtschreibung, Kürzen, Zusammenfassen und Übersetzen — jedes Ergebnis erscheint erst in einer Vorschau, übernommen wird nur, was der Verfasser übernimmt. Und eine Vorsortierung neuer Beiträge auf Werbung und Beleidigungen, die meldet statt zu löschen. Beides einzeln abschaltbar, der API-Schlüssel kommt vom Betreiber.',
+
+    // ── Zielsprachen fuer "Uebersetzen" ────────────────────────
+    'ki_sprache_de' => 'Deutsch',
+    'ki_sprache_en' => 'Englisch',
+    'ki_sprache_fr' => 'Französisch',
+    'ki_sprache_es' => 'Spanisch',
+    'ki_sprache_it' => 'Italienisch',
+    'ki_sprache_nl' => 'Niederländisch',
+    'ki_sprache_pl' => 'Polnisch',
+    'ki_sprache_tr' => 'Türkisch',
 ];

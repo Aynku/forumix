@@ -298,6 +298,8 @@ function dashboard_achievements(int $userId): array {
             ORDER BY ua.earned_at DESC
             LIMIT 3
         ', [$userId]);
+
+        $recent = array_map('achievement_uebersetzen', $recent);
     } catch (Exception $e) {
         error_log('[dashboard_achievements] recent failed: ' . $e->getMessage());
     }

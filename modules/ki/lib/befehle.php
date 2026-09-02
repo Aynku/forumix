@@ -109,6 +109,27 @@ const KI_SPRACHEN = [
 ];
 
 /**
+ * Dieselben Sprachen, wie sie im Auswahlfeld stehen sollen.
+ *
+ * WARUM getrennt von KI_SPRACHEN: Die Konstante liefert den Namen, der im
+ * Auftrag an das Modell steht ("Uebersetze nach Franzoesisch"). Der ist
+ * Teil eines durchgehend deutschen Systemtextes und bleibt deutsch. Was der
+ * Schreibende im Auswahlfeld liest, ist etwas anderes — das gehoert in seine
+ * Sprache.
+ */
+function ki_sprachen_anzeige(): array {
+    $aus = [];
+
+    foreach (KI_SPRACHEN as $code => $deutsch) {
+        $schluessel = 'ki_sprache_' . $code;
+        $text       = t($schluessel);
+        $aus[$code] = $text === $schluessel ? $deutsch : $text;
+    }
+
+    return $aus;
+}
+
+/**
  * Setzt den Systemtext eines Befehls zusammen.
  * Wirft, wenn der Befehl nicht existiert — der Name kommt aus der Anfrage.
  */

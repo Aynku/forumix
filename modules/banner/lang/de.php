@@ -27,4 +27,6 @@ return [
     'banner_nav' => 'Band',
     'banner_modul_name' => 'Ankündigungsband',
     'banner_modul_beschreibung' => 'Band über der ganzen Seite, für Wartungshinweise und Ankündigungen. Text und Farbe im Modul selbst, Besucher können es wegklicken.',
+
+    'banner_hinweis_schliessen' => 'Hinweis schließen',
 ];

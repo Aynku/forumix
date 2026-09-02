@@ -23,7 +23,7 @@ $schluessel = 'banner-' . substr(md5($text), 0, 8);
             background:color-mix(in srgb, <?= $farbe ?> 16%, transparent);
             border-bottom:2px solid <?= $farbe ?>">
   <span style="flex:1;min-width:200px"><?= nl2br(e($text)) ?></span>
-  <button type="button" aria-label="Hinweis schließen"
+  <button type="button" aria-label="<?= e(t('banner_hinweis_schliessen')) ?>"
           style="background:none;border:0;color:inherit;cursor:pointer;font-size:18px;line-height:1">×</button>
 </div>
 <script>

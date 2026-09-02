@@ -63,13 +63,13 @@
 
     <div class="profile-meta">
       {{ t('profile_dabei_seit') }} <strong>{{ profile.registered_at | date('d.m.Y') }}</strong>
-      · 🆔 Mitglied <strong>#{{ profile.user_id }}</strong>
+      · 🆔 {{ t('profile_mitglied_nr', profile.user_id) | raw }}
       {# v0.18.52: last_activity_at (Pageviews+Posts) statt last_login (nur echte Logins).
          Fallback auf last_login wenn last_activity_at noch nicht befüllt ist. #}
       {% if profile.last_activity_at %}
-        · Zuletzt aktiv <strong>{{ format_date(profile.last_activity_at) }}</strong>
+        · {{ t('profile_zuletzt_aktiv', format_date(profile.last_activity_at)) | raw }}
       {% elseif profile.last_login %}
-        · Zuletzt aktiv <strong>{{ format_date(profile.last_login) }}</strong>
+        · {{ t('profile_zuletzt_aktiv', format_date(profile.last_login)) | raw }}
       {% endif %}
       · {{ extendedStats.activity_level.icon }}
       <strong style="color:{{ extendedStats.activity_level.color }}">{{ extendedStats.activity_level.label }}</strong>

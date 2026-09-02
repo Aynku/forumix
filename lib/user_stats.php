@@ -76,15 +76,15 @@ function user_activity_level(int $userId): array {
     }
 
     if ($posts30 >= 10 || ($loginAgo !== null && $loginAgo < 7)) {
-        return ['icon' => '🟢', 'label' => 'Aktiv', 'color' => '#4a9d4a'];
+        return ['icon' => '🟢', 'label' => t('activity_active'), 'color' => '#4a9d4a'];
     }
     if ($posts30 >= 1 || ($loginAgo !== null && $loginAgo < 30)) {
-        return ['icon' => '🟡', 'label' => 'Gelegentlich', 'color' => '#d4a017'];
+        return ['icon' => '🟡', 'label' => t('activity_sometimes'), 'color' => '#d4a017'];
     }
     if ($loginAgo !== null && $loginAgo < 90) {
-        return ['icon' => '🟠', 'label' => 'Selten', 'color' => '#e07b00'];
+        return ['icon' => '🟠', 'label' => t('activity_rare'), 'color' => '#e07b00'];
     }
-    return ['icon' => '⚫', 'label' => 'Inaktiv', 'color' => '#888'];
+    return ['icon' => '⚫', 'label' => t('activity_inactive'), 'color' => '#888'];
 }
 
 /**

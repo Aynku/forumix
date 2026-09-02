@@ -171,4 +171,91 @@ return [
             }
         }
     },
+    'Jeder benutzte Schluessel steht auch im Sprachpaket' => function () use ($wurzel) {
+        /*
+         * Genau anders herum als die Pruefung darueber: Dort ging es um
+         * Schluessel ohne Verwendung, hier um Verwendungen ohne Schluessel.
+         *
+         * Der Fall ist real: Beim Uebersetzen der Profilseite habe ich
+         * t('my_profile') in die Vorlage geschrieben und den Eintrag in
+         * lang/de.php vergessen. Angezeigt wurde daraufhin "my_profile" —
+         * und zwar in BEIDEN Sprachen, weil t() auf den Schluessel selbst
+         * zurueckfaellt. Aufgefallen ist es erst nach der Freigabe.
+         *
+         * Gelesen wird mit dem Tokenizer, nicht mit einer Suche nach Text:
+         * Sonst zaehlten die Beispiele in den Kommentaren mit, und die
+         * meinen keinen echten Schluessel.
+         */
+        $texte = load_language('de');
+        $fehlt = [];
+
+        $ordner = ['lib', 'views', 'views_new', 'pages', 'admin', 'api', 'modules', 'install'];
+
+        foreach ($ordner as $o) {
+            if (!is_dir($wurzel . '/' . $o)) {
+                continue;
+            }
+
+            $lauf = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($wurzel . '/' . $o, FilesystemIterator::SKIP_DOTS)
+            );
+
+            foreach ($lauf as $datei) {
+                $pfad = $datei->getPathname();
+
+                // Die Sprachdateien selbst nennen keine Schluessel, sie sind welche.
+                if (preg_match('#/lang/[a-z]+\.php$#', $pfad)) {
+                    continue;
+                }
+
+                if (str_ends_with($pfad, '.tpl.html')) {
+                    // Vorlagen sind kein PHP — dort tut es die Suche, weil es
+                    // in ihnen keine Kommentare mit Beispielen gibt.
+                    preg_match_all('/\bt\(\s*\'([a-z0-9_]+)\'/', file_get_contents($pfad), $treffer);
+
+                    foreach ($treffer[1] as $k) {
+                        if (!isset($texte[$k])) { $fehlt[$k] = basename($pfad); }
+                    }
+                    continue;
+                }
+
+                if (!str_ends_with($pfad, '.php')) {
+                    continue;
+                }
+
+                $marken = token_get_all(file_get_contents($pfad));
+
+                foreach ($marken as $i => $marke) {
+                    if (!is_array($marke) || $marke[0] !== T_STRING) { continue; }
+                    if ($marke[1] !== 't' && $marke[1] !== 'tn') { continue; }
+
+                    // t( direkt dahinter, und darin ein fester Text
+                    $j = $i + 1;
+                    while (isset($marken[$j]) && is_array($marken[$j]) && $marken[$j][0] === T_WHITESPACE) { $j++; }
+                    if (($marken[$j] ?? null) !== '(') { continue; }
+
+                    $j++;
+                    while (isset($marken[$j]) && is_array($marken[$j]) && $marken[$j][0] === T_WHITESPACE) { $j++; }
+                    if (!is_array($marken[$j] ?? null) || $marken[$j][0] !== T_CONSTANT_ENCAPSED_STRING) { continue; }
+
+                    $k = trim($marken[$j][1], '"\'');
+
+                    if ($k !== '' && preg_match('/^[a-z0-9_]+$/', $k) && !isset($texte[$k])) {
+                        $fehlt[$k] = basename($pfad);
+                    }
+                }
+            }
+        }
+
+        if ($fehlt !== []) {
+            $liste = [];
+            foreach (array_slice($fehlt, 0, 8, true) as $k => $wo) { $liste[] = "$k ($wo)"; }
+
+            throw new RuntimeException(sprintf(
+                '%d Schluessel werden benutzt, stehen aber in keiner Sprachdatei: %s',
+                count($fehlt),
+                implode(', ', $liste)
+            ));
+        }
+    },
 ];

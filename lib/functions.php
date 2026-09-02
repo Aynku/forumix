@@ -358,10 +358,19 @@ function format_date(?string $datetime): string {
         $nowDay = (clone $now)->setTime(0, 0, 0);
         $dayDiff = (int) $nowDay->diff($dtDay)->format('%r%a'); // negativ wenn Datum in Vergangenheit
 
-        if ($dayDiff === 0)  return 'Heute, '       . $dt->format('H:i') . ' Uhr';
-        if ($dayDiff === -1) return 'Gestern, '     . $dt->format('H:i') . ' Uhr';
-        if ($dayDiff === 1)  return 'Morgen, '      . $dt->format('H:i') . ' Uhr';
-        return $dt->format('d.m.Y, H:i') . ' Uhr';
+        /*
+         * Auch das Datum gehoert ins Sprachpaket. "Gestern, 17:33 Uhr" stand
+         * bis 1.10.1 fest im Code und blieb deshalb auf jeder Seite deutsch,
+         * auch in der englischen Fassung — sichtbar an jedem Beitrag.
+         *
+         * Das Format selbst ist ebenfalls ein Schluessel: Im Deutschen steht
+         * der Tag vorn, im Englischen der Monat.
+         */
+        if ($dayDiff === 0)  return t('datum_heute',   $dt->format(t('datum_uhrzeit')));
+        if ($dayDiff === -1) return t('datum_gestern', $dt->format(t('datum_uhrzeit')));
+        if ($dayDiff === 1)  return t('datum_morgen',  $dt->format(t('datum_uhrzeit')));
+
+        return t('datum_voll', $dt->format(t('datum_format')));
     } catch (Exception $e) {
         return $datetime;
     }

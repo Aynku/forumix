@@ -27,4 +27,6 @@ return [
     'banner_nav' => 'Banner',
     'banner_modul_name' => 'Announcement banner',
     'banner_modul_beschreibung' => 'A band across the whole page, for maintenance notices and announcements. Text and colour are set in the module itself; visitors can dismiss it.',
+
+    'banner_hinweis_schliessen' => 'Dismiss notice',
 ];

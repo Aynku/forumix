@@ -28,7 +28,7 @@
       <div class="achievement-title">{{ a.title }}</div>
       <div class="achievement-desc">{{ a.description }}</div>
       <div class="achievement-meta">
-        <span class="achievement-points">+{{ a.points }} Pkt</span>
+        <span class="achievement-points">+{{ a.points }} {{ t('achievements_punkte_kurz') }}</span>
         {% if isEarned %}
           <span class="achievement-earned">{{ format_date(a.earned_at) }}</span>
         {% else %}

@@ -83,4 +83,14 @@ return [
     'ki_nav' => 'AI features',
     'ki_modul_name' => 'AI features',
     'ki_modul_beschreibung' => 'Two things: buttons in the editor for spelling, shortening, summarising and translating — every result appears in a preview first, and only what the writer accepts is taken over. And a pre-check of new posts for advertising and insults, which reports rather than deletes. Both can be switched off separately; the API key comes from the operator.',
+
+    // ── Zielsprachen fuer "Uebersetzen" ────────────────────────
+    'ki_sprache_de' => 'German',
+    'ki_sprache_en' => 'English',
+    'ki_sprache_fr' => 'French',
+    'ki_sprache_es' => 'Spanish',
+    'ki_sprache_it' => 'Italian',
+    'ki_sprache_nl' => 'Dutch',
+    'ki_sprache_pl' => 'Polish',
+    'ki_sprache_tr' => 'Turkish',
 ];

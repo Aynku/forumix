@@ -242,12 +242,12 @@ function render_profile_field_inputs(array $profile, array $privacy): string {
           </div>
           <div class="profile-field-privacy">
             <label style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">
-              Sichtbar für
+              <?= t('profil_sichtbar_fuer') ?>
             </label>
             <select name="privacy_<?= $keyE ?>">
-              <option value="public"  <?= $priv === 'public'  ? 'selected' : '' ?>>🌐 Öffentlich</option>
-              <option value="members" <?= $priv === 'members' ? 'selected' : '' ?>>🔒 Mitglieder</option>
-              <option value="private" <?= $priv === 'private' ? 'selected' : '' ?>>🔐 Nur ich</option>
+              <option value="public"  <?= $priv === 'public'  ? 'selected' : '' ?>>🌐 <?= t('profil_sicht_oeffentlich') ?></option>
+              <option value="members" <?= $priv === 'members' ? 'selected' : '' ?>>🔒 <?= t('profil_sicht_mitglieder') ?></option>
+              <option value="private" <?= $priv === 'private' ? 'selected' : '' ?>>🔐 <?= t('profil_sicht_nur_ich') ?></option>
             </select>
           </div>
         </div>

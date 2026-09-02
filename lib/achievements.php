@@ -3,6 +3,38 @@ if (!defined('FORUM_RUNNING')) { http_response_code(403); die('Forbidden'); }
 // lib/achievements.php – Trophäen-System
 
 /**
+ * Titel und Beschreibung einer Trophaee in der gewaehlten Sprache.
+ *
+ * Die Texte stehen in der Datenbank — dort hat sie der Installer angelegt,
+ * und dort kann sie ein Betreiber aendern. Uebersetzt wird deshalb ueber die
+ * Spalte `code`, die jede Trophaee ohnehin traegt: `first_post` wird zu
+ * `achv_first_post` im Sprachpaket.
+ *
+ * Steht dort nichts, bleibt der gespeicherte Text stehen. Das ist der Fall
+ * fuer eigene Trophaeen eines Betreibers — die sollen nicht ploetzlich als
+ * nackter Schluessel dastehen, nur weil sie im Kern nicht vorgesehen sind.
+ *
+ * WARUM keine Spalten je Sprache: Dann muesste jede neue Sprache die Tabelle
+ * aendern, und ein Betreiber mit eigenen Trophaeen haette leere Felder.
+ */
+function achievement_uebersetzen(array $a): array {
+    foreach (['title' => '_titel', 'description' => '_text'] as $spalte => $endung) {
+        if (empty($a['code']) || !isset($a[$spalte])) {
+            continue;
+        }
+
+        $schluessel = 'achv_' . $a['code'] . $endung;
+        $text       = t($schluessel);
+
+        if ($text !== $schluessel) {
+            $a[$spalte] = $text;
+        }
+    }
+
+    return $a;
+}
+
+/**
  * Verleiht ein Achievement falls noch nicht vorhanden. Gibt true zurück
  * wenn neu, false wenn bereits vorhanden.
  */
@@ -117,7 +149,7 @@ function check_achievements(int $userId): array {
  */
 function user_achievements_overview(int $userId): array {
     try {
-        return db_fetchAll('
+        $rows = db_fetchAll('
             SELECT a.*, ua.earned_at,
                    (ua.user_id IS NOT NULL) AS earned
             FROM achievements a
@@ -125,6 +157,8 @@ function user_achievements_overview(int $userId): array {
               ON ua.achievement_id = a.achievement_id AND ua.user_id = ?
             ORDER BY (ua.user_id IS NULL) ASC, a.points ASC
         ', [$userId]);
+
+        return array_map('achievement_uebersetzen', $rows);
     } catch (Exception $e) { return []; }
 }
 

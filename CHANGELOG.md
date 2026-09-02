@@ -8,6 +8,39 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.10.1 (2026-09-02)
+
+### Nachgezogen: was beim Umstellen auf das Sprachpaket liegen blieb
+
+Mit v1.10.0 kam das Sprachpaket. Ein paar Stellen sind dabei durchgerutscht
+und blieben auch auf Englisch deutsch:
+
+- **Datumsangaben.** „Gestern, 17:33 Uhr" stand fest im Code und erschien
+  damit unter jedem Beitrag, in jeder Sprache. Jetzt kommen Tag und Uhrzeit
+  aus dem Sprachpaket, samt Format — im Englischen steht der Monat vorn und
+  die Uhrzeit im 12-Stunden-Format.
+- **Trophäen.** Titel und Beschreibung stehen in der Datenbank. Übersetzt
+  wird jetzt über die Spalte `code`, die jede Trophäe ohnehin trägt. Eigene
+  Trophäen eines Betreibers behalten ihren gespeicherten Text — für sie gibt
+  es keinen Eintrag im Sprachpaket, und ein nackter Schlüssel wäre schlechter
+  als Deutsch. Eine Migration ist dafür nicht nötig.
+- **Weitere Stellen:** *Mein Profil* und *Moderator-Bereich* im Benutzermenü,
+  Mitgliedsnummer und letzte Aktivität im Profil, die Aktivitätsstufe, der
+  Trophäen-Fortschritt im Dashboard, die Sichtbarkeit der Profilfelder, der
+  Hinweis zum Bearbeitungsgrund, der Schließen-Knopf am Ankündigungsbanner
+  und die Zielsprachen der KI-Übersetzung.
+
+### Damit das nicht wieder passiert
+
+Der Prüflauf hat eine Prüfung mehr: **Jeder benutzte Schlüssel steht auch im
+Sprachpaket.** Genau das war die Lücke — `t('my_profile')` stand in der
+Vorlage, der Eintrag fehlte, und `t()` fällt in so einem Fall auf den
+Schlüssel selbst zurück. Angezeigt wurde deshalb „my_profile", in beiden
+Sprachen. Der Prüflauf liest die Aufrufe jetzt mit dem Tokenizer aus und
+bricht ab, wenn ein Schlüssel ins Leere zeigt.
+
+---
+
 ## v1.10.0 (2026-09-02)
 
 ### Forumix spricht Deutsch und Englisch

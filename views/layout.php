@@ -199,7 +199,7 @@ $forumName = forum_name();
                 <span style="font-size:10px;opacity:.6">▾</span>
               </button>
               <div class="user-menu-dropdown">
-                <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $currentUser['user_id'] ?>">Mein Profil</a>
+                <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $currentUser['user_id'] ?>"><?= t('my_profile') ?></a>
                 <a href="<?= e(FORUM_URL) ?>/settings.php"><?= t('settings') ?></a>
                 <div class="user-menu-divider"></div>
                 <?php
@@ -212,7 +212,7 @@ $forumName = forum_name();
                   }
                 ?>
                 <?php if ($showModLink): ?>
-                  <a href="<?= e(FORUM_URL) ?>/mod.php">Moderator-Bereich</a>
+                  <a href="<?= e(FORUM_URL) ?>/mod.php"><?= t('mod_moderator_bereich_kurz') ?></a>
                 <?php endif; ?>
                 <?php if ($isAdmin): ?>
                   <a href="<?= e(FORUM_URL) ?>/admin/"><?= e(t('admin')) ?></a>

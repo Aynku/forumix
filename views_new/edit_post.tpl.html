@@ -43,9 +43,9 @@
                {{ (isModEdit ? 'required minlength="3"' : '')|raw }}>
         <div class="form-hint">
           {% if isModEdit %}
-            Der Grund erscheint rot unter dem Beitrag und ist für alle sichtbar.
+            {{ t('edit_post_grund_oeffentlich') }}
           {% else %}
-            Sichtbar für Moderatoren im Edit-Verlauf.
+            {{ t('edit_post_grund_intern') }}
           {% endif %}
         </div>
       </div>
