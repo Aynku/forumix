@@ -3,7 +3,7 @@
 Ein vollständiges Community-Forum in nativem PHP. **Keine externen Abhängigkeiten, kein Composer, kein Framework, kein Build-Schritt.**
 
 ```
-Aktuelle Version: 1.10.1
+Aktuelle Version: 1.10.2
 Projektseite:     https://forumix.de
 Zum Ausprobieren: https://forum.forumix.de   ← läuft selbst mit Forumix
 Download:         https://forumix.de/#download

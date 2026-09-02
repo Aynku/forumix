@@ -31,4 +31,6 @@ return [
     'downloads_menu' => 'Downloads',
     'downloads_modul_name' => 'Downloads',
     'downloads_modul_beschreibung' => 'Dateiablage mit eigener Seite. Admins laden Dateien hoch und gruppieren sie in Kategorien, alle anderen laden herunter. Zählt die Abrufe.',
+
+    'downloads_loeschen_frage' => 'Diese Datei löschen?',
 ];

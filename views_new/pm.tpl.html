@@ -22,7 +22,7 @@
       </div>
       <div class="form-row">
         <label>{{ t('pm_nachricht') }}</label>
-        {{ render_editor('content', 'content', formContent ?? '', 'Deine private Nachricht…', true, false)|raw }}
+        {{ render_editor('content', 'content', formContent ?? '', t('pm_platzhalter'), true, false)|raw }}
       </div>
       <div style="display:flex;gap:8px">
         <button type="submit" class="btn btn-primary">{{ t('pm_senden') }}</button>
@@ -43,7 +43,7 @@
       {% endif %}
       &bull; {{ format_date(pm.sent_at) }}
       {% if isSenderView %}
-        &bull; <span style="font-style:italic">{{ pm.is_read ? 'Gelesen' : 'Noch nicht gelesen' }}</span>
+        &bull; <span style="font-style:italic">{{ pm.is_read ? t('pm_gelesen') : t('pm_ungelesen') }}</span>
       {% endif %}
     </p>
     <hr style="border:none;border-top:1px solid var(--border);margin-bottom:14px">
@@ -51,11 +51,11 @@
     <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
     <div style="display:flex;gap:8px">
       {% if not isSenderView %}
-        <a href="{{ url('/pm.php?new=1&to=') }}{{ pm.sender_id }}&subject={{ urlencode('Re: ' . pm.subject) }}"
+        <a href="{{ url('/pm.php?new=1&to=') }}{{ pm.sender_id }}&subject={{ urlencode(t('pm_re_praefix') . pm.subject) }}"
            class="btn btn-primary btn-sm">{{ t('pm_antworten') }}</a>
       {% endif %}
       <a href="{{ url('/pm.php?action=delete&id=') }}{{ pm.pm_id }}&csrf={{ csrfToken }}{{ (isSenderView ? '&from=sent' : '')|raw }}"
-         class="btn btn-danger btn-sm" onclick="return confirm('Löschen?')">{{ t('pm_loeschen') }}</a>
+         class="btn btn-danger btn-sm" onclick="return confirm({{ t('loeschen_frage') | json }})">{{ t('pm_loeschen') }}</a>
       <a href="{{ url('/pm.php') }}{{ (isSenderView ? '?action=sent' : '')|raw }}" class="btn btn-ghost btn-sm">{{ t('pm_zurueck') }}</a>
     </div>
   </div>
@@ -72,7 +72,7 @@
             {% if not msg.is_read and pmView != 'sent' %}{% endif %}{{ msg.subject }}
           </a>
           <div class="thread-meta">
-            {{ pmView == 'sent' ? 'An' : 'Von' }}:
+            {{ pmView == 'sent' ? t('pm_an') : t('pm_von') }}:
             <a href="{{ url('/profile.php?id=') }}{{ msg.other_id }}">{{ msg.other_name }}</a>
           </div>
         </div>
@@ -80,7 +80,7 @@
         <a href="{{ url('/pm.php?action=delete&id=') }}{{ msg.pm_id }}&csrf={{ csrfToken }}&from={{ pmView == 'sent' ? 'sent' : 'inbox' }}"
            class="notif-delete"
            title="{{ t('delete') }}"
-           onclick="return confirm('Diese Nachricht löschen?')">
+           onclick="return confirm({{ t('pm_loeschen_frage') | json }})">
           ✕
         </a>
       </div>

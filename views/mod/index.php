@@ -129,7 +129,7 @@
                onclick="return confirm('Thema freigeben?')">✅ Freigeben</a>
             <a href="?action=reject_thread&id=<?= (int) $t['thread_id'] ?>&csrf=<?= e($csrfToken) ?>&reason=<?= urlencode(t('mod_verstoss_gegen_forenregeln')) ?>"
                class="btn btn-danger btn-sm"
-               onclick="return confirm('Thema ablehnen und löschen?')">🗑️ Ablehnen</a>
+               onclick="return confirm(<?= e(json_encode(t('mod_thema_ablehnen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🗑️ Ablehnen</a>
           </div>
         </div>
         <?php if (!empty($t['content'])): ?>
@@ -163,7 +163,7 @@
                onclick="return confirm('Beitrag freigeben?')">✅ Freigeben</a>
             <a href="?action=reject_post&id=<?= (int) $p['post_id'] ?>&csrf=<?= e($csrfToken) ?>&reason=<?= urlencode(t('mod_verstoss_gegen_forenregeln')) ?>"
                class="btn btn-danger btn-sm"
-               onclick="return confirm('Beitrag ablehnen und löschen?')">🗑️ Ablehnen</a>
+               onclick="return confirm(<?= e(json_encode(t('mod_beitrag_ablehnen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🗑️ Ablehnen</a>
           </div>
         </div>
         <div style="padding:12px 14px;background:var(--bg-surface2);border-radius:var(--radius-sm);font-size:13px;max-height:160px;overflow-y:auto">
@@ -257,7 +257,7 @@
                      href="<?= e(FORUM_URL) ?>/mod_action.php?action=restore_thread&thread=<?= (int) $t['thread_id'] ?>&csrf=<?= e($csrfToken) ?>"><?= t('admin_x_wiederherstellen') ?></a>
                   <a class="btn btn-ghost btn-xs"
                      href="<?= e(FORUM_URL) ?>/mod_action.php?action=purge_thread&thread=<?= (int) $t['thread_id'] ?>&csrf=<?= e($csrfToken) ?>"
-                     onclick="return confirm('Endgültig löschen? Das lässt sich nicht rückgängig machen.')"><?= t('admin_x_endgueltig') ?></a>
+                     onclick="return confirm(<?= e(json_encode(t('endgueltig_loeschen_frage'), JSON_UNESCAPED_UNICODE)) ?>)"><?= t('admin_x_endgueltig') ?></a>
                 </td>
               </tr>
             <?php endforeach; ?>
@@ -296,7 +296,7 @@
                      href="<?= e(FORUM_URL) ?>/mod_action.php?action=restore_post&post=<?= (int) $p['post_id'] ?>&csrf=<?= e($csrfToken) ?>"><?= t('admin_x_wiederherstellen') ?></a>
                   <a class="btn btn-ghost btn-xs"
                      href="<?= e(FORUM_URL) ?>/mod_action.php?action=purge_post&post=<?= (int) $p['post_id'] ?>&csrf=<?= e($csrfToken) ?>"
-                     onclick="return confirm('Endgültig löschen? Das lässt sich nicht rückgängig machen.')"><?= t('admin_x_endgueltig') ?></a>
+                     onclick="return confirm(<?= e(json_encode(t('endgueltig_loeschen_frage'), JSON_UNESCAPED_UNICODE)) ?>)"><?= t('admin_x_endgueltig') ?></a>
                 </td>
               </tr>
             <?php endforeach; ?>

@@ -32,4 +32,9 @@ return [
     'faq_menu' => 'FAQ',
     'faq_modul_name' => 'FAQ / frequently asked questions',
     'faq_modul_beschreibung' => 'A structured help page with categories (general, posts, account, moderation). Admins maintain the questions, everyone can read them. Footer link.',
+
+    'faq_kategorie_loeschen_frage' => 'Delete category? (only works when empty)',
+    'faq_frage_loeschen_frage' => 'Really delete this question?',
+
+    'faq_antwort_platzhalter' => 'The answer goes here…',
 ];

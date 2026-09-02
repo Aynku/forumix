@@ -258,4 +258,95 @@ return [
             ));
         }
     },
+    'In den Vorlagen steht kein deutscher Text mehr' => function () use ($wurzel) {
+        /*
+         * Der Fall, der diese Pruefung ausgeloest hat: Nach der Umstellung
+         * auf das Sprachpaket war die Startseite auf Englisch immer noch
+         * halb deutsch — "1 Mitglieder · 1 Gäste", "0 Themen · 0 Beiträge".
+         *
+         * Uebersehen wurde das, weil der Text nicht als Text dastand,
+         * sondern in einem Ausdruck: {{ n == 1 ? 'Thema' : 'Themen' }}.
+         * Das Suchwerkzeug ueberspringt {{ }} absichtlich — sonst haelt es
+         * {% endif %} fuer einen Satz.
+         *
+         * Hier wird deshalb umgekehrt gesucht: Eine Vorlage darf ueberhaupt
+         * keinen deutschen Text enthalten, weder zwischen den Marken noch in
+         * einem Ausdruck. Deutsch gehoert in lang/de.php.
+         *
+         * Erkannt wird es an Umlauten und an den haeufigsten deutschen
+         * Funktionswoertern. Das faengt nicht jeden Satz — "Password" und
+         * "Avatar" schreiben sich in beiden Sprachen gleich — aber es faengt
+         * die, an denen ein Besucher sofort sieht, dass etwas fehlt.
+         */
+        $deutsch = '/[ÄÖÜäöüß]|\b(der|die|das|und|oder|nicht|noch|kein|keine|dein|deine|'
+                 . 'mein|meine|von|für|über|zurück|seit|beim|wurde|wird|sind|werden|'
+                 . 'Beitrag|Beiträge|Thema|Themen|Mitglied|Mitglieder|Gast|Gäste)\b/u';
+
+        $funde = [];
+
+        foreach (glob($wurzel . '/views_new/*.tpl.html') ?: [] as $datei) {
+            $roh = file_get_contents($datei);
+
+            /*
+             * Kommentare duerfen deutsch sein — sie erklaeren den Code und
+             * stehen nie auf der Seite. Das gilt fuer die der Vorlagen-
+             * Sprache wie fuer die im mitgelieferten JavaScript.
+             *
+             * Bei den JavaScript-Zeilen wird // nur am Zeilenanfang als
+             * Kommentar gelesen. Sonst faellt "https://..." mit darunter.
+             */
+            $roh = preg_replace('/\{#.*?#\}/s', '', $roh);
+            $roh = preg_replace('#/\*.*?\*/#s', '', $roh);
+            $roh = preg_replace('#^\s*//.*$#m', '', $roh);
+
+            $zeilen = explode("\n", $roh);
+
+            foreach ($zeilen as $nr => $zeile) {
+                // Marken raus, Entities raus — uebrig bleibt, was jemand liest.
+                $sichtbar = preg_replace('/\{[{%].*?[}%]\}/', ' ', $zeile);
+                $sichtbar = preg_replace('/<[^>]*>/', ' ', $sichtbar);
+                $sichtbar = preg_replace('/&[a-z]+;|&#\d+;/i', ' ', $sichtbar);
+
+                /*
+                 * Dazu die Attribute, die der Besucher zu sehen bekommt.
+                 * Die stehen INNERHALB einer Marke und waeren oben gerade
+                 * mit weggeschnitten worden — genau so ist mir
+                 * data-label="Letzter Beitrag" entgangen.
+                 */
+                if (preg_match_all('/\b(?:title|placeholder|aria-label|alt|data-label)="([^"<]*)"/', $zeile, $a)) {
+                    $sichtbar .= ' ' . implode(' ', $a[1]);
+                }
+
+                // Dazu die festen Texte INNERHALB der Ausdruecke.
+                $inAusdruck = '';
+                if (preg_match_all('/\{[{%](.*?)[}%]\}/', $zeile, $m)) {
+                    foreach ($m[1] as $ausdruck) {
+                        // Schluessel des Sprachpakets sind klein_mit_strich
+                        // und stehen hier zu Recht.
+                        if (preg_match_all("/'([^']*)'/", $ausdruck, $s)) {
+                            foreach ($s[1] as $wert) {
+                                if (preg_match('/^[a-z0-9_.\/#?=&-]*$/', $wert)) { continue; }
+                                $inAusdruck .= ' ' . $wert;
+                            }
+                        }
+                    }
+                }
+
+                foreach ([$sichtbar, $inAusdruck] as $text) {
+                    if (trim($text) !== '' && preg_match($deutsch, $text)) {
+                        $funde[] = basename($datei) . ':' . ($nr + 1) . ' — ' . trim(preg_replace('/\s+/', ' ', $text));
+                        break;
+                    }
+                }
+            }
+        }
+
+        if ($funde !== []) {
+            throw new RuntimeException(sprintf(
+                "%d Stellen mit deutschem Text in den Vorlagen:\n        %s",
+                count($funde),
+                implode("\n        ", array_slice($funde, 0, 10))
+            ));
+        }
+    },
 ];

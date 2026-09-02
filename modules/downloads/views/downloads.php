@@ -78,7 +78,7 @@
 
         <?php if ($canAdmin): ?>
           <form method="post" style="display:inline"
-                onsubmit="return confirm('Diese Datei löschen?')">
+                onsubmit="return confirm(<?= json_encode(t('downloads_loeschen_frage')) ?>)">
             <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
             <input type="hidden" name="tun" value="loeschen">
             <input type="hidden" name="id" value="<?= (int) $d['download_id'] ?>">

@@ -1,9 +1,9 @@
 <div style="max-width:520px;margin:60px auto;text-align:center">
   <div class="form-card">
     <div style="font-size:48px;margin-bottom:14px">🔍</div>
-    <h2 style="margin-bottom:10px">{{ title|default('Fehler') }}</h2>
+    <h2 style="margin-bottom:10px">{{ title|default(t('error_titel')) }}</h2>
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">
-      {{ message|default('Ein unbekannter Fehler ist aufgetreten.') }}
+      {{ message|default(t('error_unbekannt')) }}
     </p>
     <a href="{{ url('/') }}" class="btn btn-primary">{{ t('error_zur_startseite') }}</a>
   </div>

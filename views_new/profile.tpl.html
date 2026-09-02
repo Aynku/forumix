@@ -62,7 +62,7 @@
     </div>
 
     <div class="profile-meta">
-      {{ t('profile_dabei_seit') }} <strong>{{ profile.registered_at | date('d.m.Y') }}</strong>
+      {{ t('profile_dabei_seit') }} <strong>{{ profile.registered_at | date(t('datum_format_tag')) }}</strong>
       · 🆔 {{ t('profile_mitglied_nr', profile.user_id) | raw }}
       {# v0.18.52: last_activity_at (Pageviews+Posts) statt last_login (nur echte Logins).
          Fallback auf last_login wenn last_activity_at noch nicht befüllt ist. #}
@@ -153,7 +153,7 @@
 
 {% set visibleFields = profile_visible_fields(profile, currentUser) %}
 {% if visibleFields %}
-<div class="section-heading">Über {{ zeigename(profile.username) }}</div>
+<div class="section-heading">{{ t('profile_ueber_x', zeigename(profile.username)) }}</div>
 <div class="card" style="margin-bottom:16px;padding:14px 16px">
   <div class="profile-fields-grid">
     {% for field in visibleFields %}
@@ -192,9 +192,9 @@
       {% if not latestPosts %}
         <tr><td colspan="2" style="text-align:center;color:var(--text-faint);padding:20px">
           {% if isOwner %}
-            Du hast noch keine Beiträge geschrieben. Worauf wartest du? 😊
+            {{ t('profile_du_noch_keine_beitraege') }}
           {% else %}
-            Noch keine Beiträge.
+            {{ t('profile_noch_keine_beitraege') }}
           {% endif %}
         </td></tr>
       {% endif %}
@@ -213,9 +213,9 @@
 </div>
 
 {% if isMod and ipHistory %}
-<details class="mod-ip-history" {% if count(ipHistory) <= 10 %}open{% endif %}>
+<details class="mod-ip-history" {% if ipHistory|length <= 10 %}open{% endif %}>
   <summary class="mod-ip-summary">
-    <span>{{ t('profile_ip_verlauf') }} <span style="color:var(--text-faint);font-weight:normal">(nur für Moderatoren · {{ ipHistory|length }} Einträge)</span></span>
+    <span>{{ t('profile_ip_verlauf') }} <span style="color:var(--text-faint);font-weight:normal">{{ t('profile_ip_nur_moderatoren', count(ipHistory)) }}</span></span>
     <span class="mod-ip-summary-chevron">▼</span>
   </summary>
 
@@ -257,7 +257,7 @@
         <button type="button" class="btn btn-ghost btn-sm" onclick="
           this.closest('.card').querySelectorAll('.ip-row-hidden').forEach(r => r.style.display = '');
           this.style.display = 'none';
-        ">Weitere Einträge anzeigen</button>
+        ">{{ t('profile_weitere_eintraege') }}</button>
       </div>
     {% endif %}
   </div>

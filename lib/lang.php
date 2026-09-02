@@ -143,6 +143,8 @@ function js_texte(): array {
         'js_network_error', 'js_preview_empty',
         'bookmarks', 'js_saved',
         'react_like', 'react_love', 'react_haha', 'react_wow', 'react_sad', 'react_thanks',
+        'js_design_zuruecksetzen', 'js_abtrennen_titel', 'js_email_ungueltig',
+        'js_fehler_praefix', 'js_vorschau_fehlgeschlagen', 'js_schliessen',
     ];
 
     $aus = [];
@@ -151,6 +153,19 @@ function js_texte(): array {
     }
 
     return $aus;
+}
+
+/**
+ * Eine Zahl so schreiben, wie die gewaehlte Sprache sie schreibt.
+ *
+ * 1.234,5 im Deutschen, 1,234.5 im Englischen — Punkt und Komma sind
+ * vertauscht. In den Vorlagen stand bisher number_format($n, 0, ',', '.')
+ * mit fest eingetragenen deutschen Zeichen. Das faellt kaum auf, macht aus
+ * "1.234 Beiträge" auf Englisch aber "1.234 posts" — also tausend Mal
+ * weniger, als dastehen sollte.
+ */
+function zahl(int|float $wert, int $nachkomma = 0): string {
+    return number_format($wert, $nachkomma, t('zahl_dezimal'), t('zahl_tausender'));
 }
 
 function available_languages(): array {

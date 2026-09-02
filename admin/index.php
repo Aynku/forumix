@@ -1697,7 +1697,7 @@ if ($action === 'delete_tag') {
 }
 
 // ─── DATEN PRO ACTION ─────────────────────────────────────────────
-$vars = ['action' => $action, 'title' => 'Adminbereich'];
+$vars = ['action' => $action, 'title' => t('admin_bereich_titel')];
 
 switch ($action) {
 

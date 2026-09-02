@@ -16,7 +16,7 @@
         <div class="flash flash-error">{{ error }}</div>
       {% endif %}
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
-        {{ t('reset_hallo') }} <strong>{{ username }}</strong>, wähle ein neues Passwort:
+        {{ t('reset_hallo_neues_passwort', e(username)) | raw }}
       </p>
 
       <form method="post" autocomplete="off" id="resetForm">
@@ -79,10 +79,10 @@
           if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score += 1;
           if (/\d/.test(pw))   score += 1;
           if (/[^A-Za-z0-9]/.test(pw)) score += 1;
-          if (score <= 2) return {label: 'Schwach',     class: 'weak',   pct: 25};
-          if (score <= 3) return {label: 'Mittelmäßig', class: 'medium', pct: 50};
-          if (score <= 4) return {label: 'Gut',         class: 'good',   pct: 75};
-          return                {label: 'Stark',       class: 'strong', pct: 100};
+          if (score <= 2) return {label: {{ t('pw_schwach') | json }},     class: 'weak',   pct: 25};
+          if (score <= 3) return {label: {{ t('pw_mittel') | json }}, class: 'medium', pct: 50};
+          if (score <= 4) return {label: {{ t('pw_gut') | json }},         class: 'good',   pct: 75};
+          return                {label: {{ t('pw_stark') | json }},       class: 'strong', pct: 100};
         }
         function updateStrength() {
           const v = pwField.value;
@@ -91,17 +91,17 @@
           strengthWrap.hidden = false;
           strengthFill.style.width = s.pct + '%';
           strengthFill.className = 'password-strength-fill ' + s.class;
-          strengthLabel.textContent = 'Passwort-Stärke: ' + s.label;
+          strengthLabel.textContent = {{ t('pw_staerke_praefix') | json }} + s.label;
         }
         function updateMatch() {
           const v1 = pwField.value, v2 = pw2Field.value;
           if (!v2) { matchHint.hidden = true; return; }
           matchHint.hidden = false;
           if (v1 === v2) {
-            matchHint.textContent = 'Passwörter stimmen überein';
+            matchHint.textContent = {{ t('settings_passwoerter_gleich') | json }};
             matchHint.className = 'password-match-hint match-ok';
           } else {
-            matchHint.textContent = 'Passwörter stimmen nicht überein';
+            matchHint.textContent = {{ t('settings_passwoerter_ungleich') | json }};
             matchHint.className = 'password-match-hint match-fail';
           }
         }

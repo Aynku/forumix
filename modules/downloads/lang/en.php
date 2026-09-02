@@ -31,4 +31,6 @@ return [
     'downloads_menu' => 'Downloads',
     'downloads_modul_name' => 'Downloads',
     'downloads_modul_beschreibung' => 'A file store with its own page. Admins upload files and group them into categories, everyone else downloads. Counts the downloads.',
+
+    'downloads_loeschen_frage' => 'Delete this file?',
 ];

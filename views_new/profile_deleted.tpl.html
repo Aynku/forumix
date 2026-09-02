@@ -8,7 +8,7 @@
   </p>
   {% if profile.deleted_at %}
     <p style="color:var(--text-faint);font-size:12px;margin-top:8px">
-      Gelöscht am {{ profile.deleted_at|date('d.m.Y H:i') }}
+      {{ t('profile_deleted_geloescht_am', profile.deleted_at|date(t('datum_format'))) }}
     </p>
   {% endif %}
   <p style="color:var(--text-faint);font-size:12px;margin-top:14px;line-height:1.6">

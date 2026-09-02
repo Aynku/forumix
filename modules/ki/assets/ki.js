@@ -347,7 +347,7 @@
 
     var fuss = document.createElement('div');
     fuss.className = 'ki-menue-fuss';
-    fuss.textContent = '* am Beitrag steht danach, dass die KI geholfen hat';
+    fuss.textContent = K.texte.kennzeichnung_fuss;
     menue.appendChild(fuss);
 
     anstellen(menue, knopf);
@@ -366,7 +366,7 @@
     wahl.className = 'ki-menue ki-menue-sprachen';
     var kopf = document.createElement('div');
     kopf.className = 'ki-menue-kopf';
-    kopf.textContent = 'Wohin übersetzen?';
+    kopf.textContent = K.texte.wohin_uebersetzen;
     wahl.appendChild(kopf);
 
     Object.keys(K.sprachen).forEach(function (code) {
@@ -537,7 +537,7 @@
     var zu = document.createElement('button');
     zu.type = 'button';
     zu.className = 'ki-btn ki-btn-still';
-    zu.textContent = 'Schließen';
+    zu.textContent = K.texte.schliessen;
     zu.addEventListener('click', function () { p.remove(); });
     box.appendChild(zu);
     p.appendChild(box);
@@ -556,7 +556,7 @@
     if (!teile) {
       var hinweis = document.createElement('span');
       hinweis.className = 'ki-kopf-hinweis';
-      hinweis.textContent = 'Der Text ist zu lang, um die Unterschiede zu färben. Bitte selbst vergleichen.';
+      hinweis.textContent = K.texte.zu_lang_zum_faerben;
       kopf.appendChild(hinweis);
     }
     if (d.hinweis) {
@@ -598,7 +598,7 @@
     if (d.kennzeichnet) {
       var marke = document.createElement('span');
       marke.className = 'ki-marke-hinweis';
-      marke.textContent = 'Am Beitrag steht danach, dass die KI geholfen hat';
+      marke.textContent = K.texte.kennzeichnung;
       leiste.appendChild(marke);
     }
 

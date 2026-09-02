@@ -26,14 +26,16 @@
       {{ t('delete_account_mit_der_loeschung_deines') }}
     </p>
     <ul style="font-size:13px;color:var(--text-muted);margin-top:6px;padding-left:22px;line-height:1.7">
-      <li>{{ t('delete_account_dein') }} <strong>{{ t('delete_account_benutzername') }}</strong> wird durch „Gelöschter Benutzer" ersetzt</li>
-      <li>{{ t('delete_account_deine') }} <strong>{{ t('delete_account_e_mail_adresse') }}</strong>, dein <strong>{{ t('delete_account_avatar') }}</strong>, deine <strong>{{ t('delete_account_signatur') }}</strong>,
-          deine <strong>{{ t('delete_account_bio') }}</strong> und alle <strong>persönlichen Profil-Daten</strong> werden gelöscht</li>
-      <li>{{ t('delete_account_deine') }} <strong>{{ t('delete_account_beitraege_und_themen_bleiben') }}</strong> bestehen (sonst würden Diskussionen zerfallen),
-          erscheinen aber unter „Gelöschter Benutzer"</li>
-      <li>{{ t('delete_account_deine') }} <strong>privaten Nachrichten</strong> sind beim Empfänger noch lesbar, aber ohne deinen Namen</li>
-      <li>{{ t('delete_account_deine') }} <strong>{{ t('delete_account_lesezeichen_abos_benachrichtigungen_achievements') }}</strong> werden gelöscht</li>
-      <li><strong>{{ t('delete_account_login_wird_unmoeglich') }}</strong> – du kannst dich nie wieder anmelden</li>
+      {# Jeder Punkt ist EIN Satz mit Platzhaltern, kein Satz aus Bruchstuecken.
+         Vorher standen hier Textstuecke zwischen den <strong>-Marken; die
+         liessen sich nicht uebersetzen, weil eine andere Sprache die Woerter
+         anders anordnet. #}
+      <li>{{ t('delete_account_punkt_name') | raw }}</li>
+      <li>{{ t('delete_account_punkt_profil') | raw }}</li>
+      <li>{{ t('delete_account_punkt_beitraege') | raw }}</li>
+      <li>{{ t('delete_account_punkt_pn') | raw }}</li>
+      <li>{{ t('delete_account_punkt_sonstiges') | raw }}</li>
+      <li>{{ t('delete_account_punkt_login') | raw }}</li>
     </ul>
     <p style="font-size:13px;color:var(--text-muted);margin-top:10px;line-height:1.6">
       <strong>{{ t('delete_account_es_gibt_keine_wiederherstellung') }}</strong> {{ t('delete_account_auch_nicht_durch_einen') }}
@@ -63,8 +65,7 @@
       <input type="text" name="confirm_text" required autocomplete="off"
              placeholder="{{ t('delete_account_input_placeholder', t('delete_account_confirm_word')) }}">
       <div class="form-hint">
-        {{ t('delete_account_gib_das_wort') }} <strong>{{ t('delete_account_loeschen') }}</strong> ein (groß geschrieben), um zu bestätigen dass
-        du das wirklich willst.
+        {{ t('delete_account_wort_eingeben', t('delete_account_loeschen')) | raw }}
       </div>
     </div>
 

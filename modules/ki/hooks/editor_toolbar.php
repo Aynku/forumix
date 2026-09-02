@@ -54,7 +54,16 @@ if (empty($GLOBALS['ki_assets_geladen'])) {
         url:      <?= json_encode(FORUM_URL . '/modules/ki/api.php') ?>,
         csrf:     <?= json_encode($csrfToken ?? '') ?>,
         befehle:  <?= json_encode($ki_liste, JSON_UNESCAPED_UNICODE) ?>,
-        sprachen: <?= json_encode(ki_sprachen_anzeige(), JSON_UNESCAPED_UNICODE) ?>
+        sprachen: <?= json_encode(ki_sprachen_anzeige(), JSON_UNESCAPED_UNICODE) ?>,
+        <?php /* Was ki.js im Browser anzeigt. Eine feste Liste, wie js_texte()
+                im Kern — das Modul hat keinen Zugriff auf t() im Browser. */ ?>
+        texte:    <?= json_encode([
+                      'kennzeichnung_fuss' => t('ki_js_kennzeichnung_fuss'),
+                      'kennzeichnung'      => t('ki_js_kennzeichnung'),
+                      'wohin_uebersetzen'  => t('ki_js_wohin_uebersetzen'),
+                      'schliessen'         => t('ki_js_schliessen'),
+                      'zu_lang_zum_faerben'=> t('ki_js_zu_lang_zum_faerben'),
+                  ], JSON_UNESCAPED_UNICODE) ?>
       };
     </script>
     <script src="<?= FORUM_URL ?>/modules/ki/assets/ki.js?v=<?= $ki_v ?>" defer></script>

@@ -12,4 +12,11 @@ return [
     'shoutbox_empty' => 'Noch keine Nachrichten. Sei der/die Erste! 🚀',
     'shoutbox_modul_name' => 'Shoutbox',
     'shoutbox_modul_beschreibung' => 'Mini-Chat-Box auf der Startseite mit Live-Updates. Eingeloggte User können kurze Nachrichten posten.',
+
+    'shoutbox_server_fehler' => 'Server-Fehler. Browser-Konsole für Details öffnen (F12).',
+    'shoutbox_senden_fehlgeschlagen' => 'Senden fehlgeschlagen.',
+    'shoutbox_netzwerk_fehler' => 'Netzwerk-Fehler. Browser-Konsole für Details (F12).',
+    'shoutbox_loeschen_frage' => 'Diese Nachricht löschen?',
+
+    'shoutbox_platzhalter' => 'Schreib was Schönes… (Enter zum Absenden, max. 500 Zeichen)',
 ];

@@ -1,4 +1,4 @@
-<div class="section-heading">Edit-Verlauf von Beitrag #{{ post.post_id }}</div>
+<div class="section-heading">{{ t('post_history_titel', post.post_id) }}</div>
 
 <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
   {{ t('post_history_beitrag_von') }} <strong>{{ post.author_name }}</strong> in
@@ -12,7 +12,7 @@
   </div>
   {% if post.edited_at %}
     <div style="padding:6px 16px;background:var(--bg-surface2);border-top:1px solid var(--border);font-size:11px;color:var(--text-muted)">
-      Zuletzt bearbeitet: {{ format_date(post.edited_at) }}
+      {{ t('post_history_zuletzt_bearbeitet', format_date(post.edited_at)) }}
     </div>
   {% endif %}
 </div>
@@ -31,7 +31,7 @@
           Version vom {{ format_date(h.created_at) }}
         </span>
         <span style="font-size:11px;color:var(--text-muted)">
-          bearbeitet von <a href="{{ url('/profile.php?id=') }}{{ h.editor_id }}">{{ h.editor_name }}</a>
+          {{ t('post_history_bearbeitet_von') }} <a href="{{ url('/profile.php?id=') }}{{ h.editor_id }}">{{ h.editor_name }}</a>
         </span>
       </div>
       {% if h.reason %}

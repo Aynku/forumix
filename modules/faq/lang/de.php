@@ -32,4 +32,9 @@ return [
     'faq_menu' => 'FAQ',
     'faq_modul_name' => 'FAQ / Häufige Fragen',
     'faq_modul_beschreibung' => 'Strukturierte Hilfe-Seite mit Kategorien (Allgemein, Beiträge, Konto, Moderation). Admins können Fragen pflegen, alle User können sie lesen. Footer-Link.',
+
+    'faq_kategorie_loeschen_frage' => 'Kategorie löschen? (nur wenn leer)',
+    'faq_frage_loeschen_frage' => 'Frage wirklich löschen?',
+
+    'faq_antwort_platzhalter' => 'Hier die Antwort...',
 ];

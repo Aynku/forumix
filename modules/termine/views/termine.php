@@ -32,7 +32,7 @@
               <a class="btn btn-ghost btn-sm"
                  href="<?= e($selbst) ?>?bearbeiten=<?= (int) $t['termin_id'] ?>">Ändern</a>
               <form method="post" style="display:inline"
-                    onsubmit="return confirm('Diesen Termin löschen?')">
+                    onsubmit="return confirm(<?= json_encode(t('termine_loeschen_frage')) ?>)">
                 <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                 <input type="hidden" name="tun" value="loeschen">
                 <input type="hidden" name="id" value="<?= (int) $t['termin_id'] ?>">

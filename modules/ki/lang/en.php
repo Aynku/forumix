@@ -93,4 +93,12 @@ return [
     'ki_sprache_nl' => 'Dutch',
     'ki_sprache_pl' => 'Polish',
     'ki_sprache_tr' => 'Turkish',
+
+    'ki_hinweis_titel' => 'The author used the writing assistant for this post and kept the result.',
+
+    'ki_js_kennzeichnung_fuss' => '* the post will show that the assistant helped',
+    'ki_js_kennzeichnung' => 'The post will show that the assistant helped',
+    'ki_js_wohin_uebersetzen' => 'Translate into what?',
+    'ki_js_schliessen' => 'Close',
+    'ki_js_zu_lang_zum_faerben' => 'The text is too long to colour the differences. Please compare it yourself.',
 ];

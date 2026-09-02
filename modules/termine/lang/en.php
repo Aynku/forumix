@@ -33,4 +33,6 @@ return [
     'termine_menu' => 'Events',
     'termine_modul_name' => 'Events',
     'termine_modul_beschreibung' => 'A list of events with its own page. The next few also appear at the top of the front page. Admins create and maintain them.',
+
+    'termine_loeschen_frage' => 'Delete this event?',
 ];

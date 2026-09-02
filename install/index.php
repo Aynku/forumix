@@ -223,7 +223,7 @@ function render_page(string $title, string $body, int $cur = 0): void {
     $nav = $cur ? steps_nav($cur) : '';
     echo <<<HTML
 <!doctype html>
-<html lang="de"><head>
+<html lang="<?= e(current_language()) ?>"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">

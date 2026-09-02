@@ -12,4 +12,11 @@ return [
     'shoutbox_empty' => 'No messages yet. Be the first. 🚀',
     'shoutbox_modul_name' => 'Shoutbox',
     'shoutbox_modul_beschreibung' => 'A small chat box on the front page with live updates. Signed-in users can post short messages.',
+
+    'shoutbox_server_fehler' => 'Server error. Open the browser console for details (F12).',
+    'shoutbox_senden_fehlgeschlagen' => 'Sending failed.',
+    'shoutbox_netzwerk_fehler' => 'Network error. Open the browser console for details (F12).',
+    'shoutbox_loeschen_frage' => 'Delete this message?',
+
+    'shoutbox_platzhalter' => 'Write something nice… (Enter to send, max. 500 characters)',
 ];

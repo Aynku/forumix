@@ -65,7 +65,7 @@ $maxWidth = (int) ($theme['theme_max_width'] ?? 1200);
 $forumName = forum_name();
 ?>
 <!DOCTYPE html>
-<html lang="de" data-theme="<?= e($themeAttr) ?>">
+<html lang="<?= e(current_language()) ?>" data-theme="<?= e($themeAttr) ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -244,7 +244,7 @@ $forumName = forum_name();
     <!-- ── ZEILE 2: Hauptnavigation ── -->
     <nav class="header-nav-main">
       <div class="header-inner">
-        <button type="button" id="mobile-nav-toggle" class="mobile-nav-toggle" aria-label="Menü">
+        <button type="button" id="mobile-nav-toggle" class="mobile-nav-toggle" aria-label="<?= e(t('layout_menue')) ?>">
           <span class="hamburger-icon">☰</span>
           <span class="hamburger-label"><?= t('menu') ?></span>
         </button>

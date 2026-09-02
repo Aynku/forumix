@@ -928,7 +928,7 @@ document.addEventListener('click', function (e) {
       <div class="shortcuts-modal">
         <div class="shortcuts-header">
           <h2>⌨️ Tastatur-Shortcuts</h2>
-          <button type="button" class="shortcuts-close" title="Schließen">✕</button>
+          <button type="button" class="shortcuts-close" title="' + T('js_schliessen') + '">✕</button>
         </div>
         <div class="shortcuts-body">
           <div class="shortcuts-section">
@@ -1237,7 +1237,7 @@ document.addEventListener('click', function (e) {
 
   // ─── Reset-Button: triggert externes Form ────
   document.getElementById('reset-design-btn')?.addEventListener('click', () => {
-    if (confirm('Alle Design-Einstellungen auf Standard zurücksetzen? Das überschreibt deine aktuellen Werte!')) {
+    if (confirm(T('js_design_zuruecksetzen'))) {
       document.getElementById('reset-design-form').submit();
     }
   });
@@ -1317,7 +1317,7 @@ document.addEventListener('click', function (e) {
   btn.addEventListener('click', async () => {
     const to = (inp.value || '').trim();
     if (!to || !to.includes('@')) {
-      status.innerHTML = '<span style="color:var(--color-danger)">⚠️ Bitte gültige E-Mail-Adresse eingeben.</span>';
+      status.innerHTML = '<span style="color:var(--color-danger)">' + T('js_email_ungueltig') + '</span>';
       return;
     }
     btn.disabled = true;
@@ -1601,11 +1601,11 @@ document.addEventListener('click', function (e) {
       .then(r => r.json())
       .then(d => {
         if (d && d.html) target.innerHTML = d.html;
-        else if (d && d.error) target.textContent = 'Fehler: ' + d.error;
+        else if (d && d.error) target.textContent = T('js_fehler_praefix') + d.error;
         else target.innerHTML = '<em style="color:var(--text-muted)">' + T('js_preview_empty') + '</em>';
       })
       .catch(() => {
-        target.textContent = 'Vorschau konnte nicht geladen werden.';
+        target.textContent = T('js_vorschau_fehlgeschlagen');
       });
   }
 
@@ -1930,7 +1930,7 @@ document.addEventListener('click', function (e) {
    JavaScript bleibt genau dieser Weg uebrig, der Knopf funktioniert also
    trotzdem. */
 function abtrennen(a) {
-    const titel = prompt('Titel des neuen Themas — leer lassen für "Abgetrennt aus …":', '');
+    const titel = prompt(T('js_abtrennen_titel'), '');
     if (titel === null) return false;
     if (titel.trim() === '') return true;
 

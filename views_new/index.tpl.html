@@ -45,27 +45,27 @@
                  dem | als Namen eines Filters, "length == 1 ? ..." waere fuer
                  sie also ein Filter mit sehr langem Namen. #}
               <div class="board-mods">
-                {{ count(mods) == 1 ? 'Moderator:' : 'Moderatoren:' }}
+                {{ tn('index_moderatoren_label', count(mods)) }}
                 {% for m in mods %}
                   {% set role = user_role_style(m) %}
                   <a href="{{ url('/profile.php?id=') }}{{ m.user_id }}"
                      style="color:{{ role.color }}"
-                     title="{{ role.title|default('Moderator') }}">{{ zeigename(m.username) }}</a>{{ loop.last ? '' : ',' }}
+                     title="{{ role.title|default(t('index_moderator')) }}">{{ zeigename(m.username) }}</a>{{ loop.last ? '' : ',' }}
                 {% endfor %}
               </div>
             {% endif %}
           </td>
           <td class="stat-cell">
-            <b>{{ number_format(b.thread_count, 0, ',', '.') }}</b>
-            <span class="stat-label">{{ b.thread_count == 1 ? 'Thema' : 'Themen' }}</span><br>
-            <b>{{ number_format(b.post_count, 0, ',', '.') }}</b>
-            <span class="stat-label">{{ b.post_count == 1 ? 'Beitrag' : 'Beiträge' }}</span>
+            <b>{{ zahl(b.thread_count) }}</b>
+            <span class="stat-label">{{ tn('index_themen_label', b.thread_count) }}</span><br>
+            <b>{{ zahl(b.post_count) }}</b>
+            <span class="stat-label">{{ tn('index_beitraege_label', b.post_count) }}</span>
           </td>
-          <td class="last-post-cell" data-label="Letzter Beitrag">
+          <td class="last-post-cell" data-label="{{ t('index_letzter_beitrag') }}">
             {% if b.last_post_date %}
               <a href="{{ url('/thread.php?id=') }}{{ b.last_thread_id }}">{{ truncate(b.last_thread_title ?? '...', 44) }}</a>
               <span class="last-post-meta">
-                von <a href="{{ url('/profile.php?id=') }}{{ b.last_user_id }}">{{ zeigename(b.last_username) }}</a>
+                {{ t('index_von') }} <a href="{{ url('/profile.php?id=') }}{{ b.last_user_id }}">{{ zeigename(b.last_username) }}</a>
                 · {{ format_date(b.last_post_date) }}
               </span>
             {% else %}
@@ -88,14 +88,14 @@
         <a href="{{ url('/online.php') }}" style="color:inherit">{{ t('index_wer_ist_online') }}</a>
       </span>
       <span style="font-size:11px;color:var(--text-muted)">
-        <a href="{{ url('/online.php') }}" style="color:var(--text-muted)">{{ onlineStats.total }} insgesamt →</a>
+        <a href="{{ url('/online.php') }}" style="color:var(--text-muted)">{{ t('index_x_insgesamt', onlineStats.total) }} →</a>
       </span>
     </div>
     <div style="padding:12px 16px">
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">
-        {{ onlineStats.members }} Mitglieder &middot;
-        {{ onlineStats.guests }} Gäste{% if onlineStats.bots %} &middot;
-        {{ onlineStats.bots }} Bots{% endif %}
+        {{ tn('index_x_mitglieder', onlineStats.members) }} &middot;
+        {{ tn('index_x_gaeste', onlineStats.guests) }}{% if onlineStats.bots %} &middot;
+        {{ tn('index_x_bots', onlineStats.bots) }}{% endif %}
       </div>
       {% if not onlineList %}
         <p style="color:var(--text-faint);font-size:12px;font-style:italic">{{ t('index_niemand_online') }}</p>
@@ -112,7 +112,7 @@
           <span style="color:#7c3aed;font-weight:600">{{ t('index_inhaber') }}</span>,
           <span style="color:#dc2626;font-weight:600">{{ t('index_administrator') }}</span>,
           <span style="color:#f59e0b;font-weight:600">{{ t('index_moderator') }}</span>,
-          Mitglied
+          {{ t('index_mitglied') }}
         </p>
       {% endif %}
     </div>
@@ -124,14 +124,14 @@
     </div>
     <div style="padding:12px 16px;font-size:13px;line-height:1.9">
       <div>
-        <strong>{{ number_format(forumStats.threads, 0, ',', '.') }}</strong>
-        {{ forumStats.threads == 1 ? 'Thema' : 'Themen' }}
+        <strong>{{ zahl(forumStats.threads) }}</strong>
+        {{ tn('index_themen_label', forumStats.threads) }}
         &middot;
-        <strong>{{ number_format(forumStats.posts, 0, ',', '.') }}</strong>
-        {{ forumStats.posts == 1 ? 'Beitrag' : 'Beiträge' }}
+        <strong>{{ zahl(forumStats.posts) }}</strong>
+        {{ tn('index_beitraege_label', forumStats.posts) }}
       </div>
       <div>
-        <strong>{{ number_format(forumStats.members, 0, ',', '.') }}</strong> {{ forumStats.members == 1 ? 'Mitglied' : 'Mitglieder' }}
+        <strong>{{ zahl(forumStats.members) }}</strong> {{ tn('index_mitglieder_label', forumStats.members) }}
       </div>
       {% if forumStats.newest %}
         <div>

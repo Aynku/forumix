@@ -19,7 +19,7 @@ if (!isset($csrfToken))   $csrfToken   = $_SESSION['csrf_token'] ?? '';
       <form class="shoutbox-form" id="shoutbox-form" autocomplete="off">
         <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
         <input type="text" name="message" id="shoutbox-input"
-               placeholder="Schreib was Schönes… (Enter zum Absenden, max. 500 Zeichen)"
+               placeholder="<?= e(t('shoutbox_platzhalter')) ?>"
                maxlength="500" required>
         <button type="submit" class="btn btn-primary btn-sm">Posten</button>
       </form>
@@ -100,7 +100,7 @@ if (!isset($csrfToken))   $csrfToken   = $_SESSION['csrf_token'] ?? '';
               '<a href="<?= e(FORUM_URL) ?>/profile.php?id=' + m.user_id + '" class="shoutbox-name">' +
                 esc(m.username) + '</a> ' + badge +
               '<span class="shoutbox-time">' + esc(formatTime(m.created_at)) + '</span>' +
-              (canDelete ? '<button type="button" class="shoutbox-del" data-id="' + m.shout_id + '" title="Löschen">✕</button>' : '') +
+              (canDelete ? '<button type="button" class="shoutbox-del" data-id="' + m.shout_id + '" title="<?= e(t('delete')) ?>">✕</button>' : '') +
             '</div>' +
             '<div class="shoutbox-msg-text">' + esc(m.message) + '</div>' +
           '</div>' +
@@ -155,7 +155,7 @@ if (!isset($csrfToken))   $csrfToken   = $_SESSION['csrf_token'] ?? '';
           try { data = JSON.parse(txt); }
           catch (err) {
             console.error('Shoutbox: Antwort ist kein JSON:', txt);
-            alert('Server-Fehler. Browser-Konsole für Details öffnen (F12).');
+            alert(<?= json_encode(t('shoutbox_server_fehler')) ?>);
             btn.disabled = false;
             return;
           }
@@ -166,12 +166,12 @@ if (!isset($csrfToken))   $csrfToken   = $_SESSION['csrf_token'] ?? '';
             // sonst nur die Neuen pollen. pollNew handhabt beides korrekt.
             pollNew();
           } else {
-            alert(data.error || 'Fehler beim Senden');
+            alert(data.error || <?= json_encode(t('shoutbox_senden_fehlgeschlagen')) ?>);
           }
         }))
         .catch(err => {
           console.error('Shoutbox-Fehler:', err);
-          alert('Netzwerk-Fehler. Browser-Konsole für Details (F12).');
+          alert(<?= json_encode(t('shoutbox_netzwerk_fehler')) ?>);
           btn.disabled = false;
         });
       return false;
@@ -182,7 +182,7 @@ if (!isset($csrfToken))   $csrfToken   = $_SESSION['csrf_token'] ?? '';
   list.addEventListener('click', function(e) {
     const btn = e.target.closest('.shoutbox-del');
     if (!btn) return;
-    if (!confirm('Diese Nachricht löschen?')) return;
+    if (!confirm(<?= json_encode(t('shoutbox_loeschen_frage')) ?>)) return;
     const fd = new FormData();
     fd.append('shout_action', 'delete');
     fd.append('shout_id', btn.dataset.id);
@@ -196,7 +196,7 @@ if (!isset($csrfToken))   $csrfToken   = $_SESSION['csrf_token'] ?? '';
           row.style.opacity = '0';
           setTimeout(() => row.remove(), 200);
         } else {
-          alert(data.error || 'Fehler');
+          alert(data.error || <?= json_encode(t('error_titel')) ?>);
         }
       });
   });

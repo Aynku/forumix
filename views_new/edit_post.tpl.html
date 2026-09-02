@@ -11,7 +11,7 @@
     <form method="post">
       <input type="hidden" name="csrf" value="{{ csrfToken }}">
       <div class="form-row">
-        {{ render_editor('content', 'content', post.content, 'Beitrag bearbeiten…', true, false)|raw }}
+        {{ render_editor('content', 'content', post.content, t('edit_post_platzhalter'), true, false)|raw }}
       </div>
       {% if tagsEditable and availableTags %}
       <div class="form-row">

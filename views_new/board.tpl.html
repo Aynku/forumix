@@ -5,7 +5,7 @@
        class="btn btn-ghost btn-sm" title="{{ t('board_rss_hint') }}">RSS</a>
     {% if currentUser %}
       <a href="{{ url('/mark_all_read.php?csrf=') }}{{ csrfToken }}"
-         class="btn btn-ghost btn-sm" title="Alle Themen dieses Forums als gelesen markieren">{{ t('board_alles_gelesen') }}</a>
+         class="btn btn-ghost btn-sm" title="{{ t('board_alles_gelesen_titel') }}">{{ t('board_alles_gelesen') }}</a>
       {% if darfSchreiben %}
         <a href="{{ url('/new_thread.php?board=') }}{{ board.board_id }}"
            class="btn btn-primary btn-sm">{{ t('board_neues_thema') }}</a>
@@ -50,13 +50,13 @@
             </a>
           </div>
           <div class="thread-meta">
-            von <a href="{{ url('/profile.php?id=') }}{{ t.user_id }}">{{ t.author }}</a>
+            {{ t('index_von') }} <a href="{{ url('/profile.php?id=') }}{{ t.user_id }}">{{ t.author }}</a>
             &bull; {{ format_date(t.created_at) }}
           </div>
         </td>
         <td class="stat-cell" data-label="Antworten">{{ t.reply_count }}</td>
         <td class="stat-cell" data-label="Aufrufe">{{ number_format(t.view_count, 0, ',', '.') }}</td>
-        <td class="last-post-cell" data-label="Letzter Beitrag">
+        <td class="last-post-cell" data-label="{{ t('index_letzter_beitrag') }}">
           {% if t.last_post_date %}
             <a href="{{ url('/profile.php?id=') }}{{ t.last_poster_id }}">{{ t.last_poster }}</a>
             <span class="last-post-meta">{{ format_date(t.last_post_date) }}</span>

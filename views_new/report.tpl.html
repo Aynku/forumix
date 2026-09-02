@@ -6,8 +6,8 @@
   {% endif %}
 
   <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
-    {{ t('report_du_meldest') }} <strong>Beitrag #{{ post.post_id }}</strong>.
-    Die Moderatoren prüfen die Meldung schnellstmöglich.
+    {{ t('report_du_meldest_beitrag', post.post_id) | raw }}
+    {{ t('report_moderatoren_pruefen') }}
   </p>
 
   <div class="card" style="margin-bottom:16px;padding:12px 14px;background:var(--bg-surface2)">
@@ -23,7 +23,7 @@
     <div class="form-row">
       <label>{{ t('report_grund') }}</label>
       <select name="reason" required>
-        <option value="">– Bitte auswählen –</option>
+        <option value="">{{ t('report_bitte_auswaehlen') }}</option>
         {% for r in reasons %}
           <option value="{{ r.key }}">{{ r.label }}</option>
         {% endfor %}

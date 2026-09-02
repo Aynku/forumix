@@ -93,4 +93,12 @@ return [
     'ki_sprache_nl' => 'Niederländisch',
     'ki_sprache_pl' => 'Polnisch',
     'ki_sprache_tr' => 'Türkisch',
+
+    'ki_hinweis_titel' => 'Der Verfasser hat für diesen Beitrag die Schreibhilfe benutzt und das Ergebnis übernommen.',
+
+    'ki_js_kennzeichnung_fuss' => '* am Beitrag steht danach, dass die KI geholfen hat',
+    'ki_js_kennzeichnung' => 'Am Beitrag steht danach, dass die KI geholfen hat',
+    'ki_js_wohin_uebersetzen' => 'Wohin übersetzen?',
+    'ki_js_schliessen' => 'Schließen',
+    'ki_js_zu_lang_zum_faerben' => 'Der Text ist zu lang, um die Unterschiede zu färben. Bitte selbst vergleichen.',
 ];

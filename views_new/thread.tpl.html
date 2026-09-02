@@ -40,22 +40,22 @@
           <div class="action-dropdown-divider"></div>
           <form method="post" action="{{ url('/mod_action.php?action=merge&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}"
                 style="display:flex;gap:6px;align-items:center;padding:6px 10px">
-            <input type="number" name="ziel" min="1" placeholder="Ziel-Thema-Nr."
+            <input type="number" name="ziel" min="1" placeholder="{{ t('thread_ziel_nr') }}"
                    aria-label="{{ t('thread_merge_id_label') }}"
                    style="flex:1;min-width:0" required>
             <button type="submit" class="btn btn-ghost btn-sm"
-                    onclick="return confirm('Alle Beiträge dieses Themas in das andere verschieben? Dieses Thema verschwindet dabei.')">{{ t('thread_zusammenfuehren') }}</button>
+                    onclick="return confirm({{ t('thread_zusammenfuehren_frage') | json }})">{{ t('thread_zusammenfuehren') }}</button>
           </form>
           <div class="action-dropdown-divider"></div>
           {% if thread.deleted_at %}
             <a href="{{ url('/mod_action.php?action=restore_thread&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}">{{ t('thread_thema_wiederherstellen') }}</a>
             <a href="{{ url('/mod_action.php?action=purge_thread&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}"
                class="action-danger"
-               onclick="return confirm('Endgültig löschen? Das lässt sich nicht rückgängig machen.')">{{ t('thread_endgueltig_loeschen') }}</a>
+               onclick="return confirm({{ t('endgueltig_loeschen_frage') | json }})">{{ t('thread_endgueltig_loeschen') }}</a>
           {% else %}
             <a href="{{ url('/mod_action.php?action=delete_thread&thread=') }}{{ thread.thread_id }}&csrf={{ csrfToken }}"
                class="action-danger"
-               onclick="return confirm('Thema in den Papierkorb legen?')">{{ t('thread_thema_loeschen') }}</a>
+               onclick="return confirm({{ t('thread_papierkorb_frage') | json }})">{{ t('thread_thema_loeschen') }}</a>
           {% endif %}
         </div>
       </div>
@@ -65,7 +65,7 @@
               data-thread="{{ thread.thread_id }}"
               data-bookmarked="{{ isBookmarked ? '1' : '0' }}"
               type="button">
-        <span id="bookmark-label">{{ isBookmarked ? 'Gespeichert' : 'Lesezeichen' }}</span>
+        <span id="bookmark-label">{{ isBookmarked ? t('thread_gespeichert') : t('bookmarks') }}</span>
       </button>
       {% if isSubscribed %}
         <a href="{{ url('/subscribe.php?thread=') }}{{ thread.thread_id }}&action=unsubscribe&csrf={{ csrfToken }}"
@@ -167,13 +167,13 @@
       {% for gruppe in post.gruppen %}
         <div class="post-group-badge">{{ gruppe }}</div>
       {% endfor %}
-      <div class="post-count-label">Beiträge: {{ post.post_count }}</div>
+      <div class="post-count-label">{{ t('thread_beitraege_zahl', post.post_count) }}</div>
     </div>
     <div class="post-content-col">
       {% if post.deleted_at %}
         <p class="papierkorb-hinweis">
-          Im Papierkorb{% if post.geloescht_von %} · gelöscht von {{ post.geloescht_von }}{% endif %} ·
-          {{ post.deleted_at }} — nur für die Moderation sichtbar.
+          {{ t('thread_im_papierkorb') }}{% if post.geloescht_von %} · {{ t('thread_geloescht_von', post.geloescht_von) }}{% endif %} ·
+          {{ post.deleted_at }} — {{ t('thread_nur_moderation_sichtbar') }}
         </p>
       {% endif %}
       <div class="post-text">{{ bbcode(post.content, post.post_id)|raw }}</div>
@@ -215,9 +215,9 @@
 
       {% if post.mod_edited_by and post.mod_editor_name %}
         <div class="mod-edit-notice">
-          <strong>Bearbeitet von Moderator {{ post.mod_editor_name }}</strong>
+          <strong>{{ t('thread_bearbeitet_von_moderator', post.mod_editor_name) }}</strong>
           {% if post.mod_edited_at %}
-            <span class="mod-edit-date">am {{ format_date(post.mod_edited_at) }}</span>
+            <span class="mod-edit-date">{{ t('thread_am_datum', format_date(post.mod_edited_at)) }}</span>
           {% endif %}
           {% if post.mod_edit_reason %}
             <div class="mod-edit-reason">Grund: {{ post.mod_edit_reason }}</div>
@@ -264,7 +264,7 @@
     {% endif %}
     {% if currentUser and currentUser.user_id != post.user_id %}
       <a class="post-action" href="{{ url('/report.php?post=') }}{{ post.post_id }}"
-         title="Beitrag melden">{{ t('thread_melden') }}</a>
+         title="{{ t('thread_melden') }}">{{ t('thread_melden') }}</a>
     {% endif %}
     {% set editCount = post_edit_count(post.post_id) %}
     {% set canSeeHistory = canModThis or (currentUser and currentUser.user_id == post.user_id) %}
@@ -279,10 +279,10 @@
       {% if post.deleted_at %}
         <a class="post-action" href="{{ url('/mod_action.php?action=restore_post&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}">{{ t('thread_wiederherstellen') }}</a>
         <a class="post-action" href="{{ url('/mod_action.php?action=purge_post&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}"
-           onclick="return confirm('Endgültig löschen? Das lässt sich nicht rückgängig machen.')">{{ t('thread_endgueltig_loeschen') }}</a>
+           onclick="return confirm({{ t('endgueltig_loeschen_frage') | json }})">{{ t('thread_endgueltig_loeschen') }}</a>
       {% else %}
         <a class="post-action" href="{{ url('/mod_action.php?action=delete_post&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}"
-           onclick="return confirm('Beitrag in den Papierkorb legen?')">{{ t('delete') }}</a>
+           onclick="return confirm({{ t('post_papierkorb_frage') | json }})">{{ t('delete') }}</a>
         <a class="post-action" href="{{ url('/mod_action.php?action=split&post=') }}{{ post.post_id }}&csrf={{ csrfToken }}"
            onclick="return abtrennen(this)"
            title="{{ t('thread_split_hint') }}">{{ t('thread_ab_hier_abtrennen') }}</a>
@@ -301,11 +301,11 @@
   <form method="post" enctype="multipart/form-data">
     <input type="hidden" name="csrf" value="{{ csrfToken }}">
     <div class="form-row">
-      {{ render_editor('content', 'content', '', 'Dein Beitrag… (@user erwähnen möglich)', true, false)|raw }}
+      {{ render_editor('content', 'content', '', t('thread_platzhalter'), true, false)|raw }}
     </div>
     {% if darfAnhang %}
     <div class="form-row">
-      <label>{{ t('attach_file') }} (max. 5 MB pro Datei, mehrere möglich)</label>
+      <label>{{ t('attach_file') }} {{ t('thread_anhang_hinweis') }}</label>
       <input type="file" name="attachments[]" multiple accept="image/*,application/pdf,text/plain,.zip,.rar">
     </div>
     {% endif %}

@@ -3,16 +3,14 @@
     {% if status == 'success' %}
       <h2 style="margin-top:0">{{ t('unsubscribe_abmeldung_erfolgreich') }}</h2>
       <p style="line-height:1.6">
-        Du wirst keine Benachrichtigungen mehr für
         {% if threadTitle %}
-          den Thread <strong>"{{ threadTitle }}"</strong>
+          {{ t('unsubscribe_kein_thread_mehr', e(threadTitle)) | raw }}
         {% else %}
-          diesen Thread
+          {{ t('unsubscribe_kein_thread_mehr_ohne_titel') }}
         {% endif %}
-        erhalten.
       </p>
       <p style="font-size:13px;color:var(--text-muted);margin-top:14px;line-height:1.6">
-        {{ t('unsubscribe_falls_du_auch_generell') }} <a href="{{ url('/settings.php?tab=notifications') }}">{{ t('unsubscribe_einstellungen') }}</a> abschalten.
+        {{ t('unsubscribe_generell_abschalten', url('/settings.php?tab=notifications')) | raw }}
       </p>
 
     {% elseif status == 'error' %}
@@ -28,9 +26,7 @@
         {{ t('unsubscribe_dieser_abmelde_link_ist') }}
       </p>
       <p style="font-size:13px;color:var(--text-muted);margin-top:14px;line-height:1.6">
-        {{ t('unsubscribe_du_kannst_dich_auch') }}
-        <a href="{{ url('/settings.php?tab=notifications') }}">{{ t('unsubscribe_einstellungen') }}</a>
-        von E-Mail-Benachrichtigungen abmelden.
+        {{ t('unsubscribe_ganz_abmelden', url('/settings.php?tab=notifications')) | raw }}
       </p>
     {% endif %}
 

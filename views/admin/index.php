@@ -178,7 +178,7 @@
         <input type="hidden" name="action" value="users">
         <div style="display:flex;gap:8px">
           <input type="text" name="q" value="<?= e($searchQuery ?? '') ?>"
-                 placeholder="🔍 Name, E-Mail oder IP suchen…"
+                 placeholder="<?= e(t('adm_suche_platzhalter')) ?>"
                  style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg-surface);color:var(--text-base)">
           <button type="submit" class="btn btn-primary"><?= t('admin_suchen') ?></button>
           <?php if (!empty($searchQuery)): ?>
@@ -262,21 +262,21 @@
                         <?php /* Founder sieht hier: Owner-Status entfernen */ ?>
                         <a href="<?= $base ?>remove_owner&id=<?= $uid . $csrfQS ?>"
                            class="action-danger"
-                           onclick="return confirm('Owner-Status wirklich entziehen? <?= e($u['username']) ?> wird zum normalen Administrator.')">⬇️ Owner entziehen</a>
+                           onclick="return confirm(<?= e(json_encode(t('adm_owner_entziehen_frage', $u['username']), JSON_UNESCAPED_UNICODE)) ?>)">⬇️ Owner entziehen</a>
                       <?php elseif ($u['is_banned']): ?>
                         <a href="<?= $base ?>unban_user&id=<?= $uid . $csrfQS ?>">✅ Entsperren</a>
                       <?php else: ?>
                         <?php /* Founder-only: Owner ernennen */ ?>
                         <?php if ($isFounderViewer): ?>
                           <a href="<?= $base ?>make_owner&id=<?= $uid . $csrfQS ?>"
-                             onclick="return confirm('<?= e($u['username']) ?> zum Inhaber ernennen? Inhaber haben volle Forum-Rechte – das ist eine wichtige Entscheidung!')">👑 Zum Inhaber</a>
+                             onclick="return confirm(<?= e(json_encode(t('adm_zum_inhaber_frage', $u['username']), JSON_UNESCAPED_UNICODE)) ?>)">👑 Zum Inhaber</a>
                           <div class="action-dropdown-divider"></div>
                         <?php endif; ?>
 
                         <?php if ($u['is_admin']): ?>
                           <?php if ($uid !== $cuid): ?>
                             <a href="<?= $base ?>remove_admin&id=<?= $uid . $csrfQS ?>"
-                               onclick="return confirm('Admin-Rechte wirklich entziehen?')">⬇️ Admin entziehen</a>
+                               onclick="return confirm(<?= e(json_encode(t('adm_admin_entziehen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">⬇️ Admin entziehen</a>
                           <?php endif; ?>
                         <?php elseif ($u['is_mod']): ?>
                           <a href="<?= $base ?>make_admin&id=<?= $uid . $csrfQS ?>"
@@ -293,7 +293,7 @@
                         <?php if ($uid !== $cuid): ?>
                           <a href="<?= $base ?>ban_user&id=<?= $uid . $csrfQS ?>"
                              class="action-danger"
-                             onclick="return confirm('Benutzer wirklich sperren?')"><?= t('admin_sperren') ?></a>
+                             onclick="return confirm(<?= e(json_encode(t('adm_sperren_frage'), JSON_UNESCAPED_UNICODE)) ?>)"><?= t('admin_sperren') ?></a>
                         <?php endif; ?>
                       <?php endif; ?>
 
@@ -308,7 +308,7 @@
                       <?php if ($canDelete): ?>
                         <a href="<?= $base ?>delete_user&id=<?= $uid . $csrfQS ?>"
                            class="action-danger"
-                           onclick="return confirm('⚠️ Account von „<?= e($u['username']) ?>“ wirklich löschen?\n\nDer User wird zu „Gelöschter Benutzer“ anonymisiert. Beiträge bleiben erhalten, aber alle persönlichen Daten werden entfernt.\n\nDiese Aktion ist endgültig!')">🗑️ Account löschen</a>
+                           onclick="return confirm(<?= e(json_encode(t('adm_konto_loeschen_frage', $u['username']), JSON_UNESCAPED_UNICODE)) ?>)">🗑️ Account löschen</a>
                       <?php endif; ?>
                     </div>
                   </div>
@@ -354,7 +354,7 @@
                 </details>
                 <a href="?action=delete_cat&id=<?= (int) $c['cat_id'] ?>&csrf=<?= e($csrfToken) ?>"
                    class="btn btn-danger btn-xs"
-                   onclick="return confirm('Kategorie löschen? Alle enthaltenen Foren werden ebenfalls gelöscht!')">🗑️</a>
+                   onclick="return confirm(<?= e(json_encode(t('adm_kategorie_loeschen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🗑️</a>
               </td>
             </tr>
             <?php endforeach; ?>
@@ -384,7 +384,7 @@
             <tr>
               <td>
                 <?php if (!empty($b['password_hash'])): ?>
-                  <span title="Passwort-geschützt" style="color:var(--color-accent)">🔒</span>
+                  <span title="<?= e(t('adm_passwort_geschuetzt')) ?>" style="color:var(--color-accent)">🔒</span>
                 <?php endif; ?>
                 <?= e($b['title']) ?>
               </td>
@@ -420,7 +420,7 @@
                 <a href="?action=boards&board=<?= (int) $b['board_id'] ?>&edit=approval" class="btn btn-ghost btn-xs">🚦 Freigabe</a>
                 <a href="?action=boards&board=<?= (int) $b['board_id'] ?>" class="btn btn-ghost btn-xs">🛡️ Mods</a>
                 <a href="?action=delete_board&id=<?= (int) $b['board_id'] ?>&csrf=<?= e($csrfToken) ?>"
-                   class="btn btn-danger btn-xs" onclick="return confirm('Forum löschen?')"><?= t('admin_x_loeschen') ?></a>
+                   class="btn btn-danger btn-xs" onclick="return confirm(<?= e(json_encode(t('adm_forum_loeschen_frage'), JSON_UNESCAPED_UNICODE)) ?>)"><?= t('admin_x_loeschen') ?></a>
               </td>
             </tr>
             <?php endforeach; ?>
@@ -760,7 +760,7 @@
           <div class="form-row" style="border-top:1px dashed var(--border);padding-top:14px;margin-top:14px">
             <label><?= t('admin_passwort_schutz') ?> <span style="font-weight:400;color:var(--text-muted);font-size:11px"><?= t('admin_optional') ?></span></label>
             <input type="password" name="new_password" value="" autocomplete="new-password"
-                   placeholder="Passwort setzen (leer = öffentliches Forum)">
+                   placeholder="<?= e(t('adm_passwort_setzen_platzhalter')) ?>">
             <div class="form-hint">
               <?= t('admin_wenn_gesetzt_user_muessen_2') ?>
             </div>
@@ -813,7 +813,7 @@
                     <?php if (!$eingebaut): ?>
                       <a href="?action=delete_group&id=<?= $gid ?>&csrf=<?= e($csrfToken) ?>"
                          class="btn btn-ghost btn-xs"
-                         onclick="return confirm('Gruppe „<?= e($g['name']) ?>“ löschen? Die Rechte, die daran hängen, verschwinden mit.')"><?= t('admin_x_loeschen') ?></a>
+                         onclick="return confirm(<?= e(json_encode(t('adm_gruppe_loeschen_frage', $g['name']), JSON_UNESCAPED_UNICODE)) ?>)"><?= t('admin_x_loeschen') ?></a>
                     <?php endif; ?>
                   </td>
                 </tr>
@@ -955,7 +955,7 @@
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
         <?= t('admin_raenge_automatisch') ?>
         <a href="?action=recalc_ranks&csrf=<?= e($csrfToken) ?>" class="btn btn-primary btn-sm"
-           onclick="return confirm('Alle Ränge neu berechnen?')" style="margin-left:8px">
+           onclick="return confirm(<?= e(json_encode(t('adm_raenge_neu_frage'), JSON_UNESCAPED_UNICODE)) ?>)" style="margin-left:8px">
           🔄 Alle neu berechnen
         </a>
       </p>
@@ -1041,7 +1041,7 @@
                 </form>
                 <?php if ($hasCustom): ?>
                   <form method="post" action="?action=delete_role_avatar" style="margin-top:4px"
-                        onsubmit="return confirm('Eigenes <?= e($label) ?>-Bild löschen und zum Standard zurück?')">
+                        onsubmit="return confirm(<?= e(json_encode(t('adm_eigenes_bild_loeschen_frage', $label), JSON_UNESCAPED_UNICODE)) ?>)">
                     <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                     <input type="hidden" name="role" value="<?= e($role) ?>">
                     <button type="submit" class="btn btn-ghost btn-sm" style="font-size:11px"><?= t('admin_zurueck_zum_standard') ?></button>
@@ -1218,7 +1218,7 @@
           <div class="form-row">
             <label><?= t('admin_banner_text') ?></label>
             <textarea name="cookie_banner_text" style="min-height:60px"
-                      placeholder="Diese Seite nutzt funktionale Cookies (z.B. für den Login). Mit der weiteren Nutzung erklärst du dich damit einverstanden."><?= e($settings['cookie_banner_text'] ?? '') ?></textarea>
+                      placeholder="<?= e(t('adm_cookie_platzhalter')) ?>"><?= e($settings['cookie_banner_text'] ?? '') ?></textarea>
             <div class="form-hint"><?= t('admin_wenn_leer_standard_text') ?></div>
           </div>
         </div>
@@ -1265,7 +1265,7 @@
             <div class="form-row">
               <label><?= t('admin_smtp_benutzername') ?></label>
               <input type="text" name="smtp_user" value="<?= e($settings['smtp_user'] ?? '') ?>"
-                     placeholder="dein@account.com">
+                     placeholder="<?= e(t('adm_beispiel_konto_mail')) ?>">
             </div>
             <div class="form-row">
               <label><?= t('admin_smtp_passwort_api_key') ?></label>
@@ -1291,7 +1291,7 @@
                 </div>
               <?php else: ?>
               <input type="email" name="smtp_from" value="<?= e($settings['smtp_from'] ?? '') ?>"
-                     placeholder="noreply@deine-domain.de">
+                     placeholder="<?= e(t('adm_beispiel_absender_mail')) ?>">
               <div class="form-hint">
                 <?= t('admin_absender_hinweis', '<strong>' . e(t('admin_gilt_auch_ohne_smtp')) . '</strong>', '<code>mail()</code>') ?>
                 <?= t('admin_adresse_der_domain') ?>
@@ -1344,7 +1344,7 @@
         <div class="form-row">
           <label><?= t('admin_an_welche_adresse') ?></label>
           <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
-            <input type="email" id="test-mail-to" placeholder="deine@email.de" style="flex:1;min-width:200px">
+            <input type="email" id="test-mail-to" placeholder="<?= e(t('adm_beispiel_mail')) ?>" style="flex:1;min-width:200px">
             <button type="button" id="send-test-mail-btn" class="btn btn-ghost"><?= t('admin_test_senden') ?></button>
           </div>
           <div class="form-hint" id="test-mail-status"></div>
@@ -1452,7 +1452,7 @@
           <div class="form-row">
             <label><?= t('admin_wartungs_nachricht') ?></label>
             <textarea name="maintenance_message" style="min-height:80px"
-                      placeholder="Wir sind kurz weg und basteln am Forum. Bis gleich!"><?= e($settings['maintenance_message'] ?? '') ?></textarea>
+                      placeholder="<?= e(t('adm_wartung_platzhalter')) ?>"><?= e($settings['maintenance_message'] ?? '') ?></textarea>
             <div class="form-hint"><?= t('admin_wird_normalen_besuchern_angezeigt') ?></div>
           </div>
         </div>
@@ -1857,7 +1857,7 @@
                 <a href="?action=warnings&user=<?= (int) $r['author_id'] ?>" class="btn btn-danger btn-sm">⚠️ Warnen</a>
                 <a href="<?= e(FORUM_URL) ?>/mod_action.php?action=delete_post&post=<?= (int) $r['post_id'] ?>&csrf=<?= e($csrfToken) ?>"
                    class="btn btn-danger btn-sm"
-                   onclick="return confirm('Beitrag löschen?')">🗑️ Beitrag löschen</a>
+                   onclick="return confirm(<?= e(json_encode(t('adm_beitrag_loeschen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🗑️ Beitrag löschen</a>
                 <a href="?action=resolve_report&id=<?= (int) $r['report_id'] ?>&status=actioned&csrf=<?= e($csrfToken) ?>"
                    class="btn btn-primary btn-sm">✅ Erledigt</a>
               </div>
@@ -2004,7 +2004,7 @@
                   <td>
                     <a href="?action=delete_tag&id=<?= (int) $tg['tag_id'] ?>&csrf=<?= e($csrfToken) ?>"
                        class="btn btn-danger btn-xs"
-                       onclick="return confirm('Tag löschen? (Threads behalten Inhalt)')"><?= t('admin_x_loeschen') ?></a>
+                       onclick="return confirm(<?= e(json_encode(t('adm_tag_loeschen_frage'), JSON_UNESCAPED_UNICODE)) ?>)"><?= t('admin_x_loeschen') ?></a>
                   </td>
                 </tr>
               <?php endforeach; ?>
@@ -2173,7 +2173,7 @@
                       </form>
                     <?php endif; ?>
                     <form method="post" action="?action=invitation_revoke" style="margin:0"
-                          onsubmit="return confirm('Diese Einladung widerrufen? Der Code wird ungültig.')">
+                          onsubmit="return confirm(<?= e(json_encode(t('adm_einladung_widerrufen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">
                       <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                       <input type="hidden" name="invitation_id" value="<?= (int) $inv['invitation_id'] ?>">
                       <button type="submit" class="btn btn-danger btn-sm"><?= t('admin_widerrufen') ?></button>
@@ -2232,7 +2232,7 @@
               </div>
 
               <form method="post" action="?action=approve_user_action" style="margin:0"
-                    onsubmit="return confirm('Diesen Account freigeben? Der User bekommt eine Bestätigungs-Mail.')">
+                    onsubmit="return confirm(<?= e(json_encode(t('adm_konto_freigeben_frage'), JSON_UNESCAPED_UNICODE)) ?>)">
                 <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                 <input type="hidden" name="user_id" value="<?= (int) $u['user_id'] ?>">
                 <button type="submit" class="btn btn-primary btn-sm"><?= t('admin_freigeben') ?></button>
@@ -2244,13 +2244,13 @@
                 <?= t('admin_account_ablehnen_mit_begruendung') ?>
               </summary>
               <form method="post" action="?action=reject_user_action" style="margin-top:12px"
-                    onsubmit="return confirm('Diesen Account ablehnen und löschen? Der User bekommt eine E-Mail mit der Begründung. Aktion kann nicht rückgängig gemacht werden.')">
+                    onsubmit="return confirm(<?= e(json_encode(t('adm_konto_ablehnen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">
                 <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                 <input type="hidden" name="user_id" value="<?= (int) $u['user_id'] ?>">
                 <div class="form-row">
                   <label style="font-size:12px"><?= t('admin_begruendung_wird_dem_user') ?> <span style="color:#c44">*</span></label>
                   <textarea name="reason" rows="3" required maxlength="500"
-                            placeholder="z.B.: Account erscheint automatisiert (Bot). Wenn das ein Irrtum war, melde dich gerne über die Kontaktseite."></textarea>
+                            placeholder="<?= e(t('adm_ablehnung_platzhalter')) ?>"></textarea>
                 </div>
                 <button type="submit" class="btn btn-danger btn-sm"><?= t('admin_ablehnen_loeschen') ?></button>
               </form>
@@ -2293,7 +2293,7 @@
                    onclick="return confirm('Thema freigeben?')">✅ Freigeben</a>
                 <a href="?action=reject_thread&id=<?= (int) $t['thread_id'] ?>&csrf=<?= e($csrfToken) ?>&reason=<?= urlencode(t('mod_verstoss_gegen_forenregeln')) ?>"
                    class="btn btn-danger btn-sm"
-                   onclick="return confirm('Thema ablehnen und löschen?')">🗑️ Ablehnen</a>
+                   onclick="return confirm(<?= e(json_encode(t('mod_thema_ablehnen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🗑️ Ablehnen</a>
               </div>
             </div>
             <?php if (!empty($t['content'])): ?>
@@ -2328,7 +2328,7 @@
                    onclick="return confirm('Beitrag freigeben?')">✅ Freigeben</a>
                 <a href="?action=reject_post&id=<?= (int) $p['post_id'] ?>&csrf=<?= e($csrfToken) ?>&reason=<?= urlencode(t('mod_verstoss_gegen_forenregeln')) ?>"
                    class="btn btn-danger btn-sm"
-                   onclick="return confirm('Beitrag ablehnen und löschen?')">🗑️ Ablehnen</a>
+                   onclick="return confirm(<?= e(json_encode(t('mod_beitrag_ablehnen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🗑️ Ablehnen</a>
               </div>
             </div>
             <div style="padding:12px 14px;background:var(--bg-surface2);border-radius:var(--radius-sm);font-size:13px;max-height:160px;overflow-y:auto">
@@ -2382,7 +2382,7 @@
             <div class="form-row">
               <label><?= t('admin_slogan_tagline') ?></label>
               <input type="text" name="forum_slogan" value="<?= e($branding['forum_slogan']) ?>"
-                     placeholder="z.B. Die Community für Bastler &amp; Tüftler" maxlength="150"
+                     placeholder="<?= e(t('adm_slogan_platzhalter')) ?>" maxlength="150"
                      data-live="forum_slogan">
               <div class="form-hint"><?= t('admin_erscheint_rechts_neben_dem') ?></div>
             </div>
@@ -2403,7 +2403,7 @@
             <div class="form-row">
               <label><?= t('admin_logo_url_optional') ?></label>
               <input type="text" name="forum_logo" value="<?= e($branding['forum_logo']) ?>"
-                     placeholder="z.B. assets/logo.png oder https://example.com/logo.svg">
+                     placeholder="<?= e(t('adm_logo_platzhalter')) ?>">
               <div class="form-hint">
                 <?= t('admin_logo_leer_hinweis', '<code>assets/logo.png</code>', '<code>assets/logo.svg</code>') ?>
               </div>
@@ -2737,7 +2737,7 @@
         <div class="design-preview">
           <div class="design-preview-label">
             <span><?= t('admin_live_vorschau') ?></span>
-            <a href="<?= e(FORUM_URL) ?>/?preview=1" target="_blank" rel="noopener" title="In neuem Tab öffnen">↗ Großansicht</a>
+            <a href="<?= e(FORUM_URL) ?>/?preview=1" target="_blank" rel="noopener" title="<?= e(t('adm_neuer_tab')) ?>">↗ Großansicht</a>
           </div>
           <iframe id="design-preview-frame" src="<?= e(FORUM_URL) ?>/?preview=1"
                   style="width:100%;height:600px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff"></iframe>
@@ -2953,7 +2953,7 @@
             <?= t('admin_alles_uebernommene_ist_als') ?>
           </p>
           <form method="post" action="?action=import_zurueck"
-                onsubmit="return confirm('Alles zurücknehmen, was der Import angelegt hat?')">
+                onsubmit="return confirm(<?= e(json_encode(t('adm_import_zuruecknehmen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">
             <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
             <button type="submit" class="btn btn-danger btn-sm"><?= t('admin_import_zuruecknehmen') ?></button>
           </form>
@@ -3295,7 +3295,7 @@
           knopf.addEventListener('click', function () {
             var leerenAn = document.getElementById('import-leeren');
             if (leerenAn && leerenAn.checked &&
-                !confirm('Wirklich alles löschen, was hier steht? Das lässt sich nicht zurücknehmen.')) {
+                !confirm(<?= e(json_encode(t('adm_alles_loeschen_frage'), JSON_UNESCAPED_UNICODE)) ?>)) {
               return;
             }
             document.getElementById('import-start').hidden = true;
@@ -3346,7 +3346,7 @@
         </p>
 
         <form method="post" action="?action=upload_update" enctype="multipart/form-data"
-              onsubmit="return confirm('Update-Paket jetzt einspielen?\n\nDateien werden überschrieben und SQL ausgeführt. Vorher ein Backup anlegen!')">
+              onsubmit="return confirm(<?= e(json_encode(t('adm_update_einspielen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
             <input type="file" name="update_zip" accept=".zip,application/zip" required
@@ -3423,7 +3423,7 @@
                     <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                     <input type="hidden" name="version" value="<?= e($m['version']) ?>">
                     <button type="submit" class="btn btn-primary btn-sm"
-                            onclick="return confirm('Migration <?= e($m['version']) ?> jetzt ausführen?\n\nVorher unbedingt ein Datenbank-Backup anlegen!')">
+                            onclick="return confirm(<?= e(json_encode(t('adm_migration_ausfuehren_frage', $m['version']), JSON_UNESCAPED_UNICODE)) ?>)">
                       ▶️ Jetzt ausführen
                     </button>
                   </form>
@@ -3523,7 +3523,7 @@
             <input type="text" name="emoji" placeholder="🙂" required maxlength="10" class="smiley-emoji-input">
           </label>
           <label><?= t('admin_beschreibung') ?>
-            <input type="text" name="description" placeholder="z.B. Lächeln" maxlength="100">
+            <input type="text" name="description" placeholder="<?= e(t('adm_smiley_platzhalter')) ?>" maxlength="100">
           </label>
           <label class="smiley-picker-toggle">
             <input type="checkbox" name="is_in_picker" value="1">
@@ -3559,7 +3559,7 @@
               </label>
               <div class="smiley-actions">
                 <button type="submit" class="btn btn-sm" title="Speichern">💾</button>
-                <a href="?action=delete_smiley&id=<?= (int) $s['smiley_id'] ?>&csrf=<?= e($csrfToken) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Smiley „<?= e($s['code']) ?>“ wirklich löschen?')" title="Löschen">🗑️</a>
+                <a href="?action=delete_smiley&id=<?= (int) $s['smiley_id'] ?>&csrf=<?= e($csrfToken) ?>" class="btn btn-sm btn-danger" onclick="return confirm(<?= e(json_encode(t('adm_smiley_loeschen_frage', $s['code']), JSON_UNESCAPED_UNICODE)) ?>)" title="<?= e(t('delete')) ?>">🗑️</a>
               </div>
             </form>
           <?php endforeach; ?>
@@ -3601,7 +3601,7 @@
               </label>
               <div class="smiley-actions">
                 <button type="submit" class="btn btn-sm" title="Speichern">💾</button>
-                <a href="?action=delete_smiley&id=<?= (int) $s['smiley_id'] ?>&csrf=<?= e($csrfToken) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Smiley „<?= e($s['code']) ?>“ wirklich löschen?')" title="Löschen">🗑️</a>
+                <a href="?action=delete_smiley&id=<?= (int) $s['smiley_id'] ?>&csrf=<?= e($csrfToken) ?>" class="btn btn-sm btn-danger" onclick="return confirm(<?= e(json_encode(t('adm_smiley_loeschen_frage', $s['code']), JSON_UNESCAPED_UNICODE)) ?>)" title="<?= e(t('delete')) ?>">🗑️</a>
               </div>
             </form>
           <?php endforeach; ?>
@@ -3771,7 +3771,7 @@
             <label for="imprint_name"><?= t('admin_name_verantwortliche_person') ?></label>
             <input type="text" id="imprint_name" name="imprint_name"
                    value="<?= e($imprint['name']) ?>"
-                   placeholder="z.B. Max Mustermann oder Mustermann GmbH"
+                   placeholder="<?= e(t('adm_name_platzhalter')) ?>"
                    maxlength="200">
           </div>
 
@@ -3779,7 +3779,7 @@
             <label for="imprint_street"><?= t('admin_strasse_und_hausnummer') ?></label>
             <input type="text" id="imprint_street" name="imprint_street"
                    value="<?= e($imprint['street']) ?>"
-                   placeholder="z.B. Musterstraße 1"
+                   placeholder="<?= e(t('adm_strasse_platzhalter')) ?>"
                    maxlength="200">
           </div>
 
@@ -3928,7 +3928,7 @@
               <a href="?action=templates" class="btn btn-ghost btn-sm"><?= t('admin_zurueck') ?></a>
               <?php if (!empty($tplOverride)): ?>
                 <form method="post" action="?action=reset_template" style="display:inline"
-                      onsubmit="return confirm('Wirklich auf Original zurücksetzen? Deine Anpassungen gehen verloren.');">
+                      onsubmit="return confirm(<?= e(json_encode(t('adm_auf_original_frage'), JSON_UNESCAPED_UNICODE)) ?>);">
                   <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                   <input type="hidden" name="name" value="<?= e($editingTpl) ?>">
                   <button type="submit" class="btn btn-ghost btn-sm"><?= t('admin_auf_original_zuruecksetzen') ?></button>
@@ -3956,7 +3956,7 @@
                   <button type="submit" class="btn btn-ghost btn-sm"><?= t('admin_mein_override_behalten') ?></button>
                 </form>
                 <form method="post" action="?action=reset_template" style="display:inline"
-                      onsubmit="return confirm('Override löschen und mit neuem Original starten?');">
+                      onsubmit="return confirm(<?= e(json_encode(t('adm_override_loeschen_frage'), JSON_UNESCAPED_UNICODE)) ?>);">
                   <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                   <input type="hidden" name="name" value="<?= e($editingTpl) ?>">
                   <button type="submit" class="btn btn-ghost btn-sm"><?= t('admin_override_neu_starten') ?></button>
@@ -4081,10 +4081,10 @@
               const showing = !viewDiff.hasAttribute('hidden');
               if (showing) {
                 viewDiff.setAttribute('hidden', '');
-                btnDiff.textContent = '🔍 Original-Änderungen anzeigen';
+                btnDiff.textContent = <?= json_encode(t('adm_original_anzeigen'), JSON_UNESCAPED_UNICODE) ?>;
               } else {
                 viewDiff.removeAttribute('hidden');
-                btnDiff.textContent = '🔍 Original-Änderungen verbergen';
+                btnDiff.textContent = <?= json_encode(t('adm_original_verbergen'), JSON_UNESCAPED_UNICODE) ?>;
               }
             });
           }
@@ -4279,7 +4279,7 @@
               📁 Nur Dateien
             </button>
             <button type="submit" name="type" value="full" class="btn btn-ghost" <?= empty($zipAvailable) ? 'disabled' : '' ?>
-                    onclick="return confirm('Komplett-Backup (DB + alle Dateien) kann je nach Forumsgröße sehr lange dauern und viel Speicherplatz brauchen. Fortfahren?');">
+                    onclick="return confirm(<?= e(json_encode(t('adm_komplett_backup_frage'), JSON_UNESCAPED_UNICODE)) ?>);">
               📦 Komplett (DB + Dateien)
             </button>
           </div>
@@ -4334,10 +4334,10 @@
                     ⬇️ Download
                   </a>
                   <form method="post" action="?action=delete_backup" style="display:inline"
-                        onsubmit="return confirm('Backup wirklich löschen?');">
+                        onsubmit="return confirm(<?= e(json_encode(t('adm_backup_loeschen_frage'), JSON_UNESCAPED_UNICODE)) ?>);">
                     <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                     <input type="hidden" name="filename" value="<?= e($b['filename']) ?>">
-                    <button type="submit" class="btn btn-danger btn-sm" title="Löschen">🗑️</button>
+                    <button type="submit" class="btn btn-danger btn-sm" title="<?= e(t('delete')) ?>">🗑️</button>
                   </form>
                 </div>
               </div>
@@ -4444,7 +4444,7 @@
             <label><?= t('admin_eintraege_aelter_als_tage') ?></label>
             <input type="number" name="cleanup_days" value="90" min="7">
           </div>
-          <button type="submit" class="btn btn-danger" onclick="return confirm('Wirklich löschen?')"><?= t('admin_ip_logs_loeschen') ?></button>
+          <button type="submit" class="btn btn-danger" onclick="return confirm(<?= e(json_encode(t('adm_wirklich_loeschen_frage'), JSON_UNESCAPED_UNICODE)) ?>)"><?= t('admin_ip_logs_loeschen') ?></button>
         </form>
       </div>
 

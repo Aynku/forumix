@@ -17,7 +17,7 @@
   <div class="form-row">
     <label><?= t('banner_text') ?></label>
     <textarea name="text" maxlength="300" style="min-height:70px"
-              placeholder="Am Samstag ab 20 Uhr ist das Forum kurz nicht erreichbar."><?= e($text) ?></textarea>
+              placeholder="<?= e(t('banner_platzhalter')) ?>"><?= e($text) ?></textarea>
     <div class="form-hint"><?= t('banner_nur_text_kein_html') ?></div>
   </div>
 

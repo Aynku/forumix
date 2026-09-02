@@ -29,4 +29,6 @@ return [
     'banner_modul_beschreibung' => 'A band across the whole page, for maintenance notices and announcements. Text and colour are set in the module itself; visitors can dismiss it.',
 
     'banner_hinweis_schliessen' => 'Dismiss notice',
+
+    'banner_platzhalter' => 'On Saturday from 8 pm the forum will be briefly unavailable.',
 ];

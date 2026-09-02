@@ -44,7 +44,7 @@ $editorAllowHeadings = $editorAllowHeadings ?? false;
     <div class="editor-toolbar-group">
       <button type="button" class="editor-btn" data-action="bb" data-tag="quote" title="Zitat">❝</button>
       <button type="button" class="editor-btn" data-action="bb" data-tag="code" title="Code">{ }</button>
-      <button type="button" class="editor-btn" data-action="bb" data-tag="c" title="Wortwörtliches mitten im Satz">&lsaquo;&rsaquo;</button>
+      <button type="button" class="editor-btn" data-action="bb" data-tag="c" title="<?= e(t('editor_wortwoertlich')) ?>">&lsaquo;&rsaquo;</button>
       <button type="button" class="editor-btn" data-action="bb" data-tag="spoiler" title="Spoiler">👁️</button>
     </div>
     <div class="editor-toolbar-sep"></div>
@@ -60,8 +60,8 @@ $editorAllowHeadings = $editorAllowHeadings ?? false;
     </div>
     <div class="editor-toolbar-sep"></div>
     <div class="editor-toolbar-group">
-      <button type="button" class="editor-btn" data-action="link" title="Link einfügen">🔗</button>
-      <button type="button" class="editor-btn" data-action="image" title="Bild einfügen">🖼️</button>
+      <button type="button" class="editor-btn" data-action="link" title="<?= e(t('editor_link_einfuegen')) ?>">🔗</button>
+      <button type="button" class="editor-btn" data-action="image" title="<?= e(t('editor_bild_einfuegen')) ?>">🖼️</button>
       <button type="button" class="editor-btn" data-action="smileys" title="Smileys">😊</button>
     </div>
     <div class="editor-toolbar-group editor-toolbar-right">

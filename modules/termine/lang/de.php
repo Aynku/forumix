@@ -33,4 +33,6 @@ return [
     'termine_menu' => 'Termine',
     'termine_modul_name' => 'Termine',
     'termine_modul_beschreibung' => 'Terminliste mit eigener Seite. Die nächsten Termine erscheinen zusätzlich oben auf der Startseite. Anlegen und pflegen dürfen Admins.',
+
+    'termine_loeschen_frage' => 'Diesen Termin löschen?',
 ];

@@ -41,7 +41,7 @@
       <h2 class="faq-cat-title"><?= $c['icon'] ?> <?= e($c['title']) ?>
         <?php if ($adminMode): ?>
           <form method="post" style="display:inline-block;margin-left:auto"
-                onsubmit="return confirm('Kategorie löschen? (nur wenn leer)')">
+                onsubmit="return confirm(<?= json_encode(t('faq_kategorie_loeschen_frage')) ?>)">
             <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
             <input type="hidden" name="faq_act" value="delete_cat">
             <input type="hidden" name="cat_id" value="<?= (int) $c['cat_id'] ?>">
@@ -119,7 +119,7 @@
                         </form>
                       <?php endif; ?>
                       <form method="post" style="display:inline;margin-left:auto"
-                            onsubmit="return confirm('Frage wirklich löschen?')">
+                            onsubmit="return confirm(<?= json_encode(t('faq_frage_loeschen_frage')) ?>)">
                         <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                         <input type="hidden" name="faq_act" value="delete_item">
                         <input type="hidden" name="faq_id" value="<?= (int) $item['faq_id'] ?>">
@@ -154,7 +154,7 @@
           <input type="text" name="question" required placeholder="Wie funktioniert ...?">
         </label>
         <label><?= t('faq_antwort_bbcode_erlaubt') ?>
-          <textarea name="answer" rows="5" required placeholder="Hier die Antwort..."></textarea>
+          <textarea name="answer" rows="5" required placeholder="<?= e(t('faq_antwort_platzhalter')) ?>"></textarea>
         </label>
         <button type="submit" class="btn btn-primary btn-sm"><?= t('faq_hinzufuegen') ?></button>
       </form>

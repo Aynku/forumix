@@ -29,4 +29,6 @@ return [
     'banner_modul_beschreibung' => 'Band über der ganzen Seite, für Wartungshinweise und Ankündigungen. Text und Farbe im Modul selbst, Besucher können es wegklicken.',
 
     'banner_hinweis_schliessen' => 'Hinweis schließen',
+
+    'banner_platzhalter' => 'Am Samstag ab 20 Uhr ist das Forum kurz nicht erreichbar.',
 ];

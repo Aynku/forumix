@@ -8,6 +8,49 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.10.2 (2026-09-02)
+
+### Der Rest der Übersetzung
+
+Auf Englisch stand an einigen Stellen weiterhin deutscher Text. Betroffen war
+alles, was nicht als Text im Quelltext steht, sondern in einem Ausdruck, einem
+Attribut oder im JavaScript — und deshalb beim ersten Durchgang nicht gefunden
+wurde:
+
+- **Die Kästen auf der Startseite.** „1 Mitglieder · 1 Gäste", „0 Themen ·
+  0 Beiträge" — Einzahl und Mehrzahl standen als Bedingung mitten im Ausdruck.
+  Jetzt kommen sie aus dem Sprachpaket.
+- **Zahlen.** `1.234` heißt auf Englisch `1,234`. Punkt und Komma sind
+  vertauscht, und sie standen fest im Code. Aus „1.234 Beiträge" wurde auf
+  Englisch damit „1.234 posts" — tausend Mal weniger, als dastehen sollte.
+- **Rückfragen und Tooltips.** Rund fünfzig Sicherheitsabfragen („Wirklich
+  löschen?"), Kurzhinweise und Eingabe-Platzhalter, vor allem im Adminbereich.
+- **Sätze aus Bruchstücken.** Wo ein Satz aus Textstücken und einem Wert
+  zusammengesetzt war, ist er jetzt ein Satz mit Platzhaltern. Eine andere
+  Sprache ordnet die Wörter anders an; anders ließ sich das nicht übersetzen.
+- **Das JavaScript** des Forums, der KI-Hilfe und der Shoutbox.
+- **Die Sprachkennung der Seite** (`<html lang>`) folgt jetzt der gewählten
+  Sprache. Davon hängt ab, wie Vorleseprogramme den Text aussprechen und wie
+  der Browser die Rechtschreibprüfung einstellt.
+
+Nicht übersetzt sind **Impressum, Datenschutzerklärung und
+Nutzungsbedingungen**. Das sind Rechtstexte nach deutschem Recht, und eine
+Übersetzung wäre keine gültige Fassung, sondern nur eine Lesehilfe. Wer sie
+zweisprachig braucht, hinterlegt sie unter *Admin → Rechtliches* selbst.
+
+### Zwei neue Prüfungen
+
+Beide gab es vorher nicht, und beide hätten die Fehler gefunden:
+
+- **In den Vorlagen steht kein deutscher Text mehr.** Sucht nicht nach dem,
+  was übersetzt ist, sondern nach dem, was es nicht ist — auch in Ausdrücken
+  und Attributen.
+- **Alle Vorlagen ergeben gültiges PHP.** Vorlagen werden zu PHP übersetzt und
+  zwischengespeichert. Ein Fehler darin fiel bisher erst auf, wenn jemand
+  genau die Seite aufrief; die Seite blieb dann weiß.
+
+---
+
 ## v1.10.1 (2026-09-02)
 
 ### Nachgezogen: was beim Umstellen auf das Sprachpaket liegen blieb

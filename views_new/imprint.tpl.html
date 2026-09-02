@@ -1,12 +1,12 @@
 {% set imp = imprint_data() %}
 {% set page = get_page('imprint') %}
-<div class="section-heading">{{ page.title|default('Impressum') }}</div>
+<div class="section-heading">{{ page.title|default(t('imprint_titel')) }}</div>
 
 <div class="card" style="padding:28px 32px">
 
   {% if imp.is_default and is_admin(current_user()) %}
     <div class="flash flash-warning" style="margin-bottom:20px">
-      <strong>{{ t('imprint_hinweis_fuer_administratoren') }}</strong> {{ t('imprint_die_impressums_daten_sind') }} <a href="{{ url('/admin/?action=legal') }}">{{ t('imprint_admin_rechtliches') }}</a> die Daten eintragen.
+      <strong>{{ t('imprint_hinweis_fuer_administratoren') }}</strong> {{ t('imprint_daten_eintragen', url('/admin/?action=legal')) | raw }}
     </div>
   {% endif %}
 

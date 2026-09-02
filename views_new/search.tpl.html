@@ -11,7 +11,7 @@
           <a href="?saved=delete&id={{ s.search_id }}&csrf={{ csrfToken }}"
              class="saved-search-x"
              title="{{ t('delete') }}"
-             onclick="return confirm('Diese gespeicherte Suche löschen?')">✕</a>
+             onclick="return confirm({{ t('search_suche_loeschen_frage') | json }})">✕</a>
         </span>
       {% endfor %}
     </div>
@@ -32,7 +32,7 @@
       <div class="form-row">
         <label>{{ t('search_forum') }}</label>
         <select name="board">
-          <option value="0">– alle Foren –</option>
+          <option value="0">{{ t('search_alle_foren') }}</option>
           {% for b in boards %}
             <option value="{{ b.board_id }}" {{ boardId == b.board_id ? 'selected' : '' }}>
               {{ b.cat }} › {{ b.title }}
@@ -105,7 +105,7 @@
            class="search-result">
           <div class="search-result-meta">
             {{ r.cat_title }} › {{ r.board_title }}
-            · von <strong>{{ r.author }}</strong>
+            · {{ t('index_von') }} <strong>{{ r.author }}</strong>
             · {{ format_date(r.post_date) }}
           </div>
           <div class="search-result-title">{{ r.thread_title }}</div>
@@ -148,7 +148,7 @@
     const name = (saveInput?.value || '').trim();
     if (!name) {
       saveInput?.focus();
-      alert('Bitte einen Namen für die Suche eingeben.');
+      alert({{ t('search_name_eingeben') | json }});
       return;
     }
     document.getElementById('save_name_hidden').value = name;

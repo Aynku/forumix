@@ -3,9 +3,7 @@
     {% if result.ok %}
       <h2 style="margin-top:0">{{ t('verify_email_change_e_mail_adresse_erfolgreich') }}</h2>
       <p style="line-height:1.6">
-        {{ t('verify_email_change_deine_neue_e_mail') }} <strong>{{ result.new_email }}</strong>
-        ist jetzt aktiv. Zukünftige Passwort-Resets und Benachrichtigungen
-        gehen an diese Adresse.
+        {{ t('verify_email_change_adresse_aktiv', e(result.new_email)) | raw }}
       </p>
       <p style="margin-top:20px;text-align:center">
         <a href="{{ url('/settings.php?tab=security') }}" class="btn btn-primary">
@@ -16,11 +14,10 @@
     {% else %}
       <h2 style="margin-top:0;color:var(--color-danger)">{{ t('verify_email_change_e_mail_aenderung_fehlgeschlagen') }}</h2>
       <p style="line-height:1.6">
-        {{ result.error|default('Unbekannter Fehler.') }}
+        {{ result.error|default(t('error_unbekannt_kurz')) }}
       </p>
       <p style="font-size:13px;color:var(--text-muted);margin-top:14px;line-height:1.6">
-        {{ t('verify_email_change_bitte_gehe_in_deine') }} <a href="{{ url('/settings.php?tab=security') }}">{{ t('verify_email_change_einstellungen') }}</a>
-        und starte die E-Mail-Änderung erneut.
+        {{ t('verify_email_change_erneut_starten', url('/settings.php?tab=security')) | raw }}
       </p>
       <p style="margin-top:20px;text-align:center">
         <a href="{{ url('/') }}" class="btn btn-ghost">{{ t('verify_email_change_zur_startseite') }}</a>

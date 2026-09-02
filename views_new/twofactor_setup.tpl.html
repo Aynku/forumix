@@ -32,7 +32,7 @@
           <label>{{ t('twofactor_setup_passwort_zur_bestaetigung') }}</label>
           <input type="password" name="password" required>
         </div>
-        <button type="submit" class="btn btn-danger" onclick="return confirm('2FA wirklich deaktivieren?')">{{ t('twofactor_setup_2fa_deaktivieren') }}</button>
+        <button type="submit" class="btn btn-danger" onclick="return confirm({{ t('twofactor_aus_frage') | json }})">{{ t('twofactor_setup_2fa_deaktivieren') }}</button>
       </form>
 
     {% else %}
@@ -45,8 +45,7 @@
         {# Kein QR-Bild von einem fremden Dienst — die URL enthaelt den
            2FA-Schluessel im Klartext. Eintragen ueber den Secret-Code. #}
         <div style="text-align:center;margin:18px 0;padding:14px;border:1px dashed var(--border);border-radius:8px;color:var(--text-muted);font-size:13px">
-          {{ t('twofactor_setup_trage_den_code_unten') }}
-          <strong>„Schl&uuml;ssel manuell eingeben"</strong> ein.
+          {{ t('twofactor_setup_code_manuell_eintragen') | raw }}
         </div>
       </div>
 

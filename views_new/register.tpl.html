@@ -91,8 +91,7 @@
           <label class="checkbox-line">
             <input type="checkbox" name="accept_terms" value="1" required {% if acceptTerms %}checked{% endif %}>
             <span>
-              {{ t('register_ich_habe_die') }} <a href="{{ url('/terms.php') }}" target="_blank" rel="noopener">{{ t('register_nutzungsbedingungen') }}</a>
-              gelesen und akzeptiere sie.
+              {{ t('register_agb_gelesen', url('/terms.php')) | raw }}
             </span>
           </label>
         </div>
@@ -127,10 +126,10 @@
     if (/\d/.test(pw))   score += 1;
     if (/[^A-Za-z0-9]/.test(pw)) score += 1;
 
-    if (score <= 2) return {score, label: 'Schwach',     class: 'weak',   pct: 25};
-    if (score <= 3) return {score, label: 'Mittelmäßig', class: 'medium', pct: 50};
-    if (score <= 4) return {score, label: 'Gut',         class: 'good',   pct: 75};
-    return                {score, label: 'Stark',       class: 'strong', pct: 100};
+    if (score <= 2) return {score, label: {{ t('pw_schwach') | json }},     class: 'weak',   pct: 25};
+    if (score <= 3) return {score, label: {{ t('pw_mittel') | json }}, class: 'medium', pct: 50};
+    if (score <= 4) return {score, label: {{ t('pw_gut') | json }},         class: 'good',   pct: 75};
+    return                {score, label: {{ t('pw_stark') | json }},       class: 'strong', pct: 100};
   }
 
   function updateStrength() {
@@ -143,7 +142,7 @@
     strengthWrap.hidden = false;
     strengthFill.style.width = s.pct + '%';
     strengthFill.className = 'password-strength-fill ' + s.class;
-    strengthLabel.textContent = 'Passwort-Stärke: ' + s.label;
+    strengthLabel.textContent = {{ t('pw_staerke_praefix') | json }} + s.label;
   }
 
   function updateMatch() {
@@ -155,10 +154,10 @@
     }
     matchHint.hidden = false;
     if (v1 === v2) {
-      matchHint.textContent = 'Passwörter stimmen überein';
+      matchHint.textContent = {{ t('settings_passwoerter_gleich') | json }};
       matchHint.className = 'password-match-hint match-ok';
     } else {
-      matchHint.textContent = 'Passwörter stimmen nicht überein';
+      matchHint.textContent = {{ t('settings_passwoerter_ungleich') | json }};
       matchHint.className = 'password-match-hint match-fail';
     }
   }

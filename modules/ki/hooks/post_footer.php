@@ -21,7 +21,7 @@ if ($ki_befehl === '') return;
 $ki_alle = ki_befehle();
 $ki_name = isset($ki_alle[$ki_befehl]['name']) ? t($ki_alle[$ki_befehl]['name']) : $ki_befehl;
 ?>
-<div class="ki-marke" title="Der Verfasser hat für diesen Beitrag die Schreibhilfe benutzt und das Ergebnis übernommen.">
+<div class="ki-marke" title="<?= e(t('ki_hinweis_titel')) ?>">
   <span aria-hidden="true">✨</span>
   <span><?= e(t('ki_assisted', $ki_name)) ?></span>
 </div>

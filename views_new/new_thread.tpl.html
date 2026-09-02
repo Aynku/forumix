@@ -1,4 +1,4 @@
-<div class="section-heading">+ Neues Thema in „{{ board.title }}"</div>
+<div class="section-heading">{{ t('new_thread_neues_thema_in', board.title) }}</div>
 <div class="form-card">
     {% if error %}<div class="flash flash-error">{{ error }}</div>{% endif %}
     <form method="post" enctype="multipart/form-data">
@@ -9,7 +9,7 @@
       </div>
       <div class="form-row">
         <label>{{ t('new_thread_beitrag') }}</label>
-        {{ render_editor('content', 'content', formContent ?? '', 'Schreibe etwas zum Thema… (BBCode unterstützt)', true, false)|raw }}
+        {{ render_editor('content', 'content', formContent ?? '', t('new_thread_platzhalter'), true, false)|raw }}
       </div>
       {% if darfAnhang %}
       <div class="form-row">

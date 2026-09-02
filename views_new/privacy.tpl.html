@@ -1,12 +1,12 @@
 {% set imp = imprint_data() %}
 {% set page = get_page('privacy') %}
-<div class="section-heading">{{ page.title|default('Datenschutzerklärung') }}</div>
+<div class="section-heading">{{ page.title|default(t('privacy_titel')) }}</div>
 
 <div class="card" style="padding:28px 32px;line-height:1.7">
 
   {% if imp.is_default and is_admin(current_user()) %}
     <div class="flash flash-warning" style="margin-bottom:20px">
-      <strong>{{ t('privacy_hinweis_fuer_administratoren') }}</strong> {{ t('privacy_die_kontaktdaten_sind_noch') }} <a href="{{ url('/admin/?action=legal') }}">{{ t('privacy_admin_rechtliches') }}</a> die Daten eintragen.
+      <strong>{{ t('privacy_hinweis_fuer_administratoren') }}</strong> {{ t('privacy_daten_eintragen', url('/admin/?action=legal')) | raw }}
     </div>
   {% endif %}
 
