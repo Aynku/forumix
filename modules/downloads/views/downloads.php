@@ -4,7 +4,7 @@
       @var string $maxGroesse; @var string $selbst */
 ?>
 
-<div class="section-heading">📥 Downloads</div>
+<div class="section-heading">📥 <?= t('downloads_titel_seite') ?></div>
 
 <?php if ($canAdmin): ?>
   <form method="post" enctype="multipart/form-data" class="form-card" style="margin-bottom:18px">
@@ -20,9 +20,9 @@
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div class="form-row">
-        <label><?= t('downloads_kategorie') ?> <span style="color:var(--text-faint)">(optional)</span></label>
+        <label><?= t('downloads_kategorie') ?> <span style="color:var(--text-faint)">(<?= t('optional') ?>)</span></label>
         <input type="text" name="kategorie" maxlength="80" list="dl-kategorien"
-               placeholder="z.B. Anleitungen">
+               placeholder="<?= e(t('downloads_kategorie_beispiel')) ?>">
         <datalist id="dl-kategorien">
           <?php foreach ($kategorien as $k): ?>
             <option value="<?= e($k) ?>"></option>
@@ -32,12 +32,12 @@
       <div class="form-row">
         <label><?= t('downloads_datei') ?></label>
         <input type="file" name="datei" required>
-        <div class="form-hint"><?= t('downloads_bis') ?> <?= e($maxGroesse) ?>. Bilder, PDF, TXT, ZIP, RAR.</div>
+        <div class="form-hint"><?= t('downloads_bis') ?> <?= e($maxGroesse) ?>. <?= t('downloads_typen') ?></div>
       </div>
     </div>
 
     <div class="form-row">
-      <label><?= t('downloads_beschreibung') ?> <span style="color:var(--text-faint)">(optional)</span></label>
+      <label><?= t('downloads_beschreibung') ?> <span style="color:var(--text-faint)">(<?= t('optional') ?>)</span></label>
       <textarea name="beschreibung" maxlength="2000" style="min-height:80px"></textarea>
     </div>
 

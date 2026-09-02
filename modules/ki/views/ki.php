@@ -3,7 +3,7 @@
         @var array $verbrauch; @var int $gesamt; @var ?string $probe;
         @var bool $crypt_da; @var bool $hat_schluessel */ ?>
 
-<div class="section-heading">✨ KI-Funktionen</div>
+<div class="section-heading">✨ <?= t('ki_modul_name') ?></div>
 
 <?php if ($probe !== null): ?>
   <div class="flash <?= $probe === '' ? 'flash-success' : 'flash-error' ?>" style="margin-bottom:16px">
@@ -27,7 +27,7 @@
     <strong><?= t('ki_key_first') ?></strong>
     <p style="margin:6px 0;font-size:13px;line-height:1.6">
       <?= t('ki_ohne_ihn_liegt_dein') ?>
-      <code>config.php</code> auf:
+      <code>config.php</code> <?= t('ki_config_auf') ?>
     </p>
     <pre style="white-space:pre-wrap;word-break:break-all;background:var(--bg-body);
          padding:10px;border-radius:6px;margin:0"><code>define('FORUM_CRYPT_KEY', '<?= e($crypt_vorschlag) ?>');</code></pre>
@@ -109,7 +109,7 @@
           </td>
           <td>
             <input type="text" name="modell_je[<?= e($code) ?>]" value="<?= e($eigenes) ?>"
-                   placeholder="wie oben" style="width:100%;font-size:12px">
+                   placeholder="<?= e(t('ki_wie_oben')) ?>" style="width:100%;font-size:12px">
             <?php if ($urteil): ?>
               <div style="font-size:11px;color:var(--color-warning);margin-top:3px">
                 <?= e(t('ki_entscheidet_mit')) ?>
@@ -173,7 +173,7 @@
   <div class="form-row">
     <label>
       <input type="checkbox" name="mod_an" value="1" <?= !empty($cfg['mod_an']) ? 'checked' : '' ?>>
-      Vorsortierung einschalten
+      <?= t('ki_vorsortierung_ein') ?>
     </label>
     <div class="form-hint">
       <?= t('ki_im_auslieferungszustand_aus_sobald') ?>
@@ -183,7 +183,7 @@
   <div class="form-row">
     <label><?= t('ki_meldendes_konto') ?></label>
     <input type="text" name="mod_melder" list="ki-melder-vorschlaege" autocomplete="off"
-           value="<?= e($melder_name) ?>" placeholder="Benutzername">
+           value="<?= e($melder_name) ?>" placeholder="<?= e(t('ki_benutzername')) ?>">
     <datalist id="ki-melder-vorschlaege">
       <?php foreach ($melder_wahl as $m): ?>
         <option value="<?= e($m['username']) ?>"></option>
@@ -206,7 +206,7 @@
   <div class="form-row">
     <label><?= t('ki_modell_fuer_die_vorpruefung') ?></label>
     <input type="text" name="mod_modell" value="<?= e((string) ($cfg['mod_modell'] ?? '')) ?>"
-           placeholder="wie oben">
+           placeholder="<?= e(t('ki_wie_oben')) ?>">
     <div class="form-hint">
       <?= t('ki_hier_reicht_das_kleinste') ?>
     </div>

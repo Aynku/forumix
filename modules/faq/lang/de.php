@@ -37,4 +37,14 @@ return [
     'faq_frage_loeschen_frage' => 'Frage wirklich löschen?',
 
     'faq_antwort_platzhalter' => 'Hier die Antwort...',
+
+    // ── Nachgezogen ──
+    'faq_normale_ansicht' => 'Normale Ansicht',
+    'faq_verwalten' => 'Verwalten',
+    'faq_unsichtbar' => 'unsichtbar',
+    'faq_bearbeiten' => 'Bearbeiten',
+    'faq_hoch' => 'Hoch',
+    'faq_runter' => 'Runter',
+    'faq_frage_beispiel' => 'Wie funktioniert ...?',
+    'faq_kategorie_beispiel' => 'z.B. Zahlung',
 ];

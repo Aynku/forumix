@@ -71,4 +71,4 @@ if (empty($GLOBALS['ki_assets_geladen'])) {
 }
 ?>
 <button type="button" class="editor-btn ki-knopf" data-ki-editor="<?= e($editorId ?? 'content') ?>"
-        title="Schreibhilfe">✨ KI</button>
+        title="<?= e(t('ki_schreibhilfe')) ?>">✨ KI</button>

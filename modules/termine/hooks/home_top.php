@@ -15,7 +15,7 @@ if ($naechste):
 <div class="card" style="margin-bottom:16px">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
     <strong><?= t('termine_next') ?></strong>
-    <a class="btn btn-ghost btn-sm" href="<?= e(FORUM_URL) ?>/modules/termine/termine.php">Alle ansehen</a>
+    <a class="btn btn-ghost btn-sm" href="<?= e(FORUM_URL) ?>/modules/termine/termine.php"><?= t('termine_alle_ansehen') ?></a>
   </div>
   <div style="margin-top:10px;display:grid;gap:6px;font-size:14px">
     <?php foreach ($naechste as $t): ?>

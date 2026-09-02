@@ -4,7 +4,7 @@
       @var string $empfaenger; @var bool $canAdmin; @var array $letzte; @var string $selbst */
 ?>
 
-<div class="section-heading">✉️ Kontakt</div>
+<div class="section-heading">✉️ <?= t('kontakt_modul_name') ?></div>
 
 <?php if ($gesendet): ?>
   <div class="card" style="padding:34px;text-align:center">
@@ -14,7 +14,7 @@
       <?= t('kontakt_danke_wir_melden_uns') ?>
     </div>
     <div style="margin-top:16px">
-      <a class="btn btn-ghost" href="<?= e($selbst) ?>">Noch eine Nachricht schreiben</a>
+      <a class="btn btn-ghost" href="<?= e($selbst) ?>"><?= t('kontakt_noch_eine') ?></a>
     </div>
   </div>
 

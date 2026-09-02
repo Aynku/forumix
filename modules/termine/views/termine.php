@@ -19,7 +19,7 @@
             <div style="font-size:13px;color:var(--text-muted);margin-top:4px">
               🗓️ <?= e(format_date($t['beginn'])) ?>
               <?php if (!empty($t['ende'])): ?>
-                &nbsp;bis&nbsp;<?= e(format_date($t['ende'])) ?>
+                &nbsp;<?= t('termine_bis') ?>&nbsp;<?= e(format_date($t['ende'])) ?>
               <?php endif; ?>
               <?php if ($t['ort'] !== ''): ?>
                 &nbsp;·&nbsp;📍 <?= e($t['ort']) ?>
@@ -52,7 +52,7 @@
   };
 ?>
 
-<div class="section-heading">📅 Termine</div>
+<div class="section-heading">📅 <?= t('termine_modul_name') ?></div>
 
 <?php if ($canAdmin): ?>
   <form method="post" class="form-card" style="margin-bottom:18px">
@@ -77,26 +77,26 @@
                value="<?= e($fuersFeld($bearbeiten['beginn'] ?? null)) ?>">
       </div>
       <div class="form-row">
-        <label><?= t('termine_ende') ?> <span style="color:var(--text-faint)">(optional)</span></label>
+        <label><?= t('termine_ende') ?> <span style="color:var(--text-faint)">(<?= t('optional') ?>)</span></label>
         <input type="datetime-local" name="ende"
                value="<?= e($fuersFeld($bearbeiten['ende'] ?? null)) ?>">
       </div>
     </div>
 
     <div class="form-row">
-      <label><?= t('termine_ort') ?> <span style="color:var(--text-faint)">(optional)</span></label>
+      <label><?= t('termine_ort') ?> <span style="color:var(--text-faint)">(<?= t('optional') ?>)</span></label>
       <input type="text" name="ort" maxlength="140"
              value="<?= e($bearbeiten['ort'] ?? '') ?>">
     </div>
 
     <div class="form-row">
-      <label><?= t('termine_beschreibung') ?> <span style="color:var(--text-faint)">(optional)</span></label>
+      <label><?= t('termine_beschreibung') ?> <span style="color:var(--text-faint)">(<?= t('optional') ?>)</span></label>
       <textarea name="beschreibung" maxlength="2000" style="min-height:90px"><?= e($bearbeiten['beschreibung'] ?? '') ?></textarea>
     </div>
 
     <button class="btn btn-primary"><?= $bearbeiten ? t('termine_save_change') : t('termine_create') ?></button>
     <?php if ($bearbeiten): ?>
-      <a class="btn btn-ghost" href="<?= e($selbst) ?>">Abbrechen</a>
+      <a class="btn btn-ghost" href="<?= e($selbst) ?>"><?= t('cancel') ?></a>
     <?php endif; ?>
   </form>
 <?php endif; ?>

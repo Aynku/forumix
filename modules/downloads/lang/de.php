@@ -33,4 +33,9 @@ return [
     'downloads_modul_beschreibung' => 'Dateiablage mit eigener Seite. Admins laden Dateien hoch und gruppieren sie in Kategorien, alle anderen laden herunter. Zählt die Abrufe.',
 
     'downloads_loeschen_frage' => 'Diese Datei löschen?',
+
+    // ── Nachgezogen ──
+    'downloads_titel_seite' => 'Downloads',
+    'downloads_kategorie_beispiel' => 'z.B. Anleitungen',
+    'downloads_typen' => 'Bilder, PDF, TXT, ZIP, RAR.',
 ];

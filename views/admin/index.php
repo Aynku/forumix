@@ -262,9 +262,9 @@
                         <?php /* Founder sieht hier: Owner-Status entfernen */ ?>
                         <a href="<?= $base ?>remove_owner&id=<?= $uid . $csrfQS ?>"
                            class="action-danger"
-                           onclick="return confirm(<?= e(json_encode(t('adm_owner_entziehen_frage', $u['username']), JSON_UNESCAPED_UNICODE)) ?>)">⬇️ Owner entziehen</a>
+                           onclick="return confirm(<?= e(json_encode(t('adm_owner_entziehen_frage', $u['username']), JSON_UNESCAPED_UNICODE)) ?>)">⬇️ <?= t('adm_owner_entziehen') ?></a>
                       <?php elseif ($u['is_banned']): ?>
-                        <a href="<?= $base ?>unban_user&id=<?= $uid . $csrfQS ?>">✅ Entsperren</a>
+                        <a href="<?= $base ?>unban_user&id=<?= $uid . $csrfQS ?>">✅ <?= t('adm_entsperren') ?></a>
                       <?php else: ?>
                         <?php /* Founder-only: Owner ernennen */ ?>
                         <?php if ($isFounderViewer): ?>
@@ -276,12 +276,12 @@
                         <?php if ($u['is_admin']): ?>
                           <?php if ($uid !== $cuid): ?>
                             <a href="<?= $base ?>remove_admin&id=<?= $uid . $csrfQS ?>"
-                               onclick="return confirm(<?= e(json_encode(t('adm_admin_entziehen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">⬇️ Admin entziehen</a>
+                               onclick="return confirm(<?= e(json_encode(t('adm_admin_entziehen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">⬇️ <?= t('adm_admin_entziehen') ?></a>
                           <?php endif; ?>
                         <?php elseif ($u['is_mod']): ?>
                           <a href="<?= $base ?>make_admin&id=<?= $uid . $csrfQS ?>"
                              onclick="return confirm(<?= e(json_encode(t('adm_zum_admin_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🔴 <?= t('adm_zum_admin') ?></a>
-                          <a href="<?= $base ?>remove_mod&id=<?= $uid . $csrfQS ?>">⬇️ Mod entziehen</a>
+                          <a href="<?= $base ?>remove_mod&id=<?= $uid . $csrfQS ?>">⬇️ <?= t('adm_mod_entziehen') ?></a>
                         <?php else: ?>
                           <a href="<?= $base ?>make_admin&id=<?= $uid . $csrfQS ?>"
                              onclick="return confirm(<?= e(json_encode(t('adm_zum_admin_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🔴 <?= t('adm_zum_admin') ?></a>
@@ -417,8 +417,8 @@
               </td>
               <td style="white-space:nowrap">
                 <a href="?action=boards&board=<?= (int) $b['board_id'] ?>&edit=details" class="btn btn-ghost btn-xs"><?= t('admin_bearbeiten') ?></a>
-                <a href="?action=boards&board=<?= (int) $b['board_id'] ?>&edit=approval" class="btn btn-ghost btn-xs">🚦 Freigabe</a>
-                <a href="?action=boards&board=<?= (int) $b['board_id'] ?>" class="btn btn-ghost btn-xs">🛡️ Mods</a>
+                <a href="?action=boards&board=<?= (int) $b['board_id'] ?>&edit=approval" class="btn btn-ghost btn-xs">🚦 <?= t('adm_freigabe') ?></a>
+                <a href="?action=boards&board=<?= (int) $b['board_id'] ?>" class="btn btn-ghost btn-xs">🛡️ <?= t('adm_mods') ?></a>
                 <a href="?action=delete_board&id=<?= (int) $b['board_id'] ?>&csrf=<?= e($csrfToken) ?>"
                    class="btn btn-danger btn-xs" onclick="return confirm(<?= e(json_encode(t('adm_forum_loeschen_frage'), JSON_UNESCAPED_UNICODE)) ?>)"><?= t('admin_x_loeschen') ?></a>
               </td>
@@ -516,7 +516,7 @@
                       <td style="padding:8px 10px;border-bottom:1px solid var(--border)">
                         <?= e($g['name']) ?>
                         <?php if (!empty($g['is_builtin'])): ?>
-                          <span style="color:var(--text-faint);font-size:12px;margin-left:6px">eingebaut</span>
+                          <span style="color:var(--text-faint);font-size:12px;margin-left:6px"><?= t('adm_eingebaut') ?></span>
                         <?php endif; ?>
                       </td>
                       <?php foreach (['none', 'read', 'write'] as $stufe): ?>
@@ -786,14 +786,14 @@
                   <td>
                     <strong><?= e($g['name']) ?></strong>
                     <?php if ($eingebaut): ?>
-                      <span style="color:var(--text-faint);font-size:12px;margin-left:6px">eingebaut</span>
+                      <span style="color:var(--text-faint);font-size:12px;margin-left:6px"><?= t('adm_eingebaut') ?></span>
                     <?php endif; ?>
                   </td>
                   <td>
                     <?php if ($g['slug'] === 'guests'): ?>
                       <span style="color:var(--text-muted)"><?= t('adm_alle_gaeste') ?></span>
                     <?php elseif ($g['slug'] === 'members'): ?>
-                      <span style="color:var(--text-muted)">automatisch</span>
+                      <span style="color:var(--text-muted)"><?= t('adm_automatisch') ?></span>
                     <?php else: ?>
                       <?= (int) ($mitgliederZahl[$gid] ?? 0) ?>
                     <?php endif; ?>
@@ -826,7 +826,7 @@
           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
           <div class="form-row">
             <label><?= t('admin_name') ?></label>
-            <input type="text" name="name" required maxlength="60" placeholder="z. B. Kunden">
+            <input type="text" name="name" required maxlength="60" placeholder="<?= e(t('adm_gruppe_beispiel')) ?>">
           </div>
           <label class="checkbox-line">
             <input type="checkbox" name="show_badge" value="1">
@@ -1107,9 +1107,9 @@
               <select name="bot_detection_level">
                 <?php $bd = $settings['bot_detection_level'] ?? 'medium'; ?>
                 <option value="off"    <?= $bd === 'off'    ? 'selected' : '' ?>>🚫 <?= t('adm_aus') ?></option>
-                <option value="low"    <?= $bd === 'low'    ? 'selected' : '' ?>>🟢 Locker</option>
-                <option value="medium" <?= $bd === 'medium' ? 'selected' : '' ?>>🟡 Normal</option>
-                <option value="high"   <?= $bd === 'high'   ? 'selected' : '' ?>>🔴 Streng</option>
+                <option value="low"    <?= $bd === 'low'    ? 'selected' : '' ?>>🟢 <?= t('adm_streng_locker') ?></option>
+                <option value="medium" <?= $bd === 'medium' ? 'selected' : '' ?>>🟡 <?= t('adm_streng_normal') ?></option>
+                <option value="high"   <?= $bd === 'high'   ? 'selected' : '' ?>>🔴 <?= t('adm_streng_streng') ?></option>
               </select>
               <div class="form-hint"><?= t('admin_honeypots_submission_timing_user') ?></div>
             </div>
@@ -1298,7 +1298,7 @@
               <label><?= t('admin_absender_name') ?></label>
               <?php if (defined('FORUM_MAIL_FROM_NAME')): ?>
                 <input type="text" value="<?= e(FORUM_MAIL_FROM_NAME) ?>" disabled>
-                <div class="form-hint"><?= t('admin_in_der') ?> <code>config.php</code> festgelegt.</div>
+                <div class="form-hint"><?= t('admin_in_der') ?> <code>config.php</code> <?= t('adm_festgelegt') ?></div>
               <?php else: ?>
               <input type="text" name="smtp_from_name" value="<?= e($settings['smtp_from_name'] ?? '') ?>"
                      placeholder="<?= e(FORUM_NAME) ?>">
@@ -1359,7 +1359,7 @@
             <label>
               <input type="checkbox" name="registration_enabled" value="1"
                 <?= ($settings['registration_enabled'] ?? '1') === '1' ? 'checked' : '' ?>>
-              Registrierungen erlauben
+              <?= t('adm_registrierungen_erlauben') ?>
             </label>
             <div class="form-hint"><?= t('admin_wenn_deaktiviert_nur_bestehende') ?></div>
           </div>
@@ -1392,9 +1392,9 @@
             <label>
               <input type="checkbox" name="registration_terms_required" value="1"
                 <?= ($settings['registration_terms_required'] ?? '1') === '1' ? 'checked' : '' ?>>
-              Zustimmung zu Nutzungsbedingungen erforderlich
+              <?= t('adm_agb_pflicht') ?>
             </label>
-            <div class="form-hint"><?= t('admin_user_muessen_bei_der') ?> <a href="?action=legal"><?= t('admin_nutzungsbedingungen') ?></a> aktiv zustimmen (DSGVO-konform).</div>
+            <div class="form-hint"><?= t('admin_user_muessen_bei_der') ?> <a href="?action=legal"><?= t('admin_nutzungsbedingungen') ?></a> <?= t('adm_aktiv_zustimmen') ?></div>
           </div>
         </div>
 
@@ -1475,11 +1475,11 @@
       <div class="card" style="margin-bottom:18px;padding:4px;display:inline-flex;gap:2px;background:var(--bg-surface2)">
         <a href="?action=iplookup&sub=lookup<?= !empty($lookupIP) ? '&ip=' . urlencode($lookupIP) : '' ?>"
            class="btn btn-ghost btn-sm" style="<?= $ipTab === 'lookup' ? 'background:var(--bg-surface);font-weight:600' : '' ?>">
-          🔍 IP-Suche
+          🔍 <?= t('adm_ip_suche') ?>
         </a>
         <a href="?action=iplookup&sub=banns"
            class="btn btn-ghost btn-sm" style="<?= $ipTab === 'banns' ? 'background:var(--bg-surface);font-weight:600' : '' ?>">
-          🚫 IP-Banns (<?= count($ipBans) ?>)
+          🚫 <?= t('adm_ip_banns') ?> (<?= count($ipBans) ?>)
         </a>
       </div>
 
@@ -1499,7 +1499,7 @@
         <?php if (!empty($lookupIP)): ?>
           <div class="section-heading">
             👤 <?= t('adm_benutzer_mit_ip') ?> (<?= count($lookupUsers) ?>)
-            <a href="?action=iplookup&sub=banns&prefill=<?= e(urlencode($lookupIP)) ?>" class="btn btn-danger btn-sm">🚫 IP sperren</a>
+            <a href="?action=iplookup&sub=banns&prefill=<?= e(urlencode($lookupIP)) ?>" class="btn btn-danger btn-sm">🚫 <?= t('adm_ip_sperren') ?></a>
           </div>
           <div class="card" style="margin-bottom:16px">
             <?php if (empty($lookupUsers)): ?>
@@ -1553,7 +1553,7 @@
             </div>
             <div class="form-row">
               <label><?= t('admin_grund_optional') ?></label>
-              <input type="text" name="reason" placeholder="z.B. Spam, Trolling…">
+              <input type="text" name="reason" placeholder="<?= e(t('adm_grund_beispiel')) ?>">
             </div>
             <div class="form-row">
               <label><?= t('admin_laeuft_ab_am_optional') ?></label>
@@ -1582,9 +1582,9 @@
                 <td style="font-size:12px;color:var(--text-muted)"><?= e(format_date($b['created_at'])) ?></td>
                 <td style="font-size:12px">
                   <?php if ($b['expires_at']): ?>
-                    <?= $expired ? '<span style="color:var(--color-warning)">abgelaufen</span>' : e(format_date($b['expires_at'])) ?>
+                    <?= $expired ? '<span style="color:var(--color-warning)">' . e(t('adm_abgelaufen')) . '</span>' : e(format_date($b['expires_at'])) ?>
                   <?php else: ?>
-                    <span style="color:var(--color-danger)">permanent</span>
+                    <span style="color:var(--color-danger)"><?= t('adm_permanent') ?></span>
                   <?php endif; ?>
                 </td>
                 <td>
@@ -1612,7 +1612,7 @@
           </div>
           <div class="form-row">
             <label><?= t('admin_grund_optional') ?></label>
-            <input type="text" name="reason" placeholder="z.B. Spam, Trolling…">
+            <input type="text" name="reason" placeholder="<?= e(t('adm_grund_beispiel')) ?>">
           </div>
           <div class="form-row">
             <label><?= t('admin_laeuft_ab_am_optional') ?></label>
@@ -1641,9 +1641,9 @@
               <td style="font-size:12px;color:var(--text-muted)"><?= e(format_date($b['created_at'])) ?></td>
               <td style="font-size:12px">
                 <?php if ($b['expires_at']): ?>
-                  <?= $expired ? '<span style="color:var(--color-warning)">abgelaufen</span>' : e(format_date($b['expires_at'])) ?>
+                  <?= $expired ? '<span style="color:var(--color-warning)">' . e(t('adm_abgelaufen')) . '</span>' : e(format_date($b['expires_at'])) ?>
                 <?php else: ?>
-                  <span style="color:var(--color-danger)">permanent</span>
+                  <span style="color:var(--color-danger)"><?= t('adm_permanent') ?></span>
                 <?php endif; ?>
               </td>
               <td>
@@ -1847,13 +1847,13 @@
                 <a href="?action=resolve_report&id=<?= (int) $r['report_id'] ?>&status=reviewed&csrf=<?= e($csrfToken) ?>"
                    class="btn btn-ghost btn-sm">👁️ <?= t('adm_meldung_geprueft') ?></a>
                 <a href="?action=resolve_report&id=<?= (int) $r['report_id'] ?>&status=dismissed&csrf=<?= e($csrfToken) ?>"
-                   class="btn btn-ghost btn-sm">❌ Abweisen</a>
-                <a href="?action=warnings&user=<?= (int) $r['author_id'] ?>" class="btn btn-danger btn-sm">⚠️ Warnen</a>
+                   class="btn btn-ghost btn-sm">❌ <?= t('adm_abweisen') ?></a>
+                <a href="?action=warnings&user=<?= (int) $r['author_id'] ?>" class="btn btn-danger btn-sm">⚠️ <?= t('adm_warnen') ?></a>
                 <a href="<?= e(FORUM_URL) ?>/mod_action.php?action=delete_post&post=<?= (int) $r['post_id'] ?>&csrf=<?= e($csrfToken) ?>"
                    class="btn btn-danger btn-sm"
                    onclick="return confirm(<?= e(json_encode(t('adm_beitrag_loeschen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🗑️ <?= t('adm_beitrag_loeschen') ?></a>
                 <a href="?action=resolve_report&id=<?= (int) $r['report_id'] ?>&status=actioned&csrf=<?= e($csrfToken) ?>"
-                   class="btn btn-primary btn-sm">✅ Erledigt</a>
+                   class="btn btn-primary btn-sm">✅ <?= t('adm_erledigt') ?></a>
               </div>
             <?php else: ?>
               <div style="font-size:11px;color:var(--text-muted)">
@@ -1880,8 +1880,8 @@
               <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $warnUser['user_id'] ?>"><?= e($warnUser['username']) ?></a>
             </span>
             <span style="font-size:12px">
-              Aktuell: <strong style="color:<?= (int) $warnUser['warning_points'] >= $threshold ? 'var(--color-danger)' : 'var(--color-warning)' ?>">
-                <?= (int) $warnUser['warning_points'] ?> / <?= (int) $threshold ?> Pkt
+              <?= t('adm_aktuell_doppelpunkt') ?> <strong style="color:<?= (int) $warnUser['warning_points'] >= $threshold ? 'var(--color-danger)' : 'var(--color-warning)' ?>">
+                <?= t('adm_punkte_von', (int) $warnUser['warning_points'], (int) $threshold) ?>
               </strong>
             </span>
           </div>
@@ -1896,7 +1896,7 @@
                 </div>
                 <div class="form-row" style="margin:0">
                   <label><?= t('admin_grund') ?></label>
-                  <input type="text" name="reason" required placeholder="z.B. Spam, Beleidigung, Trolling…">
+                  <input type="text" name="reason" required placeholder="<?= e(t('adm_grund_beispiel_lang')) ?>">
                 </div>
               </div>
               <div class="form-row">
@@ -1928,11 +1928,11 @@
                     <td style="font-size:12px;color:var(--text-muted)"><?= e(format_date($w['created_at'])) ?></td>
                     <td style="font-size:11px">
                       <?php if (!$w['is_active']): ?>
-                        <span style="color:var(--color-success)">aufgehoben</span>
+                        <span style="color:var(--color-success)"><?= t('adm_aufgehoben') ?></span>
                       <?php elseif ($expired): ?>
-                        <span style="color:var(--text-faint)">abgelaufen</span>
+                        <span style="color:var(--text-faint)"><?= t('adm_abgelaufen') ?></span>
                       <?php else: ?>
-                        <span style="color:var(--color-warning)">aktiv</span>
+                        <span style="color:var(--color-warning)"><?= t('adm_aktiv') ?></span>
                       <?php endif; ?>
                     </td>
                     <td>
@@ -2014,12 +2014,12 @@
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div class="form-row" style="margin:0">
               <label><?= t('admin_slug_url') ?></label>
-              <input type="text" name="slug" required pattern="[a-z0-9]+" placeholder="z.B. tutorial">
+              <input type="text" name="slug" required pattern="[a-z0-9]+" placeholder="<?= e(t('adm_tag_slug_beispiel')) ?>">
               <div class="form-hint"><?= t('admin_nur_kleinbuchstaben_ziffern') ?></div>
             </div>
             <div class="form-row" style="margin:0">
               <label><?= t('admin_name') ?></label>
-              <input type="text" name="name" required placeholder="z.B. Tutorial">
+              <input type="text" name="name" required placeholder="<?= e(t('adm_tag_name_beispiel')) ?>">
             </div>
           </div>
           <div class="form-row">
@@ -2090,7 +2090,7 @@
           </div>
           <div class="form-row">
             <label><?= t('admin_interne_notiz_optional') ?></label>
-            <input type="text" name="note" maxlength="255" placeholder="z.B. „Schulfreund Markus"">
+            <input type="text" name="note" maxlength="255" placeholder="<?= e(t('adm_einladung_notiz_beispiel')) ?>"">
             <div class="form-hint"><?= t('admin_nur_fuer_dich_wird') ?></div>
           </div>
           <div class="form-row">
@@ -2147,12 +2147,12 @@
                       ✓ <?= t('adm_eingeloest_von') ?> <strong><?= e($inv['used_by_username'] ?? '?') ?></strong>
                       am <?= e(format_date($inv['used_at'])) ?>
                     <?php elseif ($status === 'expired'): ?>
-                      ⏰ Abgelaufen am <?= e(format_date($inv['expires_at'])) ?>
+                      ⏰ <?= t('adm_abgelaufen_am', e(format_date($inv['expires_at']))) ?>
                     <?php elseif ($status === 'revoked'): ?>
-                      🚫 Widerrufen am <?= e(format_date($inv['revoked_at'])) ?>
+                      🚫 <?= t('adm_widerrufen_am', e(format_date($inv['revoked_at']))) ?>
                     <?php endif; ?>
                     <?php if (!empty($inv['mail_sent_at'])): ?>
-                      <br>✉️ Mail versendet am <?= e(format_date($inv['mail_sent_at'])) ?>
+                      <br>✉️ <?= t('adm_mail_versendet_am', e(format_date($inv['mail_sent_at']))) ?>
                     <?php endif; ?>
                   </div>
                 </div>
@@ -2163,7 +2163,7 @@
                       <form method="post" action="?action=invitation_resend" style="margin:0">
                         <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                         <input type="hidden" name="invitation_id" value="<?= (int) $inv['invitation_id'] ?>">
-                        <button type="submit" class="btn btn-ghost btn-sm" title="Einladungs-Mail erneut versenden"><?= t('admin_resend') ?></button>
+                        <button type="submit" class="btn btn-ghost btn-sm" title="<?= e(t('adm_einladung_erneut')) ?>"><?= t('admin_resend') ?></button>
                       </form>
                     <?php endif; ?>
                     <form method="post" action="?action=invitation_revoke" style="margin:0"
@@ -2221,7 +2221,7 @@
                   <br>
                   <?= t('admin_ip') ?> <code style="font-size:11px"><?= e($u['registration_ip'] ?? '?') ?></code>
                   <br>
-                  🕒 Registriert: <?= e(format_date($u['registered_at'])) ?>
+                  🕒 <?= t('adm_registriert_am', e(format_date($u['registered_at']))) ?>
                 </div>
               </div>
 
@@ -2308,7 +2308,7 @@
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:10px">
               <div>
                 <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">
-                  <?= t('admin_in') ?> <strong><?= e($p['board_title']) ?></strong> · Thread:
+                  <?= t('admin_in') ?> <strong><?= e($p['board_title']) ?></strong> · <?= t('adm_thread_doppelpunkt') ?>
                   <a href="<?= e(FORUM_URL) ?>/thread.php?id=<?= (int) $p['thread_id'] ?>"><?= e($p['thread_title']) ?></a>
                   · <?= t('adm_vor_zeit', e(format_date($p['created_at']))) ?>
                 </div>
@@ -2384,7 +2384,7 @@
             <h3 style="margin-top:18px"><?= t('admin_logo') ?></h3>
             <div style="padding:14px;background:var(--bg-surface2);border-radius:var(--radius-sm);text-align:center;margin-bottom:10px">
               <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">
-                Aktuelle Vorschau
+                <?= t('adm_aktuelle_vorschau') ?>
                 <?php if (function_exists('is_default_logo') && is_default_logo()): ?>
                   <span style="color:var(--color-warning)"><?= t('admin_standard_logo') ?></span>
                 <?php endif; ?>
@@ -2457,9 +2457,9 @@
                 'theme_color_bg_surface2'   => [t('admin_tiefere_cards'),      t('admin_tabellen_header_code_bloecke')],
                 'theme_color_text_base'     => ['Schrift',            'Haupttext'],
                 'theme_color_text_muted'    => [t('admin_schrift_dezent'),     t('admin_sekundaerer_text')],
-                'theme_color_text_faint'    => [t('admin_schrift_verblasst'),  'Metadaten, Zeitangaben'],
-                'theme_color_border'        => ['Border',             'Linien, Trennungen'],
-                'theme_color_border_strong' => [t('admin_border_kraeftig'),     'Hover-Borders'],
+                'theme_color_text_faint'    => [t('admin_schrift_verblasst'),  t('adm_farbe_metadaten')],
+                'theme_color_border'        => ['Border', t('adm_farbe_linien')],
+                'theme_color_border_strong' => [t('admin_border_kraeftig'),     t('adm_farbe_hover_border')],
               ];
               foreach ($darkColors as $key => [$label, $hint]):
                 $val = $theme[$key] ?? '';
@@ -2528,15 +2528,15 @@
               <select name="theme_font_family" id="theme_font_family" data-live="theme_font_family">
                 <?php
                   $fontOpts = [
-                    'inter'     => '✨ Inter (Standard) – modern, gut lesbar',
-                    'system'    => '🖥️ System-Schrift (jeweilige OS-Schrift)',
-                    'roboto'    => '🤖 Roboto – Google-Schrift, klar',
+                    'inter'     => t('adm_font_inter'),
+                    'system'    => t('adm_font_system'),
+                    'roboto'    => t('adm_font_roboto'),
                     'open-sans' => t('admin_y_open_sans_freundlich'),
-                    'lato'      => '🎯 Lato – semi-rund',
-                    'nunito'    => '🍩 Nunito – verspielt, runde Formen',
-                    'poppins'   => '⭕ Poppins – geometrisch, modern',
+                    'lato'      => t('adm_font_lato'),
+                    'nunito'    => t('adm_font_nunito'),
+                    'poppins'   => t('adm_font_poppins'),
                     'chakra-petch' => t('admin_y_chakra_petch_technisch_kantig'),
-                    'custom'    => '🛠️ Custom – eigene Schriftart',
+                    'custom'    => t('adm_font_custom'),
                   ];
                   foreach ($fontOpts as $k => $lab):
                 ?>
@@ -2548,7 +2548,7 @@
             <div class="form-row" id="custom-font-row" style="<?= ($theme['theme_font_family'] ?? '') === 'custom' ? '' : 'display:none' ?>">
               <label><?= t('admin_custom_font_stack') ?></label>
               <input type="text" name="theme_font_custom" value="<?= e($theme['theme_font_custom'] ?? '') ?>"
-                     placeholder="z.B. 'Comic Sans MS', cursive" data-live="theme_font_custom">
+                     placeholder="<?= e(t('adm_schrift_beispiel')) ?>" data-live="theme_font_custom">
               <div class="form-hint"><?= t('admin_css_font_stack_komma') ?></div>
             </div>
 
@@ -2570,22 +2570,22 @@
             <h3><?= t('admin_rundungen') ?></h3>
             <div class="form-row">
               <select name="theme_radius_preset" data-live="theme_radius_preset">
-                <option value="sharp"  <?= ($theme['theme_radius_preset'] ?? '') === 'sharp'  ? 'selected' : '' ?>>⬜ Eckig – ganz scharf</option>
-                <option value="small"  <?= ($theme['theme_radius_preset'] ?? '') === 'small'  ? 'selected' : '' ?>>🔲 Klein – leichte Rundung</option>
-                <option value="medium" <?= ($theme['theme_radius_preset'] ?? '') === 'medium' ? 'selected' : '' ?>>🔘 Mittel (Standard)</option>
+                <option value="sharp"  <?= ($theme['theme_radius_preset'] ?? '') === 'sharp'  ? 'selected' : '' ?>>⬜ <?= t('adm_radius_eckig') ?></option>
+                <option value="small"  <?= ($theme['theme_radius_preset'] ?? '') === 'small'  ? 'selected' : '' ?>>🔲 <?= t('adm_radius_klein') ?></option>
+                <option value="medium" <?= ($theme['theme_radius_preset'] ?? '') === 'medium' ? 'selected' : '' ?>>🔘 <?= t('adm_radius_mittel') ?></option>
                 <option value="large"  <?= ($theme['theme_radius_preset'] ?? '') === 'large'  ? 'selected' : '' ?>>⭕ <?= t('adm_radius_gross') ?></option>
-                <option value="pill"   <?= ($theme['theme_radius_preset'] ?? '') === 'pill'   ? 'selected' : '' ?>>💊 Pille – extra-rund</option>
+                <option value="pill"   <?= ($theme['theme_radius_preset'] ?? '') === 'pill'   ? 'selected' : '' ?>>💊 <?= t('adm_radius_pille') ?></option>
               </select>
             </div>
 
             <h3 style="margin-top:18px"><?= t('admin_maximalbreite') ?></h3>
             <div class="form-row">
               <select name="theme_max_width" data-live="theme_max_width">
-                <option value="980"  <?= (int) ($theme['theme_max_width'] ?? 1200) === 980  ? 'selected' : '' ?>>980px – schmal</option>
+                <option value="980"  <?= (int) ($theme['theme_max_width'] ?? 1200) === 980  ? 'selected' : '' ?>>980px – <?= t('adm_breite_schmal') ?></option>
                 <option value="1100" <?= (int) ($theme['theme_max_width'] ?? 1200) === 1100 ? 'selected' : '' ?>>1100px</option>
-                <option value="1200" <?= (int) ($theme['theme_max_width'] ?? 1200) === 1200 ? 'selected' : '' ?>>1200px (Standard)</option>
+                <option value="1200" <?= (int) ($theme['theme_max_width'] ?? 1200) === 1200 ? 'selected' : '' ?>>1200px (<?= t('adm_standard') ?>)</option>
                 <option value="1400" <?= (int) ($theme['theme_max_width'] ?? 1200) === 1400 ? 'selected' : '' ?>>1400px</option>
-                <option value="1600" <?= (int) ($theme['theme_max_width'] ?? 1200) === 1600 ? 'selected' : '' ?>>1600px – breit</option>
+                <option value="1600" <?= (int) ($theme['theme_max_width'] ?? 1200) === 1600 ? 'selected' : '' ?>>1600px – <?= t('adm_breite_breit') ?></option>
               </select>
               <div class="form-hint"><?= t('admin_maximale_breite_des_forum') ?></div>
             </div>
@@ -2593,9 +2593,9 @@
             <h3 style="margin-top:18px"><?= t('admin_dichte') ?></h3>
             <div class="form-row">
               <select name="theme_density" data-live="theme_density">
-                <option value="compact"     <?= ($theme['theme_density'] ?? '') === 'compact'     ? 'selected' : '' ?>>🤏 Kompakt</option>
-                <option value="normal"      <?= ($theme['theme_density'] ?? '') === 'normal'      ? 'selected' : '' ?>>👌 Normal (Standard)</option>
-                <option value="comfortable" <?= ($theme['theme_density'] ?? '') === 'comfortable' ? 'selected' : '' ?>>🛋️ Komfortabel</option>
+                <option value="compact"     <?= ($theme['theme_density'] ?? '') === 'compact'     ? 'selected' : '' ?>>🤏 <?= t('adm_dichte_kompakt') ?></option>
+                <option value="normal"      <?= ($theme['theme_density'] ?? '') === 'normal'      ? 'selected' : '' ?>>👌 <?= t('adm_dichte_normal') ?></option>
+                <option value="comfortable" <?= ($theme['theme_density'] ?? '') === 'comfortable' ? 'selected' : '' ?>>🛋️ <?= t('adm_dichte_komfortabel') ?></option>
               </select>
               <div class="form-hint"><?= t('admin_beeinflusst_abstaende_und_padding') ?></div>
             </div>
@@ -2607,8 +2607,8 @@
             <div class="form-row">
               <select name="theme_header_style" data-live="theme_header_style">
                 <option value="default"  <?= ($theme['theme_header_style'] ?? 'default') === 'default'  ? 'selected' : '' ?>>📋 <?= t('adm_kopf_standard') ?></option>
-                <option value="centered" <?= ($theme['theme_header_style'] ?? '') === 'centered' ? 'selected' : '' ?>>⚖️ Zentriert (Logo mittig, klassisch)</option>
-                <option value="compact"  <?= ($theme['theme_header_style'] ?? '') === 'compact'  ? 'selected' : '' ?>>🤏 Kompakt (kleineres Banner)</option>
+                <option value="centered" <?= ($theme['theme_header_style'] ?? '') === 'centered' ? 'selected' : '' ?>>⚖️ <?= t('adm_kopf_zentriert') ?></option>
+                <option value="compact"  <?= ($theme['theme_header_style'] ?? '') === 'compact'  ? 'selected' : '' ?>>🤏 <?= t('adm_kopf_kompakt') ?></option>
                 <option value="inline"   <?= ($theme['theme_header_style'] ?? '') === 'inline'   ? 'selected' : '' ?>>📏 <?= t('adm_kopf_eine_zeile') ?></option>
               </select>
               <div class="form-hint"><?= t('admin_bestimmt_die_anordnung_im') ?></div>
@@ -2627,7 +2627,7 @@
             <div class="form-row">
               <label><?= t('admin_zusaetzliche_footer_links') ?></label>
               <input type="text" name="forum_footer_links" value="<?= e($branding['forum_footer_links']) ?>"
-                     placeholder="Discord|https://discord.gg/xyz, GitHub|https://github.com/...">
+                     placeholder="<?= e(t('adm_footerlinks_beispiel')) ?>">
               <div class="form-hint">
                 <?= t('admin_format') ?> <code><?= t('admin_label1_url1_label2_url2') ?></code> <?= t('adm_links_kommagetrennt') ?>
               </div>
@@ -2706,7 +2706,7 @@
             <div class="form-row">
               <label><?= t('admin_eigenes_css_optional') ?></label>
               <textarea name="forum_custom_css" rows="12" style="font-family:var(--font-mono);font-size:12px"
-                        placeholder=".thread-title-link { font-weight: 800 !important; }"><?= e($branding['forum_custom_css']) ?></textarea>
+                        placeholder="<?= e(t('adm_css_beispiel')) ?>"><?= e($branding['forum_custom_css']) ?></textarea>
               <div class="form-hint">
                 <?= t('admin_dieses_css_wird_direkt') ?> <code>&lt;head&gt;</code> <?= t('adm_jeder_seite') ?>
                 <strong><?= t('admin_vorsicht') ?></strong> <?= t('admin_falsches_css_kann_das') ?>
@@ -2792,18 +2792,18 @@
                       <?php elseif ($q['neuer']): ?>
                         <?= e((string) $q['hier']) ?> → <strong><?= e($q['dort']) ?></strong>
                       <?php else: ?>
-                        <?= e((string) $q['hier']) ?> · aktuell
+                        <?= e((string) $q['hier']) ?> · <?= t('adm_aktuell_kurz') ?>
                       <?php endif; ?>
                     </td>
                     <td style="width:130px;text-align:right">
                       <?php if (!$q['passt']): ?>
-                        <span style="font-size:12px;color:var(--color-warning)">braucht neueres Forumix</span>
+                        <span style="font-size:12px;color:var(--color-warning)"><?= t('adm_braucht_neueres') ?></span>
                       <?php elseif ($q['hier'] === null || $q['neuer']): ?>
                         <form method="post" action="<?= e(FORUM_URL) ?>/admin/?action=module_quelle" style="margin:0">
                           <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                           <input type="hidden" name="code" value="<?= e($q['code']) ?>">
                           <button type="submit" class="btn btn-primary" style="font-size:12px">
-                            <?= $q['hier'] === null ? 'Holen' : 'Aktualisieren' ?>
+                            <?= $q['hier'] === null ? t('adm_holen') : t('adm_aktualisieren') ?>
                           </button>
                         </form>
                       <?php endif; ?>
@@ -2875,12 +2875,12 @@
                   <a href="?action=module_toggle&code=<?= urlencode($m['code']) ?>&enable=0&csrf=<?= e($csrfToken) ?>"
                      class="btn btn-ghost btn-sm"
                      onclick="return confirm('Modul „<?= e($m['name']) ?>“ deaktivieren?')">
-                    ⏸️ Abschalten
+                    ⏸️ <?= t('adm_abschalten') ?>
                   </a>
                 <?php else: ?>
                   <a href="?action=module_toggle&code=<?= urlencode($m['code']) ?>&enable=1&csrf=<?= e($csrfToken) ?>"
                      class="btn btn-primary btn-sm">
-                    🟢 Aktivieren
+                    🟢 <?= t('adm_aktivieren') ?>
                   </a>
                   <?php /* Entfernen nur, wenn abgeschaltet — und nur fuer den
                           Inhaber, weil hier Dateien vom Server verschwinden. */ ?>
@@ -3001,7 +3001,7 @@
             <h3 style="margin-top:0"><?= t('admin_anhaenge') ?></h3>
             <div class="form-row">
               <label><?= t('admin_ordner_mit_den_dateien') ?></label>
-              <input type="text" name="dateien" placeholder="/pfad/zu/phpBB3/files">
+              <input type="text" name="dateien" placeholder="<?= e(t('adm_phpbb_pfad_beispiel')) ?>">
               <div class="form-hint">
                 <?= t('admin_phpbb_upload_pfad', '<em>' . e(t('admin_anhaenge_einstellungen')) . '</em>') ?>
                 <?= t('admin_upload_pfad_leer', '<code>files</code>') ?>
@@ -3028,7 +3028,7 @@
           <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
             <h3 style="margin:0"><?= t('admin_gefunden_in') ?> <code><?= e($o['db'] ?? '') ?></code></h3>
             <span style="font-size:13px;color:var(--text-muted)">
-              phpBB <?= $bs['fassung'] !== '' ? e($bs['fassung']) : 'unbekannter Fassung' ?>
+              phpBB <?= $bs['fassung'] !== '' ? e($bs['fassung']) : t('adm_unbekannte_fassung') ?>
             </span>
           </div>
         </div>
@@ -3087,7 +3087,7 @@
             <div>
               <strong style="color:var(--color-success);font-size:18px">
                 <?= number_format((int) $pw['uebernehmbar'], 0, ',', '.') ?></strong>
-              melden sich normal an
+              <?= t('adm_melden_sich_normal_an') ?>
             </div>
             <?php if ($pw['neu_noetig'] > 0): ?>
             <div>
@@ -3344,7 +3344,7 @@
           <code>update.json</code> <?= t('admin_pflicht_version_name') ?>
           <code>update.sql</code> <?= t('admin_optional_wird_ausgefuehrt') ?>
           <code>files/…</code> <?= t('admin_wird_ins_forum_kopiert') ?><br>
-          <strong><?= t('admin_erlaubte_typen') ?></strong> php, css, js, sql, html, tpl, json, md, txt, Bilder, Fonts.
+          <strong><?= t('admin_erlaubte_typen') ?></strong> <?= t('adm_erlaubte_typen_liste') ?>
           <?= t('admin_typen_abbruch', '<code>..</code>') ?>
         </div>
       </div>
@@ -3362,7 +3362,7 @@
         <div class="card" style="margin-bottom:18px;padding:18px 22px;border-left:3px solid <?= $ur['success'] ? '#16a34a' : 'var(--color-danger)' ?>">
           <h3 style="margin:0 0 4px">
             <?= $ur['success'] ? '✅' : '⚠️' ?>
-            Ergebnis: <?= e($ur['manifest']['name'] ?? 'Update') ?>
+            <?= t('adm_ergebnis', e($ur['manifest']['name'] ?? 'Update')) ?>
             <span style="font-weight:400;color:var(--text-muted);font-size:13px">v<?= e($ur['manifest']['version'] ?? '?') ?></span>
           </h3>
           <?php if (!$ur['success']): ?>
@@ -3427,7 +3427,7 @@
       <?php /* ── Verlauf (begrenzt + ausklappbar) ── */ ?>
       <?php if (!empty($executed)): ?>
       <div class="section-heading" style="margin-top:24px">
-        <?= t('admin_verlauf') ?> <span style="font-weight:400;color:var(--text-muted);font-size:13px">(<?= count($executed) ?> gesamt)</span>
+        <?= t('admin_verlauf') ?> <span style="font-weight:400;color:var(--text-muted);font-size:13px">(<?= t('adm_x_gesamt', count($executed)) ?>)</span>
       </div>
       <div class="card">
         <table class="forum-table">
@@ -3481,7 +3481,7 @@
       <div class="card" style="margin-top:18px;padding:16px 20px;background:var(--bg-surface2);border-left:3px solid var(--color-warning)">
         <strong style="font-size:13px"><?= t('admin_wichtige_hinweise') ?></strong>
         <ul style="margin:8px 0 0 18px;font-size:12px;color:var(--text-muted);line-height:1.8">
-          <li><?= t('admin_vor_jedem_update') ?> <strong><?= t('admin_datenbank_backup') ?></strong> anlegen</li>
+          <li><?= t('admin_vor_jedem_update') ?> <strong><?= t('admin_datenbank_backup') ?></strong> <?= t('adm_anlegen') ?></li>
           <li><?= t('admin_sql_im_paket_wird') ?></li>
           <li><?= t('admin_nur_der') ?> <strong><?= t('admin_owner') ?></strong> <?= t('adm_owner_kann_pakete') ?></li>
           <li><?= t('admin_bei_fehlern_backup_zurueckspielen') ?></li>
@@ -3523,7 +3523,7 @@
       ?>
 
       <div class="form-card">
-        <h2>⭐ Im Picker (<?= count($smileysInPicker) ?>)</h2>
+        <h2>⭐ <?= t('adm_im_picker') ?> (<?= count($smileysInPicker) ?>)</h2>
         <p class="form-hint">
           <?= t('admin_smileys_picker_hinweis') ?>
         </p>
@@ -3533,7 +3533,7 @@
             <form method="post" action="?action=update_smiley" class="smiley-row" data-id="<?= (int) $s['smiley_id'] ?>" draggable="true">
               <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
               <input type="hidden" name="smiley_id" value="<?= (int) $s['smiley_id'] ?>">
-              <div class="drag-handle" title="Zum Sortieren ziehen">≡</div>
+              <div class="drag-handle" title="<?= e(t('adm_zum_sortieren_ziehen')) ?>">≡</div>
               <input type="text" name="emoji" value="<?= e($s['emoji']) ?>" maxlength="10" class="smiley-emoji-input" required>
               <input type="text" name="code" value="<?= e($s['code']) ?>" maxlength="30" required class="smiley-code-input">
               <input type="text" name="description" value="<?= e($s['description']) ?>" maxlength="100" class="smiley-desc-input">
@@ -3542,7 +3542,7 @@
                 <span><?= t('admin_picker') ?></span>
               </label>
               <div class="smiley-actions">
-                <button type="submit" class="btn btn-sm" title="Speichern">💾</button>
+                <button type="submit" class="btn btn-sm" title="<?= e(t('adm_speichern')) ?>">💾</button>
                 <a href="?action=delete_smiley&id=<?= (int) $s['smiley_id'] ?>&csrf=<?= e($csrfToken) ?>" class="btn btn-sm btn-danger" onclick="return confirm(<?= e(json_encode(t('adm_smiley_loeschen_frage', $s['code']), JSON_UNESCAPED_UNICODE)) ?>)" title="<?= e(t('delete')) ?>">🗑️</a>
               </div>
             </form>
@@ -3551,7 +3551,7 @@
       </div>
 
       <div class="form-card">
-        <h2>📋 Weitere Smileys (<?= count($smileysOther) ?>)</h2>
+        <h2>📋 <?= t('adm_weitere_smileys') ?> (<?= count($smileysOther) ?>)</h2>
         <p class="form-hint">
           <?= t('admin_smileys_als_code', '<code>:beer:</code>') ?>
           <?= t('admin_alias_hinweis', '<em>' . e(t('admin_alias_von')) . '</em>') ?><?= '' ?>
@@ -3584,7 +3584,7 @@
                 <span><?= t('admin_picker') ?></span>
               </label>
               <div class="smiley-actions">
-                <button type="submit" class="btn btn-sm" title="Speichern">💾</button>
+                <button type="submit" class="btn btn-sm" title="<?= e(t('adm_speichern')) ?>">💾</button>
                 <a href="?action=delete_smiley&id=<?= (int) $s['smiley_id'] ?>&csrf=<?= e($csrfToken) ?>" class="btn btn-sm btn-danger" onclick="return confirm(<?= e(json_encode(t('adm_smiley_loeschen_frage', $s['code']), JSON_UNESCAPED_UNICODE)) ?>)" title="<?= e(t('delete')) ?>">🗑️</a>
               </div>
             </form>
@@ -3771,7 +3771,7 @@
             <label for="imprint_city"><?= t('admin_plz_und_ort') ?></label>
             <input type="text" id="imprint_city" name="imprint_city"
                    value="<?= e($imprint['city']) ?>"
-                   placeholder="z.B. 12345 Musterstadt"
+                   placeholder="<?= e(t('adm_plz_ort_beispiel')) ?>"
                    maxlength="200">
           </div>
 
@@ -3779,7 +3779,7 @@
             <label for="imprint_email"><?= t('admin_e_mail_adresse') ?></label>
             <input type="email" id="imprint_email" name="imprint_email"
                    value="<?= e($imprint['email']) ?>"
-                   placeholder="z.B. kontakt@example.com"
+                   placeholder="<?= e(t('adm_kontakt_mail_beispiel')) ?>"
                    maxlength="200">
           </div>
 
@@ -3790,7 +3790,7 @@
       <!-- ─── Page-Editor ─── -->
       <?php if (!empty($editingPage) && !empty($pageData)): ?>
         <div class="form-card">
-          <h2>✏️ Seite bearbeiten: <?= e($pageData['title']) ?></h2>
+          <h2>✏️ <?= t('adm_seite_bearbeiten', e($pageData['title'])) ?></h2>
           <p class="form-hint">
             <?= t('adm_bbcode_platzhalter_hinweis') ?>
             <?php $first = true; foreach ($placeholders as $ph => $desc): ?>
@@ -3859,7 +3859,7 @@
       <div class="form-card" style="background:var(--bg-surface2)">
         <h3 style="margin-bottom:8px">ℹ️ <?= t('adm_hinweise') ?></h3>
         <ul style="margin-left:18px;line-height:1.7;color:var(--text-muted);font-size:14px">
-          <li><?= t('admin_die_texte_sind_in') ?> <code>[b]</code>, <code>[i]</code>, <code>[u]</code>, <code>[h2]</code>, <code>[h3]</code>, <code>[list]</code>/<code>[*]</code>, <code>[hr]</code>, <code>[url=...]</code> usw.</li>
+          <li><?= t('admin_die_texte_sind_in') ?> <code>[b]</code>, <code>[i]</code>, <code>[u]</code>, <code>[h2]</code>, <code>[h3]</code>, <code>[list]</code>/<code>[*]</code>, <code>[hr]</code>, <code>[url=...]</code> <?= t('adm_usw') ?></li>
           <li><?= t('admin_platzhalter_ersetzt', '<code>{{name}}</code>') ?></li>
           <li><?= t('admin_bei_rechtlichen_unsicherheiten_bitte') ?> <strong><?= t('adm_kein_rechtsrat') ?></strong>.</li>
         </ul>
@@ -3994,11 +3994,11 @@
           <div class="form-card" style="margin-top:20px;background:var(--bg-surface2)">
             <h3 style="margin-bottom:8px"><?= t('admin_template_syntax_twig_aehnlich') ?></h3>
             <ul style="margin-left:18px;line-height:1.8;color:var(--text-muted);font-size:13px">
-              <li><code>{{ variable }}</code> – Variable ausgeben (HTML-escaped)</li>
+              <li><code>{{ variable }}</code> <?= t('adm_tpl_variable') ?></li>
               <li><code>{{ variable|raw }}</code> <?= t('adm_ohne_escape') ?></li>
-              <li><code>{% if expr %}…{% else %}…{% endif %}</code> – Bedingung</li>
-              <li><code>{% for item in list %}…{% endfor %}</code> – Schleife</li>
-              <li><code>{% include 'partial' %}</code> – Anderes Template einbinden</li>
+              <li><code>{% if expr %}…{% else %}…{% endif %}</code> <?= t('adm_tpl_bedingung') ?></li>
+              <li><code>{% for item in list %}…{% endfor %}</code> <?= t('adm_tpl_schleife') ?></li>
+              <li><code>{% include 'partial' %}</code> <?= t('adm_tpl_include') ?></li>
               <li><?= t('admin_filter') ?> <code>|upper</code>, <code>|lower</code>, <code>|trim</code>, <code>|length</code>, <code>|date('d.m.Y')</code>, <code>|truncate(50)</code>, <code>|nl2br</code>, <code>|default('-')</code></li>
               <li><?= t('admin_funktionen') ?> <code>url('/x')</code>, <code>asset('style.css')</code>, <code>t('key')</code>, <code>csrf_token()</code></li>
             </ul>
@@ -4120,7 +4120,7 @@
           <h3 style="margin-bottom:8px">ℹ️ <?= t('admin_wie_funktioniert_das') ?></h3>
           <ul style="margin-left:18px;line-height:1.7;color:var(--text-muted);font-size:14px">
             <li><?= t('admin_originale_im_code', '<code>views_new/*.tpl.html</code>') ?></li>
-            <li><?= t('admin_deine_anpassungen_werden_als') ?> <strong><?= t('admin_override_in_der_datenbank') ?></strong> gespeichert (Tabelle <code>template_overrides</code>)</li>
+            <li><?= t('admin_deine_anpassungen_werden_als') ?> <strong><?= t('admin_override_in_der_datenbank') ?></strong> <?= t('adm_override_gespeichert', '<code>template_overrides</code>') ?></li>
             <li><?= t('admin_bei_updates_bleiben_deine') ?></li>
             <li><?= t('admin_mit_auf_original_zuruecksetzen') ?></li>
             <li><?= t('admin_php_tags_verboten', '<strong>' . e(t('admin_nicht_erlaubt')) . '</strong>') ?></li>
@@ -4312,8 +4312,8 @@
                 </div>
                 <div class="backup-actions">
                   <a href="?action=download_backup&file=<?= e(urlencode($b['filename'])) ?>"
-                     class="btn btn-primary btn-sm" title="Herunterladen">
-                    ⬇️ Download
+                     class="btn btn-primary btn-sm" title="<?= e(t('adm_herunterladen')) ?>">
+                    ⬇️ <?= t('adm_download') ?>
                   </a>
                   <form method="post" action="?action=delete_backup" style="display:inline"
                         onsubmit="return confirm(<?= e(json_encode(t('adm_backup_loeschen_frage'), JSON_UNESCAPED_UNICODE)) ?>);">
@@ -4516,9 +4516,9 @@
       <div class="bot-log-tabs">
         <?php
           $tabs = [
-            'all'     => ['🌐 Alle',           $botStats['all']],
-            'search'  => ['🔍 Suchmaschinen',  $botStats['search']],
-            'ai'      => ['🤖 KI-Bots',        $botStats['ai']],
+            'all'     => [t('adm_bots_alle'),          $botStats['all']],
+            'search'  => [t('adm_bots_suchmaschinen'), $botStats['search']],
+            'ai'      => [t('adm_bots_ki'),            $botStats['ai']],
             'suspect' => [t('admin_y_verdaechtige'),   $botStats['suspect']],
           ];
           foreach ($tabs as $key => [$label, $count]):
@@ -4588,10 +4588,10 @@
                   <td>
                     <a href="?action=ipbans&prefill=<?= e(urlencode($b['ip'])) ?>"
                        class="btn btn-ghost btn-xs"
-                       title="IP sperren">🚫</a>
+                       title="<?= e(t('adm_ip_sperren')) ?>">🚫</a>
                     <a href="?action=iplookup&ip=<?= e(urlencode($b['ip'])) ?>"
                        class="btn btn-ghost btn-xs"
-                       title="Details">🔍</a>
+                       title="<?= e(t('adm_x_details')) ?>">🔍</a>
                   </td>
                 </tr>
                 <?php if (!empty($b['user_agent']) && $b['category'] === 'suspect'): ?>

@@ -23,4 +23,8 @@ return [
     // ── Nachgezogen ──
     'shoutbox_einloggen' => 'Einloggen',
     'shoutbox_zum_nutzen' => ', um die Shoutbox zu nutzen',
+
+    // ── Nachgezogen ──
+    'shoutbox_ein_ausklappen' => 'Ein-/Ausklappen',
+    'shoutbox_posten' => 'Posten',
 ];

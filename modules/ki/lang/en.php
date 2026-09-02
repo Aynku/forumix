@@ -113,4 +113,11 @@ return [
 
     'ki_schluessel_hinterlegt' => '•••••••• (stored — leave empty to keep it)',
     'ki_kein_schluessel' => 'none stored yet',
+
+    // ── Nachgezogen ──
+    'ki_schreibhilfe' => 'Writing assistant',
+    'ki_config_auf' => 'and add:',
+    'ki_wie_oben' => 'as above',
+    'ki_vorsortierung_ein' => 'Turn on pre-sorting',
+    'ki_benutzername' => 'Username',
 ];

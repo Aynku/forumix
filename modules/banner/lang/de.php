@@ -31,4 +31,7 @@ return [
     'banner_hinweis_schliessen' => 'Hinweis schließen',
 
     'banner_platzhalter' => 'Am Samstag ab 20 Uhr ist das Forum kurz nicht erreichbar.',
+
+    // ── Nachgezogen ──
+    'banner_band_anzeigen' => 'Band anzeigen',
 ];

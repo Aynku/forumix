@@ -37,4 +37,14 @@ return [
     'faq_frage_loeschen_frage' => 'Really delete this question?',
 
     'faq_antwort_platzhalter' => 'The answer goes here…',
+
+    // ── Nachgezogen ──
+    'faq_normale_ansicht' => 'Normal view',
+    'faq_verwalten' => 'Manage',
+    'faq_unsichtbar' => 'hidden',
+    'faq_bearbeiten' => 'Edit',
+    'faq_hoch' => 'Up',
+    'faq_runter' => 'Down',
+    'faq_frage_beispiel' => 'How does ... work?',
+    'faq_kategorie_beispiel' => 'e.g. Payment',
 ];

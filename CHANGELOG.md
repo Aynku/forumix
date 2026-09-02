@@ -8,6 +8,51 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.10.4 (2026-09-02)
+
+### Der Rest des Adminbereichs
+
+Nach 1.10.3 standen weiterhin rund 200 Stellen deutsch da — Kästchen-Beschriftungen
+in den Registrierungs-Einstellungen, Tooltips im Editor, die Schriftarten- und
+Farbliste im Design, Knöpfe in der Moderation und in mehreren Modulen.
+
+Der Grund lag in meiner Prüfung, nicht im Code: Sie erkannte Deutsch an einer
+Wortliste. „Registrierungen erlauben" enthält kein Wort daraus und keinen
+Umlaut — und rutschte deshalb durch. Eine Wortliste findet immer nur, woran
+man vorher gedacht hat.
+
+### Die Prüfung erkennt Deutsch jetzt an der Sprache selbst
+
+Drei Regeln statt einer Liste:
+
+1. **Text zwischen den Marken** wird an Umlauten, an häufigen Funktionswörtern
+   und an **deutscher Wortbildung** geprüft — `-ung`, `-keit`, `-lich`, `-ieren`
+   und so weiter. „Registrierungen" fällt über `-ungen` auf, ohne dass das Wort
+   jemand eintragen musste.
+2. **Sichtbare Attribute** (`title`, `placeholder`, `aria-label`, `alt`,
+   `data-label`) müssen **immer** aus PHP kommen. Dort steht nie Code und nie
+   ein Markenname, sondern immer eine Beschriftung — deshalb darf die Regel
+   hart sein und findet auch Einzelwörter wie „Speichern", an denen jede
+   Spracherkennung scheitert.
+3. **Feste Zeichenketten** werden geprüft, aber nur in `views/` und `admin/`.
+   Dort steht ausschließlich Anzeige. In den Modulen liegt daneben der
+   Systemtext fürs Sprachmodell, der deutsch bleiben muss.
+
+Kommentare und Ausgaben in die Entwicklerkonsole zählen nicht: die stehen nie
+auf der Seite.
+
+### Übersetzt
+
+- **Registrierungs-Einstellungen** — die Kästchen und ihre Erklärungen
+- **Design** — Schriftarten, Farbrollen, Ecken, Breite, Dichte, Kopfzeile
+- **Editor** — sämtliche Knopf-Tooltips
+- **Moderation** — Navigation, Freigaben, Papierkorb
+- **Adminbereich** — Benutzeraktionen, IP-Sperren, Warnungen, Einladungen,
+  Bot-Protokoll, Update-Verlauf, Vorlagen-Hilfe, Backups
+- **Module** — Downloads, FAQ, KI-Hilfe, Shoutbox, Kontakt, Banner, Termine
+
+---
+
 ## v1.10.3 (2026-09-02)
 
 ### Der Adminbereich spricht jetzt auch Englisch

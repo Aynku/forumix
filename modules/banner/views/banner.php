@@ -9,7 +9,7 @@
   <div class="form-row">
     <label>
       <input type="checkbox" name="aktiv" value="1" <?= $aktiv ? 'checked' : '' ?>>
-      Band anzeigen
+      <?= t('banner_band_anzeigen') ?>
     </label>
     <div class="form-hint"><?= t('banner_ohne_haken_bleibt_es') ?></div>
   </div>

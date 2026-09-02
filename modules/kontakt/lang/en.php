@@ -35,4 +35,7 @@ return [
     // ── Nachgezogen ──
     'kontakt_hinweis_adresse' => 'Enter a contact email under %s, or set a sender address under %s.',
     'kontakt_nicht_zugestellt' => 'not delivered by email',
+
+    // ── Nachgezogen ──
+    'kontakt_noch_eine' => 'Write another message',
 ];

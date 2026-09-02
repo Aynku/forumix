@@ -1040,7 +1040,7 @@ if ($action === 'ack_template_update' && $_SERVER['REQUEST_METHOD'] === 'POST') 
     if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $name = trim($_POST['name'] ?? '');
     if ($name && acknowledge_template_override_update($name)) {
-        flash('Update-Hinweis ausgeblendet. Dein Override bleibt aktiv.', 'success');
+        flash(t('adm_hinweis_ausgeblendet'), 'success');
     } else {
         flash(t('adm_aktion_fehlgeschlagen'), 'error');
     }
@@ -1506,7 +1506,7 @@ if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', '
                 // Owner ist über Admin → is_admin wird zurückgesetzt (Owner braucht es nicht extra)
                 db_execute('UPDATE users SET is_owner = 1, is_admin = 0, is_mod = 0, is_banned = 0 WHERE user_id = ?', [$targetId]);
                 db_execute("UPDATE users SET `rank` = 'Inhaber' WHERE user_id = ?", [$targetId]);
-                flash($target['username'] . ' ist jetzt Inhaber:in.', 'success');
+                flash(t('adm_ist_jetzt_inhaber', $target['username']), 'success');
                 db_execute('INSERT INTO mod_log (mod_id, action, target_type, target_id) VALUES (?, ?, ?, ?)',
                     [$cu['user_id'], 'make_owner', 'user', $targetId]);
                 break;
@@ -1522,7 +1522,7 @@ if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', '
             case 'make_admin':
                 db_execute('UPDATE users SET is_admin = 1, is_mod = 0, is_banned = 0 WHERE user_id = ?', [$targetId]);
                 db_execute("UPDATE users SET `rank` = 'Administrator' WHERE user_id = ?", [$targetId]);
-                flash($target['username'] . ' ist jetzt Administrator.', 'success');
+                flash(t('adm_ist_jetzt_admin', $target['username']), 'success');
                 db_execute('INSERT INTO mod_log (mod_id, action, target_type, target_id) VALUES (?, ?, ?, ?)',
                     [$cu['user_id'], 'make_admin', 'user', $targetId]);
                 break;
@@ -1538,7 +1538,7 @@ if (in_array($action, ['make_admin', 'remove_admin', 'make_mod', 'remove_mod', '
 
             case 'make_mod':
                 db_execute('UPDATE users SET is_mod = 1, is_admin = 0, is_banned = 0 WHERE user_id = ?', [$targetId]);
-                flash($target['username'] . ' ist jetzt Moderator.', 'success');
+                flash(t('adm_ist_jetzt_mod', $target['username']), 'success');
                 db_execute('INSERT INTO mod_log (mod_id, action, target_type, target_id) VALUES (?, ?, ?, ?)',
                     [$cu['user_id'], 'make_mod', 'user', $targetId]);
                 break;

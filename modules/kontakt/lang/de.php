@@ -35,4 +35,7 @@ return [
     // ── Nachgezogen ──
     'kontakt_hinweis_adresse' => 'Trage unter %s eine Impressum-E-Mail ein, oder hinterlege unter %s eine Absenderadresse.',
     'kontakt_nicht_zugestellt' => 'nicht per Mail zugestellt',
+
+    // ── Nachgezogen ──
+    'kontakt_noch_eine' => 'Noch eine Nachricht schreiben',
 ];

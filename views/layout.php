@@ -365,7 +365,7 @@ $forumName = forum_name();
       <?php endif; ?>
       &bull; <a href="<?= e(FORUM_URL) ?>/privacy.php"><?= t('privacy') ?></a>
       &bull; <a href="<?= e(FORUM_URL) ?>/terms.php"><?= t('terms') ?></a>
-      &bull; <a href="#" onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'?'}));return false;" title="Tastatur-Shortcuts anzeigen">Shortcuts</a>
+      &bull; <a href="#" onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'?'}));return false;" title="<?= e(t('layout_shortcuts_titel')) ?>">Shortcuts</a>
       <?php if ($footerLinks):
         // Format: "Label1|URL1, Label2|URL2"
         $pairs = array_filter(array_map('trim', explode(',', $footerLinks)));
@@ -381,7 +381,7 @@ $forumName = forum_name();
 
     <?php /* ── Zeile 3: Version ── */ ?>
     <p style="text-align:center;font-size:11px;color:var(--text-faint)">
-      Version <?= e(forum_version()) ?>
+      <?= t('layout_version', e(forum_version())) ?>
     </p>
 
     <?php

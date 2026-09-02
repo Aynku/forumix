@@ -33,4 +33,9 @@ return [
     'downloads_modul_beschreibung' => 'A file store with its own page. Admins upload files and group them into categories, everyone else downloads. Counts the downloads.',
 
     'downloads_loeschen_frage' => 'Delete this file?',
+
+    // ── Nachgezogen ──
+    'downloads_titel_seite' => 'Downloads',
+    'downloads_kategorie_beispiel' => 'e.g. Guides',
+    'downloads_typen' => 'Images, PDF, TXT, ZIP, RAR.',
 ];

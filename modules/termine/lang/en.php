@@ -38,4 +38,8 @@ return [
 
     // ── Nachgezogen ──
     'termine_aendern' => 'Edit',
+
+    // ── Nachgezogen ──
+    'termine_alle_ansehen' => 'See all',
+    'termine_bis' => 'to',
 ];

@@ -8,8 +8,8 @@ if (!isset($csrfToken))   $csrfToken   = $_SESSION['csrf_token'] ?? '';
 ?>
 <div class="shoutbox-card card" id="shoutbox-card">
   <div class="shoutbox-header">
-    <span class="shoutbox-title">Shoutbox</span>
-    <button type="button" class="shoutbox-toggle" id="shoutbox-toggle" title="Ein-/Ausklappen">▾</button>
+    <span class="shoutbox-title"><?= e(t('shoutbox_modul_name')) ?></span>
+    <button type="button" class="shoutbox-toggle" id="shoutbox-toggle" title="<?= e(t('shoutbox_ein_ausklappen')) ?>">▾</button>
   </div>
   <div class="shoutbox-body" id="shoutbox-body">
     <div class="shoutbox-list" id="shoutbox-list">
@@ -21,7 +21,7 @@ if (!isset($csrfToken))   $csrfToken   = $_SESSION['csrf_token'] ?? '';
         <input type="text" name="message" id="shoutbox-input"
                placeholder="<?= e(t('shoutbox_platzhalter')) ?>"
                maxlength="500" required>
-        <button type="submit" class="btn btn-primary btn-sm">Posten</button>
+        <button type="submit" class="btn btn-primary btn-sm"><?= e(t('shoutbox_posten')) ?></button>
       </form>
     <?php else: ?>
       <div class="shoutbox-login-hint">

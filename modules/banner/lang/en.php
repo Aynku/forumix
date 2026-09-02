@@ -31,4 +31,7 @@ return [
     'banner_hinweis_schliessen' => 'Dismiss notice',
 
     'banner_platzhalter' => 'On Saturday from 8 pm the forum will be briefly unavailable.',
+
+    // ── Nachgezogen ──
+    'banner_band_anzeigen' => 'Show the banner',
 ];

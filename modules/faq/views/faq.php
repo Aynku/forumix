@@ -7,9 +7,9 @@
   <span><?= t('faq_haeufig_gestellte_fragen') ?></span>
   <?php if ($canAdmin): ?>
     <?php if ($adminMode): ?>
-      <a href="<?= e(FORUM_URL) ?>/modules/faq/faq.php" class="btn btn-ghost btn-sm">👁️ Normale Ansicht</a>
+      <a href="<?= e(FORUM_URL) ?>/modules/faq/faq.php" class="btn btn-ghost btn-sm">👁️ <?= t('faq_normale_ansicht') ?></a>
     <?php else: ?>
-      <a href="<?= e(FORUM_URL) ?>/modules/faq/faq.php?admin=1" class="btn btn-primary btn-sm">⚙️ Verwalten</a>
+      <a href="<?= e(FORUM_URL) ?>/modules/faq/faq.php?admin=1" class="btn btn-primary btn-sm">⚙️ <?= t('faq_verwalten') ?></a>
     <?php endif; ?>
   <?php endif; ?>
 </div>
@@ -60,7 +60,7 @@
               <summary class="faq-question">
                 <span class="faq-q-text"><?= e($item['question']) ?></span>
                 <?php if ($adminMode && empty($item['visible'])): ?>
-                  <span class="faq-status-badge">unsichtbar</span>
+                  <span class="faq-status-badge"><?= t('faq_unsichtbar') ?></span>
                 <?php endif; ?>
                 <span class="faq-chevron">▾</span>
               </summary>
@@ -69,7 +69,7 @@
 
                 <?php if ($adminMode): ?>
                   <details class="faq-admin-edit">
-                    <summary>✏️ Bearbeiten</summary>
+                    <summary>✏️ <?= t('faq_bearbeiten') ?></summary>
                     <form method="post" class="faq-edit-form">
                       <input type="hidden" name="csrf" value="<?= e($csrfToken) ?>">
                       <input type="hidden" name="faq_act" value="edit_item">
@@ -95,7 +95,7 @@
                         <span><?= t('faq_fuer_alle_sichtbar') ?></span>
                       </label>
                       <div class="faq-edit-actions">
-                        <button type="submit" class="btn btn-primary btn-sm">💾 Speichern</button>
+                        <button type="submit" class="btn btn-primary btn-sm">💾 <?= t('adm_speichern') ?></button>
                       </div>
                     </form>
 
@@ -106,7 +106,7 @@
                           <input type="hidden" name="faq_act" value="move_item">
                           <input type="hidden" name="faq_id" value="<?= (int) $item['faq_id'] ?>">
                           <input type="hidden" name="dir" value="up">
-                          <button class="btn btn-ghost btn-sm">↑ Hoch</button>
+                          <button class="btn btn-ghost btn-sm">↑ <?= t('faq_hoch') ?></button>
                         </form>
                       <?php endif; ?>
                       <?php if ($idx < $totalItems): ?>
@@ -115,7 +115,7 @@
                           <input type="hidden" name="faq_act" value="move_item">
                           <input type="hidden" name="faq_id" value="<?= (int) $item['faq_id'] ?>">
                           <input type="hidden" name="dir" value="down">
-                          <button class="btn btn-ghost btn-sm">↓ Runter</button>
+                          <button class="btn btn-ghost btn-sm">↓ <?= t('faq_runter') ?></button>
                         </form>
                       <?php endif; ?>
                       <form method="post" style="display:inline;margin-left:auto"
@@ -151,7 +151,7 @@
           </select>
         </label>
         <label><?= t('faq_frage') ?>
-          <input type="text" name="question" required placeholder="Wie funktioniert ...?">
+          <input type="text" name="question" required placeholder="<?= e(t('faq_frage_beispiel')) ?>">
         </label>
         <label><?= t('faq_antwort_bbcode_erlaubt') ?>
           <textarea name="answer" rows="5" required placeholder="<?= e(t('faq_antwort_platzhalter')) ?>"></textarea>
@@ -169,7 +169,7 @@
           <input type="text" name="icon" value="📂" maxlength="4">
         </label>
         <label style="flex:1;min-width:160px"><?= t('faq_name') ?>
-          <input type="text" name="title" required placeholder="z.B. Zahlung">
+          <input type="text" name="title" required placeholder="<?= e(t('faq_kategorie_beispiel')) ?>">
         </label>
         <button type="submit" class="btn btn-primary btn-sm"><?= t('faq_anlegen') ?></button>
       </form>

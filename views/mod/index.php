@@ -13,9 +13,9 @@
   <span><?= t('mod_moderator_bereich') ?></span>
   <span style="font-size:12px;color:var(--text-muted);font-weight:400">
     <?php if ($isGlobalMod): ?>
-      Globaler Moderator
+      <?= t('mod_globaler_moderator') ?>
     <?php else: ?>
-      Mod in <?= count($modBoards) ?> Forum<?= count($modBoards) === 1 ? '' : 'en' ?>
+      <?= tn('mod_in_x_foren', count($modBoards)) ?>
     <?php endif; ?>
   </span>
 </div>
@@ -23,10 +23,10 @@
 <?php /* ── Mod-Navi ── */ ?>
 <div class="mod-nav">
   <a href="?action=dashboard" class="<?= $action === 'dashboard' ? 'active' : '' ?>">📊 <?= t('mod_uebersicht') ?></a>
-  <a href="?action=approval"  class="<?= $action === 'approval' ? 'active' : '' ?>">🚦 Freigabe</a>
+  <a href="?action=approval"  class="<?= $action === 'approval' ? 'active' : '' ?>">🚦 <?= t('adm_freigabe') ?></a>
   <a href="?action=reports"   class="<?= $action === 'reports' ? 'active' : '' ?>"><?= t('admin_meldungen') ?></a>
   <a href="?action=papierkorb" class="<?= $action === 'papierkorb' ? 'active' : '' ?>"><?= t('mod_papierkorb') ?></a>
-  <a href="?action=modlog"    class="<?= $action === 'modlog' ? 'active' : '' ?>">📜 Meine Aktionen</a>
+  <a href="?action=modlog"    class="<?= $action === 'modlog' ? 'active' : '' ?>">📜 <?= t('mod_meine_aktionen') ?></a>
 </div>
 
 <?php /* ════════════ DASHBOARD ════════════ */ ?>
@@ -85,7 +85,7 @@
               <div class="dash-list-title"><?= e($log['action'] ?? '–') ?></div>
               <div class="dash-list-snippet">
                 <?php if (!empty($log['target_username'])): ?>
-                  Ziel: <?= e($log['target_username']) ?> ·
+                  <?= t('mod_ziel', e($log['target_username'])) ?> ·
                 <?php endif; ?>
                 <?= e(format_date($log['created_at'])) ?>
               </div>
@@ -116,20 +116,20 @@
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:10px">
           <div>
             <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">
-              <?= t('mod_in') ?> <strong><?= e($t['board_title']) ?></strong> · vor <?= e(format_date($t['created_at'])) ?>
+              <?= t('mod_in') ?> <strong><?= e($t['board_title']) ?></strong> · <?= t('adm_vor_zeit', e(format_date($t['created_at']))) ?>
             </div>
             <h3 style="font-size:16px;margin-bottom:6px"><?= e($t['title']) ?></h3>
             <div style="font-size:12px;color:var(--text-muted)">
-              Von <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $t['user_id'] ?>"><strong><?= e($t['username']) ?></strong></a>
+              <?= t('adm_beitrag_von') ?> <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $t['user_id'] ?>"><strong><?= e($t['username']) ?></strong></a>
             </div>
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0">
             <a href="?action=approve_thread&id=<?= (int) $t['thread_id'] ?>&csrf=<?= e($csrfToken) ?>"
                class="btn btn-primary btn-sm"
-               onclick="return confirm(<?= e(json_encode(t('mod_thema_freigeben_frage'), JSON_UNESCAPED_UNICODE)) ?>)">✅ Freigeben</a>
+               onclick="return confirm(<?= e(json_encode(t('mod_thema_freigeben_frage'), JSON_UNESCAPED_UNICODE)) ?>)">✅ <?= t('adm_freigeben') ?></a>
             <a href="?action=reject_thread&id=<?= (int) $t['thread_id'] ?>&csrf=<?= e($csrfToken) ?>&reason=<?= urlencode(t('mod_verstoss_gegen_forenregeln')) ?>"
                class="btn btn-danger btn-sm"
-               onclick="return confirm(<?= e(json_encode(t('mod_thema_ablehnen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🗑️ Ablehnen</a>
+               onclick="return confirm(<?= e(json_encode(t('mod_thema_ablehnen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🗑️ <?= t('adm_ablehnen') ?></a>
           </div>
         </div>
         <?php if (!empty($t['content'])): ?>
@@ -143,27 +143,27 @@
   <?php endif; ?>
 
   <?php if (!empty($pendingPosts)): ?>
-    <div class="section-heading" style="margin-top:24px">💬 Neue Antworten (<?= count($pendingPosts) ?>)</div>
+    <div class="section-heading" style="margin-top:24px"><?= t('adm_neue_antworten') ?> (<?= count($pendingPosts) ?>)</div>
     <?php foreach ($pendingPosts as $p): ?>
       <div class="card" style="margin-bottom:12px;padding:16px 20px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:10px">
           <div>
             <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">
-              <?= t('mod_in') ?> <strong><?= e($p['board_title']) ?></strong> · Thread:
+              <?= t('mod_in') ?> <strong><?= e($p['board_title']) ?></strong> · <?= t('adm_thread_doppelpunkt') ?>
               <a href="<?= e(FORUM_URL) ?>/thread.php?id=<?= (int) $p['thread_id'] ?>"><?= e($p['thread_title']) ?></a>
-              · vor <?= e(format_date($p['created_at'])) ?>
+              · <?= t('adm_vor_zeit', e(format_date($p['created_at']))) ?>
             </div>
             <div style="font-size:12px;color:var(--text-muted)">
-              Von <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $p['user_id'] ?>"><strong><?= e($p['username']) ?></strong></a>
+              <?= t('adm_beitrag_von') ?> <a href="<?= e(FORUM_URL) ?>/profile.php?id=<?= (int) $p['user_id'] ?>"><strong><?= e($p['username']) ?></strong></a>
             </div>
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0">
             <a href="?action=approve_post&id=<?= (int) $p['post_id'] ?>&csrf=<?= e($csrfToken) ?>"
                class="btn btn-primary btn-sm"
-               onclick="return confirm(<?= e(json_encode(t('mod_beitrag_freigeben_frage'), JSON_UNESCAPED_UNICODE)) ?>)">✅ Freigeben</a>
+               onclick="return confirm(<?= e(json_encode(t('mod_beitrag_freigeben_frage'), JSON_UNESCAPED_UNICODE)) ?>)">✅ <?= t('adm_freigeben') ?></a>
             <a href="?action=reject_post&id=<?= (int) $p['post_id'] ?>&csrf=<?= e($csrfToken) ?>&reason=<?= urlencode(t('mod_verstoss_gegen_forenregeln')) ?>"
                class="btn btn-danger btn-sm"
-               onclick="return confirm(<?= e(json_encode(t('mod_beitrag_ablehnen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🗑️ Ablehnen</a>
+               onclick="return confirm(<?= e(json_encode(t('mod_beitrag_ablehnen_frage'), JSON_UNESCAPED_UNICODE)) ?>)">🗑️ <?= t('adm_ablehnen') ?></a>
           </div>
         </div>
         <div style="padding:12px 14px;background:var(--bg-surface2);border-radius:var(--radius-sm);font-size:13px;max-height:160px;overflow-y:auto">
@@ -208,7 +208,7 @@
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
           <?php if (!empty($r['thread_id'])): ?>
             <a href="<?= e(FORUM_URL) ?>/thread.php?id=<?= (int) $r['thread_id'] ?>#post<?= (int) $r['post_id'] ?>"
-               class="btn btn-ghost btn-sm" target="_blank">👁️ Im Thread ansehen</a>
+               class="btn btn-ghost btn-sm" target="_blank">👁️ <?= t('mod_im_thread_ansehen') ?></a>
           <?php endif; ?>
 
           <form method="post" action="?action=report_action" style="display:inline-flex;gap:6px">
@@ -249,7 +249,7 @@
                 </td>
                 <td style="color:var(--text-muted);font-size:12px;white-space:nowrap">
                   <?= e((string) $t['deleted_at']) ?>
-                  <?php if ($t['geloescht_von']): ?><br>durch <?= e(zeigename($t['geloescht_von'])) ?><?php endif; ?>
+                  <?php if ($t['geloescht_von']): ?><br><?= t('mod_durch', e(zeigename($t['geloescht_von']))) ?><?php endif; ?>
                 </td>
                 <td style="text-align:right;white-space:nowrap">
                   <a class="btn btn-ghost btn-xs"
@@ -288,7 +288,7 @@
                 </td>
                 <td style="color:var(--text-muted);font-size:12px;white-space:nowrap">
                   <?= e((string) $p['deleted_at']) ?>
-                  <?php if ($p['geloescht_von']): ?><br>durch <?= e(zeigename($p['geloescht_von'])) ?><?php endif; ?>
+                  <?php if ($p['geloescht_von']): ?><br><?= t('mod_durch', e(zeigename($p['geloescht_von']))) ?><?php endif; ?>
                 </td>
                 <td style="text-align:right;white-space:nowrap">
                   <a class="btn btn-ghost btn-xs"

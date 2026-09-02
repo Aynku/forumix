@@ -113,4 +113,11 @@ return [
 
     'ki_schluessel_hinterlegt' => '•••••••• (hinterlegt — leer lassen, um ihn zu behalten)',
     'ki_kein_schluessel' => 'noch keiner hinterlegt',
+
+    // ── Nachgezogen ──
+    'ki_schreibhilfe' => 'Schreibhilfe',
+    'ki_config_auf' => 'auf:',
+    'ki_wie_oben' => 'wie oben',
+    'ki_vorsortierung_ein' => 'Vorsortierung einschalten',
+    'ki_benutzername' => 'Benutzername',
 ];

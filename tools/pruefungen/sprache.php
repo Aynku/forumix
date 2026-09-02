@@ -38,6 +38,42 @@ $form = function (array $eintrag, int $anzahl): string {
     return vsprintf($str, [$anzahl]);
 };
 
+/**
+ * Sieht ein Text nach Deutsch aus?
+ *
+ * Drei Anzeichen, eines reicht. Eine Faustregel, kein Beweis: "Speichern"
+ * traegt keines davon. Fuer Beschriftungen faengt das die Attribut-Regel
+ * weiter unten ab; fuer ganze Saetze reicht es.
+ */
+if (!function_exists('sieht_deutsch_aus')) {
+    function sieht_deutsch_aus(string $text): bool {
+        // 1. Umlaute und Eszett gibt es im Englischen nicht.
+        if (preg_match('/[ÄÖÜäöüß]/u', $text)) { return true; }
+
+        // 2. Haeufige deutsche Funktionswoerter.
+        $woerter = 'der|die|das|den|dem|des|ein|eine|einen|einem|einer|eines|und|oder|aber|'
+                 . 'nicht|noch|kein|keine|keinen|dein|deine|mein|meine|sein|ihre|von|vom|zum|'
+                 . 'zur|auf|aus|mit|nach|vor|bei|beim|durch|ohne|über|unter|gegen|seit|als|'
+                 . 'wie|wenn|dann|sonst|auch|nur|alle|alles|jede|jeder|jedes|wird|wurde|werden|'
+                 . 'sind|ist|war|hat|haben|kann|können|muss|müssen|darf|dürfen|soll|sollen|'
+                 . 'lässt|lassen|gibt|geben|steht|stehen|bleibt|bleiben|dabei|damit|dazu|daran|'
+                 . 'davon|dafür|hier|dort|diese|dieser|dieses|man|sich|schon|immer|wieder';
+
+        if (preg_match('/(?:^|[^\p{L}])(?:' . $woerter . ')(?:[^\p{L}]|$)/ui', $text)) { return true; }
+
+        /*
+         * 3. Deutsche Wortbildung. Genau hier faellt "Registrierungen
+         *    erlauben" hinein — an -ungen. Das war die Stelle, an der die
+         *    alte Wortliste versagt hat: Sie kannte weder "Registrierungen"
+         *    noch "erlauben", und beide tragen keinen Umlaut.
+         */
+        return (bool) preg_match(
+            '/\p{L}{3,}(ungen|ung|heit|keit|schaft|nisse|lich|isch|bar|sam|los|ieren|ierung)(?:[^\p{L}]|$)/u',
+            $text
+        );
+    }
+}
+
 return [
     'Einzahl und Mehrzahl kommen aus derselben Angabe' => function () use ($form) {
         $eintrag = ['%d Beitrag', '%d Beiträge'];
@@ -353,36 +389,39 @@ return [
         /*
          * Die Pruefung darueber sieht nur views_new/ an. Genau das war die
          * Luecke: Der Adminbereich ist keine Vorlage, sondern PHP mit HTML
-         * dazwischen — und dort standen nach 1.10.2 noch rund 160 deutsche
-         * Texte. Aufgefallen ist es erst, als Juergen einen Screenshot der
-         * Startseite des Adminbereichs geschickt hat.
+         * dazwischen — und dort standen nach 1.10.2 noch ueber 300 deutsche
+         * Texte. Gemerkt habe ich es erst, als Juergen Screenshots geschickt
+         * hat.
          *
-         * Angesehen wird, was gerendert wird: Text zwischen den Marken
-         * (T_INLINE_HTML) und die Attribute, die der Besucher liest.
+         * ZWEI Regeln, weil eine allein nicht reicht:
          *
-         * NICHT angesehen werden feste Zeichenketten im PHP-Code. Die sind
+         *  1. Text zwischen den Marken wird auf Deutsch geprueft — an
+         *     Umlauten, an Funktionswoertern und an deutscher Wortbildung
+         *     (-ung, -keit, -lich ...). Das ist eine Faustregel, kein Beweis:
+         *     "Speichern" allein faellt nicht auf. Dafuer stoert sie sich
+         *     nicht an Markennamen, Dateinamen und Code-Beispielen, die dort
+         *     zu Recht stehen.
+         *
+         *  2. Sichtbare Attribute (title, placeholder, aria-label, alt,
+         *     data-label) muessen IMMER aus PHP kommen. Dort steht nie Code
+         *     und nie eine Marke, sondern immer eine Beschriftung — deshalb
+         *     kann die Regel hier hart sein und faengt auch "Speichern".
+         *     Ausgenommen sind Werte ohne Leerzeichen: Kennungen, Pfade,
+         *     Adressen.
+         *
+         * Kommentare und console.* zaehlen nicht: die stehen nie auf der
+         * Seite. Deutsch ist dort richtig.
+         *
+         * NICHT geprueft werden feste Zeichenketten im PHP-Code. Die sind
          * mehrdeutig: dort steht neben einer Beschriftung auch der Systemtext
-         * fuer das Sprachmodell (der MUSS deutsch bleiben), ein Eintrag ins
-         * Moderationsprotokoll, eine Meldung fuers Fehlerprotokoll und ein
-         * SQL-Kommentar. Die auseinanderzuhalten ginge nur ueber eine Liste
-         * von Ausnahmen, die mit jeder Datei laenger wird — und eine Pruefung,
-         * die man staendig ausnimmt, prueft irgendwann nichts mehr.
-         *
-         * Kommentare zaehlen ebenfalls nicht: sie erklaeren den Code und
-         * stehen nie auf der Seite. Deutsch ist dort richtig.
+         * fuers Sprachmodell (der MUSS deutsch bleiben), ein Eintrag ins
+         * Moderationsprotokoll und ein SQL-Kommentar.
          */
-        $deutsch = '/[ÄÖÜäöüß]|\b(der|die|das|und|oder|nicht|noch|kein|keine|dein|deine|'
-                 . 'von|für|über|zurück|seit|beim|wurde|wird|sind|werden|Beitrag|Beiträge|'
-                 . 'Thema|Themen|Mitglied|Mitglieder|Datei|Dateien|Fehler|Warnung|Hinweise|'
-                 . 'Offen|Geprüft|Bearbeitet|Abgelehnt|Erfolg|erstellt|löschen|Löschen)\b/u';
-
         $funde  = [];
         $ordner = ['views', 'admin', 'pages', 'modules'];
 
         foreach ($ordner as $o) {
-            if (!is_dir($wurzel . '/' . $o)) {
-                continue;
-            }
+            if (!is_dir($wurzel . '/' . $o)) { continue; }
 
             $lauf = new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($wurzel . '/' . $o, FilesystemIterator::SKIP_DOTS)
@@ -394,42 +433,80 @@ return [
                 if (!str_ends_with($pfad, '.php')) { continue; }
                 if (preg_match('#/lang/[a-z]+\.php$#', $pfad)) { continue; }
 
-                foreach (token_get_all(file_get_contents($pfad)) as $marke) {
-                    if (!is_array($marke)) { continue; }
+                /*
+                 * PHP ueber den Tokenizer ausblenden, nicht per Regex: ein
+                 * ?> in einem Kommentar wuerde den Block sonst zu frueh
+                 * beenden, und der halbe Code stuende als "Text" da.
+                 */
+                $marken  = token_get_all(file_get_contents($pfad));
+                $stuecke = [];
 
-                    if ($marke[0] === T_INLINE_HTML) {
-                        // Kommentare im mitgelieferten JavaScript und CSS raus.
-                        $roh = preg_replace('#/\*.*?\*/#s', '', $marke[1]);
-                        $roh = preg_replace('#^\s*//.*$#m', '', $roh);
-
-                        /*
-                         * console.* ebenso: das ist die Entwicklerkonsole,
-                         * kein Text auf der Seite. Was dort steht, liest
-                         * jemand, der ohnehin im Quelltext sucht.
-                         */
-                        $roh = preg_replace('/\bconsole\.[a-z]+\([^;]*\);/i', '', $roh);
-
-                        // Was jemand liest: Text zwischen den Marken ...
-                        $sichtbar = preg_replace('/<[^>]*>/', ' ', $roh);
-
-                        // ... und die Attribute, die auf der Seite ankommen.
-                        if (preg_match_all('/\b(?:title|placeholder|aria-label|alt|data-label)="([^"<]*)"/', $roh, $a)) {
-                            $sichtbar .= ' ' . implode(' ', $a[1]);
-                        }
-
-                        $sichtbar = preg_replace('/&[a-z]+;|&#\d+;/i', ' ', $sichtbar);
-
-                        foreach (explode("\n", $sichtbar) as $zeile) {
-                            $zeile = trim(preg_replace('/\s+/', ' ', $zeile));
-
-                            if (mb_strlen($zeile) < 4 || !preg_match($deutsch, $zeile)) { continue; }
-
-                            $funde[] = basename($pfad) . ' — ' . mb_substr($zeile, 0, 60);
-                        }
-
+                foreach ($marken as $marke) {
+                    if (is_array($marke) && $marke[0] === T_INLINE_HTML) {
+                        $stuecke[] = $marke[1];
                         continue;
                     }
+                    $txt = is_array($marke) ? $marke[1] : $marke;
+                    $stuecke[] = "\x01" . str_repeat("\n", substr_count($txt, "\n"));
+                }
 
+                /*
+                 * ── Regel 3: feste Zeichenketten, aber NUR in views/ und
+                 * admin/. Dort steht ausschliesslich Anzeige — Beschriftungen
+                 * in Arrays, Meldungen nach einer Aktion. In den lib-Ordnern
+                 * der Module
+                 * dagegen steht der Systemtext fuers Sprachmodell, der
+                 * deutsch bleiben MUSS; deshalb bleiben diese Ordner aussen
+                 * vor. Gefunden hat das der Screenshot der Design-Seite:
+                 * die Schriftarten-Liste stand als PHP-Array da.
+                 */
+                if ($o === 'views' || $o === 'admin') {
+                    foreach ($marken as $marke) {
+                        if (!is_array($marke) || $marke[0] !== T_CONSTANT_ENCAPSED_STRING) { continue; }
+
+                        $wert = trim($marke[1], "\"'");
+
+                        if (mb_strlen($wert) < 4 || !sieht_deutsch_aus($wert)) { continue; }
+                        if (preg_match('#^[a-z0-9_./-]+$#', $wert)) { continue; }   // Pfade, Schluessel
+
+                        $funde[] = basename($pfad) . ':' . $marke[2] . ' — ' . mb_substr($wert, 0, 55);
+                    }
+                }
+
+                $roh = implode('', $stuecke);
+
+                $leeren = static fn(array $m): string => str_repeat("\n", substr_count($m[0], "\n"));
+                $roh = preg_replace_callback('#<(script|style)\b[^>]*>.*?</\1>#si', $leeren, $roh);
+                $roh = preg_replace_callback('#<!--.*?-->#s', $leeren, $roh);
+                $roh = preg_replace('#^\s*//.*$#m', '', $roh);
+                $roh = preg_replace('/\bconsole\.[a-z]+\([^;]*\);/i', '', $roh);
+
+                // ── Regel 2: Attribute muessen aus PHP kommen ──
+                if (preg_match_all('/\b(?:title|placeholder|aria-label|alt|data-label)="([^"]*)"/', $roh, $a)) {
+                    foreach ($a[1] as $wert) {
+                        $wert = trim(html_entity_decode($wert));
+
+                        if ($wert === '' || str_contains($wert, "\x01")) { continue; }  // kommt aus PHP
+                        if (!preg_match('/\s/', $wert)) { continue; }                   // Kennung, Pfad, Adresse
+                        if (!preg_match('/\p{L}{3}/u', $wert)) { continue; }
+
+                        $funde[] = basename($pfad) . ' [Attribut] ' . mb_substr($wert, 0, 55);
+                    }
+                }
+
+                // ── Regel 1: Text zwischen den Marken ──
+                $sichtbar = preg_replace_callback('/<[^>]*>/s',
+                    static fn(array $m): string => str_repeat("\n", substr_count($m[0], "\n")) . "\x02", $roh);
+
+                foreach (explode("\n", $sichtbar) as $zeile) {
+                    foreach (explode("\x02", $zeile) as $stueck) {
+                        $z = trim(preg_replace('/\s+/', ' ',
+                             html_entity_decode(str_replace("\x01", '', $stueck))));
+
+                        if (mb_strlen($z) < 4 || !sieht_deutsch_aus($z)) { continue; }
+
+                        $funde[] = basename($pfad) . ' — ' . mb_substr($z, 0, 55);
+                    }
                 }
             }
         }
