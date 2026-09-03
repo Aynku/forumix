@@ -8,6 +8,59 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.11.0 (2026-09-03)
+
+### Sprachen im Adminbereich
+
+Unter **Darstellung → Sprachen** lässt sich jeder Text im Forum ändern, ohne
+eine Datei anzufassen — und eine weitere Sprache anlegen.
+
+- **Texte ändern.** Suche über alle rund 2000 Texte, dazu zwei Filter:
+  *nur geänderte* und *noch nicht übersetzt*. Jede Änderung lässt sich
+  einzeln auf das Original zurücksetzen.
+- **Sprache anlegen.** Eine neue Sprache startet leer und fällt überall auf
+  Deutsch zurück — es steht also nie ein nackter Schlüssel da, während sie
+  entsteht. Mitglieder finden sie danach in ihren Einstellungen.
+- **Hoch- und runterladen.** Der Download liefert die vollständige Sprache
+  als JSON — das ist zugleich die Vorlage zum Übersetzen. Der Upload liest
+  dieselbe Datei wieder ein.
+- **Ab- und anschalten.** Eine Sprache, die niemand sehen soll, wird
+  abgeschaltet statt entfernt. Deutsch lässt sich nicht abschalten: es ist
+  die Grundlage, auf die jede andere zurückfällt.
+
+Die Dateien im Paket bleiben unangetastet. Sie sind das Original, gegen das
+sich jede Änderung vergleichen lässt — und wenn ein Update einen Text ändert,
+sagt das Forum Bescheid, statt die Anpassung stillschweigend veralten zu
+lassen. Dasselbe Verfahren wie beim Vorlagen-Editor.
+
+### Warum der Upload nur JSON annimmt
+
+Eine Sprachdatei des Forums ist ausführbares PHP; sie wird beim Laden
+ausgeführt. Ein Feld, in das sich eine solche Datei hochladen ließe, wäre
+kein Feld für Text, sondern eines für Code — mit den Rechten des Webservers.
+Angenommen werden deshalb ausschließlich Daten: ein JSON-Objekt aus Schlüssel
+und Text. Was das Forum nicht kennt, wird übersprungen und aufgezählt.
+
+### Ein Riegel, der eine weiße Seite verhindert
+
+Viele Texte tragen Platzhalter — „%s von %s freigeschaltet". Wer einen davon
+beim Umschreiben verliert, lässt die Seite beim nächsten Aufruf weiß bleiben,
+und zwar für den Besucher, nicht für den, der es geändert hat. Die Anzahl der
+Platzhalter wird deshalb beim Speichern gegen das Original geprüft, und zwar
+auf beiden Wegen: im Eingabefeld wie beim Upload.
+
+### Weitere Änderungen
+
+- Die Sprachauswahl in den Kontoeinstellungen war fest auf Deutsch und
+  Englisch eingestellt. Sie zeigt jetzt, was tatsächlich verfügbar ist.
+- Neue Prüfgruppe `sprachverwaltung` mit acht Prüfungen — unter anderem, dass
+  eine hochgeladene PHP-Datei nichts bewirkt und dass das Forum ohne
+  Datenbank weiter aus den Dateien liest.
+
+**Migration nötig:** v32 legt die Tabellen `text_overrides` und `sprachen` an.
+
+---
+
 ## v1.10.4 (2026-09-02)
 
 ### Der Rest des Adminbereichs

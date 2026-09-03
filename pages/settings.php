@@ -421,6 +421,15 @@ $newBackupCodes = $_SESSION['_2fa_new_backup_codes'] ?? [];
 unset($_SESSION['_2fa_new_backup_codes']);
 
 render('settings', [
+    /*
+     * Als Liste, nicht als Schluessel-Wert-Paar: die Vorlagen-Sprache kennt
+     * nur {% for x in liste %}, kein {% for k, v in ... %}.
+     */
+    'sprachen' => array_map(
+        static fn(string $code, string $name): array => ['code' => $code, 'name' => $name],
+        array_keys(available_languages()),
+        array_values(available_languages())
+    ),
     'title'            => t('settings'),
     'profile'          => $profile,
     'sessions'         => $sessions,

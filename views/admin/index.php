@@ -47,6 +47,7 @@
               'items' => [
                   'design'    => '🎨 ' . t('admin_nav_design'),
                   'templates' => '🖼️ ' . t('admin_nav_templates'),
+                  'sprachen'  => '🌍 ' . t('admin_nav_sprachen'),
               ],
           ],
           // System ist, wie die Installation EINGESTELLT ist. Wartung ist, was
@@ -2334,6 +2335,197 @@
       <?php endif; ?>
 
     <?php /* ════════════ DESIGN ════════════ */ ?>
+    <?php /* ════════════ Sprachen ════════════ */ ?>
+    <?php elseif ($action === 'sprachen'): ?>
+      <h1>🌍 <?= t('admin_nav_sprachen') ?></h1>
+
+      <?php if (empty($spracheCode)): ?>
+
+        <p style="color:var(--text-muted);font-size:14px;line-height:1.7;margin-bottom:16px">
+          <?= t('sprachen_einleitung') ?>
+        </p>
+
+        <div class="card" style="margin-bottom:18px">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th><?= t('sprachen_sprache') ?></th>
+                <th style="width:90px"><?= t('admin_code') ?></th>
+                <th style="width:120px"><?= t('sprachen_herkunft') ?></th>
+                <th style="width:110px"><?= t('sprachen_geaendert') ?></th>
+                <th style="width:280px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($sprachen as $code => $s): ?>
+                <tr>
+                  <td>
+                    <strong><?= e($s['name']) ?></strong>
+                    <?php if (empty($s['aktiv'])): ?>
+                      <span style="color:var(--text-faint);font-size:12px">· <?= t('adm_aus') ?></span>
+                    <?php endif; ?>
+                  </td>
+                  <td><code><?= e($code) ?></code></td>
+                  <td style="font-size:12px;color:var(--text-muted)">
+                    <?= $s['quelle'] === 'datei' ? t('sprachen_aus_paket') : t('sprachen_aus_datenbank') ?>
+                  </td>
+                  <td><?= (int) ($s['geaendert'] ?? 0) ?></td>
+                  <td style="text-align:right">
+                    <a href="?action=sprachen&edit=<?= e(urlencode($code)) ?>" class="btn btn-primary btn-sm">✏️ <?= t('sprachen_texte') ?></a>
+                    <a href="?action=sprache_herunterladen&code=<?= e(urlencode($code)) ?>" class="btn btn-ghost btn-sm">⬇️ JSON</a>
+
+                    <?php if ($code !== 'de'): ?>
+                      <form method="post" action="?action=sprache_umschalten" style="display:inline">
+                        <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                        <input type="hidden" name="code" value="<?= e($code) ?>">
+                        <button type="submit" class="btn btn-ghost btn-sm">
+                          <?= empty($s['aktiv']) ? '🟢 ' . e(t('adm_aktivieren')) : '⏸️ ' . e(t('adm_abschalten')) ?>
+                        </button>
+                      </form>
+                    <?php endif; ?>
+
+                    <?php if ($s['quelle'] === 'datenbank'): ?>
+                      <form method="post" action="?action=sprache_entfernen" style="display:inline"
+                            onsubmit="return confirm(<?= e(json_encode(t('sprachen_entfernen_frage', $s['name']), JSON_UNESCAPED_UNICODE)) ?>)">
+                        <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                        <input type="hidden" name="code" value="<?= e($code) ?>">
+                        <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                      </form>
+                    <?php endif; ?>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" style="padding:16px">
+          <h2 style="margin-top:0;font-size:15px">➕ <?= t('sprachen_neu_anlegen') ?></h2>
+          <p style="font-size:13px;color:var(--text-muted);line-height:1.7">
+            <?= t('sprachen_neu_erklaerung') ?>
+          </p>
+          <form method="post" action="?action=sprache_anlegen" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:10px">
+            <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+            <div>
+              <label style="display:block;font-size:12px;color:var(--text-muted)"><?= t('admin_code') ?></label>
+              <input type="text" name="code" required maxlength="8" pattern="[a-z]{2,8}"
+                     placeholder="<?= e(t('sprachen_code_beispiel')) ?>" style="width:110px">
+            </div>
+            <div style="flex:1;min-width:200px">
+              <label style="display:block;font-size:12px;color:var(--text-muted)"><?= t('sprachen_sprache') ?></label>
+              <input type="text" name="name" required maxlength="60"
+                     placeholder="<?= e(t('sprachen_name_beispiel')) ?>" style="width:100%">
+            </div>
+            <button type="submit" class="btn btn-primary"><?= t('sprachen_anlegen_knopf') ?></button>
+          </form>
+        </div>
+
+      <?php else: ?>
+
+        <?php /* ── Ein einzelne Sprache bearbeiten ── */ ?>
+        <p style="margin-bottom:14px">
+          <a href="?action=sprachen" class="btn btn-ghost btn-sm">← <?= t('sprachen_alle_sprachen') ?></a>
+        </p>
+
+        <h2 style="margin-top:0"><?= e($spracheName) ?> <code style="font-size:13px"><?= e($spracheCode) ?></code></h2>
+
+        <?php if (!empty($spracheVeraltet)): ?>
+          <div class="card" style="padding:14px 16px;margin-bottom:16px;border-left:3px solid var(--color-warning)">
+            <strong>⚠️ <?= t('sprachen_veraltet_titel', count($spracheVeraltet)) ?></strong>
+            <p style="font-size:13px;color:var(--text-muted);margin:6px 0 0;line-height:1.7">
+              <?= t('sprachen_veraltet_text') ?>
+            </p>
+            <ul style="margin:8px 0 0 18px;font-size:12px;color:var(--text-muted);line-height:1.8">
+              <?php foreach (array_slice($spracheVeraltet, 0, 8, true) as $k => $v): ?>
+                <li><code><?= e($k) ?></code></li>
+              <?php endforeach; ?>
+            </ul>
+          </div>
+        <?php endif; ?>
+
+        <div class="card" style="padding:14px 16px;margin-bottom:16px">
+          <form method="get" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+            <input type="hidden" name="action" value="sprachen">
+            <input type="hidden" name="edit" value="<?= e($spracheCode) ?>">
+            <div style="flex:1;min-width:200px">
+              <label style="display:block;font-size:12px;color:var(--text-muted)"><?= t('sprachen_suchen') ?></label>
+              <input type="text" name="q" value="<?= e($spracheSuche) ?>"
+                     placeholder="<?= e(t('sprachen_suche_platzhalter')) ?>" style="width:100%">
+            </div>
+            <div>
+              <label style="display:block;font-size:12px;color:var(--text-muted)"><?= t('sprachen_zeigen') ?></label>
+              <select name="f">
+                <option value="alle"      <?= $spracheFilter === 'alle'      ? 'selected' : '' ?>><?= t('sprachen_filter_alle') ?></option>
+                <option value="geaendert" <?= $spracheFilter === 'geaendert' ? 'selected' : '' ?>><?= t('sprachen_filter_geaendert') ?></option>
+                <option value="fehlt"     <?= $spracheFilter === 'fehlt'     ? 'selected' : '' ?>><?= t('sprachen_filter_fehlt') ?></option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary"><?= t('search') ?></button>
+          </form>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:8px">
+            <?= t('sprachen_treffer', $spracheZahl, count($spracheZeilen)) ?>
+          </div>
+        </div>
+
+        <?php foreach ($spracheZeilen as $schluessel => $z): ?>
+          <div class="card" style="padding:12px 14px;margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+              <code style="font-size:12px;color:var(--text-muted)"><?= e($schluessel) ?></code>
+              <?php if ($z['eigen'] !== null): ?>
+                <span style="font-size:11px;color:var(--color-warning)"><?= t('sprachen_geaendert') ?></span>
+              <?php endif; ?>
+            </div>
+
+            <?php if ($z['eigen'] !== null): ?>
+              <div style="font-size:12px;color:var(--text-faint);margin:4px 0 6px">
+                <?= t('sprachen_original') ?> <?= e($z['original']) ?>
+              </div>
+            <?php endif; ?>
+
+            <form method="post" action="?action=sprache_text_speichern"
+                  style="display:flex;gap:8px;align-items:flex-start;margin-top:6px">
+              <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+              <input type="hidden" name="sprache" value="<?= e($spracheCode) ?>">
+              <input type="hidden" name="schluessel" value="<?= e($schluessel) ?>">
+              <input type="hidden" name="q" value="<?= e($spracheSuche) ?>">
+              <textarea name="text" rows="<?= mb_strlen((string) ($z['eigen'] ?? $z['original'])) > 90 ? 3 : 1 ?>"
+                        style="flex:1;font-size:13px;line-height:1.5"><?= e((string) ($z['eigen'] ?? $z['original'])) ?></textarea>
+              <button type="submit" class="btn btn-primary btn-sm">💾</button>
+            </form>
+
+            <?php if ($z['eigen'] !== null): ?>
+              <form method="post" action="?action=sprache_text_zuruecksetzen" style="margin-top:6px">
+                <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+                <input type="hidden" name="sprache" value="<?= e($spracheCode) ?>">
+                <input type="hidden" name="schluessel" value="<?= e($schluessel) ?>">
+                <input type="hidden" name="q" value="<?= e($spracheSuche) ?>">
+                <button type="submit" class="btn btn-ghost btn-sm" style="font-size:11px">↩︎ <?= t('sprachen_zuruecksetzen') ?></button>
+              </form>
+            <?php endif; ?>
+          </div>
+        <?php endforeach; ?>
+
+        <?php if (empty($spracheZeilen)): ?>
+          <p style="color:var(--text-faint);font-style:italic"><?= t('sprachen_nichts_gefunden') ?></p>
+        <?php endif; ?>
+
+        <div class="card" style="padding:16px;margin-top:20px">
+          <h2 style="margin-top:0;font-size:15px">⬆️ <?= t('sprachen_hochladen') ?></h2>
+          <p style="font-size:13px;color:var(--text-muted);line-height:1.7">
+            <?= t('sprachen_hochladen_erklaerung') ?>
+          </p>
+          <form method="post" action="?action=sprache_hochladen" enctype="multipart/form-data"
+                style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px">
+            <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+            <input type="hidden" name="sprache" value="<?= e($spracheCode) ?>">
+            <input type="file" name="datei" accept=".json,application/json" required>
+            <button type="submit" class="btn btn-primary"><?= t('sprachen_einlesen') ?></button>
+            <a href="?action=sprache_herunterladen&code=<?= e(urlencode($spracheCode)) ?>" class="btn btn-ghost">⬇️ <?= t('sprachen_vorlage_holen') ?></a>
+          </form>
+        </div>
+
+      <?php endif; ?>
+
     <?php elseif ($action === 'design'): ?>
       <h2><?= t('admin_design') ?></h2>
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">

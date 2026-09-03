@@ -81,6 +81,11 @@ require_once __DIR__ . '/lib/captcha.php';
 require_once __DIR__ . '/lib/ranks.php';
 require_once __DIR__ . '/lib/auth.php';
 require_once __DIR__ . '/lib/remember.php';
+/*
+ * Vor lang.php: load_language() legt die im Adminbereich geaenderten Texte
+ * als letzte Schicht obendrauf und fragt dafuer text_overrides() ab.
+ */
+require_once __DIR__ . '/lib/sprachen.php';
 require_once __DIR__ . '/lib/lang.php';
 require_once __DIR__ . '/lib/notifications.php';
 require_once __DIR__ . '/lib/attachments.php';
@@ -157,7 +162,7 @@ if (!defined('FORUM_DEBUG') || FORUM_DEBUG !== true) {
 // die Anzeige im Footer und im Cache-Busting immer aktuell, ohne dass
 // manuell SQL gefahren werden muss.
 //
-const FORUM_VERSION_CODE = '1.10.4';
+const FORUM_VERSION_CODE = '1.11.0';
 
 // Heimat der Software. Das Forumix-Zeichen im Fussbereich verweist hierher —
 // dort liegt auch der Quelltext, womit AGPLv3 § 13 erfuellt ist. Wer den Code

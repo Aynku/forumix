@@ -460,9 +460,13 @@
       <label>{{ t('settings_sprache') }}</label>
       {% set currentLang = profile.language %}
       {% if not currentLang %}{% set currentLang = 'de' %}{% endif %}
+      {# Die Liste stand hier fest als zwei Zeilen. Seit sich Sprachen im
+         Adminbereich anlegen lassen, kommt sie aus available_languages() —
+         sonst nimmt das Konto eine neue Sprache nie an. #}
       <select name="language">
-        <option value="de" {% if currentLang == 'de' %}selected{% endif %}>Deutsch</option>
-        <option value="en" {% if currentLang == 'en' %}selected{% endif %}>English</option>
+        {% for s in sprachen %}
+          <option value="{{ s.code }}" {% if currentLang == s.code %}selected{% endif %}>{{ s.name }}</option>
+        {% endfor %}
       </select>
       <div class="form-hint">{{ t('settings_sprache_hinweis') }}</div>
     </div>

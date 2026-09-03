@@ -118,6 +118,7 @@ function migration_title(string $version): string {
         'v29' => t('mig_v29'),
         'v30' => t('mig_v30'),
         'v31' => t('mig_v31'),
+        'v32' => t('mig_v32'),
     ];
     return $titles[$version] ?? $version;
 }

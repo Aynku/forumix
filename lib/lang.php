@@ -33,7 +33,29 @@ function load_language(string $code = 'de'): array {
     }
 
     foreach (array_unique(['de', $code]) as $stufe) {
-        $texte = array_merge($texte, (array) require __DIR__ . '/../lang/' . $stufe . '.php');
+        $pfad = __DIR__ . '/../lang/' . $stufe . '.php';
+
+        // Eine Sprache kann es auch ohne Datei geben — angelegt im
+        // Adminbereich, Texte nur in der Datenbank. Dann faellt diese Stufe
+        // aus, und es bleibt bei Deutsch als Grundlage.
+        if (is_file($pfad)) {
+            $texte = array_merge($texte, (array) require $pfad);
+        }
+    }
+
+    /*
+     * Zuletzt, und deshalb staerker als alles davor: was der Betreiber im
+     * Adminbereich geaendert hat. Die Dateien im Paket bleiben unangetastet
+     * — ein Update ueberschreibt sie, ohne seine Anpassungen zu verlieren.
+     *
+     * Vorsichtig geholt: lib/lang.php wird auch dort geladen, wo es noch
+     * keine Datenbank gibt (Installer) oder keine mehr (Fehlerseite bei
+     * ausgefallener Datenbank). Fehlt sie, bleibt es bei den Dateien.
+     */
+    if (function_exists('text_overrides')) {
+        foreach (array_unique(['de', $code]) as $stufe) {
+            $texte = array_merge($texte, text_overrides($stufe));
+        }
     }
 
     return $texte;
@@ -168,6 +190,28 @@ function zahl(int|float $wert, int $nachkomma = 0): string {
     return number_format($wert, $nachkomma, t('zahl_dezimal'), t('zahl_tausender'));
 }
 
+/**
+ * Die Sprachen, unter denen ein Mitglied waehlen kann.
+ *
+ * Frueher standen hier zwei fest eingetragene Eintraege. Seit sich Sprachen
+ * im Adminbereich anlegen lassen, kommen sie aus sprachen_alle() — Dateien
+ * im Paket plus das, was in der Datenbank steht. Abgeschaltete bleiben weg.
+ *
+ * Ohne lib/sprachen.php (Installer, Fehlerseite) bleibt es bei den beiden,
+ * die als Datei mitgeliefert werden.
+ */
 function available_languages(): array {
-    return ['de' => 'Deutsch', 'en' => 'English'];
+    if (!function_exists('sprachen_alle')) {
+        return ['de' => 'Deutsch', 'en' => 'English'];
+    }
+
+    $aus = [];
+
+    foreach (sprachen_alle() as $code => $s) {
+        if (!empty($s['aktiv'])) {
+            $aus[$code] = $s['name'];
+        }
+    }
+
+    return $aus ?: ['de' => 'Deutsch'];
 }

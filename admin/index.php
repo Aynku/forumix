@@ -1047,6 +1047,177 @@ if ($action === 'ack_template_update' && $_SERVER['REQUEST_METHOD'] === 'POST') 
     redirect(FORUM_URL . '/admin/?action=templates&edit=' . urlencode($name));
 }
 
+/* ════════════ Sprachen (Darstellung → Sprachen) ════════════
+ *
+ * Geschrieben wird ausschliesslich in die Datenbank. Die Dateien unter
+ * lang/ bleiben unangetastet — sie sind das Original, gegen das sich jede
+ * Aenderung vergleichen laesst, und sie sind ausfuehrbares PHP.
+ */
+
+if ($action === 'sprache_text_speichern' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
+
+    $sprache    = preg_replace('/[^a-z]/', '', (string) ($_POST['sprache'] ?? ''));
+    $schluessel = trim((string) ($_POST['schluessel'] ?? ''));
+    $text       = (string) ($_POST['text'] ?? '');
+    $zurueck    = FORUM_URL . '/admin/?action=sprachen&edit=' . urlencode($sprache)
+                . '&q=' . urlencode((string) ($_POST['q'] ?? ''));
+
+    $grund = text_pruefen($sprache, $schluessel, $text);
+
+    if ($grund !== null) {
+        flash($grund, 'error');
+    } elseif (text_override_speichern($sprache, $schluessel, $text, $cu ? (int) $cu['user_id'] : null)) {
+        flash(t('sprachen_text_gespeichert'), 'success');
+    } else {
+        flash(t('adm_speichern_fehlgeschlagen'), 'error');
+    }
+
+    redirect($zurueck);
+}
+
+if ($action === 'sprache_text_zuruecksetzen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
+
+    $sprache    = preg_replace('/[^a-z]/', '', (string) ($_POST['sprache'] ?? ''));
+    $schluessel = trim((string) ($_POST['schluessel'] ?? ''));
+
+    if (text_override_loeschen($sprache, $schluessel)) {
+        flash(t('sprachen_text_zurueckgesetzt'), 'success');
+    } else {
+        flash(t('adm_zuruecksetzen_fehlgeschlagen'), 'error');
+    }
+
+    redirect(FORUM_URL . '/admin/?action=sprachen&edit=' . urlencode($sprache)
+           . '&q=' . urlencode((string) ($_POST['q'] ?? '')));
+}
+
+if ($action === 'sprache_anlegen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
+
+    $grund = sprache_anlegen((string) ($_POST['code'] ?? ''), (string) ($_POST['name'] ?? ''));
+
+    if ($grund === null) {
+        flash(t('sprachen_angelegt'), 'success');
+    } else {
+        flash($grund, 'error');
+    }
+
+    redirect(FORUM_URL . '/admin/?action=sprachen');
+}
+
+if ($action === 'sprache_entfernen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
+
+    $grund = sprache_entfernen(preg_replace('/[^a-z]/', '', (string) ($_POST['code'] ?? '')));
+
+    if ($grund === null) {
+        flash(t('sprachen_entfernt'), 'success');
+    } else {
+        flash($grund, 'error');
+    }
+
+    redirect(FORUM_URL . '/admin/?action=sprachen');
+}
+
+if ($action === 'sprache_umschalten' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
+
+    $code = preg_replace('/[^a-z]/', '', (string) ($_POST['code'] ?? ''));
+
+    /*
+     * Deutsch bleibt an. Es ist die Grundlage, auf die jede andere Sprache
+     * zurueckfaellt — abgeschaltet stuenden ueberall nackte Schluessel.
+     */
+    if ($code === 'de') {
+        flash(t('sprachen_fehler_deutsch_aus'), 'error');
+        redirect(FORUM_URL . '/admin/?action=sprachen');
+    }
+
+    try {
+        $da = db_fetch('SELECT code FROM sprachen WHERE code = ?', [$code]);
+
+        if ($da) {
+            db_execute('UPDATE sprachen SET aktiv = 1 - aktiv WHERE code = ?', [$code]);
+        } else {
+            // Eine Sprache aus dem Paket bekommt beim ersten Abschalten
+            // ihren Eintrag in der Tabelle.
+            $name = sprachen_alle()[$code]['name'] ?? strtoupper($code);
+            db_execute('INSERT INTO sprachen (code, name, aktiv) VALUES (?, ?, 0)', [$code, $name]);
+        }
+
+        flash(t('sprachen_umgeschaltet'), 'success');
+    } catch (Throwable $e) {
+        flash(t('adm_aktion_fehlgeschlagen'), 'error');
+    }
+
+    redirect(FORUM_URL . '/admin/?action=sprachen');
+}
+
+if ($action === 'sprache_hochladen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
+
+    $sprache = preg_replace('/[^a-z]/', '', (string) ($_POST['sprache'] ?? ''));
+    $datei   = $_FILES['datei'] ?? null;
+
+    /*
+     * is_uploaded_file(): sonst liesse sich ueber einen untergeschobenen
+     * Pfad eine beliebige Datei vom Server einlesen.
+     */
+    if (!$datei || ($datei['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK
+        || !is_uploaded_file($datei['tmp_name'])) {
+        flash(t('sprachen_fehler_kein_upload'), 'error');
+        redirect(FORUM_URL . '/admin/?action=sprachen&edit=' . urlencode($sprache));
+    }
+
+    $ergebnis = sprachdatei_lesen((string) file_get_contents($datei['tmp_name']), $sprache);
+    $gesetzt  = 0;
+
+    foreach ($ergebnis['texte'] as $schluessel => $wert) {
+        if (text_override_speichern($sprache, $schluessel, $wert, $cu ? (int) $cu['user_id'] : null)) {
+            $gesetzt++;
+        }
+    }
+
+    if ($gesetzt > 0) {
+        flash(tn('sprachen_uebernommen', $gesetzt), 'success');
+    }
+
+    if ($ergebnis['fehler'] !== []) {
+        // Nur die ersten paar: eine Meldung mit 500 Zeilen liest niemand.
+        flash(t('sprachen_uebersprungen', count($ergebnis['fehler']))
+            . ' ' . implode(' · ', array_slice($ergebnis['fehler'], 0, 5)), 'error');
+    } elseif ($gesetzt === 0) {
+        flash(t('sprachen_nichts_uebernommen'), 'error');
+    }
+
+    redirect(FORUM_URL . '/admin/?action=sprachen&edit=' . urlencode($sprache));
+}
+
+if ($action === 'sprache_herunterladen') {
+    $sprache = preg_replace('/[^a-z]/', '', (string) ($_GET['code'] ?? ''));
+
+    if (!isset(sprachen_alle()[$sprache])) {
+        error_page(404, t('adm_nicht_gefunden'), t('sprachen_fehler_unbekannte_sprache'));
+    }
+
+    $dateien = texte_aus_dateien($sprache);
+    $eigene  = text_overrides($sprache);
+    $aus     = [];
+
+    foreach ($dateien as $schluessel => $wert) {
+        if (is_array($wert)) continue;           // Mehrzahl-Eintraege bleiben aussen vor
+        $aus[$schluessel] = $eigene[$schluessel] ?? (string) $wert;
+    }
+
+    ksort($aus);
+
+    header('Content-Type: application/json; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $sprache . '.json"');
+    echo json_encode($aus, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
 if ($action === 'approve_user_action' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf($_POST['csrf'] ?? '')) error_page(400, t('adm_sicherheits_token_ungueltig'), t('adm_bitte_lade_die_seite'));
     $uid = (int) ($_POST['user_id'] ?? 0);
@@ -2165,6 +2336,74 @@ switch ($action) {
             'forum_custom_css'   => (string) get_setting('forum_custom_css'),
             'source_url'         => (string) get_setting('source_url', ''),
         ];
+        break;
+
+    case 'sprachen':
+        $vars['sprachen'] = sprachen_alle();
+        $bearbeitet = preg_replace('/[^a-z]/', '', (string) ($_GET['edit'] ?? ''));
+
+        if ($bearbeitet !== '' && isset($vars['sprachen'][$bearbeitet])) {
+            $suche   = trim((string) ($_GET['q'] ?? ''));
+            $filter  = (string) ($_GET['f'] ?? 'alle');
+            $dateien = texte_aus_dateien($bearbeitet);
+            $eigene  = text_overrides($bearbeitet);
+            $deutsch = texte_aus_dateien('de');
+
+            $zeilen = [];
+
+            foreach ($dateien as $schluessel => $wert) {
+                // Mehrzahl-Eintraege sind eine Liste aus zwei Formen. Die
+                // braeuchten zwei Felder; bis dahin bleiben sie draussen.
+                if (is_array($wert)) continue;
+
+                $eigen = $eigene[$schluessel] ?? null;
+
+                if ($filter === 'geaendert' && $eigen === null) continue;
+
+                if ($filter === 'fehlt') {
+                    // "Fehlt" heisst: der Text ist noch der deutsche, also
+                    // bisher gar nicht uebersetzt.
+                    $istDeutsch = isset($deutsch[$schluessel])
+                               && !is_array($deutsch[$schluessel])
+                               && (string) $deutsch[$schluessel] === (string) ($eigen ?? $wert);
+
+                    if ($bearbeitet === 'de' || !$istDeutsch) continue;
+                }
+
+                if ($suche !== ''
+                    && stripos($schluessel, $suche) === false
+                    && stripos((string) $wert, $suche) === false
+                    && stripos((string) ($eigen ?? ''), $suche) === false) {
+                    continue;
+                }
+
+                $zeilen[$schluessel] = [
+                    'original' => (string) $wert,
+                    'eigen'    => $eigen,
+                ];
+            }
+
+            ksort($zeilen);
+
+            $vars['spracheCode']   = $bearbeitet;
+            $vars['spracheName']   = $vars['sprachen'][$bearbeitet]['name'];
+            $vars['spracheSuche']  = $suche;
+            $vars['spracheFilter'] = $filter;
+            $vars['spracheZahl']   = count($zeilen);
+            // Nur ein Ausschnitt: 2000 Zeilen auf einmal macht die Seite
+            // unbenutzbar und den Browser langsam.
+            $vars['spracheZeilen']   = array_slice($zeilen, 0, 100, true);
+            $vars['spracheVeraltet'] = text_overrides_veraltet($bearbeitet);
+        }
+
+        foreach ($vars['sprachen'] as $code => $daten) {
+            try {
+                $vars['sprachen'][$code]['geaendert'] =
+                    db_count('SELECT COUNT(*) FROM text_overrides WHERE sprache = ?', [$code]);
+            } catch (Throwable $e) {
+                $vars['sprachen'][$code]['geaendert'] = 0;
+            }
+        }
         break;
 
     case 'smileys':
