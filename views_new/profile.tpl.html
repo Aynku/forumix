@@ -213,7 +213,7 @@
 </div>
 
 {% if isMod and ipHistory %}
-<details class="mod-ip-history" {% if ipHistory|length <= 10 %}open{% endif %}>
+<details class="mod-ip-history" {% if count(ipHistory) <= 10 %}open{% endif %}>
   <summary class="mod-ip-summary">
     <span>{{ t('profile_ip_verlauf') }} <span style="color:var(--text-faint);font-weight:normal">{{ t('profile_ip_nur_moderatoren', count(ipHistory)) }}</span></span>
     <span class="mod-ip-summary-chevron">▼</span>
