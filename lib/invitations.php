@@ -66,7 +66,7 @@ function invitation_create(int $adminId, ?string $email = null, ?string $note = 
             );
         } catch (Exception $e) {}
 
-        return db_fetch('SELECT * FROM invitations WHERE code = ?', [$code]);
+        return db_fetch('SELECT * FROM invitations WHERE code = ?', [$code]) ?: null;
     } catch (Exception $e) {
         return null;
     }

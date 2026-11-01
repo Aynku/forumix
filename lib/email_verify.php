@@ -21,7 +21,7 @@ function verify_email_token(string $token): ?array {
              JOIN users u ON u.user_id = ev.user_id
              WHERE ev.token = ? AND ev.expires_at > NOW()',
             [$token]
-        );
+        ) ?: null;   // false (keine Zeile) passt nicht zu ?array
     } catch (Exception $e) { return null; }
 }
 

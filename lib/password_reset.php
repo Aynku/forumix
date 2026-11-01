@@ -18,12 +18,14 @@ function create_password_reset(int $userId): ?string {
 
 function verify_reset_token(string $token): ?array {
     try {
+        // db_fetch() liefert false, wenn es keine Zeile gibt — fuer ?array
+        // muss daraus null werden, sonst bricht ein alter Link mit 500 ab.
         return db_fetch(
             'SELECT pr.*, u.username, u.email FROM password_resets pr
              JOIN users u ON u.user_id = pr.user_id
              WHERE pr.token = ? AND pr.used = 0 AND pr.expires_at > NOW()',
             [$token]
-        );
+        ) ?: null;
     } catch (Exception $e) { return null; }
 }
 
