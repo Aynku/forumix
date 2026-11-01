@@ -279,10 +279,6 @@ $forumName = forum_name();
             <a href="<?= e(FORUM_URL) ?>/achievements.php" class="<?= $script === 'achievements' ? 'active' : '' ?>">
               <?= t('achievements') ?>
             </a>
-          <?php else: ?>
-            <a href="<?= e(FORUM_URL) ?>/search.php?recent=1" class="<?= $script === 'search' ? 'active' : '' ?>">
-              <?= t('recent') ?>
-            </a>
           <?php endif; ?>
           <?php /* Ohne Suchfeld im Kopfband muss die Suche hier stehen —
                    sonst waere sie im einzeiligen Kopf nur noch ueber die
