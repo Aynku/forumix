@@ -8,6 +8,28 @@ Versionierung nach [SemVer](https://semver.org): `MAJOR.MINOR.PATCH`
 
 ---
 
+## v1.11.1 (2026-11-01)
+
+### Fehlerseiten bei alten Links und im Profil behoben
+
+Diese Fassung behebt zwei Stellen, an denen statt einer Meldung eine
+Fehlerseite (HTTP 500) erschien, und räumt das Menü für Gäste auf.
+
+- **Abgelaufene Links aus E-Mails.** Ein abgelaufener, bereits benutzter oder
+  unvollständig kopierter Link zum Zurücksetzen des Passworts oder zum
+  Bestätigen der E-Mail-Adresse endete mit einer Fehlerseite. Jetzt erscheint
+  der Hinweis „Link ungültig oder abgelaufen“.
+- **Profile mit IP-Verlauf.** Administration und Moderation sahen beim Öffnen
+  eines Profils mit gespeichertem IP-Verlauf eine Fehlerseite. Das Profil
+  öffnet sich wieder, der Verlauf steht wie vorgesehen darunter.
+- **Menüpunkt „Aktuelles“ für Gäste entfernt.** Er führte in ein leeres
+  Suchformular statt zu den neuesten Themen. Die neuesten Themen stehen
+  weiterhin auf der Startseite.
+
+Keine Migration nötig.
+
+---
+
 ## v1.11.0 (2026-09-03)
 
 ### Sprachen im Adminbereich
